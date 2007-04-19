@@ -1,0 +1,61 @@
+#
+# Copyright (C) 2007 Mateusz Pusz
+#
+# This file is part of freettcn (Free TTCN) library.
+
+# This library is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation; either version 2.1 of the License, or
+# (at your option) any later version.
+
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+
+# You should have received a copy of the GNU Lesser General Public License
+# along with this library; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+include $(TOP_DIR)/Makefile.defines
+
+
+# files
+CPP_FILES = exception.cpp \
+	ttcn_types.cpp ttcn_values.cpp \
+	te.cpp module.cpp \
+	tci_value.cpp tci_tm_te.cpp tci_ch_te.cpp \
+	tri_sa_te.cpp
+CPP_O_FILES := $(patsubst %.cpp,%.o,$(CPP_FILES))
+O_FILES = $(addprefix $(BIN_DIR)/, $(patsubst %.cpp,%.o,$(CPP_FILES)))
+DEPEND_FILES = $(patsubst %.cpp,%.d,$(CPP_FILES))
+
+H_FILES_PATH = include
+LIB_H_FILES_PATH = $(H_FILES_PATH)/$(LIB_NAME)
+INCLUDE_DIRS = -I$(H_FILES_PATH)
+
+
+# targets
+.PHONY: all tags clobber clean
+
+all: $(BIN_DIR)/$(LIB_FILE_NAME).so.$(VERSION)
+
+tags:
+	$(call cmd,cmd_tags)
+
+clobber: clean
+	$(Q)$(RM) -f *~ $(H_FILES_PATH)/*~ $(LIB_H_FILES_PATH)/*~ $(DEPEND_FILES)
+
+clean:
+	$(Q)$(RM) -f $(O_FILES) $(BIN_DIR)/$(LIB_FILE_NAME).so $(BIN_DIR)/$(LIB_FILE_NAME).so.$(VERSION_1) $(BIN_DIR)/$(LIB_FILE_NAME).so.$(VERSION)
+
+
+# rules
+$(BIN_DIR)/$(LIB_FILE_NAME).so.$(VERSION): $(O_FILES)
+	$(call cmd,cmd_link)
+
+$(BIN_DIR)/%.o: %.cpp
+	$(call cmd,cmd_cc_d_o)
+
+# include depends files
+-include $(CPP_FILES:.cpp=.d)

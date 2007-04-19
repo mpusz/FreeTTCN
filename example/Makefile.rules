@@ -1,0 +1,56 @@
+#
+# Copyright (C) 2007 Mateusz Pusz
+#
+# This file is part of freettcn (Free TTCN) usage example.
+
+# This example is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+
+# This example is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this example; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+
+# paths
+LIB_PATH = $(BIN_DIR)/lib$(DIR_NAME).a
+
+# defines
+INCLUDE_DIRS = -I$(LIB_DIR)/src/include -Iinclude
+
+# macros
+O_FILES = $(addprefix $(BIN_DIR)/, $(patsubst %.cpp,%.o,$(CPP_FILES)))
+DEPEND_FILES = $(patsubst %.cpp,%.d,$(CPP_FILES))
+LIB_PARTS = $(foreach file, $(CPP_FILES), $(LIB_PATH)($(patsubst %.cpp,%.o,$(file))))
+
+
+# targets
+.PHONY: lib tags clobber clean
+
+lib: $(LIB_PATH)
+
+tags:
+	$(TAGS) --append --output=$(TAG_DIR)/TAGS *.cpp
+
+clobber: clean
+	$(Q)$(RM) -f *~ include/*~
+
+clean:
+	$(Q)$(RM) -f $(LIB_PATH) $(O_FILES) $(DEPEND_FILES)
+
+
+# rules
+$(LIB_PATH): $(LIB_PARTS)
+
+(%.o): %.cpp
+	$(call cmd,cmd_cc_d_a)
+
+
+# include depends files
+-include $(CPP_FILES:.cpp=.d)

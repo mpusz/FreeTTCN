@@ -1,0 +1,103 @@
+#
+# Copyright (C) 2007 Mateusz Pusz
+#
+# This file is part of freettcn (Free TTCN) usage example.
+
+# This example is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+
+# This example is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this example; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+include Makefile.defines
+
+PROG_NAME = ttcn_example
+LIB_NAME = freettcn
+MODULES_FILES = ip.ttcn
+
+# directories
+MODULES_DIR = modules
+PA_DIR = pa
+SA_DIR = sa
+CD_DIR = cd
+CH_DIR = ch
+TM_DIR = tm
+TL_DIR = tl
+MAIN_DIR = main
+SRC_DIRS = $(MAIN_DIR) $(TM_DIR) $(SA_DIR) $(CD_DIR) $(CH_DIR) $(TL_DIR)
+DOC_DIR = doc
+DIR_NAME = $(notdir $(PWD))
+
+# modules
+MODULES_O_FILES = $(addprefix $(BIN_DIR)/, $(patsubst %.ttcn,%.o,$(MODULES_FILES)))
+
+# libraries
+INCLUDE_LIBS = $(addprefix -l, $(SRC_DIRS))
+
+
+# targets
+.PHONY: all modules pa sa cd ch tm tl main tags doc clobber dist clean
+
+all: $(BIN_DIR)/$(PROG_NAME)
+
+$(SRC_DIRS):
+	@$(ECHO)
+	@$(ECHO) "Building '$@'..."
+	@$(MAKE) -C $@ TOP_DIR=$(TOP_DIR)/.. DIR_NAME=$@ all
+
+modules:
+	@for mod in $(MODULES_FILES); do \
+	  $(ECHO); \
+	  $(ECHO) "Building module '$$mod'..."; \
+	  $(MAKE) -C $(MODULES_DIR) TOP_DIR=$(TOP_DIR)/.. MODULE=$$mod all; \
+	done
+
+tags:
+	@for dir in $(SRC_DIRS); do \
+	  $(MAKE) -C $$dir TOP_DIR=$(TOP_DIR)/.. DIR_NAME=$$dir TAG_DIR=$(PWD) tags; \
+	done
+	@for mod in $(MODULES_FILES); do \
+	  $(MAKE) -C $(MODULES_DIR) TOP_DIR=$(TOP_DIR)/.. MODULE=$$mod tags; \
+	done
+
+doc:
+	$(DOXYGEN) $(DOC_DIR)/Doxyfile
+
+clobber:
+	@for dir in $(SRC_DIRS); do \
+	  $(MAKE) -C $$dir TOP_DIR=$(TOP_DIR)/.. DIR_NAME=$$dir clobber; \
+	done
+	@for mod in $(MODULES_FILES); do \
+	  $(MAKE) -C $(MODULES_DIR) TOP_DIR=$(TOP_DIR)/.. MODULE=$$mod clobber; \
+	done
+	@$(RM) -f $(BIN_DIR)/$(PROG_NAME)
+	@$(RM) -f *~ TAGS BROWSE
+	@$(RM) -f $(DOC_DIR)/tags.xml $(DOC_DIR)/html
+
+dist: clobber
+	@$(TAR) -cvzf $(DIR_NAME).tar.gz ../$(DIR_NAME)
+
+clean:
+	@for dir in $(SRC_DIRS); do \
+	  $(MAKE) -C $$dir TOP_DIR=$(TOP_DIR)/.. DIR_NAME=$$dir clean; \
+	done
+	@for mod in $(MODULES_FILES); do \
+	  $(MAKE) -C $(MODULES_DIR) TOP_DIR=$(TOP_DIR)/.. MODULE=$$mod clean; \
+	done
+	@$(RM) -f $(BIN_DIR)/$(PROG_NAME)
+
+
+# rules
+$(BIN_DIR)/$(PROG_NAME): $(SRC_DIRS) modules
+	@$(ECHO)
+	@$(ECHO) "Linking '$(PROG_NAME)'..."
+	$(CPP) $(MODULES_O_FILES) -L$(LIB_DIR)/bin -l$(LIB_NAME) -L$(BIN_DIR) $(INCLUDE_LIBS) -o $(BIN_DIR)/$(PROG_NAME)
+# DO NOT DELETE

@@ -1,0 +1,115 @@
+#
+# Copyright (C) 2007 Mateusz Pusz
+#
+# This file is part of freettcn (Free TTCN) library.
+
+# This library is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation; either version 2.1 of the License, or
+# (at your option) any later version.
+
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+
+# You should have received a copy of the GNU Lesser General Public License
+# along with this library; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+
+# library name
+LIB_NAME = freettcn
+
+# software version
+VERSION_1 = 0
+VERSION_2 = 0
+VERSION_3 = 1
+VERSION = $(VERSION_1).$(VERSION_2).$(VERSION_3)
+
+LIB_FILE_NAME = lib$(LIB_NAME)
+
+LIB_FULL_NAME = $(LIB_FILE_NAME).so.$(VERSION)
+
+
+#
+# tools
+#
+MAKE = make
+CPP = g++ -g -Wall
+CP = cp
+RM = rm
+LN = ln
+SED = sed
+TAGS = etags #--declarations --members
+LDCONFIG = ldconfig
+DOXYGEN = doxygen
+
+
+#
+# directories
+#
+ifndef $(TOP_DIR)
+TOP_DIR = .
+endif
+SRC_DIR = $(TOP_DIR)/src
+BIN_DIR = $(TOP_DIR)/bin
+DOC_DIR = $(TOP_DIR)/doc
+#DIR_NAME = `pwd | sed 's,.*/,,'`
+
+#BIN_DIR_PATH = $(TOP_DIR)/$(BIN_DIR)
+
+
+#
+# varaibles
+#
+MAKEFLAGS += -rR --no-print-directory
+
+ifeq ($(BUILD_VERBOSE),1)
+  quiet =
+  Q =
+else
+  quiet=quiet_
+  Q = @
+endif
+
+# If the user is running make -s (silent mode), suppress echoing of commands
+ifneq ($(findstring s,$(MAKEFLAGS)),)
+  quiet=silent_
+endif
+
+
+#
+# Command template
+#
+# If quiet is set, only print short version of command
+#
+cmd = @$(if $($(quiet)$(1)),printf "$($(quiet)$(1))\n" &&) $($(1))
+
+
+
+#
+# Commands
+#
+
+# start library compilation
+quiet_cmd_make_lib = \nBUILD_LIB  $(BIN_DIR)/$(LIB_FULL_NAME)
+      cmd_make_lib = $(MAKE) -C $(SRC_DIR) TOP_DIR=$(TOP_DIR)/.. all
+
+# compile source file, create depend file *.d
+quiet_cmd_cc_d_o = CC_D_O     $<
+      cmd_cc_d_o = $(CPP) -MMD -MF $*.d_ -c -fPIC $(INCLUDE_DIRS) $< -o $@; \
+                   $(CP) $*.d_ $*.d; \
+	           $(SED) -e 's/\#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' -e '/^$$/ d' -e 's/$$/ :/' < $*.d_ >> $*.d; \
+	           $(RM) -f $*.d_
+
+# link program
+quiet_cmd_link = LINK       $(BIN_DIR)/$(LIB_FULL_NAME)
+      cmd_link = $(CPP) -shared -Wl,-export-dynamic,-soname,$(LIB_FILE_NAME).so.$(VERSION_1) -o $(BIN_DIR)/$(LIB_FULL_NAME) $(O_FILES); \
+	         $(LN) -sf $(PWD)/bin/lib$(LIB_NAME).so.$(VERSION) $(PWD)/bin/lib$(LIB_NAME).so.$(VERSION_1); \
+	         $(LN) -sf $(PWD)/bin/lib$(LIB_NAME).so.$(VERSION_1) $(PWD)/bin/lib$(LIB_NAME).so
+
+# make tags
+quiet_cmd_tags = TAGS
+      cmd_tags = $(TAGS) --append --output=$(TAG_DIR)/TAGS $(LIB_H_FILES_PATH)/*.h $(H_FILES_PATH)/*.h *.cpp
+
