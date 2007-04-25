@@ -18,7 +18,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /**
- * @file   ttcn_values.cpp
+ * @file   value.cpp
  * @author Mateusz Pusz
  * @date   Wed Apr 25 11:08:28 2007
  * 
@@ -28,7 +28,7 @@
  */
 
 
-#include "ttcn_values.h"
+#include "value.h"
 #include <cstdlib>
 
 

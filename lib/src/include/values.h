@@ -19,7 +19,7 @@
 
 
 /**
- * @file   ttcn_values.h
+ * @file   value.h
  * @author Mateusz Pusz
  * @date   Tue Apr 24 21:05:20 2007
  * 
@@ -28,10 +28,10 @@
  * 
  */
 
-#ifndef __TTCN_VALUES_H__
-#define __TTCN_VALUES_H__
+#ifndef __VALUE_H__
+#define __VALUE_H__
 
-#include "ttcn_types.h"
+#include "type.h"
 #include "exception.h"
 
 
@@ -206,4 +206,4 @@ namespace freettcn {
   
 } // namespace freettcn
 
-#endif /* __TTCN_VALUES_H__ */
+#endif /* __VALUE_H__ */

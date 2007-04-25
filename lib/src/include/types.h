@@ -18,7 +18,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /**
- * @file   ttcn_types.h
+ * @file   type.h
  * @author Mateusz Pusz
  * @date   Tue Apr 24 21:05:51 2007
  * 
@@ -27,8 +27,8 @@
  * 
  */
 
-#ifndef __TTCN_TYPES_H__
-#define __TTCN_TYPES_H__
+#ifndef __TYPE_H__
+#define __TYPE_H__
 
 extern "C" {
 #include "freettcn/tci.h"
@@ -97,4 +97,4 @@ namespace freettcn {
 } // namespace freettcn
 
 
-#endif /* __TTCN_TYPES_H__ */
+#endif /* __TYPE_H__ */

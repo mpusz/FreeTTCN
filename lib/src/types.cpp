@@ -19,7 +19,7 @@
 
 
 /**
- * @file   ttcn_types.cpp
+ * @file   type.cpp
  * @author Mateusz Pusz
  * @date   Wed Apr 25 11:08:14 2007
  * 
@@ -29,8 +29,8 @@
  */
 
 
-#include "ttcn_types.h"
-#include "ttcn_values.h"
+#include "type.h"
+#include "value.h"
 
 
 freettcn::TE::CType::CType(const CModule   *module,

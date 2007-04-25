@@ -21,11 +21,10 @@ include $(TOP_DIR)/Makefile.defines
 
 
 # files
-CPP_FILES = exception.cpp tools.cpp \
+CPP_FILES = exception.cpp tools.cpp type.cpp value.cpp \
 	tci_value.cpp tci_tm_te.cpp tci_ch_te.cpp \
 	tri_sa_te.cpp \
-	te.cpp module.cpp testComponent.cpp behavior.cpp testCase.cpp \
-	ttcn_types.cpp ttcn_values.cpp
+	te.cpp module.cpp testComponent.cpp behavior.cpp testCase.cpp
 CPP_O_FILES := $(patsubst %.cpp,%.o,$(CPP_FILES))
 O_FILES = $(addprefix $(BIN_DIR)/, $(patsubst %.cpp,%.o,$(CPP_FILES)))
 DEPEND_FILES = $(patsubst %.cpp,%.d,$(CPP_FILES))
