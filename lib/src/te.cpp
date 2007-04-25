@@ -33,6 +33,7 @@
 #include "testComponent.h"
 #include "behavior.h"
 #include "testCase.h"
+#include "type.h"
 extern "C" {
 #include "freettcn/tci_te_tm.h"
 #include "freettcn/tci_te_ch.h"

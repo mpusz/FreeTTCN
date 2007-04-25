@@ -31,14 +31,17 @@
 #ifndef __VALUE_H__
 #define __VALUE_H__
 
-#include "type.h"
+extern "C" {
+#include "freettcn/tci.h"
+}
 #include "exception.h"
-
 
 namespace freettcn {
 
   namespace TE {
 
+    class CType;
+    
     class CValue {
       const CType &_type;
       const bool _omit;
@@ -69,15 +72,15 @@ namespace freettcn {
       //     Integer Value() const;
       //    void Value(Integer value);
       void AbsValue(String value) throw(freettcn::EOperationFailed);
-      void DigitsNum(unsigned long int dig_num);
+      void DigitsNum(unsigned long dig_num);
       void Sign(bool sign);
     };
   
     class CFloatValue : public CValue {
-      Float _value;
+      float _value;
     public:
-      Float Value() const;
-      void Value(Float value);
+      float Value() const;
+      void Value(float value);
     };
   
     class CObjIdValue : public CValue {
@@ -95,10 +98,10 @@ namespace freettcn {
     };
   
     class CVerdictValue : public CValue {
-      Integer _value;
+      unsigned long _value;
     public:
-      Integer Value() const;
-      void Value(Integer value);
+      unsigned long Value() const;
+      void Value(unsigned long value);
     };
   
     class CAddressValue : public CValue {
@@ -114,11 +117,11 @@ namespace freettcn {
       const String Value() const;
       void Value(const String value);
     
-      Char Element(Integer position) const;
-      void Element(Integer position, Char value);
+      char Element(unsigned long position) const;
+      void Element(unsigned long position, char value);
     
-      Integer Length() const;
-      void Length(Integer len);
+      unsigned long Length() const;
+      void Length(unsigned long len);
     };
   
     class CUniversalCharstringValue : public CValue {
@@ -127,11 +130,11 @@ namespace freettcn {
       String Value() const;
       void Value(String value);
     
-      TciUCValue *Element(Integer position) const;
-      void Element(Integer position, TciUCValue value);
+      TciUCValue *Element(unsigned long position) const;
+      void Element(unsigned long position, TciUCValue value);
     
-      Integer Length() const;
-      void Length(Integer len);
+      unsigned long Length() const;
+      void Length(unsigned long len);
     };
   
     class CHexstringValue : public CValue {
@@ -140,11 +143,11 @@ namespace freettcn {
       String Value() const;
       void Value(String value);
     
-      Integer Element(Integer position) const;
-      void Element(Integer position, Integer value);
+      unsigned long Element(unsigned long position) const;
+      void Element(unsigned long position, unsigned long value);
     
-      Integer Length() const;
-      void Length(Integer len);
+      unsigned long Length() const;
+      void Length(unsigned long len);
     };
   
     class COctetstringValue : public CValue {
@@ -153,11 +156,11 @@ namespace freettcn {
       String Value() const;
       void Value(String value);
     
-      Integer Element(Integer position) const;
-      void Element(Integer position, Integer value);
+      unsigned long Element(unsigned long position) const;
+      void Element(unsigned long position, unsigned long value);
     
-      Integer Length() const;
-      void Length(Integer len);
+      unsigned long Length() const;
+      void Length(unsigned long len);
     };
   
     class CBitstringValue : public CValue {
@@ -166,11 +169,11 @@ namespace freettcn {
       String Value() const;
       void Value(String value);
     
-      Integer Element(Integer position) const;
-      void Element(Integer position, Integer value);
+      unsigned long Element(unsigned long position) const;
+      void Element(unsigned long position, unsigned long value);
     
-      Integer Length() const;
-      void Length(Integer len);
+      unsigned long Length() const;
+      void Length(unsigned long len);
     };
   
     class CUnionValue : public CValue {
@@ -179,7 +182,7 @@ namespace freettcn {
       TciValue Variant(String variantName) const;
       void Variant(String variantName, TciValue value);
       String PresentVariantName() const;
-      StringSeq VariantNames() const;
+      char** VariantNames() const;
     };
   
     class CRecordValue : public CValue {
@@ -188,18 +191,18 @@ namespace freettcn {
       CRecordValue(const CType &type, bool omit);
       TciValue Field(String fieldName) const;
       void Field(String fieldName, TciValue value);
-      StringSeq FieldNames() const;
+      char** FieldNames() const;
     };
     
     class CRecordOfValue : public CValue {
       TciValue _value;
     public:
-      TciValue Field(Integer position) const;
-      void Field(Integer position, TciValue value);
+      TciValue Field(unsigned long position) const;
+      void Field(unsigned long position, TciValue value);
       void Append(TciValue value);
       TciType ElementType() const;
-      Integer Length() const;
-      void Length(Integer len);
+      unsigned long Length() const;
+      void Length(unsigned long len);
     };
     
   } // namespace TE

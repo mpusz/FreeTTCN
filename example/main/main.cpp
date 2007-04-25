@@ -26,6 +26,7 @@
 #include "../pa/include/pa.h"
 #include "../sa/include/sa.h"
 #include "te.h"
+#include "log.h"
 #include "exception.h"
 #include <iostream>
 

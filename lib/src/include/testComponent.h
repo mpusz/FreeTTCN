@@ -35,7 +35,7 @@ extern "C" {
 #include "freettcn/tci.h"
 #include "freettcn/tri.h"
 }
-#include "ttcn_values.h"
+#include "value.h"
 #include <string>
 
 

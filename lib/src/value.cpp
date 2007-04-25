@@ -29,6 +29,7 @@
 
 
 #include "value.h"
+#include "type.h"
 #include <cstdlib>
 
 

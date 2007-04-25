@@ -21,7 +21,8 @@
 extern "C" {
 #include "freettcn/tci_value.h"
 }
-#include "ttcn_values.h"
+#include "value.h"
+#include "type.h"
 #include "module.h"
 #include "exception.h"
 

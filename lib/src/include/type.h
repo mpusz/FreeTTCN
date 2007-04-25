@@ -38,11 +38,11 @@ namespace freettcn {
 
   namespace TE {
 
-    typedef unsigned long int Integer;
-    typedef char** StringSeq;
+//     typedef unsigned long int Integer;
+//     typedef char** StringSeq;
     
-    typedef float Float;
-    typedef char Char;
+//    typedef float Float;
+//    typedef char Char;
 
     class CValue;
     class CModule;

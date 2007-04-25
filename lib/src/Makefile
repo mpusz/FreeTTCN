@@ -21,7 +21,7 @@ include $(TOP_DIR)/Makefile.defines
 
 
 # files
-CPP_FILES = exception.cpp tools.cpp type.cpp value.cpp \
+CPP_FILES = exception.cpp tools.cpp type.cpp value.cpp log.cpp \
 	tci_value.cpp tci_tm_te.cpp tci_ch_te.cpp \
 	tri_sa_te.cpp \
 	te.cpp module.cpp testComponent.cpp behavior.cpp testCase.cpp
