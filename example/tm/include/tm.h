@@ -35,7 +35,7 @@ extern "C" {
 #include "freettcn/tci.h"
 #include "freettcn/tri.h"
 }
-#include "exception.h"
+#include "tools.h"
 #include <string>
 #include <vector>
 
@@ -44,7 +44,15 @@ namespace freettcn {
   
   namespace TM {
     
-    class CTestManagement {
+    class CLogMask : public freettcn::CLogMask {
+    public:
+      CLogMask(bool enabled = true);
+      ~CLogMask();
+    };
+    
+    
+    
+    class CTestManagement : public freettcn::CEntity {
       
       class CTestCase {
         TciTestCaseIdType _id;

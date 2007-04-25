@@ -31,6 +31,7 @@
 extern "C" {
 #include "freettcn/tci_tm_te.h"
 #include "freettcn/tci_value.h"
+#include "freettcn/tci_tl.h"
 }
 #include <iostream>
 
@@ -128,6 +129,18 @@ void freettcn::TM::CTestManagement::CModuleParameter::Print() const
 
 
 
+// ********************************** L O G   M A S K *************************************
+
+freettcn::TM::CLogMask::CLogMask(bool enabled /* true */):
+  freettcn::CLogMask(freettcn::LOG_TM_NUM, enabled)
+{
+}
+
+freettcn::TM::CLogMask::~CLogMask()
+{
+}
+
+
 
 // **************************** T E S T   M A N A G E M E N T *****************************
 
@@ -195,6 +208,7 @@ void freettcn::TM::CTestManagement::Init(String moduleId) throw(freettcn::EOpera
   Clear();
   
   // select root TTCN-3 module
+  /// @todo perform below operation on all TE's in environment
   tciRootModule(moduleId);
   
   // obtain and store module parameters with its default values
@@ -278,17 +292,27 @@ void freettcn::TM::CTestManagement::TestCaseInit(String testCaseId) throw(freett
 
 void freettcn::TM::CTestManagement::TestCaseStart(String testCaseId, TciParameterListType parameterlist) throw(ENotFound)
 {
-  CTestCase &tc = TestCaseGet(testCaseId);
-  tc.Start(parameterlist);
+  _tc = &TestCaseGet(testCaseId);
+  _tc->Start(parameterlist);
 }
 
 
 void freettcn::TM::CTestManagement::TestCaseStarted(TciTestCaseIdType testCaseId, TciParameterListType parameterList, double timer)
 {
   _moduleRunning = true;
-  CTestCase &tc = TestCaseGet(testCaseId.objectName);
-  _tc = &tc;
-  tc.Started(parameterList, timer);
+  _tc = &TestCaseGet(testCaseId.objectName);
+  _tc->Started(parameterList, timer);
+  
+  if (Logging() && LogMask().Get(freettcn::LOG_TM_TC_STARTED)) {
+    TriComponentId comp = { { 0 } };
+    comp.compName = "";
+    comp.compType.moduleName = "";
+    comp.compType.objectName = "";
+    TriParameterList parList;                     /**< @todo Paramters list should be translated */
+    parList.length = 0;
+    parList.parList = 0;
+    tliTcStarted(0, TimeStamp().Get(), 0, 0, comp, testCaseId, parList, timer);
+  }
 }
 
 
@@ -296,8 +320,21 @@ void freettcn::TM::CTestManagement::TestCaseTerminated(TciVerdictValue verdict, 
 {
   if (_tc) {
     _tc->Terminated(verdict, parameterlist);
+    
+    if (Logging() && LogMask().Get(freettcn::LOG_TM_TC_TERMINATED)) {
+      TriComponentId comp = { { 0 } };
+      comp.compName = "";
+      comp.compType.moduleName = "";
+      comp.compType.objectName = "";
+      TriParameterList parList;                     /**< @todo Paramters list should be translated */
+      parList.length = 0;
+      parList.parList = 0;
+      tliTcTerminated(0, TimeStamp().Get(), 0, 0, comp, _tc->Id(), parList, verdict);
+    }
+    
     _tc = 0;
   }
+  
   _moduleRunning = false;
 }
 
@@ -343,4 +380,7 @@ void freettcn::TM::CTestManagement::ControlStop() throw(EOperationFailed)
 void freettcn::TM::CTestManagement::ControlTerminated()
 {
   _moduleRunning = false;
+  
+  if (Logging() && LogMask().Get(freettcn::LOG_TM_CTRL_TERMINATED))
+    tliCtrlTerminated(0, TimeStamp().Get(), 0, 0, _ctrlCompId);
 }

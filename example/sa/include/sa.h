@@ -34,13 +34,20 @@
 extern "C" {
 #include "freettcn/tri.h"
 }
-#include "exception.h"
+#include "tools.h"
 
 namespace freettcn {
   
   namespace SA {
     
-    class CSUTAdaptor {
+    class CLogMask : public freettcn::CLogMask {
+    public:
+      CLogMask(bool enabled = true);
+      ~CLogMask();
+    };
+
+
+    class CSUTAdaptor : public freettcn::CEntity {
       static CSUTAdaptor *_instance;
       
     public:

@@ -17,54 +17,65 @@
 // along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+/**
+ * @file   ttcn_values.cpp
+ * @author Mateusz Pusz
+ * @date   Wed Apr 25 11:08:28 2007
+ * 
+ * @brief  
+ * 
+ * 
+ */
+
+
 #include "ttcn_values.h"
 #include <cstdlib>
 
 
-freettcn::CValue::CValue(const CType &type, bool omit) :
+freettcn::TE::CValue::CValue(const CType &type, bool omit) :
   _type(type), _omit(omit)
 {
 }
 
-freettcn::CValue::~CValue()
+freettcn::TE::CValue::~CValue()
 {
 }
 
-const freettcn::CType &freettcn::CValue::Type() const
+const freettcn::TE::CType &freettcn::TE::CValue::Type() const
 {
   return _type;
 }
 
-bool freettcn::CValue::Omit() const
+bool freettcn::TE::CValue::Omit() const
 {
   return _omit;
 }
 
-const String freettcn::CValue::Encoding() const
+const String freettcn::TE::CValue::Encoding() const
 {
   return Type().Encoding();
 }
 
-const String freettcn::CValue::EncodingVariant() const
+const String freettcn::TE::CValue::EncodingVariant() const
 {
   return Type().EncodingVariant();
 }
 
-const String freettcn::CValue::Extension() const
+const String freettcn::TE::CValue::Extension() const
 {
   return Type().Extension();
 }
 
 
 
-freettcn::CBooleanValue::CBooleanValue(const CType &type, bool omit) :
+freettcn::TE::CBooleanValue::CBooleanValue(const CType &type, bool omit) :
   CValue(type, omit)
 {
 }
 
 
 
-freettcn::CRecordValue::CRecordValue(const CType &type, bool omit) :
+freettcn::TE::CRecordValue::CRecordValue(const CType &type, bool omit) :
   CValue(type, omit)
 {
 }
@@ -74,7 +85,7 @@ freettcn::CRecordValue::CRecordValue(const CType &type, bool omit) :
 
 
 
-void freettcn::CIntegerValue::AbsValue(String value) throw(freettcn::EOperationFailed)
+void freettcn::TE::CIntegerValue::AbsValue(String value) throw(freettcn::EOperationFailed)
 {
   if (*value == '\0')
     throw freettcn::EOperationFailed();
@@ -90,12 +101,12 @@ void freettcn::CIntegerValue::AbsValue(String value) throw(freettcn::EOperationF
 }
 
 
-void freettcn::CIntegerValue::DigitsNum(unsigned long int dig_num)
+void freettcn::TE::CIntegerValue::DigitsNum(unsigned long int dig_num)
 {
 }
 
 
-void freettcn::CIntegerValue::Sign(bool sign)
+void freettcn::TE::CIntegerValue::Sign(bool sign)
 {
   _sign = sign;
 }
@@ -103,7 +114,7 @@ void freettcn::CIntegerValue::Sign(bool sign)
 
 
 
-TciValue freettcn::CRecordValue::Field(String fieldName) const
+TciValue freettcn::TE::CRecordValue::Field(String fieldName) const
 {
   return 0;
 }

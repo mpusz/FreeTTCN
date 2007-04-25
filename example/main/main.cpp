@@ -20,9 +20,12 @@
 
 //#include "freettcn/tci_value.h"
 //#include "ttcn_values.h"
+#include "../tl/include/tl.h"
 #include "../ch/include/ch.h"
 #include "../tm/include/tm.h"
+#include "../pa/include/pa.h"
 #include "../sa/include/sa.h"
+#include "te.h"
 #include "exception.h"
 #include <iostream>
 
@@ -48,8 +51,36 @@ int main()
 //   TypePrint(ping);
 
   try {
-    freettcn::CH::CComponentHandler ch;
+    // init timestamping
+    freettcn::CTimeStamp ts(4);
+    
+    // init logger
+    freettcn::TL::CLogger logger(ts);
+    
+    // get TE
+    freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
+    
+    // initiate all entities
     freettcn::TM::CTestManagement tm;
+    freettcn::CH::CComponentHandler ch;
+//     freettcn::CD::CComponentHandler cd;
+    freettcn::PA::CPlatformAdaptor pa;
+    freettcn::SA::CSUTAdaptor sa;
+    freettcn::TL::CTestLogging tl(logger);
+    
+    // create log masks for all entities
+    freettcn::TE::CLogMask teLogMask(true);
+    freettcn::TM::CLogMask tmLogMask(true);
+    freettcn::CH::CLogMask chLogMask(true);
+    freettcn::PA::CLogMask paLogMask(true);
+    freettcn::SA::CLogMask saLogMask(true);
+    
+    // set logging in all entities
+    te.LogEnable(ts, teLogMask);
+    tm.LogEnable(ts, tmLogMask);
+    ch.LogEnable(ts, chLogMask);
+    pa.LogEnable(ts, paLogMask);
+    sa.LogEnable(ts, saLogMask);
     
     // init module
     tm.Init("IP");
@@ -70,10 +101,10 @@ int main()
     
     //    MessageReceived();
   }
-  catch (freettcn::Exception &ex) {
+  catch(freettcn::Exception &ex) {
     std::cout << "Unhandled freettcn library exception: " << ex.what() << " caught!!!" << std::endl;
   }
-  catch (exception &ex) {
+  catch(exception &ex) {
     std::cout << "Unhandled system exception: " << ex.what() << " caught!!!" << std::endl;
   }
 }

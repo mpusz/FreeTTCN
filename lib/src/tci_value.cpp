@@ -17,10 +17,12 @@
 // along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+
 extern "C" {
 #include "freettcn/tci_value.h"
 }
 #include "ttcn_values.h"
+#include "module.h"
 #include "exception.h"
 
 
@@ -29,8 +31,8 @@ TciModuleIdType tciGetDefiningModule(TciType inst)
   if (!inst)
     throw freettcn::ECastFailed();
   
-  const freettcn::CType *type = static_cast<const freettcn::CType *>(inst);
-  if (const freettcn::CModule *module = type->DefiningModule())
+  const freettcn::TE::CType *type = static_cast<const freettcn::TE::CType *>(inst);
+  if (const freettcn::TE::CModule *module = type->DefiningModule())
     // user defined type
     return module->Id();
   else {
@@ -50,7 +52,7 @@ String tciGetName(TciType inst)
   if (!inst)
     throw freettcn::ECastFailed();
   
-  const freettcn::CType *type = static_cast<const freettcn::CType *>(inst);
+  const freettcn::TE::CType *type = static_cast<const freettcn::TE::CType *>(inst);
   return type->Name();
 }
 
@@ -60,7 +62,7 @@ TciTypeClassType tciGetTypeClass(TciType inst)
   if (!inst)
     throw freettcn::ECastFailed();
   
-  const freettcn::CType *type = static_cast<const freettcn::CType *>(inst);
+  const freettcn::TE::CType *type = static_cast<const freettcn::TE::CType *>(inst);
   return type->Class();
 }
 
@@ -70,7 +72,7 @@ TciValue tciNewInstance(TciType inst)
   if (!inst)
     throw freettcn::ECastFailed();
   
-  const freettcn::CType *type = static_cast<const freettcn::CType *>(inst);
+  const freettcn::TE::CType *type = static_cast<const freettcn::TE::CType *>(inst);
   return type->InstanceCreate();
 }
 
@@ -82,8 +84,8 @@ TciType tciGetType(TciValue inst)
   if (!inst)
     throw freettcn::ECastFailed();
   
-  freettcn::CValue *val = static_cast<freettcn::CValue *>(inst);
-  return &const_cast<freettcn::CType &>(val->Type());
+  freettcn::TE::CValue *val = static_cast<freettcn::TE::CValue *>(inst);
+  return &const_cast<freettcn::TE::CType &>(val->Type());
 }
 
 
@@ -93,8 +95,8 @@ void tciSetIntAbs(TciValue inst, String value)
   if (!inst)
     throw freettcn::ECastFailed();
   
-  freettcn::CValue *val = static_cast<freettcn::CValue *>(inst);
-  freettcn::CIntegerValue *integer = dynamic_cast<freettcn::CIntegerValue *>(val);
+  freettcn::TE::CValue *val = static_cast<freettcn::TE::CValue *>(inst);
+  freettcn::TE::CIntegerValue *integer = dynamic_cast<freettcn::TE::CIntegerValue *>(val);
   if (!integer)
     throw freettcn::ECastFailed();
   
@@ -107,8 +109,8 @@ void tciSetIntNumberOfDigits(TciValue inst, unsigned long int dig_num)
   if (!inst)
     throw freettcn::ECastFailed();
   
-  freettcn::CValue *val = static_cast<freettcn::CValue *>(inst);
-  freettcn::CIntegerValue *integer = dynamic_cast<freettcn::CIntegerValue *>(val);
+  freettcn::TE::CValue *val = static_cast<freettcn::TE::CValue *>(inst);
+  freettcn::TE::CIntegerValue *integer = dynamic_cast<freettcn::TE::CIntegerValue *>(val);
   if (!integer)
     throw freettcn::ECastFailed();
   
@@ -121,8 +123,8 @@ void tciSetIntSign(TciValue inst, Boolean sign)
   if (!inst)
     throw freettcn::ECastFailed();
   
-  freettcn::CValue *val = static_cast<freettcn::CValue *>(inst);
-  freettcn::CIntegerValue *integer = dynamic_cast<freettcn::CIntegerValue *>(val);
+  freettcn::TE::CValue *val = static_cast<freettcn::TE::CValue *>(inst);
+  freettcn::TE::CIntegerValue *integer = dynamic_cast<freettcn::TE::CIntegerValue *>(val);
   if (!integer)
     throw freettcn::ECastFailed();
   
@@ -135,8 +137,8 @@ TciValue tciGetRecFieldValue(TciValue inst, String fieldName)
   if (!inst)
     throw freettcn::ECastFailed();
   
-  const freettcn::CValue *val = static_cast<const freettcn::CValue *>(inst);
-  const freettcn::CRecordValue *record = dynamic_cast<const freettcn::CRecordValue *>(val);
+  const freettcn::TE::CValue *val = static_cast<const freettcn::TE::CValue *>(inst);
+  const freettcn::TE::CRecordValue *record = dynamic_cast<const freettcn::TE::CRecordValue *>(val);
   if (!record)
     throw freettcn::ECastFailed();
   

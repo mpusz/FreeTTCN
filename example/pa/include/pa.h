@@ -34,13 +34,20 @@
 extern "C" {
 #include "freettcn/tri.h"
 }
-#include "exception.h"
+#include "tools.h"
 
 namespace freettcn {
   
   namespace PA {
     
-    class CPlatformAdaptor {
+    class CLogMask : public freettcn::CLogMask {
+    public:
+      CLogMask(bool enabled = true);
+      ~CLogMask();
+    };
+
+    
+    class CPlatformAdaptor : public freettcn::CEntity {
       static CPlatformAdaptor *_instance;
       
     public:

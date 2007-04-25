@@ -26,6 +26,16 @@ extern "C" {
 }
 
 
+freettcn::SA::CLogMask::CLogMask(bool enabled /* true */):
+  freettcn::CLogMask(freettcn::LOG_SA_NUM, enabled)
+{
+}
+
+freettcn::SA::CLogMask::~CLogMask()
+{
+}
+
+
 freettcn::SA::CSUTAdaptor *freettcn::SA::CSUTAdaptor::_instance = 0;
 
 freettcn::SA::CSUTAdaptor &freettcn::SA::CSUTAdaptor::Instance() throw(ENotFound)

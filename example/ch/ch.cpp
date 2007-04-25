@@ -36,6 +36,16 @@ extern "C" {
 
 
 
+freettcn::CH::CLogMask::CLogMask(bool enabled /* true */):
+  freettcn::CLogMask(freettcn::LOG_CH_NUM, enabled)
+{
+}
+
+freettcn::CH::CLogMask::~CLogMask()
+{
+}
+
+
 freettcn::CH::CComponentHandler *freettcn::CH::CComponentHandler::_instance = 0;
 
 freettcn::CH::CComponentHandler &freettcn::CH::CComponentHandler::Instance() throw(ENotFound)
@@ -70,23 +80,7 @@ void freettcn::CH::CComponentHandler::ResetReq()
 
 TriComponentId freettcn::CH::CComponentHandler::TestComponentCreateReq(TciTestComponentKindType kind, TciType componentType, String name)
 {
-  TriComponentId compId = TestComponentCreate(kind, componentType, name);
-  
-  if (kind == TCI_CTRL_COMP) {
-    // start test component immediately
-    TciBehaviourIdType behavior;
-    behavior.moduleName = 0;
-    behavior.objectName = 0;
-    behavior.aux = 0;
-    
-    TciParameterListType parameterList;
-    parameterList.length = 0;
-    parameterList.parList = 0;
-    
-    TestComponentStart(compId, behavior, parameterList);
-  }
-  
-  return compId;
+  return TestComponentCreate(kind, componentType, name);
 }
 
 TriComponentId freettcn::CH::CComponentHandler::TestComponentCreate(TciTestComponentKindType kind, TciType componentType, String name)

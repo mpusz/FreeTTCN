@@ -20,6 +20,6 @@
 include $(TOP_DIR)/Makefile.defines
 
 # files
-CPP_FILES = tci_tl.cpp
+CPP_FILES = tci_tl.cpp tl.cpp
 
 include $(TOP_DIR)/Makefile.rules

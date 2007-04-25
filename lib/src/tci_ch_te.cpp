@@ -39,23 +39,6 @@ TriComponentId tciCreateTestComponent(TciTestComponentKindType kind,
                                       String name)
 {
   freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
-  
-  if (kind == TCI_CTRL_COMP && componentType) {
-    std::cout << "ERROR: 'componentType' given for Control component!!!" << std::endl;
-
-    // return dummy data
-    TriComponentId ctrlId;
-    ctrlId.compInst.data = 0;
-    ctrlId.compInst.bits = 0;
-    ctrlId.compInst.aux = 0;
-    ctrlId.compName = 0;
-    ctrlId.compType.moduleName = 0;
-    ctrlId.compType.objectName = 0;
-    ctrlId.compType.aux = 0;
-    
-    return ctrlId;
-  }
-  
   return te.TestComponentCreate(kind, componentType, name);
 }
 
@@ -113,10 +96,7 @@ void tciTestComponentTerminated(TriComponentId component,
 void tciExecuteTestCase(TciTestCaseIdType testCaseId, TriPortIdList tsiPortList)
 {
   freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
-
-  // get active module
-  const freettcn::TE::CModule &module = te.RootModule();
-  module.TestCase(testCaseId.objectName).Execute(testCaseId, tsiPortList);
+  te.TestCaseExecute(testCaseId, tsiPortList);
 }
 
 

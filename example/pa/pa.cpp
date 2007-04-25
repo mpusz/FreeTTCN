@@ -26,6 +26,17 @@ extern "C" {
 }
 
 
+freettcn::PA::CLogMask::CLogMask(bool enabled /* true */):
+  freettcn::CLogMask(freettcn::LOG_PA_NUM, enabled)
+{
+}
+
+freettcn::PA::CLogMask::~CLogMask()
+{
+}
+
+
+
 freettcn::PA::CPlatformAdaptor *freettcn::PA::CPlatformAdaptor::_instance = 0;
 
 freettcn::PA::CPlatformAdaptor &freettcn::PA::CPlatformAdaptor::Instance() throw(ENotFound)

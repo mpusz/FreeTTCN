@@ -17,56 +17,84 @@
 // along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+/**
+ * @file   ttcn_types.h
+ * @author Mateusz Pusz
+ * @date   Tue Apr 24 21:05:51 2007
+ * 
+ * @brief  
+ * 
+ * 
+ */
 
-#include "module.h"
+#ifndef __TTCN_TYPES_H__
+#define __TTCN_TYPES_H__
+
+extern "C" {
+#include "freettcn/tci.h"
+}
 
 namespace freettcn {
 
-  class CValue;
-  
-  class CType {
-    const CModule *_module;
-    char *_name;
-    TciTypeClassType _class;
-    String _encoding;
-    String _encodingVariant;
-    String _extension;
-    
-  protected:
-    CType(const CModule    *module,
-          String           name,
-          TciTypeClassType typeClass,
-          String           encoding,
-          String           encodingVariant,
-          String           extension);
-    virtual ~CType();
-    
-  public:
-    const CModule *DefiningModule() const;
-    String Name() const;
-    TciTypeClassType Class() const;
-    
-    String Encoding() const;
-    String EncodingVariant() const;
-    String Extension() const;
-    
-    virtual CValue *InstanceCreate(bool omit = false) const = 0;
-  };
-  
-  class CBooleanType : public CType {
-  public:
-    CBooleanType(String           encoding,
-                 String           encodingVariant,
-                 String           extension);
-    virtual CValue *InstanceCreate(bool omit = false) const;
-  };
+  namespace TE {
 
-  class CRecordType : public CType {
-  public:
-    CRecordType(const CModule    *module,
-                String           encoding,
-                String           encodingVariant,
-                String           extension);
-    virtual CValue *InstanceCreate(bool omit = false) const;
-  };
-}
+    typedef unsigned long int Integer;
+    typedef char** StringSeq;
+    
+    typedef float Float;
+    typedef char Char;
+
+    class CValue;
+    class CModule;
+  
+    class CType {
+      const CModule *_module;
+      char *_name;
+      TciTypeClassType _class;
+      String _encoding;
+      String _encodingVariant;
+      String _extension;
+    
+    public:
+      CType(const CModule    *module,
+            String           name,
+            TciTypeClassType typeClass,
+            String          encoding,
+            String          encodingVariant,
+            String          extension);
+      virtual ~CType();
+    
+      const CModule *DefiningModule() const;
+      String Name() const;
+      TciTypeClassType Class() const;
+
+      String Encoding() const;
+      String EncodingVariant() const;
+      String Extension() const;
+    
+      virtual CValue *InstanceCreate(bool omit = false) const = 0;
+    };
+  
+    class CBooleanType : public CType {
+    public:
+      CBooleanType(String           encoding,
+                   String           encodingVariant,
+                   String           extension);
+      virtual CValue *InstanceCreate(bool omit = false) const;
+    };
+
+    class CRecordType : public CType {
+    public:
+      CRecordType(const CModule    *module,
+                  String           encoding,
+                  String           encodingVariant,
+                  String           extension);
+      virtual CValue *InstanceCreate(bool omit = false) const;
+    };
+
+  } // namespace TE
+  
+} // namespace freettcn
+
+
+#endif /* __TTCN_TYPES_H__ */

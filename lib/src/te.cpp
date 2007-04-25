@@ -17,347 +17,29 @@
 // along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+/**
+ * @file   te.cpp
+ * @author Mateusz Pusz
+ * @date   Wed Apr 25 11:04:58 2007
+ * 
+ * @brief  
+ * 
+ * 
+ */
+
 
 #include "te.h"
+#include "module.h"
+#include "testComponent.h"
+#include "behavior.h"
+#include "testCase.h"
 extern "C" {
 #include "freettcn/tci_te_tm.h"
 #include "freettcn/tci_te_ch.h"
 #include "freettcn/tri_te_sa.h"
-#include "freettcn/tri_te_pa.h"
+#include "freettcn/tci_tl.h"
 }
-#include "tools.h"
 #include <iostream>
-
-
-
-freettcn::TE::CObject::CObject(const std::string &name):
-  _name(name), _inited(false)
-{
-}
-
-freettcn::TE::CObject::~CObject()
-{
-}
-
-const std::string &freettcn::TE::CObject::Name() const
-{
-  return _name;
-}
-
-void freettcn::TE::CObject::Init()
-{
-  if (!_inited) {
-    Initialize();
-    _inited = true;
-  }
-}
-
-
-
-
-freettcn::TE::CTestCase::CTestCase(const std::string &name):
-  CObject(name), _module(0)
-{
-}
-
-freettcn::TE::CTestCase::~CTestCase()
-{
-}
-
-void freettcn::TE::CTestCase::Register(CModule &module)
-{
-  _module = &module;
-}
-
-freettcn::TE::CModule &freettcn::TE::CTestCase::Module() const throw(freettcn::EOperationFailed)
-{
-  if (_module)
-    return *_module;
-  
-  std::cout << "ERROR: Module not set" << std::endl;
-  throw freettcn::EOperationFailed();
-}
-
-TciParameterTypeListType freettcn::TE::CTestCase::Parameters() const
-{
-  TciParameterTypeListType tcParams;
-  tcParams.length = 0;
-  tcParams.parList = 0;
-  
-  return tcParams;
-}
-
-TriPortIdList freettcn::TE::CTestCase::Ports() const
-{
-  TriPortIdList portList;
-  portList.portIdList = 0;
-  portList.length = 0;
-  
-  return portList;
-}
-
-
-void freettcn::TE::CTestCase::Start(TciParameterListType parameterlist)
-{
-  // create MTC
-  TciType mtcType = 0;                            /**< @todo MTC type support */
-  _mtcId = tciCreateTestComponentReq(TCI_MTC_COMP, mtcType, 0);
-  
-  // give a chance to create static connections and the initialization of TSI ports
-  TciTestCaseIdType testCaseId;
-  testCaseId.moduleName = "";                     /**< @todo Module name */
-  testCaseId.objectName = const_cast<char *>(Name().c_str());
-  testCaseId.aux = 0;
-  
-  tciExecuteTestCaseReq(testCaseId, Ports());
-  
-  // start MTC
-  TciBehaviourIdType behavior;
-  behavior.moduleName = 0;
-  behavior.objectName = 0;
-  behavior.aux = 0;
-  
-  TciParameterListType parameterList;
-  parameterList.length = 0;
-  parameterList.parList = 0;
-  
-  tciStartTestComponentReq(_mtcId, behavior, parameterList);
-}
-
-
-void freettcn::TE::CTestCase::Execute(TciTestCaseIdType testCaseId, TriPortIdList tsiPortList)
-{
-  // set current test case
-  _module->TestCase(this);
-  
-  if (triExecuteTestCase(&testCaseId, &tsiPortList) != TRI_OK) {
-    /// @todo do something
-  }
-}
-
-
-void freettcn::TE::CTestCase::Stop()
-{
-  tciResetReq();
-  
-  /// @todo set verdict to ERROR
-  
-  // notify TM about test case termination
-  TciValue error = 0;
-  TciParameterListType parList;
-  parList.length = 0;
-  parList.parList = 0;
-  tciTestCaseTerminated(error, parList);
-}
-
-
-
-freettcn::TE::CModule::CParameter::CParameter(const std::string &name):
-  CObject(name), _defaultValue(0), _value(0)
-{
-  
-}
-
-freettcn::TE::CModule::CParameter::~CParameter()
-{
-//   if (_defaultValue)
-//     delete _defaultValue;
-//   if (_value)
-//     delete value;
-}
-
-TciValue freettcn::TE::CModule::CParameter::DefaultValue() const
-{
-  return _defaultValue;
-}
-
-void freettcn::TE::CModule::CParameter::Value(TciValue value)
-{
-//   if (_value)
-//     delete value;
-  _value = value;
-}
-
-freettcn::TE::CModule::CModule(const std::string &name):
-  CObject(name), _running(false), _tc(0), __modParList(0), __tcIdList(0)
-{
-  freettcn::TE::CModulesContainer &modContainer = freettcn::TE::CModulesContainer::Instance();
-  modContainer.Register(*this);
-}
-
-freettcn::TE::CModule::~CModule()
-{
-  freettcn::TE::CModulesContainer &modContainer = freettcn::TE::CModulesContainer::Instance();
-  modContainer.Deregister(*this);
-  
-  Purge(_tcList);
-  Purge(_parameterList);
-  
-  // delete temporary variables
-  if (__modParList)
-    delete[] __modParList;
-  if (__tcIdList)
-    delete[] __tcIdList;
-}
-
-
-bool freettcn::TE::CModule::Running() const
-{
-  return _running;
-}
-
-
-void freettcn::TE::CModule::Reset()
-{
-  if (Running()) {
-    if (_tc) {
-      // reset SA only if test case is running
-      triSAReset();
-    }
-    
-    _running = false;
-
-    // reset PA
-    triPAReset();
-  }
-}
-
-
-void freettcn::TE::CModule::Register(CParameter *parameter)
-{
-  _parameterList.push_back(parameter);
-  parameter->Init();
-}
-
-void freettcn::TE::CModule::Register(CTestCase *tc)
-{
-  _tcList.push_back(tc);
-  tc->Register(*this);
-  tc->Init();
-}
-
-void freettcn::TE::CModule::ParametersSet() throw(freettcn::EOperationFailed)
-{
-  // obtain and set module parameters values
-  for(ParameterList::iterator it=_parameterList.begin(); it != _parameterList.end(); ++it) {
-    TciValue val = tciGetModulePar(const_cast<char *>((*it)->Name().c_str()));
-//     if (!val && (*it)->DefaultValue())
-//       val = new((*it)->DefaultValue());
-    
-    if (!val)
-      throw freettcn::EOperationFailed();
-    
-    (*it)->Value(val);
-  }
-}
-
-TciModuleParameterListType freettcn::TE::CModule::Parameters() const
-{
-  TciModuleParameterListType modParList;
-  modParList.length = _parameterList.size();
-  if (__modParList)
-    delete[] __modParList;
-  modParList.modParList = __modParList = new TciModuleParameterType[modParList.length];
-  
-  unsigned int i=0;
-  for(ParameterList::const_iterator it=_parameterList.begin(); it != _parameterList.end(); ++it, i++) {
-    modParList.modParList[i].parName = const_cast<char *>((*it)->Name().c_str());
-    modParList.modParList[i].defaultValue = ((*it)->DefaultValue());
-  }
-  
-  return modParList;
-}
-
-TciTestCaseIdListType freettcn::TE::CModule::TestCases() const
-{
-  TciTestCaseIdListType tcList;
-  tcList.length = _tcList.size();
-  if (__tcIdList)
-    delete[] __tcIdList;
-  tcList.idList = __tcIdList = new TciTestCaseIdType[tcList.length];
-  
-  unsigned int i=0;
-  for(TCList::const_iterator it=_tcList.begin(); it != _tcList.end(); ++it, i++) {
-    tcList.idList[i].moduleName = const_cast<char *>(Name().c_str());
-    tcList.idList[i].objectName = const_cast<char *>((*it)->Name().c_str());
-    tcList.idList[i].aux = (*it);
-  }
-  
-  return tcList;
-}
-
-freettcn::TE::CTestCase &freettcn::TE::CModule::TestCase(const std::string &tcId) const throw(ENotFound)
-{
-  for(TCList::const_iterator it=_tcList.begin(); it != _tcList.end(); ++it)
-    if ((*it)->Name() == tcId)
-      return *(*it);
-  std::cout << "ERROR: Test Case not found" << std::endl;
-  throw freettcn::ENotFound();
-}
-
-void freettcn::TE::CModule::TestCase(freettcn::TE::CTestCase *tc)
-{
-  _tc = tc;
-}
-
-freettcn::TE::CTestCase &freettcn::TE::CModule::TestCase() const throw(EOperationFailed)
-{
-  if (_tc)
-    return *_tc;
-  else {
-    std::cout << "ERROR: Test Case not set" << std::endl;
-    throw freettcn::EOperationFailed();
-  }
-}
-
-TriComponentId freettcn::TE::CModule::ControlStart()
-{
-  return tciCreateTestComponentReq(TCI_CTRL_COMP, 0, 0);
-}
-
-
-void freettcn::TE::CModule::ControlStop() throw(EOperationFailed)
-{
-  _tc = 0;
-  
-  tciResetReq();
-  
-  // notify TM about control part termination
-  tciControlTerminated();
-}
-
-
-
-freettcn::TE::CModulesContainer::CModulesContainer()
-{
-}
-
-freettcn::TE::CModulesContainer &freettcn::TE::CModulesContainer::Instance()
-{
-  static freettcn::TE::CModulesContainer container;
-  
-  return container;
-}
-
-void freettcn::TE::CModulesContainer::Register(CModule &module)
-{
-  _modList.push_back(&module);
-}
-
-void freettcn::TE::CModulesContainer::Deregister(const CModule &module)
-{
-  /// @todo remove
-}
-
-freettcn::TE::CModule &freettcn::TE::CModulesContainer::Get(const std::string &moduleId) const throw(ENotFound)
-{
-  for(ModuleList::const_iterator it=_modList.begin(); it != _modList.end(); ++it)
-    if ((*it)->Name() == moduleId)
-      return *(*it);
-  std::cout << "ERROR: Module not found" << std::endl;
-  throw freettcn::ENotFound();
-}
-
 
 
 
@@ -380,22 +62,6 @@ freettcn::TE::CTTCNExecutable::~CTTCNExecutable()
 }
 
 
-void freettcn::TE::CTTCNExecutable::Reset()
-{
-  // stop running module
-  RootModule().Reset();
-}
-
-
-void freettcn::TE::CTTCNExecutable::RootModule(freettcn::TE::CModule &module)
-{
-  _rootModule = &module;
-  
-  // init module
-  _rootModule->Init();
-}
-
-
 freettcn::TE::CModule &freettcn::TE::CTTCNExecutable::RootModule() const throw(ENotFound)
 {
   if (_rootModule)
@@ -406,32 +72,258 @@ freettcn::TE::CModule &freettcn::TE::CTTCNExecutable::RootModule() const throw(E
 }
 
 
+
+
+
+void freettcn::TE::CTTCNExecutable::RootModule(String moduleId)
+{
+  try {
+    // obtain requested module
+    freettcn::TE::CModulesContainer &modContainer = freettcn::TE::CModulesContainer::Instance();
+    freettcn::TE::CModule &module = modContainer.Get(moduleId);
+    
+    // check if TTCN Executable is running test case or control part
+    if (_rootModule && _rootModule->Running()) {
+      tciError("Cannot set TTCN Root Module while tests are running");
+      return;
+    }
+    
+    // set given module as active module
+    _rootModule = &module;
+    
+    // init module
+    _rootModule->Init();
+  }
+  catch(freettcn::ENotFound) {
+    std::string str;
+    str = "TTCN Module '";
+    str += moduleId;
+    str += "' not found";
+    tciError(const_cast<char *>(str.c_str()));
+    return;
+  }
+}
+
+
+TciModuleParameterListType freettcn::TE::CTTCNExecutable::ModuleParametersGet(const TciModuleIdType &moduleName) const
+{
+  const freettcn::TE::CModule &module = RootModule();
+  
+  // check if the same module given
+  if (module.Name() != moduleName.moduleName) {
+    std::string str;
+    str = "ERROR: Given module: ";
+    str += moduleName.moduleName;
+    str += " different than root module: ";
+    str += module.Name();
+    
+    // send an error
+    tciError(const_cast<char *>(str.c_str()));
+    
+    // return dummy data
+    TciModuleParameterListType modParList;
+    modParList.length = 0;
+    modParList.modParList = 0;
+    
+    return modParList;
+  }
+  
+  return module.Parameters();
+}
+
+
+TciTestCaseIdListType freettcn::TE::CTTCNExecutable::TestCasesGet() const
+{
+  return RootModule().TestCases();
+}
+
+
+TciParameterTypeListType freettcn::TE::CTTCNExecutable::TestCaseParametersGet(const TciTestCaseIdType &testCaseId) const
+{
+  const freettcn::TE::CModule &module = RootModule();
+  
+  // check if the same module given
+  if (module.Name() != testCaseId.moduleName) {
+    std::string str;
+    str = "ERROR: Given test case module: ";
+    str += testCaseId.moduleName;
+    str += " different than root module: ";
+    str += module.Name();
+    
+    // send an error
+    tciError(const_cast<char *>(str.c_str()));
+    
+    // return dummy data
+    TciParameterTypeListType tcParams;
+    tcParams.length = 0;
+    tcParams.parList = 0;
+    
+    return tcParams;
+  }
+  
+  return module.TestCase(testCaseId.objectName).Parameters();
+}
+
+
+TriPortIdList freettcn::TE::CTTCNExecutable::TestCaseTSIGet(const TciTestCaseIdType &testCaseId) const
+{
+  const freettcn::TE::CModule &module = RootModule();
+  
+  // check if the same module given
+  if (module.Name() != testCaseId.moduleName) {
+    std::string str;
+    str = "ERROR: Given test case module: ";
+    str += testCaseId.moduleName;
+    str += " different than root module: ";
+    str += module.Name();
+    
+    // send an error
+    tciError(const_cast<char *>(str.c_str()));
+    
+    // return dummy data
+    TriPortIdList portList;
+    portList.portIdList = 0;
+    portList.length = 0;
+    
+    return portList;
+  }
+  
+  return module.TestCase(testCaseId.objectName).Ports();
+}
+
+
+void freettcn::TE::CTTCNExecutable::TestCaseStart(const TciTestCaseIdType &testCaseId, const TciParameterListType &parameterlist) const
+{
+  freettcn::TE::CModule &module = RootModule();
+  
+  // check if the same module given
+  if (module.Name() != testCaseId.moduleName) {
+    std::string str;
+    str = "ERROR: Given test case module: ";
+    str += testCaseId.moduleName;
+    str += " different than root module: ";
+    str += module.Name();
+    
+    // send an error
+    tciError(const_cast<char *>(str.c_str()));
+    return;
+  }
+  
+  module.TestCase(&module.TestCase(testCaseId.objectName));
+  module.TestCase().Start(parameterlist);
+}
+
+
+void freettcn::TE::CTTCNExecutable::TestCaseStop() const
+{
+  freettcn::TE::CModule &module = RootModule();
+  if (module.Running()) {
+    module.TestCase().Stop();
+    module.TestCase(0); /**< @todo fixme - it can be matched with string version if module is const */
+  }
+}
+
+
+TriComponentId freettcn::TE::CTTCNExecutable::ControlStart() const
+{
+  return RootModule().ControlStart();
+  
+//   // obtain module parameters
+//   module.ParametersSet();
+}
+
+
+void freettcn::TE::CTTCNExecutable::ControlStop() const
+{
+  freettcn::TE::CModule &module = RootModule();
+  if (module.Running())
+    module.ControlStop();
+}
+
+
+
 TriComponentId freettcn::TE::CTTCNExecutable::TestComponentCreate(TciTestComponentKindType kind,
                                                                   TciType componentType,
-                                                                  String name)
+                                                                  String name) const
 {
-  TriComponentId ctrlId;
-  ctrlId.compInst.data = 0;
-  ctrlId.compInst.bits = 0;
-  ctrlId.compInst.aux = 0;
-  ctrlId.compName = "saComp";
-  ctrlId.compType.moduleName = "IP";
-  ctrlId.compType.objectName = "IP_SA";
-  ctrlId.compType.aux = 0;
+  if (kind == TCI_CTRL_COMP && componentType) {
+    std::cout << "ERROR: 'componentType' given for Control component!!!" << std::endl;
+    
+    // return dummy data
+    TriComponentId ctrlId;
+    ctrlId.compInst.data = 0;
+    ctrlId.compInst.bits = 0;
+    ctrlId.compInst.aux = 0;
+    ctrlId.compName = 0;
+    ctrlId.compType.moduleName = 0;
+    ctrlId.compType.objectName = 0;
+    ctrlId.compType.aux = 0;
+    
+    return ctrlId;
+  }
   
-  return ctrlId;
+  freettcn::TE::CTestComponent *cValue;
+  
+  if (componentType) {
+    const freettcn::TE::CType *cType = static_cast<const freettcn::TE::CType *>(componentType);
+    freettcn::TE::CValue *value = cType->InstanceCreate();
+    cValue = dynamic_cast<freettcn::TE::CTestComponent *>(value);
+    if (!cValue) {
+      std::cout << "ERROR!!! TciType does not specify Component type" << std::endl;
+      throw EOperationFailed();
+    }
+  }
+  else if (kind == TCI_CTRL_COMP) {
+//     cValue = new freettcn::TE::CTestComponent;
+  }
+  else {
+    std::cout << "ERROR!!! TciType not defined" << std::endl;
+    throw EOperationFailed();
+  }
+  
+  cValue->Init(kind, name);
+  TriComponentId compId = cValue->Id();
+  
+  return compId;
 }
 
 
-void freettcn::TE::CTTCNExecutable::TestComponentStart(TriComponentId component,
-                                                       TciBehaviourIdType behavior,
-                                                       TciParameterListType parameterList)
+void freettcn::TE::CTTCNExecutable::TestComponentStart(const TriComponentId &componentId,
+                                                       const TciBehaviourIdType &behaviorId,
+                                                       const TciParameterListType &parameterList) const
 {
-//   cmp.Started();
+  freettcn::TE::CTestComponent &component = RootModule().TestComponent(componentId);
+  const freettcn::TE::CBehavior &behavior = RootModule().Behavior(behaviorId);
+  component.Start(behavior, parameterList);
 }
 
 
-void freettcn::TE::CTTCNExecutable::TestComponentTerminated(TriComponentId component, TciVerdictValue verdict)
+void freettcn::TE::CTTCNExecutable::Connect(const TriPortId &fromPort, const TriPortId &toPort)
+{
+
+}
+
+void freettcn::TE::CTTCNExecutable::Disconnect(const TriPortId &fromPort, const TriPortId &toPort)
+{
+
+}
+
+void freettcn::TE::CTTCNExecutable::Map(const TriPortId &fromPort, const TriPortId &toPort)
+{
+  if (triMap(&fromPort, &toPort) != TRI_OK) {
+    /// @todo do something
+  }
+}
+
+void freettcn::TE::CTTCNExecutable::Unmap(const TriPortId &fromPort, const TriPortId &toPort)
+{
+  if (triUnmap(&fromPort, &toPort) != TRI_OK) {
+    /// @todo do something
+  }
+}
+
+void freettcn::TE::CTTCNExecutable::TestComponentTerminated(const TriComponentId &componentId,
+                                                            TciVerdictValue verdict) const
 {
 //   cmp.Terminated();
 
@@ -451,30 +343,107 @@ void freettcn::TE::CTTCNExecutable::TestComponentTerminated(TriComponentId compo
 //       tciTestComponentTerminatedReq(mtc, verdict);
 //     }
 //   }
-}
 
-
-
-void freettcn::TE::CTTCNExecutable::Connect(TriPortId fromPort, TriPortId toPort)
-{
-
-}
-
-void freettcn::TE::CTTCNExecutable::Disconnect(TriPortId fromPort, TriPortId toPort)
-{
-
-}
-
-void freettcn::TE::CTTCNExecutable::Map(TriPortId fromPort, TriPortId toPort)
-{
-  if (triMap(&fromPort, &toPort) != TRI_OK) {
-    /// @todo do something
+  // log
+  if (Logging() && LogMask().Get(LOG_TE_C_TERMINATED)) {
+    TriComponentId ctrlId;
+    ctrlId.compInst.data = 0;
+    ctrlId.compInst.bits = 0;
+    ctrlId.compInst.aux = 0;
+    ctrlId.compName = "saComp";
+    ctrlId.compType.moduleName = "IP";
+    ctrlId.compType.objectName = "IP_SA";
+    ctrlId.compType.aux = 0;
+    
+    tliCTerminated(0, TimeStamp().Get(), "ip.ttcn", 122, ctrlId, 0);
   }
 }
 
-void freettcn::TE::CTTCNExecutable::Unmap(TriPortId fromPort, TriPortId toPort)
+
+void freettcn::TE::CTTCNExecutable::TestCaseExecute(const TciTestCaseIdType &testCaseId, const TriPortIdList &tsiPortList) const
 {
-  if (triUnmap(&fromPort, &toPort) != TRI_OK) {
-    /// @todo do something
+  RootModule().TestCase(testCaseId.objectName).Execute(testCaseId, tsiPortList);
+}
+
+
+void freettcn::TE::CTTCNExecutable::Reset() const
+{
+  // stop running module
+  RootModule().Reset();
+}
+
+
+
+
+
+
+TriComponentId freettcn::TE::CTTCNExecutable::TestComponentCreateReq(const freettcn::TE::CTestComponent *creator, TciTestComponentKindType kind, TciType componentType, String name)
+{
+  TriComponentId compId = tciCreateTestComponentReq(kind, componentType, name);
+  
+  // log
+  if (Logging() && LogMask().Get(LOG_TE_C_CREATE)) {
+    TriComponentId creatorId;
+    
+    if (creator)
+      creatorId = creator->Id();
+    else {
+      // first creator
+      creatorId.compInst.data = 0;
+      creatorId.compInst.bits = 0;
+      creatorId.compInst.aux = 0;
+      creatorId.compName = const_cast<char *>(RootModule().Name().c_str());
+      creatorId.compType.moduleName = "";
+      creatorId.compType.objectName = "";
+      creatorId.compType.aux = 0;
+    }
+    
+    tliCCreate(0, TimeStamp().Get(), "ip.ttcn", 122, creatorId, compId, name);
+  }
+  
+  if (kind == TCI_CTRL_COMP) {
+    // start control test component immediately using default control behavior
+    
+    // control does not have parameters
+    TciParameterListType parameterList;
+    parameterList.length = 0;
+    parameterList.parList = 0;
+    
+    // log
+    if (Logging() && LogMask().Get(LOG_TE_CTRL_START))
+      tliCtrlStart(0, TimeStamp().Get(), "ip.ttcn", 122, compId);
+    
+    TestComponentStartReq(creator, compId, RootModule().ControlBehavior().Id(), parameterList);
+  }
+  
+  return compId;
+}
+
+
+void freettcn::TE::CTTCNExecutable::TestComponentStartReq(const freettcn::TE::CTestComponent *creator,
+                                                          const TriComponentId &componentId,
+                                                          const TciBehaviourIdType &behaviorId,
+                                                          const TciParameterListType &parameterList)
+{
+  tciStartTestComponentReq(componentId, behaviorId, parameterList);
+  
+  // log
+  if (Logging() && LogMask().Get(LOG_TE_C_START)) {
+    TriComponentId creatorId;
+    
+    if (creator)
+      creatorId = creator->Id();
+    else {
+      // first creator
+      creatorId.compInst.data = 0;
+      creatorId.compInst.bits = 0;
+      creatorId.compInst.aux = 0;
+      creatorId.compName = const_cast<char *>(RootModule().Name().c_str());
+      creatorId.compType.moduleName = "";
+      creatorId.compType.objectName = "";
+      creatorId.compType.aux = 0;
+    }
+    
+    tliCStart(0, TimeStamp().Get(), "ip.ttcn", 122, creatorId, componentId, behaviorId, parameterList);
   }
 }

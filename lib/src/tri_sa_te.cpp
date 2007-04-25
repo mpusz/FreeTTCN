@@ -17,6 +17,18 @@
 // along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+
+/**
+ * @file   tri_sa_te.cpp
+ * @author Mateusz Pusz
+ * @date   Wed Apr 25 13:09:54 2007
+ * 
+ * @brief  
+ * 
+ * 
+ */
+
+
 extern "C" {
 #include "freettcn/tri_sa_te.h"
   /// @todo Remove header below

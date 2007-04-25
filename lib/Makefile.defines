@@ -98,15 +98,15 @@ quiet_cmd_make_lib = \nBUILD_LIB  $(BIN_DIR)/$(LIB_FULL_NAME)
 
 # compile source file, create depend file *.d
 quiet_cmd_cc_d_o = CC_D_O     $<
-      cmd_cc_d_o = $(CPP) -MMD -MF $*.d_ -c -fPIC $(INCLUDE_DIRS) $< -o $@; \
-                   $(CP) $*.d_ $*.d; \
-	           $(SED) -e 's/\#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' -e '/^$$/ d' -e 's/$$/ :/' < $*.d_ >> $*.d; \
+      cmd_cc_d_o = $(CPP) -MMD -MF $*.d_ -c -fPIC $(INCLUDE_DIRS) $< -o $@ && \
+                   $(CP) $*.d_ $*.d && \
+	           $(SED) -e 's/\#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' -e '/^$$/ d' -e 's/$$/ :/' < $*.d_ >> $*.d && \
 	           $(RM) -f $*.d_
 
 # link program
 quiet_cmd_link = LINK       $(BIN_DIR)/$(LIB_FULL_NAME)
-      cmd_link = $(CPP) -shared -Wl,-export-dynamic,-soname,$(LIB_FILE_NAME).so.$(VERSION_1) -o $(BIN_DIR)/$(LIB_FULL_NAME) $(O_FILES); \
-	         $(LN) -sf $(PWD)/bin/lib$(LIB_NAME).so.$(VERSION) $(PWD)/bin/lib$(LIB_NAME).so.$(VERSION_1); \
+      cmd_link = $(CPP) -shared -Wl,-export-dynamic,-soname,$(LIB_FILE_NAME).so.$(VERSION_1) -o $(BIN_DIR)/$(LIB_FULL_NAME) $(O_FILES) && \
+	         $(LN) -sf $(PWD)/bin/lib$(LIB_NAME).so.$(VERSION) $(PWD)/bin/lib$(LIB_NAME).so.$(VERSION_1) && \
 	         $(LN) -sf $(PWD)/bin/lib$(LIB_NAME).so.$(VERSION_1) $(PWD)/bin/lib$(LIB_NAME).so
 
 # make tags

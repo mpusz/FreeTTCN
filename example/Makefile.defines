@@ -94,8 +94,8 @@ cmd = @$(if $($(quiet)$(1)),printf "$($(quiet)$(1))\n" &&) $($(1))
 #
 
 # temporary commands used below
-tmp_cmd_d    = $(CP) $*.d_ $*.d; \
-               $(SED) -e 's/\#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' -e '/^$$/ d' -e 's/$$/ :/' < $*.d_ >> $*.d; \
+tmp_cmd_d    = $(CP) $*.d_ $*.d && \
+               $(SED) -e 's/\#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' -e '/^$$/ d' -e 's/$$/ :/' < $*.d_ >> $*.d && \
 	       $(RM) -f $*.d_
 
 # start library compilation
@@ -112,15 +112,15 @@ quiet_cmd_make_main = \nBUILD_MAIN
 
 # compile source file, create depend file *.d, insert *.o file to library <bindir>\<dirname>.a
 quiet_cmd_cc_d_a = CC_D_A     $<
-      cmd_cc_d_a = $(CPP) -MMD -MF $*.d_ $(INCLUDE_DIRS) -c $< -o $(@D)/$%; \
-	           $(AR) -rs $@ $(@D)/$%; \
-                   $(RM) -f $(@D)/$%; \
-                   $(SED) -i 's,^.*/\(.*\.o\):,$(LIB_PATH)(\1):,' $*.d_; \
+      cmd_cc_d_a = $(CPP) -MMD -MF $*.d_ $(INCLUDE_DIRS) -c $< -o $(@D)/$% && \
+	           $(AR) -rs $@ $(@D)/$% && \
+                   $(RM) -f $(@D)/$% && \
+                   $(SED) -i 's,^.*/\(.*\.o\):,$(LIB_PATH)(\1):,' $*.d_ && \
                    $(tmp_cmd_d)
 
 # compile source file, create depend file *.d
 quiet_cmd_cc_d_o = CC_D_O     $<
-      cmd_cc_d_o = $(CPP) -MMD -MF $*.d_ $(INCLUDE_DIRS) -c $< -o $@; \
+      cmd_cc_d_o = $(CPP) -MMD -MF $*.d_ $(INCLUDE_DIRS) -c $< -o $@ && \
                    $(tmp_cmd_d)
 
 # translate source TTCN module file to *.cpp

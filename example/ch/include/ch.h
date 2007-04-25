@@ -34,13 +34,20 @@ extern "C" {
 #include "freettcn/tri.h"
 #include "freettcn/tci.h"
 }
-#include "exception.h"
+#include "tools.h"
 
 namespace freettcn {
   
   namespace CH {
+
+    class CLogMask : public freettcn::CLogMask {
+    public:
+      CLogMask(bool enabled = true);
+      ~CLogMask();
+    };
     
-    class CComponentHandler {
+    
+    class CComponentHandler : public freettcn::CEntity {
       static CComponentHandler *_instance;
       
     protected:

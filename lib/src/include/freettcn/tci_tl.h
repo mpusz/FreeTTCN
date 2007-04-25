@@ -2082,7 +2082,7 @@ void tliPConnect(String am,
 
 
 /** 
- * @brief CH log the disconnect operation.
+ * @brief CH logs the disconnect operation.
  * 
  * Shall be called by CH to log the disconnect operation. This event occurs after the disconnect
  * operation.
