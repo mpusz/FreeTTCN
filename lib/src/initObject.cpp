@@ -31,7 +31,7 @@
 
 
 
-freettcn::TE::CInitObject::CInitObject(const std::string &name):
+freettcn::TE::CInitObject::CInitObject(const char *name):
   _name(name), _inited(false)
 {
 }
@@ -40,7 +40,7 @@ freettcn::TE::CInitObject::~CInitObject()
 {
 }
 
-const std::string &freettcn::TE::CInitObject::Name() const
+const char *freettcn::TE::CInitObject::Name() const
 {
   return _name;
 }

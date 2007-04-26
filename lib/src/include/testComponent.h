@@ -36,6 +36,7 @@ extern "C" {
 #include "freettcn/tri.h"
 }
 #include "value.h"
+#include "type.h"
 #include <string>
 
 
@@ -55,6 +56,10 @@ namespace freettcn {
     class CPort;
     
     class CTestComponent : public CValue {
+    public:
+      class ENotInited : public freettcn::EOperationFailed {};
+      
+    private:
       class CState {
         // STATUS:
         // - ACTIVE
@@ -76,21 +81,47 @@ namespace freettcn {
         // KEEP_ALIVE (indicated wheter the entity can be restarted after its termination or not; 'true' if the entity can be restarted)
       };
       
-      const TciTestComponentKindType _kind;
-      const std::string _name;
+      bool _inited;
+      CModule *_module;
+      TciTestComponentKindType _kind;
+      TriComponentId _id;
+//     protected:
+//       bool Inited() const;
     public:
       CTestComponent(const CType &type);
       ~CTestComponent();
       
-      void Init(TciTestComponentKindType kind, String name);
-      //      const std::string &Name() const;
-      const TriComponentId &Id() const;
+      void Init(CModule &module, TciTestComponentKindType kind, String name);
+      const TriComponentId &Id() const throw(ENotInited);
       
-      void Start(const CBehavior &behavior, TciParameterListType parameterList);
+      virtual void Start(const CBehavior &behavior, TciParameterListType parameterList) throw(ENotInited);
       
-      void Map(const CPort &fromPort, const CPort &toPort) throw(EOperationFailed);
-      void Verdict(VerdictType_t value);
+//       void Map(const CPort &fromPort, const CPort &toPort) throw(ENotInited);
+//       void Verdict(VerdictType_t value);
     };
+    
+    
+    class CTestComponentType : public CType {
+    public:
+      CTestComponentType(const CModule &module, String name);
+    };
+    
+
+
+
+    class CControlComponent : public CTestComponent {
+    public:
+      CControlComponent(const CType &type);
+    };
+    
+    class CControlComponentType : public CTestComponentType {
+    public:
+      CControlComponentType(const CModule &module);
+      virtual CValue *InstanceCreate(bool omit = false) const;
+    };
+    
+    
+    
     
 //     CTestComponent::CTestComponent(flowGraphNode, bool keepAlive):
 //       STATUS(ACTIVE), DEFAULT_POINTER(0), E_VERDICT(NONE), TIMER_GUARD(binding("GUARD", IDLE, 0)), KEEP_ALIVE(keepAlive)

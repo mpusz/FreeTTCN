@@ -92,12 +92,17 @@ int main()
     tm.ControlStart();
     tm.ControlStop();
     
-    // run specified test case
-    tm.TestCaseInit("ICMP_Ping_1");
+    // run specified test cases
     TciParameterListType parameterlist;
     parameterlist.length = 0;
     parameterlist.parList = 0;
+
+    tm.TestCaseInit("ICMP_Ping_1");
     tm.TestCaseStart("ICMP_Ping_1", parameterlist);
+    tm.TestCaseStop();
+    
+    tm.TestCaseInit("ICMP_Ping_2");
+    tm.TestCaseStart("ICMP_Ping_2", parameterlist);
     tm.TestCaseStop();
     
     //    MessageReceived();

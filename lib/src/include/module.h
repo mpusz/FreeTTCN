@@ -37,8 +37,10 @@ extern "C" {
 #include "freettcn/tri.h"
 }
 #include "initObject.h"
+#include "testComponent.h"
 #include "exception.h"
 #include <vector>
+#include <list>
 
 
 namespace freettcn {
@@ -61,17 +63,17 @@ namespace freettcn {
 
   namespace TE {
 
-    class CTestComponent;
     class CBehavior;
     class CTestCase;
-
+    class CSourceData;
+    
     class CModule : public CInitObject {
     public:
       class CParameter : public CInitObject {
         TciValue _defaultValue;
         TciValue _value;
       public:
-        CParameter(const std::string &name);
+        CParameter(const char *name);
         virtual ~CParameter();
         
         TciValue DefaultValue() const;
@@ -86,39 +88,51 @@ namespace freettcn {
         // KILLED - (CList) a list of all terminated test components during test case execution (filled when TC is killed)
       };
       
-      
+      // module types
       typedef std::vector<CParameter *> ParameterList;
-      typedef std::vector<CTestCase *> TCList;
+      typedef std::vector<CTestCase *> TestCaseList;
+      typedef std::list<CTestComponent *> TestCompList;
+      typedef std::list<CBehavior *> BehaviorList;
       
+      // module info
+      CBehavior * _ctrlBehavior;
+      const CSourceData * _ctrlSrcData;
+      CControlComponentType _ctrlCompType;
+      TciModuleIdType _id;
       ParameterList _parameterList;
-      TCList _tcList;
-      CBehavior *_ctrlBehavior;
+      TestCaseList _testCaseList;
+      BehaviorList _behaviorList;
       
-      CTestCase *_tc;
+      // module state
+      TestCompList _allEntityStates;
+      CTestCase *_currTestCase;
+      TestCompList _done;
+      TestCompList _killed;
       
       // temporary variables
       mutable TciModuleParameterType *__modParList;
-      mutable TciTestCaseIdType *__tcIdList;
+      mutable TciTestCaseIdType *__testCaseIdList;
       
     protected:
       void Register(CParameter *parameter);
       void Register(CTestCase *tc);
-      void Register(CBehavior *ctrlBehavior);
+      void Register(CBehavior *ctrlBehavior, const CSourceData *ctrlSrcData);
       
       void ParametersSet() throw(freettcn::EOperationFailed);
     public:
       bool _running; /// @todo temporary solution
       
-      CModule(const std::string &name);
+      CModule(const char *name);
       virtual ~CModule() = 0;
       
       const TciModuleIdType &Id() const;
+      TriComponentId ModuleComponentId() const;
+      const CControlComponentType &ControlComponentType() const;
+      
       bool Running() const;
       void Reset();
       
       TciModuleParameterListType Parameters() const;
-      CTestComponent &TestComponent(const TriComponentId &component) const;
-      const CBehavior &Behavior(const TciBehaviourIdType &behavior) const;
       
       TciTestCaseIdListType TestCases() const;
       CTestCase &TestCase(const std::string &tcId) const throw(ENotFound);
@@ -128,6 +142,12 @@ namespace freettcn {
       const CBehavior &ControlBehavior() const throw(ENotFound);
       TriComponentId ControlStart();
       void ControlStop() throw(EOperationFailed);
+      
+      void BehaviorAdd(CBehavior *behavior);
+      const CBehavior &Behavior(const TciBehaviourIdType &behavior) const throw(ENotFound);
+      
+      void TestComponentAdd(CTestComponent &component);
+      CTestComponent &TestComponent(const TriComponentId &component) const throw(ENotFound);
     };
     
     

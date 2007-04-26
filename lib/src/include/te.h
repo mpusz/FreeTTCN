@@ -44,6 +44,7 @@ namespace freettcn {
     
     class CModule;
     class CTestComponent;
+    class CTestComponentType;
 
     class CTTCNExecutable : public freettcn::CEntity {
     private:
@@ -84,8 +85,8 @@ namespace freettcn {
       
 
 
-      TriComponentId TestComponentCreateReq(const CTestComponent *creator, TciTestComponentKindType kind, TciType componentType, String name);
-      void TestComponentStartReq(const CTestComponent *creator, const TriComponentId &componentId, const TciBehaviourIdType &behaviorId, const TciParameterListType &parameterList);
+      TriComponentId TestComponentCreateReq(const char *src, int line, const CTestComponent *creator, TciTestComponentKindType kind, const CTestComponentType *compType, String name);
+      void TestComponentStartReq(const char *src, int line, const CTestComponent *creator, const TriComponentId &componentId, const TciBehaviourIdType &behaviorId, const TciParameterListType &parameterList);
     };
     
   } // namespace TE

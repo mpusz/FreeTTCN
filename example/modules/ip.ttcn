@@ -106,10 +106,14 @@ module IP {
     unmap(mtc:icmpPort, system:icmpPort);
   }
   
+  testcase TC_ICMPPing_2() runs on ICMPComponent
+  {
+  }
   
   // ********** CONTROL ***********
   
   control {
     execute(TC_ICMPPing_1());
+    execute(TC_ICMPPing_2(), 3.0);
   }
 }

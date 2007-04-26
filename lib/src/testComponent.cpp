@@ -28,3 +28,99 @@
  */
 
 #include "testComponent.h"
+#include "module.h"
+#include "type.h"
+
+
+freettcn::TE::CTestComponent::CTestComponent(const CType &type):
+  freettcn::TE::CValue(type, false), _inited(false), _module(0)
+{
+}
+
+
+freettcn::TE::CTestComponent::~CTestComponent()
+{
+}
+
+
+// bool freettcn::TE::CTestComponent::Inited() const
+// {
+//   return _inited;
+// }
+
+
+void freettcn::TE::CTestComponent::Init(freettcn::TE::CModule &module, TciTestComponentKindType kind, String name)
+{
+  _module = &module;
+  _kind = kind;
+  
+  _id.compInst.data = 0;                          /**< @todo Create unique identifier */
+  _id.compInst.bits = 0;
+  _id.compInst.aux = this;
+  _id.compName = name;
+  if (Type().DefiningModule())
+    _id.compType.moduleName = const_cast<char *>(Type().DefiningModule()->Name());
+  else
+    _id.compType.moduleName = "";
+  _id.compType.objectName = Type().Name();
+  _id.compType.aux = const_cast<void *>(reinterpret_cast<const void *>(&Type()));
+  
+  // register in a module
+  _module->TestComponentAdd(*this);
+  
+  _inited = true;
+}
+
+
+const TriComponentId &freettcn::TE::CTestComponent::Id() const throw(freettcn::TE::CTestComponent::ENotInited)
+{
+  return _id;
+}
+
+
+void freettcn::TE::CTestComponent::Start(const freettcn::TE::CBehavior &behavior, TciParameterListType parameterList) throw(freettcn::TE::CTestComponent::ENotInited)
+{
+}
+
+
+// void freettcn::TE::CTestComponent::Map(const freettcn::TE::CPort &fromPort, const freettcn::TE::CPort &toPort) throw(freettcn::TE::CTestComponent::ENotInited)
+// {
+// }
+
+
+// void freettcn::TE::CTestComponent::Verdict(VerdictType_t value)
+// {
+// }
+
+
+
+
+
+freettcn::TE::CTestComponentType::CTestComponentType(const freettcn::TE::CModule &module, String name) :
+  freettcn::TE::CType(&module, name, TCI_COMPONENT_TYPE, "", "", "")
+{
+}
+
+
+
+
+
+
+
+freettcn::TE::CControlComponent::CControlComponent(const CType &type):
+  freettcn::TE::CTestComponent(type)
+{
+}
+
+
+
+freettcn::TE::CControlComponentType::CControlComponentType(const CModule &module):
+  freettcn::TE::CTestComponentType(module, "_ControlComponentType_")
+{
+}
+
+freettcn::TE::CValue *freettcn::TE::CControlComponentType::InstanceCreate(bool omit /* false */) const
+{
+  return new freettcn::TE::CControlComponent(*this);
+}
+

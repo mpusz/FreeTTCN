@@ -31,6 +31,7 @@
 #include "te.h"
 #include "module.h"
 #include "behavior.h"
+#include "sourceData.h"
 extern "C" {
 #include "freettcn/tci_te_tm.h"
 #include "freettcn/tci_te_ch.h"
@@ -41,35 +42,27 @@ extern "C" {
 
 
 
-freettcn::TE::CTestCase::CTestCase(const std::string &name):
-  CInitObject(name), _behavior(0), _module(0)
+freettcn::TE::CTestCase::CTestCase(CModule &module, const char *name, const freettcn::TE::CSourceData *srcData,
+                                   const freettcn::TE::CTestComponentType &mtcType, freettcn::TE::CBehavior *behavior,
+                                   const freettcn::TE::CTestComponentType *systemType /* 0 */):
+  CInitObject(name), _module(module), _srcData(srcData),
+  _mtcType(mtcType), _behavior(behavior), _systemType(systemType ? *systemType : mtcType)
 {
+  _id.moduleName = const_cast<char *>(_module.Name());
+  _id.objectName = const_cast<char *>(name);
+  _id.aux = 0;
 }
 
 freettcn::TE::CTestCase::~CTestCase()
 {
-  if (_behavior)
-    delete _behavior;
+  if (_srcData)
+    delete _srcData;
 }
 
-void freettcn::TE::CTestCase::Register(CBehavior *behavior)
-{
-  _behavior = behavior;
-}
-
-void freettcn::TE::CTestCase::Module(CModule &module)
-{
-  _module = &module;
-}
-
-freettcn::TE::CModule &freettcn::TE::CTestCase::Module() const throw(freettcn::EOperationFailed)
-{
-  if (_module)
-    return *_module;
-  
-  std::cout << "ERROR: Module not set" << std::endl;
-  throw freettcn::EOperationFailed();
-}
+// freettcn::TE::CModule &freettcn::TE::CTestCase::Module() const
+// {
+//   return _module;
+// }
 
 TciParameterTypeListType freettcn::TE::CTestCase::Parameters() const
 {
@@ -90,30 +83,37 @@ TriPortIdList freettcn::TE::CTestCase::Ports() const
 }
 
 
-void freettcn::TE::CTestCase::Start(TciParameterListType parameterlist)
+void freettcn::TE::CTestCase::Start(const char *src, int line,
+                                    const freettcn::TE::CTestComponent *creator,
+                                    TciParameterListType parameterlist,
+                                    TriTimerDuration dur)
 {
+  TriComponentId creatorId;
+  
+  if (creator) {
+    creatorId = creator->Id();
+  }
+  else {
+    src = _srcData->Source();
+    line = _srcData->Line();
+    creatorId = _module.ModuleComponentId();
+  }
+  
   freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
   
-  // create MTC
-  TciType mtcType = 0;                            /**< @todo MTC type support */
-  _mtcId = te.TestComponentCreateReq(0, TCI_MTC_COMP, mtcType, "MTC");
-  
-  // give a chance to create static connections and the initialization of TSI ports
-  TciTestCaseIdType testCaseId;
-  testCaseId.moduleName = "";                     /**< @todo Module name */
-  testCaseId.objectName = const_cast<char *>(Name().c_str());
-  testCaseId.aux = 0;
-  
   // log
-  /// @todo should be moved to the start of the function
   if (te.Logging() && te.LogMask().Get(LOG_TE_TC_START)) {
-    TriTimerDuration dur = 0.0;                   /**< @todo Timer duration should be set */
     TriParameterList parList;                     /**< @todo Paramters list should be translated */
     parList.length = 0;
     parList.parList = 0;
     
-    tliTcStart(0, te.TimeStamp().Get(), 0, 0, _mtcId, testCaseId, parList, dur);
+    tliTcStart(0, te.TimeStamp().Get(), const_cast<char *>(src), line, creatorId, _id, parList, dur);
   }
+  
+  // create MTC
+  _mtcId = te.TestComponentCreateReq(src, line, creator, TCI_MTC_COMP, &_mtcType, "MTC");
+  
+  // give a chance to create static connections and the initialization of TSI ports
   
   // log
   if (te.Logging() && te.LogMask().Get(LOG_TE_TC_EXECUTE)) {
@@ -122,30 +122,26 @@ void freettcn::TE::CTestCase::Start(TciParameterListType parameterlist)
     parList.length = 0;
     parList.parList = 0;
     
-    tliTcExecute(0, te.TimeStamp().Get(), "ip.ttcn", 123, _mtcId, testCaseId, parList, dur);
+    tliTcExecute(0, te.TimeStamp().Get(), const_cast<char *>(src), line, _mtcId, _id, parList, dur);
   }
-  tciExecuteTestCaseReq(testCaseId, Ports());
+  tciExecuteTestCaseReq(_id, Ports());
   
   // start MTC
-  TciBehaviourIdType behavior;
-  behavior.moduleName = 0;
-  behavior.objectName = 0;
-  behavior.aux = 0;
-  
+  /// @todo define parameter list
   TciParameterListType parameterList;
   parameterList.length = 0;
   parameterList.parList = 0;
   
-  te.TestComponentStartReq(0, _mtcId, behavior, parameterList);
+  te.TestComponentStartReq(src, line, creator, _mtcId, _behavior->Id(), parameterList);
   
-  _module->_running = true;
+  _module._running = true;
 }
 
 
 void freettcn::TE::CTestCase::Execute(TciTestCaseIdType testCaseId, TriPortIdList tsiPortList)
 {
   // set current test case
-  _module->TestCase(this);
+  _module.TestCase(this);
   
   if (triExecuteTestCase(&testCaseId, &tsiPortList) != TRI_OK) {
     /// @todo do something

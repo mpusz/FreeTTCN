@@ -40,16 +40,16 @@ namespace freettcn {
 
   namespace TE {
     
+    class CModule;
+    
     class CBehavior {
-    private:
-      const std::string _name;
+      CModule &_module;
       TciBehaviourIdType _id;
       //      VerdictType_t _verdict;
     public:
-      CBehavior(const std::string &name);
+      CBehavior(CModule &module, const char *name);
       virtual ~CBehavior();
       
-      const std::string &Name() const;
       const TciBehaviourIdType &Id() const;
       
       virtual void Run() = 0;

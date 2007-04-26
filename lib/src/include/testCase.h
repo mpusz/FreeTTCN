@@ -45,6 +45,9 @@ namespace freettcn {
     
     class CModule;
     class CBehavior;
+    class CSourceData;
+    class CTestComponent;
+    class CTestComponentType;
     
     class CTestCase : public CInitObject {
       class CState {
@@ -53,23 +56,32 @@ namespace freettcn {
         // TC_VERDICT - actual global test verdict of a test case, updated after every test component termination
       };
       
+      CModule &_module;
+      CSourceData const * const _srcData;
+      const CTestComponentType &_mtcType;
+      CBehavior * const _behavior;
+      const CTestComponentType &_systemType;
+      
+      TciTestCaseIdType _id;
+      
+      // state
       TriComponentId _mtcId;
-      CBehavior *_behavior;
-      CModule *_module;
       
     public:
-      CTestCase(const std::string &name);
+      CTestCase(CModule &module, const char *name, const CSourceData *srcData,
+                const CTestComponentType &mtcType, CBehavior *behavior,
+                const CTestComponentType *systemType = 0);
       virtual ~CTestCase();
       
-      void Register(CBehavior *behavior);
-      
-      void Module(CModule &module);
-      CModule &Module() const throw(EOperationFailed);
+//       CModule &Module() const;
       
       TciParameterTypeListType Parameters() const;
       TriPortIdList Ports() const;
       
-      void Start(TciParameterListType parameterlist);
+      void Start(const char *src, int line,
+                 const CTestComponent *creator,
+                 TciParameterListType parameterlist,
+                 TriTimerDuration dur);
       void Execute(TciTestCaseIdType testCaseId, TriPortIdList tsiPortList);
       void Stop();
     };

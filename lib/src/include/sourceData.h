@@ -17,41 +17,37 @@
 // along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+
 /**
- * @file   initObject.h
+ * @file   sourceData.h
  * @author Mateusz Pusz
- * @date   Wed Apr 25 11:13:10 2007
+ * @date   Thu Apr 26 08:46:45 2007
  * 
  * @brief  
  * 
  * 
  */
 
-#ifndef __INITOBJECT_H__
-#define __INITOBJECT_H__
+#ifndef __SOURCEDATA_H__
+#define __SOURCEDATA_H__
 
-#include <string>
 
 namespace freettcn {
 
   namespace TE {
-    
-    class CInitObject {
-      char const * const _name;
-      bool _inited;
-      
-      virtual void Initialize() = 0;
+
+    class CSourceData {
+      char const * const _src;
+      const int _line;
     public:
-      CInitObject(const char *name);
-      virtual ~CInitObject();
-      
-      const char *Name() const;
-      void Init();
+      CSourceData(const char *src, int line);
+      const char *Source() const;
+      int Line() const;
     };
-    
+
   } // namespace TE
   
 } // namespace freettcn
 
 
-#endif /* __INITOBJECT_H__ */
+#endif /* __SOURCEDATA_H__ */

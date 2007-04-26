@@ -18,40 +18,30 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /**
- * @file   initObject.h
+ * @file   sourceData.cpp
  * @author Mateusz Pusz
- * @date   Wed Apr 25 11:13:10 2007
+ * @date   Thu Apr 26 08:47:29 2007
  * 
  * @brief  
  * 
  * 
  */
 
-#ifndef __INITOBJECT_H__
-#define __INITOBJECT_H__
+#include "sourceData.h"
 
-#include <string>
-
-namespace freettcn {
-
-  namespace TE {
-    
-    class CInitObject {
-      char const * const _name;
-      bool _inited;
-      
-      virtual void Initialize() = 0;
-    public:
-      CInitObject(const char *name);
-      virtual ~CInitObject();
-      
-      const char *Name() const;
-      void Init();
-    };
-    
-  } // namespace TE
-  
-} // namespace freettcn
+freettcn::TE::CSourceData::CSourceData(const char *src, int line):
+  _src(src), _line(line)
+{
+}
 
 
-#endif /* __INITOBJECT_H__ */
+const char *freettcn::TE::CSourceData::Source() const
+{
+  return _src;
+}
+
+
+int freettcn::TE::CSourceData::Line() const
+{
+  return _line;
+}

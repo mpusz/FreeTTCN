@@ -27,13 +27,18 @@
  * 
  */
 
-#include "te.h"
+#include "module.h"
+#include "testComponent.h"
+#include "testCase.h"
+#include "behavior.h"
+#include "port.h"
+#include "sourceData.h"
 
 
 namespace freettcn {
   
   namespace IP {
-    
+
 //     // ********** TYPES ***********
     
 //     class CICMPPingDataType {
@@ -86,16 +91,71 @@ namespace freettcn {
     
     class CICMPPort : public freettcn::TE::CPort {
     };
+
+    
+    // ********** COMPONENTS ***********
     
     class CICMPComponent : public freettcn::TE::CTestComponent {
     public:
       CICMPPort icmpPort;
+      
+      CICMPComponent(const freettcn::TE::CType &type);
     };
+    
+    CICMPComponent::CICMPComponent(const freettcn::TE::CType &type):
+      freettcn::TE::CTestComponent(type)
+    {
+    }
     
     class CIPStack : public freettcn::TE::CTestComponent {
     public:
       CICMPPort icmpPort;
+      
+      CIPStack(const freettcn::TE::CType &type);
     };
+
+    CIPStack::CIPStack(const freettcn::TE::CType &type):
+      freettcn::TE::CTestComponent(type)
+    {
+    }
+    
+    
+    
+    // ********** COMPONENTS TYPES ***********
+    
+    class CICMPComponentType : public freettcn::TE::CTestComponentType {
+    public:
+      CICMPComponentType(const freettcn::TE::CModule &module);
+      virtual freettcn::TE::CValue *InstanceCreate(bool omit = false) const;
+    };
+    
+    CICMPComponentType::CICMPComponentType(const freettcn::TE::CModule &module):
+      freettcn::TE::CTestComponentType(module, "ICMPComponent")
+    {
+    }
+    
+    freettcn::TE::CValue *CICMPComponentType::InstanceCreate(bool omit /* false */) const
+    {
+      return new CICMPComponent(*this);
+    }
+    
+    
+    class CIPStackType : public freettcn::TE::CTestComponentType {
+    public:
+      CIPStackType(const freettcn::TE::CModule &module);
+      virtual freettcn::TE::CValue *InstanceCreate(bool omit = false) const;
+    };
+    
+    CIPStackType::CIPStackType(const freettcn::TE::CModule &module):
+      freettcn::TE::CTestComponentType(module, "IPStack")
+    {
+    }
+    
+    freettcn::TE::CValue *CIPStackType::InstanceCreate(bool omit /* false */) const
+    {
+      return new CIPStack(*this);
+    }
+    
     
     
     
@@ -182,42 +242,90 @@ namespace freettcn {
     class CTestCase_ICMP_Ping_1 : public freettcn::TE::CTestCase {
       class CBehavior : public freettcn::TE::CBehavior {
       public:
+        CBehavior(freettcn::TE::CModule &module);
         virtual void Run();
       };
       
       virtual void Initialize();
     public:
-      CTestCase_ICMP_Ping_1();
+      CTestCase_ICMP_Ping_1(freettcn::TE::CModule &module);
     };
     
-    CTestCase_ICMP_Ping_1::CTestCase_ICMP_Ping_1():
-      freettcn::TE::CTestCase("ICMP_Ping_1")
+    CTestCase_ICMP_Ping_1::CTestCase_ICMP_Ping_1(freettcn::TE::CModule &module):
+      freettcn::TE::CTestCase(module, "ICMP_Ping_1", new freettcn::TE::CSourceData("ip.ttcn", 76),
+                              *new CICMPComponentType(module), new CBehavior(module),
+                              new CIPStackType(module))
     {
     }
     
     void CTestCase_ICMP_Ping_1::Initialize()
     {
       // register test case parameters
-      
-      // register module behaviour
-      Register(new CTestCase_ICMP_Ping_1::CBehavior);
+    }
+    
+    
+    
+    CTestCase_ICMP_Ping_1::CBehavior::CBehavior(freettcn::TE::CModule &module):
+      freettcn::TE::CBehavior(module, "TC_ICMPPing_1")
+    {
     }
     
     void CTestCase_ICMP_Ping_1::CBehavior::Run()
     {
     }
+
     
+    
+    class CTestCase_ICMP_Ping_2 : public freettcn::TE::CTestCase {
+      class CBehavior : public freettcn::TE::CBehavior {
+      public:
+        CBehavior(freettcn::TE::CModule &module);
+        virtual void Run();
+      };
+      
+      virtual void Initialize();
+    public:
+      CTestCase_ICMP_Ping_2(freettcn::TE::CModule &module);
+    };
+    
+    CTestCase_ICMP_Ping_2::CTestCase_ICMP_Ping_2(freettcn::TE::CModule &module):
+      freettcn::TE::CTestCase(module, "ICMP_Ping_2", new freettcn::TE::CSourceData("ip.ttcn", 109),
+                              *new CICMPComponentType(module), new CBehavior(module))
+    {
+    }
+    
+    void CTestCase_ICMP_Ping_2::Initialize()
+    {
+      // register test case parameters
+    }
+    
+    
+    CTestCase_ICMP_Ping_2::CBehavior::CBehavior(freettcn::TE::CModule &module):
+      freettcn::TE::CBehavior(module, "TC_ICMPPing_2")
+    {
+    }
+    
+    void CTestCase_ICMP_Ping_2::CBehavior::Run()
+    {
+    }
+
     
     // *********************** C O N T R O L ***************************
     
     class CControlBehavior : public freettcn::TE::CBehavior {
     public:
+      CControlBehavior(freettcn::TE::CModule &module);
       virtual void Run();
     };
     
+    CControlBehavior::CControlBehavior(freettcn::TE::CModule &module):
+      freettcn::TE::CBehavior(module, "_control_")
+    {
+    }
+
     void CControlBehavior::Run()
     {
-      _module.TestCase(0).Run();
+      //      _module.TestCase(0).Run();
     }
     
     
@@ -243,10 +351,11 @@ namespace freettcn {
       // register module parameters
       
       // register module test cases
-      Register(new CTestCase_ICMP_Ping_1);
+      Register(new CTestCase_ICMP_Ping_1(*this));
+      Register(new CTestCase_ICMP_Ping_2(*this));
       
-      // register module control
-      Register(new CControlBehavior);
+      // register control behavior
+      Register(new CControlBehavior(*this), new freettcn::TE::CSourceData("ip.ttcn", 115));
     }
     
     

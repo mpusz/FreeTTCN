@@ -273,8 +273,8 @@ void freettcn::TL::CTestLogging::TcStarted(const char *am, int ts, const char *s
   
   char str[256];
   
-  sprintf(str, "%s [%s.%s]", c.compName, c.compType.moduleName, c.compType.objectName);
-  data->LineAdd("From", str);
+//   sprintf(str, "%s [%s.%s]", c.compName, c.compType.moduleName, c.compType.objectName);
+//   data->LineAdd("From", str);
   
   sprintf(str, "%s.%s", tcId.moduleName, tcId.objectName);
   data->LineAdd("Testcase Id", str);
@@ -304,8 +304,8 @@ void freettcn::TL::CTestLogging::TcTerminated(const char *am, int ts, const char
   
   char str[256];
   
-  sprintf(str, "%s [%s.%s]", c.compName, c.compType.moduleName, c.compType.objectName);
-  data->LineAdd("From", str);
+//   sprintf(str, "%s [%s.%s]", c.compName, c.compType.moduleName, c.compType.objectName);
+//   data->LineAdd("From", str);
   
   sprintf(str, "%s.%s", tcId.moduleName, tcId.objectName);
   data->LineAdd("Testcase Id", str);
