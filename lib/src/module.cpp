@@ -97,7 +97,7 @@ void freettcn::TE::CModule::CParameter::Value(TciValue value)
 
 freettcn::TE::CModule::CModule(const char *name):
   CInitObject(name), _ctrlBehavior(0), _ctrlSrcData(0),
-  _ctrlCompType(*this), _currTestCase(0), __modParList(0), __testCaseIdList(0), _running(false)
+  _ctrlCompType(*this), _ctrlRunning(false), _currTestCase(0), __modParList(0), __testCaseIdList(0)
 {
   freettcn::TE::CModulesContainer &modContainer = freettcn::TE::CModulesContainer::Instance();
   modContainer.Register(*this);
@@ -157,18 +157,21 @@ const freettcn::TE::CControlComponentType &freettcn::TE::CModule::ControlCompone
 
 bool freettcn::TE::CModule::Running() const
 {
-  return _running;
+  return _ctrlRunning || _currTestCase;
 }
 
 
 void freettcn::TE::CModule::Reset()
 {
   if (Running()) {
-    if (_currTestCase)
+    if (_currTestCase) {
+      _currTestCase->Stop();
+      
       // reset SA only if test case is running
       triSAReset();
+    }
     
-    _running = false;
+    _ctrlRunning = false;
     
     // reset PA
     triPAReset();
@@ -245,7 +248,7 @@ TciTestCaseIdListType freettcn::TE::CModule::TestCases() const
   return tcList;
 }
 
-freettcn::TE::CTestCase &freettcn::TE::CModule::TestCase(const std::string &tcId) const throw(ENotFound)
+freettcn::TE::CTestCase &freettcn::TE::CModule::TestCase(const char *tcId) const throw(ENotFound)
 {
   for(TestCaseList::const_iterator it=_testCaseList.begin(); it != _testCaseList.end(); ++it)
     if ((*it)->Name() == tcId)
@@ -259,14 +262,9 @@ void freettcn::TE::CModule::TestCase(freettcn::TE::CTestCase *tc)
   _currTestCase = tc;
 }
 
-freettcn::TE::CTestCase &freettcn::TE::CModule::TestCase() const throw(EOperationFailed)
+freettcn::TE::CTestCase *freettcn::TE::CModule::TestCase() const
 {
-  if (_currTestCase)
-    return *_currTestCase;
-  else {
-    std::cout << "ERROR: Test Case not set" << std::endl;
-    throw freettcn::EOperationFailed();
-  }
+  return _currTestCase;
 }
 
 
@@ -294,7 +292,7 @@ const freettcn::TE::CBehavior &freettcn::TE::CModule::ControlBehavior() const th
 
 TriComponentId freettcn::TE::CModule::ControlStart()
 {
-  _running = true;
+  _ctrlRunning = true;
   
   freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
   return te.TestComponentCreateReq(_ctrlSrcData->Source(), _ctrlSrcData->Line(), 0, TCI_CTRL_COMP, 0, "CONTROL");
@@ -308,12 +306,15 @@ void freettcn::TE::CModule::ControlStop() throw(EOperationFailed)
   if (te.Logging() && te.LogMask().Get(LOG_TE_CTRL_STOP))
     tliCtrlStop(0, te.TimeStamp().Get(), 0, 0, ModuleComponentId());
   
-  _currTestCase = 0;
+  if (_currTestCase)
+    _currTestCase->Stop();
   
   tciResetReq();
   
   // notify TM about control part termination
   tciControlTerminated();
+  
+  _ctrlRunning = 0;
 }
 
 

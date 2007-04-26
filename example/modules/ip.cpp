@@ -325,7 +325,8 @@ namespace freettcn {
 
     void CControlBehavior::Run()
     {
-      //      _module.TestCase(0).Run();
+//       _module.TestCase(0).Execute();
+//       _module.TestCase(1).Execute(3.0);
     }
     
     

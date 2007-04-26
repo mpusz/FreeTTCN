@@ -133,8 +133,6 @@ void freettcn::TE::CTestCase::Start(const char *src, int line,
   parameterList.parList = 0;
   
   te.TestComponentStartReq(src, line, creator, _mtcId, _behavior->Id(), parameterList);
-  
-  _module._running = true;
 }
 
 
@@ -151,6 +149,8 @@ void freettcn::TE::CTestCase::Execute(TciTestCaseIdType testCaseId, TriPortIdLis
 
 void freettcn::TE::CTestCase::Stop()
 {
+  _module.TestCase(0);
+  
   // log
   freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
   if (te.Logging() && te.LogMask().Get(LOG_TE_TC_STOP))

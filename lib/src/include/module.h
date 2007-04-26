@@ -104,6 +104,7 @@ namespace freettcn {
       BehaviorList _behaviorList;
       
       // module state
+      bool _ctrlRunning;
       TestCompList _allEntityStates;
       CTestCase *_currTestCase;
       TestCompList _done;
@@ -120,8 +121,6 @@ namespace freettcn {
       
       void ParametersSet() throw(freettcn::EOperationFailed);
     public:
-      bool _running; /// @todo temporary solution
-      
       CModule(const char *name);
       virtual ~CModule() = 0;
       
@@ -135,9 +134,9 @@ namespace freettcn {
       TciModuleParameterListType Parameters() const;
       
       TciTestCaseIdListType TestCases() const;
-      CTestCase &TestCase(const std::string &tcId) const throw(ENotFound);
+      CTestCase &TestCase(const char *tcId) const throw(ENotFound);
       void TestCase(CTestCase *tc);
-      CTestCase &TestCase() const throw(EOperationFailed);
+      CTestCase *TestCase() const;
       
       const CBehavior &ControlBehavior() const throw(ENotFound);
       TriComponentId ControlStart();

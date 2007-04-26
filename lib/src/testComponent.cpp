@@ -80,6 +80,8 @@ const TriComponentId &freettcn::TE::CTestComponent::Id() const throw(freettcn::T
 
 void freettcn::TE::CTestComponent::Start(const freettcn::TE::CBehavior &behavior, TciParameterListType parameterList) throw(freettcn::TE::CTestComponent::ENotInited)
 {
+  // schedule executing test component
+//   Timer().Start();
 }
 
 

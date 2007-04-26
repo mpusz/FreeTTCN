@@ -211,7 +211,11 @@ void freettcn::TE::CTTCNExecutable::TestCaseStart(const TciTestCaseIdType &testC
   }
   
   freettcn::TE::CTestCase &tc = module.TestCase(testCaseId.objectName);
+
+  // set as current test case
   module.TestCase(&tc);
+
+  // start test case
   tc.Start(0, 0, 0, parameterlist, 0);
 }
 
@@ -220,8 +224,8 @@ void freettcn::TE::CTTCNExecutable::TestCaseStop() const
 {
   freettcn::TE::CModule &module = RootModule();
   if (module.Running()) {
-    module.TestCase().Stop();
-    module.TestCase(0); /**< @todo fixme - it can be matched with string version if module is const */
+    if (freettcn::TE::CTestCase *tc = module.TestCase())
+      tc->Stop();
   }
 }
 
@@ -356,12 +360,21 @@ void freettcn::TE::CTTCNExecutable::TestComponentTerminated(const TriComponentId
     
     tliCTerminated(0, TimeStamp().Get(), "ip.ttcn", 122, ctrlId, 0);
   }
+  
+  // reset current test case
+  RootModule().TestCase(0);
 }
 
 
 void freettcn::TE::CTTCNExecutable::TestCaseExecute(const TciTestCaseIdType &testCaseId, const TriPortIdList &tsiPortList) const
 {
-  RootModule().TestCase(testCaseId.objectName).Execute(testCaseId, tsiPortList);
+  freettcn::TE::CTestCase &tc = RootModule().TestCase(testCaseId.objectName);
+  
+  // set as current test case
+  RootModule().TestCase(&tc);
+
+  // prepare test case
+  tc.Execute(testCaseId, tsiPortList);
 }
 
 
