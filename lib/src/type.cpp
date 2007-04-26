@@ -80,10 +80,8 @@ String freettcn::TE::CType::Extension() const
 
 
 
-freettcn::TE::CBooleanType::CBooleanType(String           encoding,
-                                         String           encodingVariant,
-                                         String           extension) :
-  CType(0, "boolean", TCI_BOOLEAN_TYPE, encoding, encodingVariant, extension)
+freettcn::TE::CBooleanType::CBooleanType() :
+  CType(0, "boolean", TCI_BOOLEAN_TYPE, "", "", "")
 {
 }
 
@@ -95,15 +93,15 @@ freettcn::TE::CValue *freettcn::TE::CBooleanType::InstanceCreate(bool omit /* fa
 
 
 
-freettcn::TE::CRecordType::CRecordType(const CModule    *module,
-                                       String           encoding,
-                                       String           encodingVariant,
-                                       String           extension) :
-  CType(module, "record", TCI_RECORD_TYPE, encoding, encodingVariant, extension)
-{
-}
+// freettcn::TE::CRecordType::CRecordType(const CModule    &module,
+//                                        String           encoding,
+//                                        String           encodingVariant,
+//                                        String           extension) :
+//   CType(&module, "record", TCI_RECORD_TYPE, encoding, encodingVariant, extension)
+// {
+// }
 
-freettcn::TE::CValue *freettcn::TE::CRecordType::InstanceCreate(bool omit /* false */) const
-{
-  return new freettcn::TE::CRecordValue(*this, omit);
-}
+// freettcn::TE::CValue *freettcn::TE::CRecordType::InstanceCreate(bool omit /* false */) const
+// {
+//   return new freettcn::TE::CRecordValue(*this, omit);
+// }

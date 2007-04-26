@@ -58,10 +58,10 @@ namespace freettcn {
       
       TriStatus Reset();
       
-      TriStatus TestCaseExecute(const TriTestCaseId* testCaseId, const TriPortIdList* tsiPortList);
+      TriStatus TestCaseExecute(const TriTestCaseId &testCaseId, const TriPortIdList &tsiPortList);
 
-      TriStatus Map(const TriPortId* compPortId, const TriPortId* tsiPortId);
-      TriStatus Unmap(const TriPortId* compPortId, const TriPortId* tsiPortId);
+      TriStatus Map(const TriPortId &compPortId, const TriPortId &tsiPortId);
+      TriStatus Unmap(const TriPortId &compPortId, const TriPortId &tsiPortId);
     };
     
   } // namespace SA
@@ -69,7 +69,7 @@ namespace freettcn {
 } // namespace freettcn
 
 
-void MessageReceived();
+// void MessageReceived();
 
 #endif /* __SA_H__ */
 

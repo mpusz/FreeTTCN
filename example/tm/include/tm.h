@@ -63,9 +63,9 @@ namespace freettcn {
         TciTestCaseIdType Id() const;
         void Print() const;
         
-        void Start(TciParameterListType parameterlist);
-        void Started(TciParameterListType parameterList, double timer);
-        void Terminated(TciVerdictValue verdict, TciParameterListType parameterlist);
+        void Start(const TciParameterListType &parameterlist);
+        void Started(const TciParameterListType &parameterList, double timer);
+        void Terminated(TciVerdictValue verdict, const TciParameterListType &parameterlist);
         void Stop();
       };
       
@@ -104,17 +104,17 @@ namespace freettcn {
       
       void Init(String moduleId) throw(EOperationFailed);
       
-      virtual void Log(TriComponentId testComponentId, String message);
+      virtual void Log(const TriComponentId &testComponentId, String message);
       virtual void Error(String message);
       void Abort();
       
-      virtual TciValue ModuleParameterGet(TciModuleParameterIdType parameterId) const;
+      virtual TciValue ModuleParameterGet(const TciModuleParameterIdType &parameterId) const;
       
       void TestCasesPrint() const;
       void TestCaseInit(String testCaseId) throw(ENotFound);
-      void TestCaseStart(String testCaseId, TciParameterListType parameterlist) throw(ENotFound);
-      void TestCaseStarted(TciTestCaseIdType testCaseId, TciParameterListType parameterList, double timer);
-      void TestCaseTerminated(TciVerdictValue verdict, TciParameterListType parameterlist);
+      void TestCaseStart(String testCaseId, const TciParameterListType &parameterlist) throw(ENotFound);
+      void TestCaseStarted(const TciTestCaseIdType &testCaseId, const TciParameterListType &parameterList, double timer);
+      void TestCaseTerminated(TciVerdictValue verdict, const TciParameterListType &parameterlist);
       void TestCaseStop() throw(EOperationFailed);
 
       void ControlInit();

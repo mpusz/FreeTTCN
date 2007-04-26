@@ -64,7 +64,7 @@ void freettcn::TM::CTestManagement::CTestCase::Print() const
 }
 
 
-void freettcn::TM::CTestManagement::CTestCase::Start(TciParameterListType parameterlist)
+void freettcn::TM::CTestManagement::CTestCase::Start(const TciParameterListType &parameterlist)
 {
 //   TciTestCaseIdType testCaseId;
 //   testCaseId.moduleName = _tm.ModuleId().c_str();
@@ -73,11 +73,11 @@ void freettcn::TM::CTestManagement::CTestCase::Start(TciParameterListType parame
   tciStartTestCase(_id, parameterlist);
 }
 
-void freettcn::TM::CTestManagement::CTestCase::Started(TciParameterListType parameterList, double timer)
+void freettcn::TM::CTestManagement::CTestCase::Started(const TciParameterListType &parameterList, double timer)
 {
 }
 
-void freettcn::TM::CTestManagement::CTestCase::Terminated(TciVerdictValue verdict, TciParameterListType parameterlist)
+void freettcn::TM::CTestManagement::CTestCase::Terminated(TciVerdictValue verdict, const TciParameterListType &parameterlist)
 {
 }
 
@@ -227,7 +227,7 @@ void freettcn::TM::CTestManagement::Init(String moduleId) throw(freettcn::EOpera
 }
 
 
-void freettcn::TM::CTestManagement::Log(TriComponentId testComponentId, String message)
+void freettcn::TM::CTestManagement::Log(const TriComponentId &testComponentId, String message)
 {
   std::cout << "Log: " << message << std::endl;
 }
@@ -254,7 +254,7 @@ void freettcn::TM::CTestManagement::Abort()
 }
 
 
-TciValue freettcn::TM::CTestManagement::ModuleParameterGet(TciModuleParameterIdType parameterId) const
+TciValue freettcn::TM::CTestManagement::ModuleParameterGet(const TciModuleParameterIdType &parameterId) const
 {
   for(ModuleParList::const_iterator it = _modParList.begin(); it != _modParList.end(); ++it) {
     if ((*it)->Name() == parameterId)
@@ -290,14 +290,14 @@ void freettcn::TM::CTestManagement::TestCaseInit(String testCaseId) throw(freett
 }
 
 
-void freettcn::TM::CTestManagement::TestCaseStart(String testCaseId, TciParameterListType parameterlist) throw(ENotFound)
+void freettcn::TM::CTestManagement::TestCaseStart(String testCaseId, const TciParameterListType &parameterlist) throw(ENotFound)
 {
   _tc = &TestCaseGet(testCaseId);
   _tc->Start(parameterlist);
 }
 
 
-void freettcn::TM::CTestManagement::TestCaseStarted(TciTestCaseIdType testCaseId, TciParameterListType parameterList, double timer)
+void freettcn::TM::CTestManagement::TestCaseStarted(const TciTestCaseIdType &testCaseId, const TciParameterListType &parameterList, double timer)
 {
   _moduleRunning = true;
   _tc = &TestCaseGet(testCaseId.objectName);
@@ -316,7 +316,7 @@ void freettcn::TM::CTestManagement::TestCaseStarted(TciTestCaseIdType testCaseId
 }
 
 
-void freettcn::TM::CTestManagement::TestCaseTerminated(TciVerdictValue verdict, TciParameterListType parameterlist)
+void freettcn::TM::CTestManagement::TestCaseTerminated(TciVerdictValue verdict, const TciParameterListType &parameterlist)
 {
   if (_tc) {
     _tc->Terminated(verdict, parameterlist);

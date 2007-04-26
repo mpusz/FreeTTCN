@@ -52,15 +52,15 @@ namespace freettcn {
       
     protected:
       virtual TriComponentId TestComponentCreate(TciTestComponentKindType kind, TciType componentType, String name);
-      virtual void TestComponentStart(TriComponentId component, TciBehaviourIdType behavior, TciParameterListType parameterList);
-      virtual void TestComponentTerminated(TriComponentId component, TciVerdictValue verdict);
+      virtual void TestComponentStart(const TriComponentId &component, const TciBehaviourIdType &behavior, const TciParameterListType &parameterList);
+      virtual void TestComponentTerminated(const TriComponentId &component, TciVerdictValue verdict);
 
-      virtual void TestCaseExecute(TciTestCaseIdType testCaseId, TriPortIdList tsiPortList);
+      virtual void TestCaseExecute(const TciTestCaseIdType &testCaseId, const TriPortIdList &tsiPortList);
 
-      virtual void Connect(TriPortId fromPort, TriPortId toPort);
-      virtual void Disconnect(TriPortId fromPort, TriPortId toPort);
-      virtual void Map(TriPortId fromPort, TriPortId toPort);
-      virtual void Unmap(TriPortId fromPort, TriPortId toPort);
+      virtual void Connect(const TriPortId &fromPort, const TriPortId &toPort);
+      virtual void Disconnect(const TriPortId &fromPort, const TriPortId &toPort);
+      virtual void Map(const TriPortId &fromPort, const TriPortId &toPort);
+      virtual void Unmap(const TriPortId &fromPort, const TriPortId &toPort);
     public:
       static CComponentHandler &Instance() throw(ENotFound);
       
@@ -70,15 +70,15 @@ namespace freettcn {
       void ResetReq();
       
       TriComponentId TestComponentCreateReq(TciTestComponentKindType kind, TciType componentType, String name);
-      void TestComponentStartReq(TriComponentId component, TciBehaviourIdType behavior, TciParameterListType parameterList); 
-      void TestComponentTerminatedReq(TriComponentId component, TciVerdictValue verdict);
+      void TestComponentStartReq(const TriComponentId &component, const TciBehaviourIdType &behavior, const TciParameterListType &parameterList); 
+      void TestComponentTerminatedReq(const TriComponentId &component, TciVerdictValue verdict);
       
-      void TestCaseExecuteReq(TciTestCaseIdType testCaseId, TriPortIdList tsiPortList);
+      void TestCaseExecuteReq(const TciTestCaseIdType &testCaseId, const TriPortIdList &tsiPortList);
 
-      void ConnectReq(TriPortId fromPort, TriPortId toPort);
-      void DisconnectReq(TriPortId fromPort, TriPortId toPort);
-      void MapReq(TriPortId fromPort, TriPortId toPort);
-      void UnmapReq(TriPortId fromPort, TriPortId toPort);
+      void ConnectReq(const TriPortId &fromPort, const TriPortId &toPort);
+      void DisconnectReq(const TriPortId &fromPort, const TriPortId &toPort);
+      void MapReq(const TriPortId &fromPort, const TriPortId &toPort);
+      void UnmapReq(const TriPortId &fromPort, const TriPortId &toPort);
     };
     
   } // namespace CH

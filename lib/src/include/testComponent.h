@@ -41,7 +41,7 @@ extern "C" {
 
 
 namespace freettcn {
-
+  
   namespace TE {
     
     enum VerdictType_t {
@@ -53,7 +53,7 @@ namespace freettcn {
     };
     
     class CBehavior;
-    class CPort;
+//     class CPort;
     
     class CTestComponent : public CValue {
     public:
@@ -85,8 +85,6 @@ namespace freettcn {
       CModule *_module;
       TciTestComponentKindType _kind;
       TriComponentId _id;
-//     protected:
-//       bool Inited() const;
     public:
       CTestComponent(const CType &type);
       ~CTestComponent();
@@ -103,24 +101,8 @@ namespace freettcn {
     
     class CTestComponentType : public CType {
     public:
-      CTestComponentType(const CModule &module, String name);
+      CTestComponentType(const CModule *module, String name);
     };
-    
-
-
-
-    class CControlComponent : public CTestComponent {
-    public:
-      CControlComponent(const CType &type);
-    };
-    
-    class CControlComponentType : public CTestComponentType {
-    public:
-      CControlComponentType(const CModule &module);
-      virtual CValue *InstanceCreate(bool omit = false) const;
-    };
-    
-    
     
     
 //     CTestComponent::CTestComponent(flowGraphNode, bool keepAlive):

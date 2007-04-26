@@ -17,32 +17,50 @@
 // along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+
 /**
- * @file   sourceData.cpp
+ * @file   modulesContainer.h
  * @author Mateusz Pusz
- * @date   Thu Apr 26 08:47:29 2007
+ * @date   Thu Apr 26 16:49:51 2007
  * 
  * @brief  
  * 
  * 
  */
 
-#include "sourceData.h"
+#ifndef __MODULESCONTAINER_H__
+#define __MODULESCONTAINER_H__
+
+#include "exception.h"
+#include <vector>
 
 
-freettcn::TE::CSourceData::CSourceData(const char *src, int line):
-  _src(src), _line(line)
-{
-}
+namespace freettcn {
+
+  namespace TE {
+    
+    class CModule;
+    
+    /**
+     * Singleton design pattern
+     */
+    class CModulesContainer {
+      typedef std::vector<CModule *> ModuleList;
+      ModuleList _modList;
+      
+      CModulesContainer();
+      CModulesContainer &operator=(CModulesContainer &);  // Disallowed
+      CModulesContainer(const CModulesContainer &);       // Disallowed
+    public:
+      static CModulesContainer &Instance();
+      
+      void Register(CModule &module);
+      CModule &Get(const std::string &moduleId) const throw(ENotFound);
+    };
+
+  } // namespace TE
+  
+} // namespace freettcn
 
 
-const char *freettcn::TE::CSourceData::Source() const
-{
-  return _src;
-}
-
-
-int freettcn::TE::CSourceData::Line() const
-{
-  return _line;
-}
+#endif /* __MODULESCONTAINER_H__ */

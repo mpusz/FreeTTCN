@@ -31,6 +31,7 @@
 #include "te.h"
 #include "module.h"
 #include "behavior.h"
+#include "testComponent.h"
 #include "sourceData.h"
 extern "C" {
 #include "freettcn/tci_te_tm.h"
@@ -58,11 +59,6 @@ freettcn::TE::CTestCase::~CTestCase()
   if (_srcData)
     delete _srcData;
 }
-
-// freettcn::TE::CModule &freettcn::TE::CTestCase::Module() const
-// {
-//   return _module;
-// }
 
 TciParameterTypeListType freettcn::TE::CTestCase::Parameters() const
 {
@@ -99,9 +95,8 @@ void freettcn::TE::CTestCase::Start(const char *src, int line,
     creatorId = _module.ModuleComponentId();
   }
   
-  freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
-  
   // log
+  freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
   if (te.Logging() && te.LogMask().Get(LOG_TE_TC_START)) {
     TriParameterList parList;                     /**< @todo Paramters list should be translated */
     parList.length = 0;
@@ -111,7 +106,7 @@ void freettcn::TE::CTestCase::Start(const char *src, int line,
   }
   
   // create MTC
-  _mtcId = te.TestComponentCreateReq(src, line, creator, TCI_MTC_COMP, &_mtcType, "MTC");
+  _mtcId = _module.TestComponentCreateReq(src, line, creator, TCI_MTC_COMP, &_mtcType, "MTC");
   
   // give a chance to create static connections and the initialization of TSI ports
   
@@ -132,7 +127,7 @@ void freettcn::TE::CTestCase::Start(const char *src, int line,
   parameterList.length = 0;
   parameterList.parList = 0;
   
-  te.TestComponentStartReq(src, line, creator, _mtcId, _behavior->Id(), parameterList);
+  _module.TestComponentStartReq(src, line, creator, _mtcId, _behavior->Id(), parameterList);
 }
 
 

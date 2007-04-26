@@ -43,12 +43,6 @@ freettcn::TE::CTestComponent::~CTestComponent()
 }
 
 
-// bool freettcn::TE::CTestComponent::Inited() const
-// {
-//   return _inited;
-// }
-
-
 void freettcn::TE::CTestComponent::Init(freettcn::TE::CModule &module, TciTestComponentKindType kind, String name)
 {
   _module = &module;
@@ -61,7 +55,7 @@ void freettcn::TE::CTestComponent::Init(freettcn::TE::CModule &module, TciTestCo
   if (Type().DefiningModule())
     _id.compType.moduleName = const_cast<char *>(Type().DefiningModule()->Name());
   else
-    _id.compType.moduleName = "";
+    _id.compType.moduleName = "<freettcn>";
   _id.compType.objectName = Type().Name();
   _id.compType.aux = const_cast<void *>(reinterpret_cast<const void *>(&Type()));
   
@@ -81,7 +75,7 @@ const TriComponentId &freettcn::TE::CTestComponent::Id() const throw(freettcn::T
 void freettcn::TE::CTestComponent::Start(const freettcn::TE::CBehavior &behavior, TciParameterListType parameterList) throw(freettcn::TE::CTestComponent::ENotInited)
 {
   // schedule executing test component
-//   Timer().Start();
+  //   Timer().Start();
 }
 
 
@@ -98,31 +92,7 @@ void freettcn::TE::CTestComponent::Start(const freettcn::TE::CBehavior &behavior
 
 
 
-freettcn::TE::CTestComponentType::CTestComponentType(const freettcn::TE::CModule &module, String name) :
-  freettcn::TE::CType(&module, name, TCI_COMPONENT_TYPE, "", "", "")
+freettcn::TE::CTestComponentType::CTestComponentType(const freettcn::TE::CModule *module, String name) :
+  freettcn::TE::CType(module, name, TCI_COMPONENT_TYPE, "", "", "")
 {
 }
-
-
-
-
-
-
-
-freettcn::TE::CControlComponent::CControlComponent(const CType &type):
-  freettcn::TE::CTestComponent(type)
-{
-}
-
-
-
-freettcn::TE::CControlComponentType::CControlComponentType(const CModule &module):
-  freettcn::TE::CTestComponentType(module, "_ControlComponentType_")
-{
-}
-
-freettcn::TE::CValue *freettcn::TE::CControlComponentType::InstanceCreate(bool omit /* false */) const
-{
-  return new freettcn::TE::CControlComponent(*this);
-}
-

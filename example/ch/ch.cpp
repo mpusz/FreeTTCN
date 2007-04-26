@@ -91,20 +91,20 @@ TriComponentId freettcn::CH::CComponentHandler::TestComponentCreate(TciTestCompo
 
 
 
-void freettcn::CH::CComponentHandler::TestComponentStartReq(TriComponentId component, TciBehaviourIdType behavior, TciParameterListType parameterList)
+void freettcn::CH::CComponentHandler::TestComponentStartReq(const TriComponentId &component, const TciBehaviourIdType &behavior, const TciParameterListType &parameterList)
 {
   TestComponentStart(component, behavior, parameterList);
 }
 
 
-void freettcn::CH::CComponentHandler::TestComponentStart(TriComponentId component, TciBehaviourIdType behavior, TciParameterListType parameterList)
+void freettcn::CH::CComponentHandler::TestComponentStart(const TriComponentId &component, const TciBehaviourIdType &behavior, const TciParameterListType &parameterList)
 {
   return tciStartTestComponent(component, behavior, parameterList);
 }
 
 
 
-void freettcn::CH::CComponentHandler::TestComponentTerminatedReq(TriComponentId component, TciVerdictValue verdict)
+void freettcn::CH::CComponentHandler::TestComponentTerminatedReq(const TriComponentId &component, TciVerdictValue verdict)
 {
   const unsigned int teNum = 1;                     /**< @todo define TEs for the test case */
   for (unsigned int i = 0; i < teNum; i++) {
@@ -113,14 +113,14 @@ void freettcn::CH::CComponentHandler::TestComponentTerminatedReq(TriComponentId 
   }
 }
 
-void freettcn::CH::CComponentHandler::TestComponentTerminated(TriComponentId component, TciVerdictValue verdict)
+void freettcn::CH::CComponentHandler::TestComponentTerminated(const TriComponentId &component, TciVerdictValue verdict)
 {
   tciTestComponentTerminated(component, verdict);
 }
 
 
 
-void freettcn::CH::CComponentHandler::TestCaseExecuteReq(TciTestCaseIdType testCaseId, TriPortIdList tsiPortList)
+void freettcn::CH::CComponentHandler::TestCaseExecuteReq(const TciTestCaseIdType &testCaseId, const TriPortIdList &tsiPortList)
 {
   const unsigned int teNum = 1;                     /**< @todo define TEs for the test case (having system ports of the indicated TC) */
   //execute test case on all TEs
@@ -130,13 +130,13 @@ void freettcn::CH::CComponentHandler::TestCaseExecuteReq(TciTestCaseIdType testC
   }
 }
 
-void freettcn::CH::CComponentHandler::TestCaseExecute(TciTestCaseIdType testCaseId, TriPortIdList tsiPortList)
+void freettcn::CH::CComponentHandler::TestCaseExecute(const TciTestCaseIdType &testCaseId, const TriPortIdList &tsiPortList)
 {
   tciExecuteTestCase(testCaseId, tsiPortList);
 }
 
 
-void freettcn::CH::CComponentHandler::ConnectReq(TriPortId fromPort, TriPortId toPort)
+void freettcn::CH::CComponentHandler::ConnectReq(const TriPortId &fromPort, const TriPortId &toPort)
 {
   Connect(fromPort, toPort);
   
@@ -145,13 +145,13 @@ void freettcn::CH::CComponentHandler::ConnectReq(TriPortId fromPort, TriPortId t
 //     toPort.cmp.te.Connect(TriPortId fromPort, TriPortId toPort);
 }
 
-void freettcn::CH::CComponentHandler::Connect(TriPortId fromPort, TriPortId toPort)
+void freettcn::CH::CComponentHandler::Connect(const TriPortId &fromPort, const TriPortId &toPort)
 {
   tciConnect(fromPort, toPort);
 }
 
 
-void freettcn::CH::CComponentHandler::DisconnectReq(TriPortId fromPort, TriPortId toPort)
+void freettcn::CH::CComponentHandler::DisconnectReq(const TriPortId &fromPort, const TriPortId &toPort)
 {
   Disconnect(fromPort, toPort);
   
@@ -160,28 +160,28 @@ void freettcn::CH::CComponentHandler::DisconnectReq(TriPortId fromPort, TriPortI
 //     toPort.cmp.te.Disconnect(TriPortId fromPort, TriPortId toPort);
 }
 
-void freettcn::CH::CComponentHandler::Disconnect(TriPortId fromPort, TriPortId toPort)
+void freettcn::CH::CComponentHandler::Disconnect(const TriPortId &fromPort, const TriPortId &toPort)
 {
   tciDisconnect(fromPort, toPort);
 }
 
 
-void freettcn::CH::CComponentHandler::MapReq(TriPortId fromPort, TriPortId toPort)
+void freettcn::CH::CComponentHandler::MapReq(const TriPortId &fromPort, const TriPortId &toPort)
 {
   Map(fromPort, toPort);
 }
 
-void freettcn::CH::CComponentHandler::Map(TriPortId fromPort, TriPortId toPort)
+void freettcn::CH::CComponentHandler::Map(const TriPortId &fromPort, const TriPortId &toPort)
 {
   tciMap(fromPort, toPort);
 }
 
-void freettcn::CH::CComponentHandler::UnmapReq(TriPortId fromPort, TriPortId toPort)
+void freettcn::CH::CComponentHandler::UnmapReq(const TriPortId &fromPort, const TriPortId &toPort)
 {
   Unmap(fromPort, toPort);
 }
 
-void freettcn::CH::CComponentHandler::Unmap(TriPortId fromPort, TriPortId toPort)
+void freettcn::CH::CComponentHandler::Unmap(const TriPortId &fromPort, const TriPortId &toPort)
 {
   tciUnmap(fromPort, toPort);
 }

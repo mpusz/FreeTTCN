@@ -37,7 +37,6 @@ extern "C" {
 #include "freettcn/tri.h"
 }
 #include "initObject.h"
-#include "testComponent.h"
 #include "exception.h"
 #include <vector>
 #include <list>
@@ -45,26 +44,12 @@ extern "C" {
 
 namespace freettcn {
 
-  
-//   class CQualifiedName {
-//     QualifiedName _name;
-//   public:
-//     CQualifiedName(String moduleName, String objectName, void *aux);
-//     const QualifiedName &Get() const;
-//   };
-
-//   class CModule {
-//     const CQualifiedName _id;
-//   public:
-//     CModule(const CQualifiedName &id);
-//     const TciModuleIdType &Id() const;
-//   };
-
-
   namespace TE {
 
     class CBehavior;
     class CTestCase;
+    class CTestComponent;
+    class CTestComponentType;
     class CSourceData;
     
     class CModule : public CInitObject {
@@ -88,27 +73,26 @@ namespace freettcn {
         // KILLED - (CList) a list of all terminated test components during test case execution (filled when TC is killed)
       };
       
-      // module types
+      // types
       typedef std::vector<CParameter *> ParameterList;
       typedef std::vector<CTestCase *> TestCaseList;
       typedef std::list<CTestComponent *> TestCompList;
-      typedef std::list<CBehavior *> BehaviorList;
+      typedef std::list<const CBehavior *> BehaviorList;
       
       // module info
-      CBehavior * _ctrlBehavior;
+      const CBehavior * _ctrlBehavior;
       const CSourceData * _ctrlSrcData;
-      CControlComponentType _ctrlCompType;
       TciModuleIdType _id;
       ParameterList _parameterList;
       TestCaseList _testCaseList;
       BehaviorList _behaviorList;
       
-      // module state
+      // module dynamic state
       bool _ctrlRunning;
-      TestCompList _allEntityStates;
-      CTestCase *_currTestCase;
-      TestCompList _done;
-      TestCompList _killed;
+      TestCompList _allEntityStates;              /**< list of all entities that was used in a test case - M-CONTROL (must be the first), MTC, PTCs */
+      CTestCase *_currTestCase;                   /**< current test case pointer */
+//       TestCompList _done;                         /**< a list of all currently stopped test components during test case execution (filled when TC is stopped or killed, removed when TC is started) */
+//       TestCompList _killed;                       /**< a list of all terminated test components during test case execution (filled when TC is killed) */
       
       // temporary variables
       mutable TciModuleParameterType *__modParList;
@@ -117,7 +101,7 @@ namespace freettcn {
     protected:
       void Register(CParameter *parameter);
       void Register(CTestCase *tc);
-      void Register(CBehavior *ctrlBehavior, const CSourceData *ctrlSrcData);
+      void Register(const CBehavior *ctrlBehavior, const CSourceData *ctrlSrcData);
       
       void ParametersSet() throw(freettcn::EOperationFailed);
     public:
@@ -126,7 +110,6 @@ namespace freettcn {
       
       const TciModuleIdType &Id() const;
       TriComponentId ModuleComponentId() const;
-      const CControlComponentType &ControlComponentType() const;
       
       bool Running() const;
       void Reset();
@@ -138,34 +121,17 @@ namespace freettcn {
       void TestCase(CTestCase *tc);
       CTestCase *TestCase() const;
       
-      const CBehavior &ControlBehavior() const throw(ENotFound);
       TriComponentId ControlStart();
       void ControlStop() throw(EOperationFailed);
       
+      const CBehavior &ControlBehavior() const throw(ENotFound);
       void BehaviorAdd(CBehavior *behavior);
       const CBehavior &Behavior(const TciBehaviourIdType &behavior) const throw(ENotFound);
       
       void TestComponentAdd(CTestComponent &component);
       CTestComponent &TestComponent(const TriComponentId &component) const throw(ENotFound);
-    };
-    
-    
-    /**
-     * Singleton design pattern
-     */
-    class CModulesContainer {
-      typedef std::vector<CModule *> ModuleList;
-      ModuleList _modList;
-      
-      CModulesContainer();
-      CModulesContainer &operator=(CModulesContainer &);  // Disallowed
-      CModulesContainer(const CModulesContainer &);       // Disallowed
-    public:
-      static CModulesContainer &Instance();
-      
-      void Register(CModule &module);
-      void Deregister(const CModule &module);
-      CModule &Get(const std::string &moduleId) const throw(ENotFound);
+      TriComponentId TestComponentCreateReq(const char *src, int line, const CTestComponent *creator, TciTestComponentKindType kind, const CTestComponentType *compType, String name);
+      void TestComponentStartReq(const char *src, int line, const CTestComponent *creator, const TriComponentId &componentId, const TciBehaviourIdType &behaviorId, const TciParameterListType &parameterList);
     };
 
   } // namespace TE

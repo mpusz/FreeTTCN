@@ -43,15 +43,13 @@ namespace freettcn {
   namespace TE {
     
     class CModule;
-    class CTestComponent;
-    class CTestComponentType;
-
+    
     class CTTCNExecutable : public freettcn::CEntity {
     private:
       static CTTCNExecutable _instance;
       
       CModule *_rootModule;
-
+      
     protected:
       CModule &RootModule() const throw(ENotFound);
       
@@ -82,11 +80,6 @@ namespace freettcn {
       void TestComponentTerminated(const TriComponentId &componentId, TciVerdictValue verdict) const;
       void TestCaseExecute(const TciTestCaseIdType &testCaseId, const TriPortIdList &tsiPortList) const;
       void Reset() const;
-      
-
-
-      TriComponentId TestComponentCreateReq(const char *src, int line, const CTestComponent *creator, TciTestComponentKindType kind, const CTestComponentType *compType, String name);
-      void TestComponentStartReq(const char *src, int line, const CTestComponent *creator, const TriComponentId &componentId, const TciBehaviourIdType &behaviorId, const TciParameterListType &parameterList);
     };
     
   } // namespace TE

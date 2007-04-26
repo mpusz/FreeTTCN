@@ -18,31 +18,47 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /**
- * @file   sourceData.cpp
+ * @file   typesContainer.cpp
  * @author Mateusz Pusz
- * @date   Thu Apr 26 08:47:29 2007
+ * @date   Thu Apr 26 17:32:57 2007
  * 
  * @brief  
  * 
  * 
  */
 
-#include "sourceData.h"
+#include "typesContainer.h"
 
 
-freettcn::TE::CSourceData::CSourceData(const char *src, int line):
-  _src(src), _line(line)
+freettcn::TE::CControlComponent::CControlComponent(const CType &type):
+  freettcn::TE::CTestComponent(type)
 {
 }
 
 
-const char *freettcn::TE::CSourceData::Source() const
+freettcn::TE::CControlComponentType::CControlComponentType():
+  freettcn::TE::CTestComponentType(0 , "_ControlComponentType_")
 {
-  return _src;
+}
+
+freettcn::TE::CValue *freettcn::TE::CControlComponentType::InstanceCreate(bool omit /* false */) const
+{
+  return new freettcn::TE::CControlComponent(*this);
 }
 
 
-int freettcn::TE::CSourceData::Line() const
+
+
+const freettcn::TE::CBooleanType freettcn::TE::CTypesContainer::_boolean;
+const freettcn::TE::CControlComponentType freettcn::TE::CTypesContainer::_control;
+
+const freettcn::TE::CBooleanType &freettcn::TE::CTypesContainer::Boolean()
 {
-  return _line;
+  return _boolean;
+}
+
+
+const freettcn::TE::CControlComponentType &freettcn::TE::CTypesContainer::ControlComponent()
+{
+  return _control;
 }

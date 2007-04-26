@@ -38,15 +38,9 @@ namespace freettcn {
 
   namespace TE {
 
-//     typedef unsigned long int Integer;
-//     typedef char** StringSeq;
-    
-//    typedef float Float;
-//    typedef char Char;
-
     class CValue;
     class CModule;
-  
+    
     class CType {
       const CModule *_module;
       char *_name;
@@ -54,7 +48,7 @@ namespace freettcn {
       String _encoding;
       String _encodingVariant;
       String _extension;
-    
+      
     public:
       CType(const CModule    *module,
             String           name,
@@ -63,34 +57,34 @@ namespace freettcn {
             String          encodingVariant,
             String          extension);
       virtual ~CType();
-    
+      
       const CModule *DefiningModule() const;
       String Name() const;
       TciTypeClassType Class() const;
-
+      
       String Encoding() const;
       String EncodingVariant() const;
       String Extension() const;
-    
+      
       virtual CValue *InstanceCreate(bool omit = false) const = 0;
     };
-  
+    
+    
     class CBooleanType : public CType {
     public:
-      CBooleanType(String           encoding,
-                   String           encodingVariant,
-                   String           extension);
+      CBooleanType();
       virtual CValue *InstanceCreate(bool omit = false) const;
     };
-
-    class CRecordType : public CType {
-    public:
-      CRecordType(const CModule    *module,
-                  String           encoding,
-                  String           encodingVariant,
-                  String           extension);
-      virtual CValue *InstanceCreate(bool omit = false) const;
-    };
+    
+    
+//     class CRecordType : public CType {
+//     public:
+//       CRecordType(const CModule    &module,
+//                   String           encoding,
+//                   String           encodingVariant,
+//                   String           extension);
+//       virtual CValue *InstanceCreate(bool omit = false) const;
+//     };
 
   } // namespace TE
   

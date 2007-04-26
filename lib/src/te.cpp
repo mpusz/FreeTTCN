@@ -30,10 +30,12 @@
 
 #include "te.h"
 #include "module.h"
+#include "modulesContainer.h"
 #include "testComponent.h"
 #include "behavior.h"
 #include "testCase.h"
 #include "type.h"
+#include "typesContainer.h"
 extern "C" {
 #include "freettcn/tci_te_tm.h"
 #include "freettcn/tci_te_ch.h"
@@ -233,9 +235,6 @@ void freettcn::TE::CTTCNExecutable::TestCaseStop() const
 TriComponentId freettcn::TE::CTTCNExecutable::ControlStart() const
 {
   return RootModule().ControlStart();
-  
-//   // obtain module parameters
-//   module.ParametersSet();
 }
 
 
@@ -271,7 +270,7 @@ TriComponentId freettcn::TE::CTTCNExecutable::TestComponentCreate(TciTestCompone
   if (componentType)
     cType = static_cast<const freettcn::TE::CType *>(componentType);
   else if (kind == TCI_CTRL_COMP)
-    cType = &RootModule().ControlComponentType();
+    cType = &freettcn::TE::CTypesContainer::ControlComponent();
   else {
     std::cout << "ERROR!!! TciType not defined" << std::endl;
     throw EOperationFailed();
@@ -382,69 +381,4 @@ void freettcn::TE::CTTCNExecutable::Reset() const
 {
   // stop running module
   RootModule().Reset();
-}
-
-
-
-
-
-
-TriComponentId freettcn::TE::CTTCNExecutable::TestComponentCreateReq(const char *src, int line,
-                                                                     const freettcn::TE::CTestComponent *creator,
-                                                                     TciTestComponentKindType kind,
-                                                                     const CTestComponentType *compType, String name)
-{
-  TriComponentId compId = tciCreateTestComponentReq(kind, const_cast<void *>(reinterpret_cast<const void*>(compType)), name);
-  TriComponentId creatorId;
-  
-  if (Logging() &&
-      (LogMask().Get(LOG_TE_C_CREATE) || LogMask().Get(LOG_TE_CTRL_START))) {
-    if (creator)
-      creatorId = creator->Id();
-    else
-      creatorId = RootModule().ModuleComponentId();
-  }
-  
-  // log
-  if (Logging() && LogMask().Get(LOG_TE_C_CREATE))
-    tliCCreate(0, TimeStamp().Get(), const_cast<char *>(src), line, creatorId, compId, name);
-  
-  if (kind == TCI_CTRL_COMP) {
-    // start control test component immediately using default control behavior
-    
-    // control does not have parameters
-    TciParameterListType parameterList;
-    parameterList.length = 0;
-    parameterList.parList = 0;
-    
-    // log
-    if (Logging() && LogMask().Get(LOG_TE_CTRL_START))
-      tliCtrlStart(0, TimeStamp().Get(), const_cast<char *>(src), line, creatorId);
-    
-    TestComponentStartReq(src, line, creator, compId, RootModule().ControlBehavior().Id(), parameterList);
-  }
-  
-  return compId;
-}
-
-
-void freettcn::TE::CTTCNExecutable::TestComponentStartReq(const char *src, int line,
-                                                          const freettcn::TE::CTestComponent *creator,
-                                                          const TriComponentId &componentId,
-                                                          const TciBehaviourIdType &behaviorId,
-                                                          const TciParameterListType &parameterList)
-{
-  tciStartTestComponentReq(componentId, behaviorId, parameterList);
-  
-  // log
-  if (Logging() && LogMask().Get(LOG_TE_C_START)) {
-    TriComponentId creatorId;
-    
-    if (creator)
-      creatorId = creator->Id();
-    else
-      creatorId = RootModule().ModuleComponentId();
-    
-    tliCStart(0, TimeStamp().Get(), const_cast<char *>(src), line, creatorId, componentId, behaviorId, parameterList);
-  }
 }

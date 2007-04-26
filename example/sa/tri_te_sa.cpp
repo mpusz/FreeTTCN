@@ -25,27 +25,36 @@ extern "C" {
 
 
 
-TriStatus triExecuteTestCase(const TriTestCaseId* testCaseId,
-                             const TriPortIdList* tsiPortList)
+TriStatus triExecuteTestCase(const TriTestCaseId *testCaseId,
+                             const TriPortIdList *tsiPortList)
 {
+  if (!testCaseId || !tsiPortList)
+    return TRI_ERROR;
+  
   freettcn::SA::CSUTAdaptor &sa = freettcn::SA::CSUTAdaptor::Instance();
-  return sa.TestCaseExecute(testCaseId, tsiPortList);
+  return sa.TestCaseExecute(*testCaseId, *tsiPortList);
 }
 
 
-TriStatus triMap(const TriPortId* compPortId,
-                 const TriPortId* tsiPortId)
+TriStatus triMap(const TriPortId *compPortId,
+                 const TriPortId *tsiPortId)
 {
+  if (!compPortId || !tsiPortId)
+    return TRI_ERROR;
+  
   freettcn::SA::CSUTAdaptor &sa = freettcn::SA::CSUTAdaptor::Instance();
-  return sa.Map(compPortId, tsiPortId);
+  return sa.Map(*compPortId, *tsiPortId);
 }
 
 
-TriStatus triUnmap(const TriPortId* compPortId,
-                   const TriPortId* tsiPortId)
+TriStatus triUnmap(const TriPortId *compPortId,
+                   const TriPortId *tsiPortId)
 {
+  if (!compPortId || !tsiPortId)
+    return TRI_ERROR;
+  
   freettcn::SA::CSUTAdaptor &sa = freettcn::SA::CSUTAdaptor::Instance();
-  return sa.Unmap(compPortId, tsiPortId);
+  return sa.Unmap(*compPortId, *tsiPortId);
 }
 
 

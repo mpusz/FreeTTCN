@@ -29,6 +29,7 @@
 
 
 #include "module.h"
+#include "modulesContainer.h"
 #include "te.h"
 #include "testComponent.h"
 #include "behavior.h"
@@ -44,30 +45,6 @@ extern "C" {
 #include "freettcn/tci_tl.h"
 }
 
-
-// freettcn::CQualifiedName::CQualifiedName(String moduleName, String objectName, void *aux)
-// {
-//   _name.moduleName = moduleName;
-//   _name.objectName = objectName;
-//   _name.aux = aux;
-// }
-
-// const QualifiedName &freettcn::CQualifiedName::Get() const
-// {
-//   return _name;
-// }
-
-
-
-// freettcn::CModule::CModule(const CQualifiedName &id) :
-//   _id(id)
-// {
-// }
-
-// const TciModuleIdType &freettcn::CModule::Id() const
-// {
-//   return _id.Get();
-// }
 
 freettcn::TE::CModule::CParameter::CParameter(const char *name):
   CInitObject(name), _defaultValue(0), _value(0)
@@ -95,9 +72,18 @@ void freettcn::TE::CModule::CParameter::Value(TciValue value)
   _value = value;
 }
 
+
+
+
+
+
+
+
+
 freettcn::TE::CModule::CModule(const char *name):
   CInitObject(name), _ctrlBehavior(0), _ctrlSrcData(0),
-  _ctrlCompType(*this), _ctrlRunning(false), _currTestCase(0), __modParList(0), __testCaseIdList(0)
+  //_ctrlCompType(*this), 
+  _ctrlRunning(false), _currTestCase(0), __modParList(0), __testCaseIdList(0)
 {
   freettcn::TE::CModulesContainer &modContainer = freettcn::TE::CModulesContainer::Instance();
   modContainer.Register(*this);
@@ -109,9 +95,6 @@ freettcn::TE::CModule::CModule(const char *name):
 
 freettcn::TE::CModule::~CModule()
 {
-  freettcn::TE::CModulesContainer &modContainer = freettcn::TE::CModulesContainer::Instance();
-  modContainer.Deregister(*this);
-  
   Purge(_testCaseList);
   Purge(_parameterList);
   Purge(_allEntityStates);
@@ -149,10 +132,10 @@ TriComponentId freettcn::TE::CModule::ModuleComponentId() const
 }
 
 
-const freettcn::TE::CControlComponentType &freettcn::TE::CModule::ControlComponentType() const
-{
-  return _ctrlCompType;
-}
+// const freettcn::TE::CControlComponentType &freettcn::TE::CModule::ControlComponentType() const
+// {
+//   return _ctrlCompType;
+// }
 
 
 bool freettcn::TE::CModule::Running() const
@@ -191,7 +174,7 @@ void freettcn::TE::CModule::Register(CTestCase *tc)
   tc->Init();
 }
 
-void freettcn::TE::CModule::Register(freettcn::TE::CBehavior *ctrlBehavior, const freettcn::TE::CSourceData *ctrlSrcData)
+void freettcn::TE::CModule::Register(const freettcn::TE::CBehavior *ctrlBehavior, const freettcn::TE::CSourceData *ctrlSrcData)
 {
   _ctrlBehavior = ctrlBehavior;
   _ctrlSrcData = ctrlSrcData;
@@ -242,7 +225,7 @@ TciTestCaseIdListType freettcn::TE::CModule::TestCases() const
   for(TestCaseList::const_iterator it=_testCaseList.begin(); it!=_testCaseList.end(); ++it, i++) {
     tcList.idList[i].moduleName = const_cast<char *>(Name());
     tcList.idList[i].objectName = const_cast<char *>((*it)->Name());
-    tcList.idList[i].aux = (*it);
+    tcList.idList[i].aux = 0;
   }
   
   return tcList;
@@ -268,34 +251,14 @@ freettcn::TE::CTestCase *freettcn::TE::CModule::TestCase() const
 }
 
 
-const freettcn::TE::CBehavior &freettcn::TE::CModule::ControlBehavior() const throw(ENotFound)
-{
-  if (_ctrlBehavior)
-    return *_ctrlBehavior;
-  else {
-    std::cout << "ERROR: Control Behavior not set" << std::endl;
-    throw freettcn::EOperationFailed();
-  }
-}
-
-
-// const freettcn::TE::CSourceData &freettcn::TE::CModule::ControlSourceData() const throw(ENotFound)
-// {
-//   if (_ctrlSrcData)
-//     return *_ctrlSrcData;
-//   else {
-//     std::cout << "ERROR: Control source data not set" << std::endl;
-//     throw freettcn::EOperationFailed();
-//   }
-// }
-
-
 TriComponentId freettcn::TE::CModule::ControlStart()
 {
+  // obtain module parameters
+//   ParametersSet();
+
   _ctrlRunning = true;
   
-  freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
-  return te.TestComponentCreateReq(_ctrlSrcData->Source(), _ctrlSrcData->Line(), 0, TCI_CTRL_COMP, 0, "CONTROL");
+  return TestComponentCreateReq(_ctrlSrcData->Source(), _ctrlSrcData->Line(), 0, TCI_CTRL_COMP, 0, "CONTROL");
 }
 
 
@@ -317,6 +280,16 @@ void freettcn::TE::CModule::ControlStop() throw(EOperationFailed)
   _ctrlRunning = 0;
 }
 
+
+const freettcn::TE::CBehavior &freettcn::TE::CModule::ControlBehavior() const throw(ENotFound)
+{
+  if (_ctrlBehavior)
+    return *_ctrlBehavior;
+  else {
+    std::cout << "ERROR: Control Behavior not set" << std::endl;
+    throw freettcn::EOperationFailed();
+  }
+}
 
 
 void freettcn::TE::CModule::BehaviorAdd(freettcn::TE::CBehavior *behavior)
@@ -359,39 +332,64 @@ freettcn::TE::CTestComponent &freettcn::TE::CModule::TestComponent(const TriComp
 
 
 
-
-
-
-
-
-
-freettcn::TE::CModulesContainer::CModulesContainer()
+TriComponentId freettcn::TE::CModule::TestComponentCreateReq(const char *src, int line,
+                                                             const freettcn::TE::CTestComponent *creator,
+                                                             TciTestComponentKindType kind,
+                                                             const CTestComponentType *compType, String name)
 {
-}
-
-freettcn::TE::CModulesContainer &freettcn::TE::CModulesContainer::Instance()
-{
-  static freettcn::TE::CModulesContainer container;
+  TriComponentId compId = tciCreateTestComponentReq(kind, const_cast<void *>(reinterpret_cast<const void*>(compType)), name);
+  TriComponentId creatorId;
+  freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
   
-  return container;
+  if (te.Logging() &&
+      (te.LogMask().Get(LOG_TE_C_CREATE) || te.LogMask().Get(LOG_TE_CTRL_START))) {
+    if (creator)
+      creatorId = creator->Id();
+    else
+      creatorId = ModuleComponentId();
+  }
+  
+  // log
+  if (te.Logging() && te.LogMask().Get(LOG_TE_C_CREATE))
+    tliCCreate(0, te.TimeStamp().Get(), const_cast<char *>(src), line, creatorId, compId, name);
+  
+  if (kind == TCI_CTRL_COMP) {
+    // start control test component immediately using default control behavior
+    
+    // control does not have parameters
+    TciParameterListType parameterList;
+    parameterList.length = 0;
+    parameterList.parList = 0;
+    
+    // log
+    if (te.Logging() && te.LogMask().Get(LOG_TE_CTRL_START))
+      tliCtrlStart(0, te.TimeStamp().Get(), const_cast<char *>(src), line, creatorId);
+    
+    TestComponentStartReq(src, line, creator, compId, ControlBehavior().Id(), parameterList);
+  }
+  
+  return compId;
 }
 
-void freettcn::TE::CModulesContainer::Register(CModule &module)
+
+void freettcn::TE::CModule::TestComponentStartReq(const char *src, int line,
+                                                  const freettcn::TE::CTestComponent *creator,
+                                                  const TriComponentId &componentId,
+                                                  const TciBehaviourIdType &behaviorId,
+                                                  const TciParameterListType &parameterList)
 {
-  _modList.push_back(&module);
+  tciStartTestComponentReq(componentId, behaviorId, parameterList);
+  
+  // log
+  freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
+  if (te.Logging() && te.LogMask().Get(LOG_TE_C_START)) {
+    TriComponentId creatorId;
+    
+    if (creator)
+      creatorId = creator->Id();
+    else
+      creatorId = ModuleComponentId();
+    
+    tliCStart(0, te.TimeStamp().Get(), const_cast<char *>(src), line, creatorId, componentId, behaviorId, parameterList);
+  }
 }
-
-void freettcn::TE::CModulesContainer::Deregister(const CModule &module)
-{
-  /// @todo remove
-}
-
-freettcn::TE::CModule &freettcn::TE::CModulesContainer::Get(const std::string &moduleId) const throw(ENotFound)
-{
-  for(ModuleList::const_iterator it=_modList.begin(); it != _modList.end(); ++it)
-    if ((*it)->Name() == moduleId)
-      return *(*it);
-  std::cout << "ERROR: Module not found" << std::endl;
-  throw freettcn::ENotFound();
-}
-

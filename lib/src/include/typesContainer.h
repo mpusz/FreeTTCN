@@ -18,31 +18,50 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /**
- * @file   sourceData.cpp
+ * @file   typesContainer.h
  * @author Mateusz Pusz
- * @date   Thu Apr 26 08:47:29 2007
+ * @date   Thu Apr 26 17:21:55 2007
  * 
  * @brief  
  * 
  * 
  */
 
-#include "sourceData.h"
+#ifndef __TYPESCONTAINER_H__
+#define __TYPESCONTAINER_H__
 
 
-freettcn::TE::CSourceData::CSourceData(const char *src, int line):
-  _src(src), _line(line)
-{
-}
+#include "testComponent.h"
+
+namespace freettcn {
+
+  namespace TE {
+
+    class CControlComponent : public CTestComponent {
+    public:
+      CControlComponent(const CType &type);
+    };
+    
+    class CControlComponentType : public CTestComponentType {
+    public:
+      CControlComponentType();
+      virtual CValue *InstanceCreate(bool omit = false) const;
+    };
+    
+    
+    
+    class CTypesContainer {
+      static const CBooleanType _boolean;
+      static const CControlComponentType _control;
+    public:
+      static const CBooleanType &Boolean();
+      static const CControlComponentType &ControlComponent();
+    };
+  
+
+  } // namespace TE
+  
+} // namespace freettcn
 
 
-const char *freettcn::TE::CSourceData::Source() const
-{
-  return _src;
-}
-
-
-int freettcn::TE::CSourceData::Line() const
-{
-  return _line;
-}
+#endif /* __TYPESCONTAINER_H__ */

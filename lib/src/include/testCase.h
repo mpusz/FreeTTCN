@@ -73,8 +73,6 @@ namespace freettcn {
                 const CTestComponentType *systemType = 0);
       virtual ~CTestCase();
       
-//       CModule &Module() const;
-      
       TciParameterTypeListType Parameters() const;
       TriPortIdList Ports() const;
       

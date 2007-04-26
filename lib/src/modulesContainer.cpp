@@ -18,31 +18,42 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /**
- * @file   sourceData.cpp
+ * @file   modulesContainer.cpp
  * @author Mateusz Pusz
- * @date   Thu Apr 26 08:47:29 2007
+ * @date   Thu Apr 26 16:48:52 2007
  * 
  * @brief  
  * 
  * 
  */
 
-#include "sourceData.h"
+#include "modulesContainer.h"
+#include "module.h"
+#include <iostream>
 
 
-freettcn::TE::CSourceData::CSourceData(const char *src, int line):
-  _src(src), _line(line)
+freettcn::TE::CModulesContainer::CModulesContainer()
 {
 }
 
-
-const char *freettcn::TE::CSourceData::Source() const
+freettcn::TE::CModulesContainer &freettcn::TE::CModulesContainer::Instance()
 {
-  return _src;
+  static freettcn::TE::CModulesContainer container;
+  
+  return container;
 }
 
-
-int freettcn::TE::CSourceData::Line() const
+void freettcn::TE::CModulesContainer::Register(CModule &module)
 {
-  return _line;
+  _modList.push_back(&module);
 }
+
+freettcn::TE::CModule &freettcn::TE::CModulesContainer::Get(const std::string &moduleId) const throw(ENotFound)
+{
+  for(ModuleList::const_iterator it=_modList.begin(); it != _modList.end(); ++it)
+    if ((*it)->Name() == moduleId)
+      return *(*it);
+  std::cout << "ERROR: Module not found" << std::endl;
+  throw freettcn::ENotFound();
+}
+

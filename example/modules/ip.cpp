@@ -130,7 +130,7 @@ namespace freettcn {
     };
     
     CICMPComponentType::CICMPComponentType(const freettcn::TE::CModule &module):
-      freettcn::TE::CTestComponentType(module, "ICMPComponent")
+      freettcn::TE::CTestComponentType(&module, "ICMPComponent")
     {
     }
     
@@ -147,7 +147,7 @@ namespace freettcn {
     };
     
     CIPStackType::CIPStackType(const freettcn::TE::CModule &module):
-      freettcn::TE::CTestComponentType(module, "IPStack")
+      freettcn::TE::CTestComponentType(&module, "IPStack")
     {
     }
     
