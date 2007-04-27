@@ -91,7 +91,10 @@ namespace freettcn {
       CTestCase *_tc;                             /**< currently started test case */
       ModuleParList _modParList;
       TCList _tcList;
-
+      
+      CTestManagement& operator=(CTestManagement&);  // Disallowed
+      CTestManagement(const CTestManagement&);       // Disallowed
+      
       void Clear();
       CTestCase &TestCaseGet(const char *testCaseId) const throw(ENotFound);
       void ModuleParamsSet();

@@ -49,6 +49,9 @@ namespace freettcn {
     
     class CComponentHandler : public freettcn::CEntity {
       static CComponentHandler *_instance;
+
+      CComponentHandler& operator=(CComponentHandler&);  // Disallowed
+      CComponentHandler(const CComponentHandler&);       // Disallowed
       
     protected:
       virtual TriComponentId TestComponentCreate(TciTestComponentKindType kind, TciType componentType, String name);

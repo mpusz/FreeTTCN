@@ -96,6 +96,9 @@ namespace freettcn {
       static CTestLogging *_instance;
       
       CLogger &_logger;
+
+      CTestLogging& operator=(CTestLogging&);  // Disallowed
+      CTestLogging(const CTestLogging&);       // Disallowed
       
     protected:
       CLogger &Logger() const;

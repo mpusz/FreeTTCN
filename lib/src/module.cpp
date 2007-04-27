@@ -138,6 +138,11 @@ TriComponentId freettcn::TE::CModule::ModuleComponentId() const
 // }
 
 
+void freettcn::TE::CModule::Cleanup()
+{
+}
+
+
 bool freettcn::TE::CModule::Running() const
 {
   return _ctrlRunning || _currTestCase;

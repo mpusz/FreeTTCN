@@ -86,6 +86,33 @@ namespace freettcn {
 //       virtual CValue *InstanceCreate(bool omit = false) const;
 //     };
 
+
+
+
+    class CTestComponentType : public CType {
+    public:
+      CTestComponentType(const CModule *module, String name);
+    };
+    
+    class CControlComponentType : public CTestComponentType {
+    public:
+      CControlComponentType();
+      virtual CValue *InstanceCreate(bool omit = false) const;
+    };
+    
+    
+    
+    
+    
+    
+    class CBasicType {
+      static const CBooleanType _boolean;
+      static const CControlComponentType _control;
+    public:
+      static const CBooleanType &Boolean();
+      static const CControlComponentType &ControlComponent();
+    };
+    
   } // namespace TE
   
 } // namespace freettcn

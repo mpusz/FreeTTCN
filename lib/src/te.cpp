@@ -35,7 +35,6 @@
 #include "behavior.h"
 #include "testCase.h"
 #include "type.h"
-#include "typesContainer.h"
 extern "C" {
 #include "freettcn/tci_te_tm.h"
 #include "freettcn/tci_te_ch.h"
@@ -270,7 +269,7 @@ TriComponentId freettcn::TE::CTTCNExecutable::TestComponentCreate(TciTestCompone
   if (componentType)
     cType = static_cast<const freettcn::TE::CType *>(componentType);
   else if (kind == TCI_CTRL_COMP)
-    cType = &freettcn::TE::CTypesContainer::ControlComponent();
+    cType = &freettcn::TE::CBasicType::ControlComponent();
   else {
     std::cout << "ERROR!!! TciType not defined" << std::endl;
     throw EOperationFailed();

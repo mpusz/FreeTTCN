@@ -50,6 +50,8 @@ namespace freettcn {
     class CPlatformAdaptor : public freettcn::CEntity {
       static CPlatformAdaptor *_instance;
       
+      CPlatformAdaptor& operator=(CPlatformAdaptor&);  // Disallowed
+      CPlatformAdaptor(const CPlatformAdaptor&);       // Disallowed
     public:
       static CPlatformAdaptor &Instance() throw(ENotFound);
       

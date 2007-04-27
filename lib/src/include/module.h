@@ -98,12 +98,18 @@ namespace freettcn {
       mutable TciModuleParameterType *__modParList;
       mutable TciTestCaseIdType *__testCaseIdList;
       
+      CModule& operator=(CModule&);  // Disallowed
+      CModule(const CModule&);       // Disallowed
+      
     protected:
       void Register(CParameter *parameter);
       void Register(CTestCase *tc);
       void Register(const CBehavior *ctrlBehavior, const CSourceData *ctrlSrcData);
       
       void ParametersSet() throw(freettcn::EOperationFailed);
+      
+      virtual void Cleanup();
+      
     public:
       CModule(const char *name);
       virtual ~CModule() = 0;

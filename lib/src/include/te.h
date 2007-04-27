@@ -50,14 +50,15 @@ namespace freettcn {
       
       CModule *_rootModule;
       
+      CTTCNExecutable();
+      virtual ~CTTCNExecutable();
+      CTTCNExecutable& operator=(CTTCNExecutable&);  // Disallowed
+      CTTCNExecutable(const CTTCNExecutable&);       // Disallowed
     protected:
       CModule &RootModule() const throw(ENotFound);
       
     public:
       static CTTCNExecutable &Instance();
-      
-      CTTCNExecutable();
-      virtual ~CTTCNExecutable();
       
       // TM requests
       void RootModule(String moduleId);

@@ -89,10 +89,3 @@ void freettcn::TE::CTestComponent::Start(const freettcn::TE::CBehavior &behavior
 // }
 
 
-
-
-
-freettcn::TE::CTestComponentType::CTestComponentType(const freettcn::TE::CModule *module, String name) :
-  freettcn::TE::CType(module, name, TCI_COMPONENT_TYPE, "", "", "")
-{
-}

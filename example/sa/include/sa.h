@@ -50,6 +50,8 @@ namespace freettcn {
     class CSUTAdaptor : public freettcn::CEntity {
       static CSUTAdaptor *_instance;
       
+      CSUTAdaptor& operator=(CSUTAdaptor&);  // Disallowed
+      CSUTAdaptor(const CSUTAdaptor&);       // Disallowed
     public:
       static CSUTAdaptor &Instance() throw(ENotFound);
       

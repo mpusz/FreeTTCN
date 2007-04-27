@@ -31,6 +31,7 @@
 
 #include "type.h"
 #include "value.h"
+#include "testComponent.h"
 
 
 freettcn::TE::CType::CType(const CModule   *module,
@@ -105,3 +106,43 @@ freettcn::TE::CValue *freettcn::TE::CBooleanType::InstanceCreate(bool omit /* fa
 // {
 //   return new freettcn::TE::CRecordValue(*this, omit);
 // }
+
+
+
+
+freettcn::TE::CTestComponentType::CTestComponentType(const freettcn::TE::CModule *module, String name) :
+  freettcn::TE::CType(module, name, TCI_COMPONENT_TYPE, "", "", "")
+{
+}
+
+
+
+freettcn::TE::CControlComponentType::CControlComponentType():
+  freettcn::TE::CTestComponentType(0 , "_ControlComponentType_")
+{
+}
+
+freettcn::TE::CValue *freettcn::TE::CControlComponentType::InstanceCreate(bool omit /* false */) const
+{
+  return new freettcn::TE::CTestComponent(*this);
+}
+
+
+
+
+
+/* *************************** B A S I C   T Y P E *************************** */
+
+const freettcn::TE::CBooleanType freettcn::TE::CBasicType::_boolean;
+const freettcn::TE::CControlComponentType freettcn::TE::CBasicType::_control;
+
+const freettcn::TE::CBooleanType &freettcn::TE::CBasicType::Boolean()
+{
+  return _boolean;
+}
+
+
+const freettcn::TE::CControlComponentType &freettcn::TE::CBasicType::ControlComponent()
+{
+  return _control;
+}

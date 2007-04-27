@@ -98,13 +98,13 @@ namespace freettcn {
     class CICMPComponent : public freettcn::TE::CTestComponent {
     public:
       CICMPPort icmpPort;
-      CICMPComponent(const freettcn::TE::CType &type);
+      CICMPComponent(const freettcn::TE::CType &type) : freettcn::TE::CTestComponent(type) {};
     };
     
     class CIPStack : public freettcn::TE::CTestComponent {
     public:
       CICMPPort icmpPort;
-      CIPStack(const freettcn::TE::CType &type);
+      CIPStack(const freettcn::TE::CType &type) : freettcn::TE::CTestComponent(type) {};
     };
 
     
@@ -112,19 +112,15 @@ namespace freettcn {
     // ********** COMPONENTS TYPES ***********
     
     class CICMPComponentType : public freettcn::TE::CTestComponentType {
-      static CICMPComponentType _instance;
     public:
-      static CICMPComponentType &Instance();
-      CICMPComponentType(const freettcn::TE::CModule &module);
-      virtual freettcn::TE::CValue *InstanceCreate(bool omit = false) const;
+      CICMPComponentType(const freettcn::TE::CModule &module) : freettcn::TE::CTestComponentType(&module, "ICMPComponent") {};
+      virtual freettcn::TE::CValue *InstanceCreate(bool omit = false) const { return new CICMPComponent(*this); }
     };
     
     class CIPStackType : public freettcn::TE::CTestComponentType {
-      static CIPStackType _instance;
     public:
-      static CIPStackType &Instance();
-      CIPStackType(const freettcn::TE::CModule &module);
-      virtual freettcn::TE::CValue *InstanceCreate(bool omit = false) const;
+      CIPStackType(const freettcn::TE::CModule &module) : freettcn::TE::CTestComponentType(&module, "IPStack") {};
+      virtual freettcn::TE::CValue *InstanceCreate(bool omit = false) const { return new CIPStack(*this); }
     };
     
         
@@ -247,15 +243,40 @@ namespace freettcn {
     
 
     
-    
     // ************************ M O D U L E ****************************
     
     class CModule : public freettcn::TE::CModule {
+    public:
+      class CType {
+        static CType *_instance;
+        
+        const CICMPComponentType _icmpComponent;
+        const CIPStackType _ipStack;
+        
+        CType();
+        CType& operator=(CType&);  // Disallowed
+        CType(const CType&);       // Disallowed
+        
+      public:
+        static CType &Instance();
+
+        ~CType() { _instance = 0; }
+        const CICMPComponentType &ICMPComponent() const { return _icmpComponent; }
+        const CIPStackType &IPStack() const { return _ipStack; }
+      };
+      
+    private:
       static CModule _instance;
+      
+      CType *_types;
+      
+      CModule();
+      ~CModule();
+      
       virtual void Initialize();
+      virtual void Cleanup();
     public:
       static CModule &Instance();
-      CModule();
     };
     
     
@@ -265,68 +286,16 @@ namespace freettcn {
     // ************************ S T A T I C ****************************
     
     CModule CModule::_instance;
-    CICMPComponentType CICMPComponentType::_instance(CModule::Instance());
-    CIPStackType CIPStackType::_instance(CModule::Instance());
+    CModule::CType *CModule::CType::_instance = 0;
     
     
     
-    
-    // ********** COMPONENTS ***********
-    
-    CICMPComponent::CICMPComponent(const freettcn::TE::CType &type):
-      freettcn::TE::CTestComponent(type)
-    {
-    }
-    
-    CIPStack::CIPStack(const freettcn::TE::CType &type):
-      freettcn::TE::CTestComponent(type)
-    {
-    }
-    
-    
-
-    // ********** COMPONENTS TYPES ***********
-
-    CICMPComponentType &CICMPComponentType::Instance()
-    {
-      return _instance;
-    }
-
-    CICMPComponentType::CICMPComponentType(const freettcn::TE::CModule &module):
-      freettcn::TE::CTestComponentType(&module, "ICMPComponent")
-    {
-    }
-    
-    freettcn::TE::CValue *CICMPComponentType::InstanceCreate(bool omit /* false */) const
-    {
-      return new CICMPComponent(*this);
-    }
-    
-    
-
-    CIPStackType &CIPStackType::Instance()
-    {
-      return _instance;
-    }
-
-    CIPStackType::CIPStackType(const freettcn::TE::CModule &module):
-      freettcn::TE::CTestComponentType(&module, "IPStack")
-    {
-    }
-    
-    freettcn::TE::CValue *CIPStackType::InstanceCreate(bool omit /* false */) const
-    {
-      return new CIPStack(*this);
-    }
-    
-
-
     // ********************* T E S T   C A S E *************************
 
     CTestCase_ICMP_Ping_1::CTestCase_ICMP_Ping_1(freettcn::TE::CModule &module):
       freettcn::TE::CTestCase(module, "ICMP_Ping_1", new freettcn::TE::CSourceData("ip.ttcn", 76),
-                              CICMPComponentType::Instance(), new CBehavior(module),
-                              &CIPStackType::Instance())
+                              CModule::CType::Instance().ICMPComponent(), new CBehavior(module),
+                              &CModule::CType::Instance().IPStack())
     {
     }
     
@@ -350,7 +319,7 @@ namespace freettcn {
     
     CTestCase_ICMP_Ping_2::CTestCase_ICMP_Ping_2(freettcn::TE::CModule &module):
       freettcn::TE::CTestCase(module, "ICMP_Ping_2", new freettcn::TE::CSourceData("ip.ttcn", 109),
-                              CICMPComponentType::Instance(), new CBehavior(module))
+                              CModule::CType::Instance().ICMPComponent(), new CBehavior(module))
     {
     }
     
@@ -394,12 +363,21 @@ namespace freettcn {
     }
     
     CModule::CModule():
-      freettcn::TE::CModule("IP")
+      freettcn::TE::CModule("IP"), _types(0)
     {
     }
     
+    CModule::~CModule()
+    {
+      if (_types)
+        delete _types;
+    }
+
     void CModule::Initialize()
     {
+      // init module types
+      _types = &CType::Instance();
+      
       // register module parameters
       
       // register module test cases
@@ -409,7 +387,35 @@ namespace freettcn {
       // register control behavior
       Register(new CControlBehavior(*this), new freettcn::TE::CSourceData("ip.ttcn", 115));
     }
+    
+    void CModule::Cleanup()
+    {
+      // cleanup base class
+      freettcn::TE::CModule::Cleanup();
+      
+      // delete module specific types
+      if (_types) {
+        delete _types;
+        _types = 0;
+      }
+    }
+    
+    
+    CModule::CType::CType():
+      _icmpComponent(CModule::Instance()),
+      _ipStack(CModule::Instance())
+    {
+    }
 
+
+    CModule::CType &CModule::CType::Instance()
+    {
+      if (!_instance)
+        _instance = new CModule::CType;
+      return *_instance;
+    }
+    
+    
     
   } // namespace IP
 

@@ -99,12 +99,6 @@ namespace freettcn {
     };
     
     
-    class CTestComponentType : public CType {
-    public:
-      CTestComponentType(const CModule *module, String name);
-    };
-    
-    
 //     CTestComponent::CTestComponent(flowGraphNode, bool keepAlive):
 //       STATUS(ACTIVE), DEFAULT_POINTER(0), E_VERDICT(NONE), TIMER_GUARD(binding("GUARD", IDLE, 0)), KEEP_ALIVE(keepAlive)
 //     {
