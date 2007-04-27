@@ -37,7 +37,7 @@
 
 namespace freettcn {
   
-  namespace IP {
+  namespace icmp {
 
 //     // ********** TYPES ***********
     
@@ -113,7 +113,11 @@ namespace freettcn {
     
     class CICMPComponentType : public freettcn::TE::CTestComponentType {
     public:
-      CICMPComponentType(const freettcn::TE::CModule &module) : freettcn::TE::CTestComponentType(&module, "ICMPComponent") {};
+      CICMPComponentType(const freettcn::TE::CModule &module):
+        freettcn::TE::CTestComponentType(&module, "ICMPComponent")
+      {
+        
+      };
       virtual freettcn::TE::CValue *InstanceCreate(bool omit = false) const { return new CICMPComponent(*this); }
     };
     
@@ -261,6 +265,8 @@ namespace freettcn {
         static CType &Instance();
 
         ~CType() { _instance = 0; }
+        void Init();
+        
         const CICMPComponentType &ICMPComponent() const { return _icmpComponent; }
         const CIPStackType &IPStack() const { return _ipStack; }
       };
@@ -293,7 +299,7 @@ namespace freettcn {
     // ********************* T E S T   C A S E *************************
 
     CTestCase_ICMP_Ping_1::CTestCase_ICMP_Ping_1(freettcn::TE::CModule &module):
-      freettcn::TE::CTestCase(module, "ICMP_Ping_1", new freettcn::TE::CSourceData("ip.ttcn", 76),
+      freettcn::TE::CTestCase(module, "ICMP_Ping_1", new freettcn::TE::CSourceData("icmp.ttcn", 76),
                               CModule::CType::Instance().ICMPComponent(), new CBehavior(module),
                               &CModule::CType::Instance().IPStack())
     {
@@ -318,7 +324,7 @@ namespace freettcn {
     
     
     CTestCase_ICMP_Ping_2::CTestCase_ICMP_Ping_2(freettcn::TE::CModule &module):
-      freettcn::TE::CTestCase(module, "ICMP_Ping_2", new freettcn::TE::CSourceData("ip.ttcn", 109),
+      freettcn::TE::CTestCase(module, "ICMP_Ping_2", new freettcn::TE::CSourceData("icmp.ttcn", 109),
                               CModule::CType::Instance().ICMPComponent(), new CBehavior(module))
     {
     }
@@ -363,7 +369,7 @@ namespace freettcn {
     }
     
     CModule::CModule():
-      freettcn::TE::CModule("IP"), _types(0)
+      freettcn::TE::CModule("icmp"), _types(0)
     {
     }
     
@@ -385,7 +391,7 @@ namespace freettcn {
       Register(new CTestCase_ICMP_Ping_2(*this));
       
       // register control behavior
-      Register(new CControlBehavior(*this), new freettcn::TE::CSourceData("ip.ttcn", 115));
+      Register(new CControlBehavior(*this), new freettcn::TE::CSourceData("icmp.ttcn", 115));
     }
     
     void CModule::Cleanup()
@@ -401,6 +407,8 @@ namespace freettcn {
     }
     
     
+
+
     CModule::CType::CType():
       _icmpComponent(CModule::Instance()),
       _ipStack(CModule::Instance())
@@ -410,13 +418,22 @@ namespace freettcn {
 
     CModule::CType &CModule::CType::Instance()
     {
-      if (!_instance)
+      if (!_instance) {
         _instance = new CModule::CType;
+        _instance->Init();
+      }
       return *_instance;
     }
     
+    void CModule::CType::Init()
+    {
+//       Register(_icmpComponent = new CICMPComponentType());
+      
+//       _icmpComponent->Init();
+//       _ipStack->Init();
+    }
     
     
-  } // namespace IP
+  } // namespace icmp
 
 } // namespace freettcn

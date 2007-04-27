@@ -136,8 +136,8 @@ namespace freettcn {
       
       void TestComponentAdd(CTestComponent &component);
       CTestComponent &TestComponent(const TriComponentId &component) const throw(ENotFound);
-      TriComponentId TestComponentCreateReq(const char *src, int line, const CTestComponent *creator, TciTestComponentKindType kind, const CTestComponentType *compType, String name);
-      void TestComponentStartReq(const char *src, int line, const CTestComponent *creator, const TriComponentId &componentId, const TciBehaviourIdType &behaviorId, const TciParameterListType &parameterList);
+      TriComponentId TestComponentCreateReq(const char *src, int line, const TriComponentId &creatorId, TciTestComponentKindType kind, const CTestComponentType *compType, String name);
+      void TestComponentStartReq(const char *src, int line, const TriComponentId &creatorId, const TriComponentId &componentId, const TciBehaviourIdType &behaviorId, const TciParameterListType &parameterList);
     };
 
   } // namespace TE

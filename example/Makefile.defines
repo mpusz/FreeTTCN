@@ -20,7 +20,7 @@
 
 PROG_NAME = ttcn_example
 LIB_NAME = freettcn
-MOD_FILES = ip.ttcn
+MOD_FILES = icmp.ttcn
 
 # directories
 MAIN_DIR = main

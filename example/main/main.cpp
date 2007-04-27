@@ -84,7 +84,7 @@ int main()
     sa.LogEnable(ts, saLogMask);
     
     // init module
-    tm.Init("IP");
+    tm.Init("icmp");
     tm.TestCasesPrint();
     
     // run control part

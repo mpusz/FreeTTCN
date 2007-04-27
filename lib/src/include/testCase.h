@@ -66,6 +66,7 @@ namespace freettcn {
       
       // state
       TriComponentId _mtcId;
+      TriComponentId _systemId;
       
     public:
       CTestCase(CModule &module, const char *name, const CSourceData *srcData,

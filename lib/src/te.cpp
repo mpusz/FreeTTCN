@@ -212,10 +212,10 @@ void freettcn::TE::CTTCNExecutable::TestCaseStart(const TciTestCaseIdType &testC
   }
   
   freettcn::TE::CTestCase &tc = module.TestCase(testCaseId.objectName);
-
+  
   // set as current test case
   module.TestCase(&tc);
-
+  
   // start test case
   tc.Start(0, 0, 0, parameterlist, 0);
 }
@@ -345,8 +345,8 @@ void freettcn::TE::CTTCNExecutable::TestComponentTerminated(const TriComponentId
 //     }
 //   }
 
-  // log
   if (Logging() && LogMask().Get(LOG_TE_C_TERMINATED)) {
+    // log
     TriComponentId ctrlId;
     ctrlId.compInst.data = 0;
     ctrlId.compInst.bits = 0;

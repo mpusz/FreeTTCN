@@ -263,15 +263,15 @@ TriComponentId freettcn::TE::CModule::ControlStart()
 
   _ctrlRunning = true;
   
-  return TestComponentCreateReq(_ctrlSrcData->Source(), _ctrlSrcData->Line(), 0, TCI_CTRL_COMP, 0, "CONTROL");
+  return TestComponentCreateReq(_ctrlSrcData->Source(), _ctrlSrcData->Line(), ModuleComponentId(), TCI_CTRL_COMP, 0, "CONTROL");
 }
 
 
 void freettcn::TE::CModule::ControlStop() throw(EOperationFailed)
 {
-  // log
   freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
   if (te.Logging() && te.LogMask().Get(LOG_TE_CTRL_STOP))
+    // log
     tliCtrlStop(0, te.TimeStamp().Get(), 0, 0, ModuleComponentId());
   
   if (_currTestCase)
@@ -338,24 +338,15 @@ freettcn::TE::CTestComponent &freettcn::TE::CModule::TestComponent(const TriComp
 
 
 TriComponentId freettcn::TE::CModule::TestComponentCreateReq(const char *src, int line,
-                                                             const freettcn::TE::CTestComponent *creator,
+                                                             const TriComponentId &creatorId,
                                                              TciTestComponentKindType kind,
                                                              const CTestComponentType *compType, String name)
 {
   TriComponentId compId = tciCreateTestComponentReq(kind, const_cast<void *>(reinterpret_cast<const void*>(compType)), name);
-  TriComponentId creatorId;
   freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
   
-  if (te.Logging() &&
-      (te.LogMask().Get(LOG_TE_C_CREATE) || te.LogMask().Get(LOG_TE_CTRL_START))) {
-    if (creator)
-      creatorId = creator->Id();
-    else
-      creatorId = ModuleComponentId();
-  }
-  
-  // log
   if (te.Logging() && te.LogMask().Get(LOG_TE_C_CREATE))
+    // log
     tliCCreate(0, te.TimeStamp().Get(), const_cast<char *>(src), line, creatorId, compId, name);
   
   if (kind == TCI_CTRL_COMP) {
@@ -366,11 +357,11 @@ TriComponentId freettcn::TE::CModule::TestComponentCreateReq(const char *src, in
     parameterList.length = 0;
     parameterList.parList = 0;
     
-    // log
     if (te.Logging() && te.LogMask().Get(LOG_TE_CTRL_START))
+      // log
       tliCtrlStart(0, te.TimeStamp().Get(), const_cast<char *>(src), line, creatorId);
     
-    TestComponentStartReq(src, line, creator, compId, ControlBehavior().Id(), parameterList);
+    TestComponentStartReq(src, line, creatorId, compId, ControlBehavior().Id(), parameterList);
   }
   
   return compId;
@@ -378,23 +369,15 @@ TriComponentId freettcn::TE::CModule::TestComponentCreateReq(const char *src, in
 
 
 void freettcn::TE::CModule::TestComponentStartReq(const char *src, int line,
-                                                  const freettcn::TE::CTestComponent *creator,
+                                                  const TriComponentId &creatorId,
                                                   const TriComponentId &componentId,
                                                   const TciBehaviourIdType &behaviorId,
                                                   const TciParameterListType &parameterList)
 {
   tciStartTestComponentReq(componentId, behaviorId, parameterList);
   
-  // log
   freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
-  if (te.Logging() && te.LogMask().Get(LOG_TE_C_START)) {
-    TriComponentId creatorId;
-    
-    if (creator)
-      creatorId = creator->Id();
-    else
-      creatorId = ModuleComponentId();
-    
+  if (te.Logging() && te.LogMask().Get(LOG_TE_C_START))
+    // log
     tliCStart(0, te.TimeStamp().Get(), const_cast<char *>(src), line, creatorId, componentId, behaviorId, parameterList);
-  }
 }
