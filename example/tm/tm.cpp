@@ -181,7 +181,7 @@ void freettcn::TM::CTestManagement::Clear()
   _moduleRunning = false;
 }
 
-freettcn::TM::CTestManagement::CTestCase &freettcn::TM::CTestManagement::TestCaseGet(const char *testCaseId) const throw(freettcn::ENotFound)
+freettcn::TM::CTestManagement::CTestCase &freettcn::TM::CTestManagement::TestCaseGet(const std::string &testCaseId) const throw(freettcn::ENotFound)
 {
   for(TCList::const_iterator it = _tcList.begin(); it != _tcList.end(); ++it) {
     if ((*it)->Name() == testCaseId)
@@ -197,7 +197,7 @@ void freettcn::TM::CTestManagement::ModuleParamsSet()
 {
 }
 
-void freettcn::TM::CTestManagement::Init(String moduleId) throw(freettcn::EOperationFailed)
+void freettcn::TM::CTestManagement::Init(const std::string &moduleId) throw(freettcn::EOperationFailed)
 {
   if (_moduleRunning) {
     std::cout << "ERROR: Module already running" << std::endl;
@@ -209,11 +209,11 @@ void freettcn::TM::CTestManagement::Init(String moduleId) throw(freettcn::EOpera
   
   // select root TTCN-3 module
   /// @todo perform below operation on all TE's in environment
-  tciRootModule(moduleId);
+  tciRootModule(const_cast<char *>(moduleId.c_str()));
   
   // obtain and store module parameters with its default values
   TciModuleIdType moduleName;
-  moduleName.moduleName = moduleId;
+  moduleName.moduleName = const_cast<char *>(moduleId.c_str());
   moduleName.objectName = 0;
   moduleName.aux = 0;
   TciModuleParameterListType modParList = tciGetModuleParameters(moduleName);
@@ -265,17 +265,7 @@ TciValue freettcn::TM::CTestManagement::ModuleParameterGet(const TciModuleParame
 }
 
 
-void freettcn::TM::CTestManagement::TestCasesPrint() const
-{
-  std::cout << "Test cases:" << std::endl;
-  for(TCList::const_iterator it=_tcList.begin(); it != _tcList.end(); ++it) {
-    std::cout << " - ";
-    (*it)->Print();
-  }
-}
-
-
-void freettcn::TM::CTestManagement::TestCaseInit(String testCaseId) throw(freettcn::ENotFound)
+void freettcn::TM::CTestManagement::TestCaseInit(const std::string &testCaseId) throw(freettcn::ENotFound)
 {
   CTestCase &tc = TestCaseGet(testCaseId);
 
@@ -290,7 +280,7 @@ void freettcn::TM::CTestManagement::TestCaseInit(String testCaseId) throw(freett
 }
 
 
-void freettcn::TM::CTestManagement::TestCaseStart(String testCaseId, const TciParameterListType &parameterlist) throw(ENotFound)
+void freettcn::TM::CTestManagement::TestCaseStart(const std::string &testCaseId, const TciParameterListType &parameterlist) throw(ENotFound)
 {
   _tc = &TestCaseGet(testCaseId);
   _tc->Start(parameterlist);

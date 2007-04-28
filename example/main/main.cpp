@@ -18,8 +18,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-//#include "freettcn/tci_value.h"
-//#include "ttcn_values.h"
 #include "../tl/include/tl.h"
 #include "../ch/include/ch.h"
 #include "../tm/include/tm.h"
@@ -29,29 +27,28 @@
 #include "log.h"
 #include "exception.h"
 #include <iostream>
+#include <getopt.h>
 
 
 using namespace std;
 
 
-// void TypePrint(TTCN::CType &type)
-// {
-//   cout << "Type class: " << tciGetTypeClass(&type) << " name: " << (tciGetDefiningModule(&type).objectName ? tciGetDefiningModule(&type).objectName : "<TTCN-3>") << "." << tciGetName(&type) << endl;
-// }
-
-
-int main()
+void Run(const std::string &testCase)
 {
-//   TTCN::CBooleanType boolean("", "", "");
-  
-//   TTCN::CModule ipMod(TTCN::CQualifiedName("", "IP", 0));
-//   TTCN::CRecordType ping(&ipMod, "", "", "");
-// //   TTCN::CRecordType ping(&ipMod, "PingMsg", TCI_RECORD_TYPE, "", "", "");
-
-//   TypePrint(boolean);
-//   TypePrint(ping);
-
   try {
+    freettcn::TM::CTestManagement &tm = freettcn::TM::CTestManagement::Instance();
+    
+    if (testCase != "") {
+      // init specified test cases
+      try {
+        tm.TestCaseInit(testCase);
+      }
+      catch(freettcn::Exception) {
+        std::cout << "Error: Could not init test case '" << testCase << "'" << std::endl;
+        exit(0);
+      }
+    }
+    
     // init timestamping
     freettcn::CTimeStamp ts(4);
     
@@ -62,7 +59,6 @@ int main()
     freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
     
     // initiate all entities
-    freettcn::TM::CTestManagement tm;
     freettcn::CH::CComponentHandler ch;
 //     freettcn::CD::CComponentHandler cd;
     freettcn::PA::CPlatformAdaptor pa;
@@ -83,34 +79,131 @@ int main()
     pa.LogEnable(ts, paLogMask);
     sa.LogEnable(ts, saLogMask);
     
-    // init module
-    tm.Init("icmp");
-    tm.TestCasesPrint();
-    
-    // run control part
-    tm.ControlInit();
-    tm.ControlStart();
-    tm.ControlStop();
-    
-    // run specified test cases
-    TciParameterListType parameterlist;
-    parameterlist.length = 0;
-    parameterlist.parList = 0;
-
-    tm.TestCaseInit("ICMP_Ping_1");
-    tm.TestCaseStart("ICMP_Ping_1", parameterlist);
-    tm.TestCaseStop();
-    
-    tm.TestCaseInit("ICMP_Ping_2");
-    tm.TestCaseStart("ICMP_Ping_2", parameterlist);
-    tm.TestCaseStop();
-    
-    //    MessageReceived();
+    if (testCase != "") {
+      // run specified test case
+      TciParameterListType parameterlist;
+      parameterlist.length = 0;
+      parameterlist.parList = 0;
+      
+      tm.TestCaseStart(testCase, parameterlist);
+      //      tm.TestCaseStop();
+    }
+    else {
+      // run control part
+      tm.ControlInit();
+      tm.ControlStart();
+      //      tm.ControlStop();
+    }
   }
   catch(freettcn::Exception &ex) {
-    std::cout << "Unhandled freettcn library exception: " << ex.what() << " caught!!!" << std::endl;
+    std::cout << "Error: Unhandled freettcn library exception: " << ex.what() << " caught!!!" << std::endl;
   }
   catch(exception &ex) {
-    std::cout << "Unhandled system exception: " << ex.what() << " caught!!!" << std::endl;
+    std::cout << "Error: Unhandled system exception: " << ex.what() << " caught!!!" << std::endl;
   }
 }
+
+
+
+int main (int argc, char **argv)
+{
+  std::string module;
+  std::string testCase;
+  bool list = false;
+  bool help = false;
+  
+  // get options
+  while (1) {
+    int c;
+    int option_index = 0;
+    static struct option long_options[] = {
+      {"module",   1, 0, 'm'},
+      {"testcase", 1, 0, 't'},
+      {"list",     0, 0, 'l'},
+      {"help",     0, 0, 'h'},
+      {0, 0, 0, 0}
+    };
+    
+    c = getopt_long(argc, argv, "m:t:lh", long_options, &option_index);
+    if (c == -1)
+      break;
+    
+    switch (c) {
+    case 'm':
+      module = optarg;
+      break;
+      
+    case 't':
+      testCase = optarg;
+      break;
+      
+    case 'l':
+      list = true;
+      break;
+      
+    case 'h':
+      help = true;
+      break;
+      
+    case '?':
+      break;
+      
+    default:
+      printf ("?? getopt returned character code 0%o ??\n", c);
+    }
+  }
+  if (optind < argc) {
+    std::cout << "Error: Non-option ARGV-elements: ";
+    while (optind < argc)
+      std::cout << argv[optind++] << " ";
+    std::cout << std::endl;
+    
+    exit(0);
+  }
+  
+  if (help) {
+    std::cout << "Usage:" << std::endl;
+    exit(0);
+  }
+  
+  if (list && module == "") {
+    // list modules
+    exit(0);
+  }
+  
+  if (module == "") {
+    std::cout << "Error: Module name not given" << std::endl;
+    exit(0);
+  }
+  
+  // init test management
+  freettcn::TM::CTestManagement tm;
+  
+  try {
+    // init module
+    tm.Init(module.c_str());
+  }
+  catch(freettcn::Exception) {
+    std::cout << "Error: Could not init module '" << module << "'" << std::endl;
+    exit(0);
+  }
+  
+  if (list) {
+    // list test cases
+    
+    exit(0);
+  }
+  
+  // run TTCN module
+  Run(testCase);
+}
+
+
+// void freettcn::TM::CTestManagement::TestCasesPrint() const
+// {
+//   std::cout << "Test cases:" << std::endl;
+//   for(TCList::const_iterator it=_tcList.begin(); it != _tcList.end(); ++it) {
+//     std::cout << " - ";
+//     (*it)->Print();
+//   }
+// }

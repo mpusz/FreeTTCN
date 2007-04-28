@@ -96,7 +96,7 @@ namespace freettcn {
       CTestManagement(const CTestManagement&);       // Disallowed
       
       void Clear();
-      CTestCase &TestCaseGet(const char *testCaseId) const throw(ENotFound);
+      CTestCase &TestCaseGet(const std::string &testCaseId) const throw(ENotFound);
       void ModuleParamsSet();
       
     public:
@@ -105,7 +105,7 @@ namespace freettcn {
       CTestManagement();
       virtual ~CTestManagement();
       
-      void Init(String moduleId) throw(EOperationFailed);
+      void Init(const std::string &moduleId) throw(EOperationFailed);
       
       virtual void Log(const TriComponentId &testComponentId, String message);
       virtual void Error(String message);
@@ -113,9 +113,8 @@ namespace freettcn {
       
       virtual TciValue ModuleParameterGet(const TciModuleParameterIdType &parameterId) const;
       
-      void TestCasesPrint() const;
-      void TestCaseInit(String testCaseId) throw(ENotFound);
-      void TestCaseStart(String testCaseId, const TciParameterListType &parameterlist) throw(ENotFound);
+      void TestCaseInit(const std::string &testCaseId) throw(ENotFound);
+      void TestCaseStart(const std::string &testCaseId, const TciParameterListType &parameterlist) throw(ENotFound);
       void TestCaseStarted(const TciTestCaseIdType &testCaseId, const TciParameterListType &parameterList, double timer);
       void TestCaseTerminated(TciVerdictValue verdict, const TciParameterListType &parameterlist);
       void TestCaseStop() throw(EOperationFailed);
