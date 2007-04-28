@@ -36,56 +36,6 @@ DOC_DIR = doc
 DIR_NAME = $(notdir $(PWD))
 
 
-#
-# tools
-#
-MAKE = make
-CPP = g++ -g -Wall
-AR = ar -c
-CP = cp
-RM = rm
-SED = sed
-ECHO = echo
-TOUCH = touch
-TAGS = etags --declarations --members
-DOXYGEN = doxygen
-TAR = tar
-
-#
-# directories
-#
-ifndef $(TOP_DIR)
-TOP_DIR = .
-endif
-BIN_DIR = $(TOP_DIR)/bin
-LIB_DIR = $(TOP_DIR)/../lib
-
-
-#
-# varaibles
-#
-MAKEFLAGS += -rR --no-print-directory
-
-ifeq ($(BUILD_VERBOSE),1)
-  quiet =
-  Q =
-else
-  quiet=quiet_
-  Q = @
-endif
-
-# If the user is running make -s (silent mode), suppress echoing of commands
-ifneq ($(findstring s,$(MAKEFLAGS)),)
-  quiet=silent_
-endif
-
-
-#
-# Command template
-#
-# If quiet is set, only print short version of command
-#
-cmd = @$(if $($(quiet)$(1)),printf "$($(quiet)$(1))\n" &&) $($(1))
 
 
 
