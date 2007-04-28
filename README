@@ -1,0 +1,35 @@
+
+
+Chapter I - Basic information
+
+'freettcn' project provides 3 basic modules:
+
+1. TTCN code interpreter + C++ code generator + libfreettcn.so library (TE)
+
+  Only this module is necessary to create TTCN Executable library. It provides:
+   - freettcn - TTCN code translator to C++ language (run 'freettcn -h' after
+   instalation for more info). It converts all module specific data from TTCN
+   source module file to C++ file.
+   - libfreettcn.so - contains all core TE functionalities. Code is written
+   in C++ language but it uses standardized C language interface to communicate
+   with other entities of TTCN test environment.
+   
+  
+2. TTCN environment library (TM, TL, CH, CD, SA, PA)
+  
+  libfreettcnenv.so library contains example implementation of the rest of
+  TTCN environment entities. Every entity is a standalone implementation
+  with standardized C language interface. Final user application can use all,
+  any or none of these entities.
+
+
+3. 'freettcn' project usage example
+
+  That module provides simple final implementation of all TTCN environment
+  entities and some TTCN source module files with corresponding CD and SA
+  information.
+
+
+
+Chapter II - Compilation and instalation
+
