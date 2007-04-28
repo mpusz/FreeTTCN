@@ -1,6 +1,11 @@
 
 
+                  F R E E T T C N     P R O J E C T
+
+
+
 Chapter I - Basic information
+-----------------------------
 
 'freettcn' project provides 3 basic modules:
 
@@ -32,4 +37,12 @@ Chapter I - Basic information
 
 
 Chapter II - Compilation and instalation
+----------------------------------------
 
+'freettcn' project compilation and instalation needs following steps:
+ - make distclean              (optional)
+ - make freettcn
+ - su -c 'make freettcn_install'
+ - make env                    (optional)
+ - su -c 'make env_install'    (optional)
+ - make example                (optional)

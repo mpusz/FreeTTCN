@@ -1,7 +1,7 @@
 'freettcn' project is distributed with 2 licence types: GNU GPL and GNU LGPL.
 
 Licences are assigned in following manner:
-- freettcn          - GNU GPL  - ./compiler/COPYING
-- libfreettcn.so    - GNU LGPL - ./lib/COPYING
+- freettcn          - GNU GPL  - ./freettcn/translator/COPYING
+- libfreettcn.so    - GNU LGPL - ./freettcn/lib/COPYING
 - libfreettcnenv.so - GNU LGPL - ./libenv/COPYING
 - example           - GNU GPL  - ./example/COPYING

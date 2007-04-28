@@ -18,52 +18,25 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-include Makefile.defines
+include ../Makefile.defines
 
 
+#
 # directories
-FREETTCN_DIR = freettcn
-ENV_DIR = libenv
-EXAMPLE_DIR = example
-ALL_DIRS = $(FREETTCN_DIR) $(ENV_DIR) $(EXAMPLE_DIR)
-
-
-# dist
-quiet_cmd_dist = DIST $(2)
-      cmd_dist = 
-
+#
+TRANSLATOR_DIR = translator
+LIB_DIR = lib
+ALL_DIRS = $(LIB_DIR)
 
 
 # targets
-.PHONY: help freettcn freettcn_install env env_install example clean distclean dist
+.PHONY: all install clean distclean
 
+all:
+	$(foreach dir, $(ALL_DIRS), $(call cmd,cmd_make,$(dir)))
 
-help:
-	@$(ECHO) ""
-	@$(ECHO) "'freettcn' project compilation and instalation needs following steps:"
-	@$(ECHO) ""
-	@$(ECHO) " - make distclean              (optional)'"
-	@$(ECHO) " - make freettcn"
-	@$(ECHO) " - su -c 'make freettcn_install'"
-	@$(ECHO) " - make env                    (optional)"
-	@$(ECHO) " - su -c 'make env_install'    (optional)"
-	@$(ECHO) " - make example                (optional)"
-	@$(ECHO) ""
-
-freettcn:
-	$(call cmd,cmd_make,$(FREETTCN_DIR))
-
-freettcn_install:
-	$(call cmd,cmd_make_install,$(FREETTCN_DIR))
-
-evn:
-	$(call cmd,cmd_make,$(ENV_DIR))
-
-env_install:
-	$(call cmd,cmd_make_install,$(ENV_DIR))
-
-example:
-	$(call cmd,cmd_make,$(EXAMPLE_DIR))
+install:
+	$(foreach dir, $(ALL_DIRS), $(call cmd,cmd_install,$(dir)))
 
 clean:
 	$(foreach dir, $(ALL_DIRS), $(call cmd,cmd_make_clean,$(dir)))

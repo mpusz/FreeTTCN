@@ -18,7 +18,44 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-include Makefile.defines
+include ../../Makefile.defines
+
+
+#
+# directories
+#
+TE_DIR = te
+TOOLS_DIR = tools
+BIN_DIR = bin
+#DOC_DIR = doc
+
+
+#
+# Commands
+#
+
+# start library compilation
+quiet_cmd_make_lib = \nBUILD_LIB  $(BIN_DIR)/$(LIB_FULL_NAME)
+      cmd_make_lib = $(MAKE) -C $(SRC_DIR) TOP_DIR=$(TOP_DIR)/.. all
+
+# compile source file, create depend file *.d
+quiet_cmd_cc_d_o = CC_D_O     $<
+      cmd_cc_d_o = $(CPP) -MMD -MF $*.d_ -c -fPIC $(INCLUDE_DIRS) $< -o $@ && \
+                   $(CP) $*.d_ $*.d && \
+	           $(SED) -e 's/\#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' -e '/^$$/ d' -e 's/$$/ :/' < $*.d_ >> $*.d && \
+	           $(RM) -f $*.d_
+
+# link program
+quiet_cmd_link = LINK       $(BIN_DIR)/$(LIB_FULL_NAME)
+      cmd_link = $(CPP) -shared -Wl,-export-dynamic,-soname,$(LIB_FILE_NAME).so.$(VERSION_1) -o $(BIN_DIR)/$(LIB_FULL_NAME) $(O_FILES) && \
+	         $(LN) -sf $(PWD)/bin/lib$(LIB_NAME).so.$(VERSION) $(PWD)/bin/lib$(LIB_NAME).so.$(VERSION_1) && \
+	         $(LN) -sf $(PWD)/bin/lib$(LIB_NAME).so.$(VERSION_1) $(PWD)/bin/lib$(LIB_NAME).so
+
+# make tags
+quiet_cmd_tags = TAGS
+      cmd_tags = $(TAGS) --append --output=$(TAG_DIR)/TAGS $(LIB_H_FILES_PATH)/*.h $(H_FILES_PATH)/*.h *.cpp
+
+
 
 # targets
 .PHONY: all install tags doc clobber dist clean
