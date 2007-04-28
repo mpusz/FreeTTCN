@@ -26,63 +26,50 @@ include ../../Makefile.defines
 #
 TE_DIR = te
 TOOLS_DIR = tools
-BIN_DIR = bin
+BUILD_DIRS = $(TOOLS_DIR) $(TE_DIR) 
+
+TTCN3_H_DIR = include/ttcn3
 #DOC_DIR = doc
 
 
-#
-# Commands
-#
 
-# start library compilation
-quiet_cmd_make_lib = \nBUILD_LIB  $(BIN_DIR)/$(LIB_FULL_NAME)
-      cmd_make_lib = $(MAKE) -C $(SRC_DIR) TOP_DIR=$(TOP_DIR)/.. all
-
-# compile source file, create depend file *.d
-quiet_cmd_cc_d_o = CC_D_O     $<
-      cmd_cc_d_o = $(CPP) -MMD -MF $*.d_ -c -fPIC $(INCLUDE_DIRS) $< -o $@ && \
-                   $(CP) $*.d_ $*.d && \
-	           $(SED) -e 's/\#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' -e '/^$$/ d' -e 's/$$/ :/' < $*.d_ >> $*.d && \
-	           $(RM) -f $*.d_
-
-# link program
-quiet_cmd_link = LINK       $(BIN_DIR)/$(LIB_FULL_NAME)
-      cmd_link = $(CPP) -shared -Wl,-export-dynamic,-soname,$(LIB_FILE_NAME).so.$(VERSION_1) -o $(BIN_DIR)/$(LIB_FULL_NAME) $(O_FILES) && \
-	         $(LN) -sf $(PWD)/bin/lib$(LIB_NAME).so.$(VERSION) $(PWD)/bin/lib$(LIB_NAME).so.$(VERSION_1) && \
-	         $(LN) -sf $(PWD)/bin/lib$(LIB_NAME).so.$(VERSION_1) $(PWD)/bin/lib$(LIB_NAME).so
-
-# make tags
-quiet_cmd_tags = TAGS
-      cmd_tags = $(TAGS) --append --output=$(TAG_DIR)/TAGS $(LIB_H_FILES_PATH)/*.h $(H_FILES_PATH)/*.h *.cpp
+# # make tags
+# quiet_cmd_tags = TAGS
+#       cmd_tags = $(TAGS) --append --output=$(TAG_DIR)/TAGS $(LIB_H_FILES_PATH)/*.h $(H_FILES_PATH)/*.h *.cpp
 
 
 
 # targets
-.PHONY: all install tags doc clobber dist clean
+.PHONY: all install clean distclean tags
 
 all:
-	$(call cmd,cmd_make_lib)
+	$(Q)$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make,$(dir)))
 
 install:
-	$(LDCONFIG) -n $(BIN_DIR)
-
-tags:
-	$(Q)$(MAKE) -C $(SRC_DIR) TOP_DIR=$(TOP_DIR)/.. TAG_DIR=$(PWD) tags;
-
-doc:
-	$(DOXYGEN) $(DOC_DIR)/Doxyfile
-
-clobber:
-	$(Q)$(MAKE) -C $(SRC_DIR) TOP_DIR=$(TOP_DIR)/.. clobber;
-	$(Q)$(RM) -f *~ TAGS BROWSE
-	$(Q)$(RM) -rf $(DOC_DIR)/tags.xml $(DOC_DIR)/html
-#	$(RM) -f $(DIR_NAME).tar.gz
-
-# dist: clobber
-# 	tar -cvzf $(DIR_NAME).tar.gz ../$(DIR_NAME)
+	$(INSTALL) $(BIN_DIR)/$(LIB_FULL_NAME) $(LIB_INSTALL_DIR)
+	$(LDCONFIG) -n $(LIB_INSTALL_DIR)
+	$(LN) -sf $(LIB_FILE_NAME).so.$(VERSION_1) $(LIB_INSTALL_DIR)/$(LIB_FILE_NAME).so
+	$(INSTALL) -d $(H_INSTALL_DIR)/$(PROJECT_NAME) $(H_INSTALL_DIR)/$(PROJECT_NAME)/ttcn3 \
+	           $(H_INSTALL_DIR)/$(PROJECT_NAME)/te $(H_INSTALL_DIR)/$(PROJECT_NAME)/tools
+	$(INSTALL) -m 644 $(TTCN3_H_DIR)/* $(H_INSTALL_DIR)/$(PROJECT_NAME)/ttcn3
 
 clean:
-	$(Q)$(MAKE) -C $(SRC_DIR) TOP_DIR=$(TOP_DIR)/.. clean
+	$(Q)$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_clean,$(dir)))
+
+distclean:
+	$(Q)$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_distclean,$(dir)))
+# 	$(Q)$(MAKE) -C $(SRC_DIR) TOP_DIR=$(TOP_DIR)/.. clobber;
+# 	$(Q)$(RM) -f *~ TAGS BROWSE
+# 	$(Q)$(RM) -rf $(DOC_DIR)/tags.xml $(DOC_DIR)/html
+#	$(RM) -f $(DIR_NAME).tar.gz
+
+tags:
+# 	$(Q)$(MAKE) -C $(SRC_DIR) TOP_DIR=$(TOP_DIR)/.. TAG_DIR=$(PWD) tags;
+
+# doc:
+# 	$(DOXYGEN) $(DOC_DIR)/Doxyfile
+
+
 
 #classes:
 #	ebrowse -s include/ttcn3/*.h *.h *.cpp

@@ -20,24 +20,20 @@
 include ../../../Makefile.defines
 
 
-#
-# directories
-#
 BIN_DIR = ../bin
 
-
 # files
-CPP_FILES = type.cpp value.cpp log.cpp sourceData.cpp modulesContainer.cpp \
-	tci_value.cpp tci_tm_te.cpp tci_ch_te.cpp \
-	tri_sa_te.cpp \
-	te.cpp initObject.cpp module.cpp testComponent.cpp behavior.cpp testCase.cpp
+# CPP_FILES = type.cpp value.cpp log.cpp sourceData.cpp modulesContainer.cpp \
+# 	tci_value.cpp tci_tm_te.cpp tci_ch_te.cpp \
+# 	tri_sa_te.cpp \
+# 	te.cpp initObject.cpp module.cpp testComponent.cpp behavior.cpp testCase.cpp
 CPP_O_FILES := $(patsubst %.cpp,%.o,$(CPP_FILES))
 O_FILES = $(addprefix $(BIN_DIR)/, $(patsubst %.cpp,%.o,$(CPP_FILES)))
 DEPEND_FILES = $(patsubst %.cpp,%.d,$(CPP_FILES))
 
-H_FILES_PATH = include ../include ../tools/include
+H_FILES_PATH = include
 LIB_H_FILES_PATH = $(H_FILES_PATH)/$(LIB_NAME)
-INCLUDE_DIRS = -Iinclude -I../include -I../tools/include
+INCLUDE_DIRS = -I$(H_FILES_PATH)
 
 
 
@@ -62,10 +58,10 @@ quiet_cmd_link = LINK       $(BIN_DIR)/$(LIB_FULL_NAME)
 # targets
 .PHONY: all tags clobber clean
 
-all: $(BIN_DIR)/$(LIB_FILE_NAME).so.$(VERSION)
+all:
 
 tags:
-	$(Q)$(call cmd,cmd_tags)
+	$(call cmd,cmd_tags)
 
 clobber: clean
 	$(Q)$(RM) -f *~ $(H_FILES_PATH)/*~ $(LIB_H_FILES_PATH)/*~ $(DEPEND_FILES)
@@ -76,10 +72,10 @@ clean:
 
 # rules
 $(BIN_DIR)/$(LIB_FILE_NAME).so.$(VERSION): $(O_FILES)
-	$(Q)$(call cmd,cmd_link)
+	$(call cmd,cmd_link)
 
 $(BIN_DIR)/%.o: %.cpp
-	$(Q)$(call cmd,cmd_cc_d_o)
+	$(call cmd,cmd_cc_d_o)
 
 # include depends files
 -include $(CPP_FILES:.cpp=.d)

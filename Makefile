@@ -25,7 +25,7 @@ include Makefile.defines
 FREETTCN_DIR = freettcn
 ENV_DIR = libenv
 EXAMPLE_DIR = example
-ALL_DIRS = $(FREETTCN_DIR) $(ENV_DIR) $(EXAMPLE_DIR)
+BUILD_DIRS = $(FREETTCN_DIR) $(ENV_DIR) $(EXAMPLE_DIR)
 
 
 # dist
@@ -51,71 +51,26 @@ help:
 	@$(ECHO) ""
 
 freettcn:
-	$(call cmd,cmd_make,$(FREETTCN_DIR))
+	@$(ECHO) "Building 'freettcn'..."
+	$(Q)$(call cmd,cmd_make,$(FREETTCN_DIR))
 
 freettcn_install:
-	$(call cmd,cmd_make_install,$(FREETTCN_DIR))
+	$(Q)$(call cmd,cmd_make_install,$(FREETTCN_DIR))
 
 evn:
-	$(call cmd,cmd_make,$(ENV_DIR))
+	$(Q)$(call cmd,cmd_make,$(ENV_DIR))
 
 env_install:
-	$(call cmd,cmd_make_install,$(ENV_DIR))
+	$(Q)$(call cmd,cmd_make_install,$(ENV_DIR))
 
 example:
-	$(call cmd,cmd_make,$(EXAMPLE_DIR))
+	$(Q)$(call cmd,cmd_make,$(EXAMPLE_DIR))
 
 clean:
-	$(foreach dir, $(ALL_DIRS), $(call cmd,cmd_make_clean,$(dir)))
+	$(Q)$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_clean,$(dir)))
 
 distclean:
-	$(foreach dir, $(ALL_DIRS), $(call cmd,cmd_make_distclean,$(dir)))
+	$(Q)$(foreach dir, $(BUILD_DIRS), (call cmd,cmd_make_distclean,$(dir)))
 
-dist:
-	$(call cmd,cmd_dist)
-
-
-# modules:
-# 	$(foreach mod, $(MOD_FILES), $(call cmd,cmd_make_mod))
-
-# $(LIB_DIRS):
-# 	$(call cmd,cmd_make_lib)
-
-# tags:
-# 	$(Q)for dir in $(LIB_DIRS); do \
-# 	  $(MAKE) -C $$dir TOP_DIR=$(TOP_DIR)/.. DIR_NAME=$$dir TAG_DIR=$(PWD) tags; \
-# 	done
-# 	$(Q)for mod in $(MOD_FILES); do \
-# 	  $(MAKE) -C $(MOD_DIR) TOP_DIR=$(TOP_DIR)/.. MODULE=$$mod tags; \
-# 	done
-# 	$(MAKE) -C $(MAIN_DIR) TOP_DIR=$(TOP_DIR)/.. tags;
-
-# doc:
-# 	$(DOXYGEN) $(DOC_DIR)/Doxyfile
-
-# clobber:
-# 	$(Q)for dir in $(LIB_DIRS); do \
-# 	  $(MAKE) -C $$dir TOP_DIR=$(TOP_DIR)/.. DIR_NAME=$$dir clobber; \
-# 	done
-# 	$(Q)for mod in $(MOD_FILES); do \
-# 	  $(MAKE) -C $(MOD_DIR) TOP_DIR=$(TOP_DIR)/.. MODULE=$$mod clobber; \
-# 	done
-# 	$(Q)$(MAKE) -C $(MAIN_DIR) TOP_DIR=$(TOP_DIR)/.. clobber;
-# 	$(Q)$(RM) -f *~ TAGS BROWSE
-# 	$(Q)$(RM) -f $(DOC_DIR)/tags.xml $(DOC_DIR)/html
-
-# dist: clobber
-# 	$(Q)$(TAR) -cvzf $(DIR_NAME).tar.gz ../$(DIR_NAME)
-
-# clean:
-# 	$(Q)for dir in $(LIB_DIRS); do \
-# 	  $(MAKE) -C $$dir TOP_DIR=$(TOP_DIR)/.. DIR_NAME=$$dir clean; \
-# 	done
-# 	$(Q)for mod in $(MOD_FILES); do \
-# 	  $(MAKE) -C $(MOD_DIR) TOP_DIR=$(TOP_DIR)/.. MODULE=$$mod clean; \
-# 	done
-# 	$(Q)$(MAKE) -C $(MAIN_DIR) TOP_DIR=$(TOP_DIR)/.. clean;
-
-
-# # rules
-# $(BIN_DIR)/$(PROG_NAME): $(LIB_DIRS) modules main
+dist: distclean
+	$(Q)$(call cmd,cmd_dist)

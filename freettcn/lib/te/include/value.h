@@ -32,7 +32,7 @@
 #define __VALUE_H__
 
 extern "C" {
-#include "freettcn/tci.h"
+#include <freettcn/ttcn3/tci.h>
 }
 #include "exception.h"
 

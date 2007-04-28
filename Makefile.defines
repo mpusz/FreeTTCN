@@ -45,6 +45,7 @@ SED = sed
 ECHO = echo
 TOUCH = touch
 TAGS = etags --declarations --members
+INSTALL = install
 LDCONFIG = ldconfig
 DOXYGEN = doxygen
 TAR = tar
@@ -53,6 +54,8 @@ TAR = tar
 #
 # directories
 #
+LIB_INSTALL_DIR = /usr/local/lib
+H_INSTALL_DIR = /usr/local/include
 # ifndef $(TOP_DIR)
 # TOP_DIR = .
 # endif
@@ -82,7 +85,7 @@ endif
 #
 # If quiet is set, only print short version of command
 #
-cmd = @$(if $($(quiet)$(1)),printf "$($(quiet)$(1))\n" &&) $($(1))
+cmd = $(if $($(quiet)$(1)),printf "$($(quiet)$(1))\n" &&) $($(1));
 
 
 # start compilation
