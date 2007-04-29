@@ -34,7 +34,7 @@
 extern "C" {
 #include <freettcn/ttcn3/tci.h>
 }
-#include "exception.h"
+#include <freettcn/tools/exception.h>
 
 namespace freettcn {
 

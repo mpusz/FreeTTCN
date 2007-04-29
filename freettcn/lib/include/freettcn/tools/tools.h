@@ -11,7 +11,7 @@
 #ifndef __TOOLS_H__
 #define __TOOLS_H__
 
-#include "exception.h"
+#include <freettcn/tools/exception.h>
 #include <algorithm>
 #include <string>
 #include <vector>

@@ -17,58 +17,52 @@
 # along with this example; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-include Makefile.defines
+include ../Makefile.defines
 
+
+PROG_NAME = ttcn_example
+MOD_FILES = icmp.ttcn
+
+#
+# directories
+#
+MODULES_DIR = modules
+MAIN_DIR = main
+BUILD_DIRS = $(MODULES_DIR) $(MAIN_DIR)
+
+BIN_DIR = bin
+
+export MOD_FILES PROG_NAME
 
 # targets
-.PHONY: all main modules pa sa cd ch tm tl tags doc clobber dist clean
+.PHONY: all main modules clean distclean tags
 
 all: $(BIN_DIR)/$(PROG_NAME)
 
 main:
-	$(call cmd,cmd_make_main)
+	@$(call cmd,cmd_make,$(MAIN_DIR))
 
 modules:
-	$(foreach mod, $(MOD_FILES), $(call cmd,cmd_make_mod))
-
-$(LIB_DIRS):
-	$(call cmd,cmd_make_lib)
-
-tags:
-	$(Q)for dir in $(LIB_DIRS); do \
-	  $(MAKE) -C $$dir TOP_DIR=$(TOP_DIR)/.. DIR_NAME=$$dir TAG_DIR=$(PWD) tags; \
-	done
-	$(Q)for mod in $(MOD_FILES); do \
-	  $(MAKE) -C $(MOD_DIR) TOP_DIR=$(TOP_DIR)/.. MODULE=$$mod tags; \
-	done
-	$(MAKE) -C $(MAIN_DIR) TOP_DIR=$(TOP_DIR)/.. tags;
-
-doc:
-	$(DOXYGEN) $(DOC_DIR)/Doxyfile
-
-clobber:
-	$(Q)for dir in $(LIB_DIRS); do \
-	  $(MAKE) -C $$dir TOP_DIR=$(TOP_DIR)/.. DIR_NAME=$$dir clobber; \
-	done
-	$(Q)for mod in $(MOD_FILES); do \
-	  $(MAKE) -C $(MOD_DIR) TOP_DIR=$(TOP_DIR)/.. MODULE=$$mod clobber; \
-	done
-	$(Q)$(MAKE) -C $(MAIN_DIR) TOP_DIR=$(TOP_DIR)/.. clobber;
-	$(Q)$(RM) -f *~ TAGS BROWSE
-	$(Q)$(RM) -f $(DOC_DIR)/tags.xml $(DOC_DIR)/html
-
-dist: clobber
-	$(Q)$(TAR) -cvzf $(DIR_NAME).tar.gz ../$(DIR_NAME)
+	@$(foreach mod, $(MOD_FILES), $(call cmd,cmd_make_mod,$(mod)))
 
 clean:
-	$(Q)for dir in $(LIB_DIRS); do \
-	  $(MAKE) -C $$dir TOP_DIR=$(TOP_DIR)/.. DIR_NAME=$$dir clean; \
-	done
-	$(Q)for mod in $(MOD_FILES); do \
-	  $(MAKE) -C $(MOD_DIR) TOP_DIR=$(TOP_DIR)/.. MODULE=$$mod clean; \
-	done
-	$(Q)$(MAKE) -C $(MAIN_DIR) TOP_DIR=$(TOP_DIR)/.. clean;
+	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_clean,$(dir)))
+
+distclean:
+	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_distclean,$(dir)))
+
+tags:
+# 	$(Q)for dir in $(LIB_DIRS); do \
+# 	  $(MAKE) -C $$dir TOP_DIR=$(TOP_DIR)/.. DIR_NAME=$$dir TAG_DIR=$(PWD) tags; \
+# 	done
+# 	$(Q)for mod in $(MOD_FILES); do \
+# 	  $(MAKE) -C $(MOD_DIR) TOP_DIR=$(TOP_DIR)/.. MODULE=$$mod tags; \
+# 	done
+# 	$(MAKE) -C $(MAIN_DIR) TOP_DIR=$(TOP_DIR)/.. tags;
+
+# doc:
+# 	$(DOXYGEN) $(DOC_DIR)/Doxyfile
 
 
 # rules
-$(BIN_DIR)/$(PROG_NAME): $(LIB_DIRS) modules main
+$(BIN_DIR)/$(PROG_NAME): modules main

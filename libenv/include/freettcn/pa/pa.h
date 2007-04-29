@@ -1,7 +1,7 @@
 //
 // Copyright (C) 2007 Mateusz Pusz
 //
-// This file is part of freettcn (Free TTCN Compiler) product library.
+// This file is part of freettcnenv (Free TTCN Environment) library.
 
 // This library is free software; you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -32,9 +32,9 @@
 #define __PA_H__
 
 extern "C" {
-#include "freettcn/tri.h"
+#include <freettcn/ttcn3/tri.h>
 }
-#include "tools.h"
+#include <freettcn/tools/tools.h>
 
 namespace freettcn {
   

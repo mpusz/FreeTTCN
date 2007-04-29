@@ -17,37 +17,38 @@
 # along with this example; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-include $(TOP_DIR)/Makefile.defines
+include ../../Makefile.defines
+
+
+BIN_DIR = ../bin
 
 # files
 MODULE_CPP_FILE = $(patsubst %.ttcn,%.cpp,$(MODULE))
 MODULE_DEPEND_FILE = $(patsubst %.ttcn,%.d,$(MODULE))
-MODULE_O_FILE = $(addprefix $(BIN_DIR)/, $(patsubst %.ttcn,%.o,$(MODULE)))
+MODULE_O_FILE = $(BIN_DIR)/$(patsubst %.ttcn,%.o,$(MODULE))
 
-# defines
-INCLUDE_DIRS = -I$(LIB_DIR)/src/include -Iinclude
 
 # targets
-.PHONY: mod tags clobber clean
+.PHONY: mod tags distclean clean
 
 mod: $(MODULE_O_FILE)
-
-tags:
-	$(TAGS) --append --output=$(TAG_DIR)/TAGS *.cpp
-
-clobber: clean
-	$(Q)$(RM) -f *~ include/*~
 
 clean:
 	$(Q)$(RM) -f $(MODULE_O_FILE) $(MODULE_DEPEND_FILE)
 
+distclean: clean
+	$(Q)$(RM) -f *~ include/*~
+
+tags:
+#	$(TAGS) --append --output=$(TAG_DIR)/TAGS *.cpp
+
 
 # rules
 $(BIN_DIR)/%.o: %.cpp
-	$(call cmd,cmd_cc_d_o)
+	@$(call cmd,cmd_cc_d_o)
 
 %.cpp: %.ttcn
-	$(call cmd,cmd_ttcn_cc)
+	@$(call cmd,cmd_ttcn_cc)
 
 
 # include depends files

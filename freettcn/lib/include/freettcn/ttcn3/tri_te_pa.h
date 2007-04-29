@@ -30,7 +30,7 @@
 #ifndef __TRI_TE_PA_H__
 #define __TRI_TE_PA_H__
 
-#include "freettcn/tri.h"
+#include <freettcn/ttcn3/tri.h>
 
 
 /**

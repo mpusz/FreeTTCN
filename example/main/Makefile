@@ -17,13 +17,15 @@
 # along with this example; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-include $(TOP_DIR)/Makefile.defines
+include ../../Makefile.defines
+
 
 # files
 CPP_FILES = main.cpp
 
 # defines
-INCLUDE_DIRS = -I$(LIB_DIR)/src/include -Iinclude
+BIN_DIR = ../bin
+INCLUDE_DIRS = -Iinclude
 
 # macros
 O_FILES = $(addprefix $(BIN_DIR)/, $(patsubst %.cpp,%.o,$(CPP_FILES)))
@@ -32,32 +34,28 @@ DEPEND_FILES = $(patsubst %.cpp,%.d,$(CPP_FILES))
 # modules
 MODULES_O_FILES = $(addprefix $(BIN_DIR)/, $(patsubst %.ttcn,%.o,$(MOD_FILES)))
 
-# libraries
-INCLUDE_LIBS = $(addprefix -l, $(LIB_DIRS))
-
 
 
 # targets
-.PHONY: all tags clobber clean
+.PHONY: all clean distclean tags 
 
 all: $(O_FILES)
-	$(call cmd,cmd_link)
-
-tags:
-	$(TAGS) --append --output=$(TAG_DIR)/TAGS *.cpp
-
-clobber: clean
-	$(Q)$(RM) -f *~ include/*~
-	$(Q)$(RM) -f $(BIN_DIR)/$(PROG_NAME)
+	@$(call cmd,cmd_example_link)
 
 clean:
 	$(Q)$(RM) -f $(LIB_PATH) $(O_FILES) $(DEPEND_FILES)
 	$(Q)$(RM) -f $(BIN_DIR)/$(PROG_NAME)
 
+distclean: clean
+	$(Q)$(RM) -f *~ include/*~
+
+tags:
+#	$(TAGS) --append --output=$(TAG_DIR)/TAGS *.cpp
+
 
 # rules
 $(BIN_DIR)/%.o: %.cpp
-	$(call cmd,cmd_cc_d_o)
+	@$(call cmd,cmd_cc_d_o)
 
 # include depends files
 -include $(CPP_FILES:.cpp=.d)

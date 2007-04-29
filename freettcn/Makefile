@@ -33,16 +33,13 @@ BUILD_DIRS = $(LIB_DIR)
 .PHONY: all install clean distclean
 
 all:
-	$(Q)$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make,$(dir)))
+	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make,$(dir)))
 
 install:
-	$(Q)$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_install,$(dir)))
+	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_install,$(dir)))
 
 clean:
-	$(Q)$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_clean,$(dir)))
+	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_clean,$(dir)))
 
 distclean:
-	$(Q)$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_distclean,$(dir)))
-
-dist:
-	$(Q)$(call cmd,cmd_dist)
+	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_distclean,$(dir)))

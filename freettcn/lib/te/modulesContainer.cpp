@@ -27,8 +27,8 @@
  * 
  */
 
-#include "modulesContainer.h"
-#include "module.h"
+#include <freettcn/te/modulesContainer.h>
+#include <freettcn/te/module.h>
 #include <iostream>
 
 

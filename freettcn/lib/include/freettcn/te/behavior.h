@@ -17,22 +17,23 @@
 // along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-
 /**
- * @file   modulesContainer.h
+ * @file   behavior.h
  * @author Mateusz Pusz
- * @date   Thu Apr 26 16:49:51 2007
+ * @date   Wed Apr 25 11:01:46 2007
  * 
  * @brief  
  * 
  * 
  */
 
-#ifndef __MODULESCONTAINER_H__
-#define __MODULESCONTAINER_H__
+#ifndef __BEHAVIOR_H__
+#define __BEHAVIOR_H__
 
-#include "exception.h"
-#include <vector>
+extern "C" {
+#include <freettcn/ttcn3/tci.h>
+}
+#include <string>
 
 
 namespace freettcn {
@@ -41,21 +42,17 @@ namespace freettcn {
     
     class CModule;
     
-    /**
-     * Singleton design pattern
-     */
-    class CModulesContainer {
-      typedef std::vector<CModule *> ModuleList;
-      ModuleList _modList;
-      
-      CModulesContainer();
-      CModulesContainer &operator=(CModulesContainer &);  // Disallowed
-      CModulesContainer(const CModulesContainer &);       // Disallowed
+    class CBehavior {
+      CModule &_module;
+      TciBehaviourIdType _id;
+      //      VerdictType_t _verdict;
     public:
-      static CModulesContainer &Instance();
+      CBehavior(CModule &module, const char *name);
+      virtual ~CBehavior();
       
-      void Register(CModule &module);
-      CModule &Get(const std::string &moduleId) const throw(ENotFound);
+      const TciBehaviourIdType &Id() const;
+      
+      virtual void Run() = 0;
     };
 
   } // namespace TE
@@ -63,4 +60,4 @@ namespace freettcn {
 } // namespace freettcn
 
 
-#endif /* __MODULESCONTAINER_H__ */
+#endif /* __BEHAVIOR_H__ */

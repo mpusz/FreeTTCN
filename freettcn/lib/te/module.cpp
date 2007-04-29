@@ -28,21 +28,21 @@
  */
 
 
-#include "module.h"
-#include "modulesContainer.h"
-#include "te.h"
-#include "testComponent.h"
-#include "behavior.h"
-#include "testCase.h"
-#include "sourceData.h"
-#include "tools.h"
+#include <freettcn/te/module.h>
+#include <freettcn/te/modulesContainer.h>
+#include <freettcn/te/te.h>
+#include <freettcn/te/testComponent.h>
+#include <freettcn/te/behavior.h>
+#include <freettcn/te/testCase.h>
+#include <freettcn/te/sourceData.h>
+#include <freettcn/tools/tools.h>
 #include <iostream>
 extern "C" {
-#include "freettcn/tci_te_tm.h"
-#include "freettcn/tci_te_ch.h"
-#include "freettcn/tri_te_sa.h"
-#include "freettcn/tri_te_pa.h"
-#include "freettcn/tci_tl.h"
+#include <freettcn/ttcn3/tci_te_tm.h>
+#include <freettcn/ttcn3/tci_te_ch.h>
+#include <freettcn/ttcn3/tri_te_sa.h>
+#include <freettcn/ttcn3/tri_te_pa.h>
+#include <freettcn/ttcn3/tci_tl.h>
 }
 
 

@@ -27,12 +27,12 @@
  * 
  */
 
-#include "module.h"
-#include "testComponent.h"
-#include "testCase.h"
-#include "behavior.h"
-#include "port.h"
-#include "sourceData.h"
+#include <freettcn/te/module.h>
+#include <freettcn/te/testComponent.h>
+#include <freettcn/te/testCase.h>
+#include <freettcn/te/behavior.h>
+#include <freettcn/te/port.h>
+#include <freettcn/te/sourceData.h>
 
 
 namespace freettcn {

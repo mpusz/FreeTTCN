@@ -33,11 +33,11 @@
 
 
 extern "C" {
-#include "freettcn/tci.h"
-#include "freettcn/tri.h"
+#include <freettcn/ttcn3/tci.h>
+#include <freettcn/ttcn3/tri.h>
 }
-#include "initObject.h"
-#include "exception.h"
+#include <freettcn/te/initObject.h>
+#include <freettcn/tools/exception.h>
 #include <vector>
 #include <list>
 

@@ -28,9 +28,9 @@
  */
 
 extern "C" {
-#include "freettcn/tci_ch_te.h"
+#include <freettcn/ttcn3/tci_ch_te.h>
 }
-#include "te.h"
+#include <freettcn/te/te.h>
 #include <iostream>
 
 

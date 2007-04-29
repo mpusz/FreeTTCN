@@ -27,8 +27,8 @@
  * 
  */
 
-#include "behavior.h"
-#include "module.h"
+#include <freettcn/te/behavior.h>
+#include <freettcn/te/module.h>
 
 
 freettcn::TE::CBehavior::CBehavior(CModule &module, const char *name):

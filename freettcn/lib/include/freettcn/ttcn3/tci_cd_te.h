@@ -31,7 +31,7 @@
 #ifndef __TCI_CD_TE_H__
 #define __TCI_CD_TE_H__
 
-#include "freettcn/tci.h"
+#include <freettcn/ttcn3/tci.h>
 
 
 /**

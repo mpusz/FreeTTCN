@@ -27,7 +27,7 @@
  * 
  */
 
-#include "initObject.h"
+#include <freettcn/te/initObject.h>
 
 
 

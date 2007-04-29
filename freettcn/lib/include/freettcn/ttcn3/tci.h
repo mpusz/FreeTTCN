@@ -29,7 +29,7 @@
 #ifndef __TCI_H__
 #define __TCI_H__
 
-#include "freettcn/types.h"
+#include <freettcn/ttcn3/types.h>
 
 
 /**

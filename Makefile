@@ -51,26 +51,35 @@ help:
 	@$(ECHO) ""
 
 freettcn:
+	@$(ECHO) ""
 	@$(ECHO) "Building 'freettcn'..."
-	$(Q)$(call cmd,cmd_make,$(FREETTCN_DIR))
+	@$(call cmd,cmd_make,$(FREETTCN_DIR))
 
 freettcn_install:
-	$(Q)$(call cmd,cmd_make_install,$(FREETTCN_DIR))
+	@$(ECHO) ""
+	@$(ECHO) "Installing 'freettcn'..."
+	@$(call cmd,cmd_make_install,$(FREETTCN_DIR))
 
-evn:
-	$(Q)$(call cmd,cmd_make,$(ENV_DIR))
+env:
+	@$(ECHO) ""
+	@$(ECHO) "Building 'freettcnenv'..."
+	@$(call cmd,cmd_make,$(ENV_DIR))
 
 env_install:
-	$(Q)$(call cmd,cmd_make_install,$(ENV_DIR))
+	@$(ECHO) ""
+	@$(ECHO) "Installing 'freettcnenv'..."
+	@$(call cmd,cmd_make_install,$(ENV_DIR))
 
 example:
-	$(Q)$(call cmd,cmd_make,$(EXAMPLE_DIR))
+	@$(ECHO) ""
+	@$(ECHO) "Building example..."
+	@$(call cmd,cmd_make,$(EXAMPLE_DIR))
 
 clean:
-	$(Q)$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_clean,$(dir)))
+	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_clean,$(dir)))
 
 distclean:
-	$(Q)$(foreach dir, $(BUILD_DIRS), (call cmd,cmd_make_distclean,$(dir)))
+	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_distclean,$(dir)))
 
 dist: distclean
-	$(Q)$(call cmd,cmd_dist)
+	@$(call cmd,cmd_dist)

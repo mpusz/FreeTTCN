@@ -1,7 +1,7 @@
 #
 # Copyright (C) 2007 Mateusz Pusz
 #
-# This file is part of freettcn (Free TTCN) library.
+# This file is part of freettcnenv (Free TTCN Environment) library.
 
 # This library is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
@@ -18,15 +18,19 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-include ../../Makefile.defines
+include ../Makefile.defines
 
 
 #
 # directories
 #
-TE_DIR = te
-TOOLS_DIR = tools
-BUILD_DIRS = $(TOOLS_DIR) $(TE_DIR) 
+PA_DIR = pa
+SA_DIR = sa
+CD_DIR = cd
+CH_DIR = ch
+TM_DIR = tm
+TL_DIR = tl
+BUILD_DIRS = $(TM_DIR) $(PA_DIR) $(SA_DIR) $(CD_DIR) $(CH_DIR) $(TL_DIR)
 
 BIN_DIR = bin
 
@@ -34,7 +38,7 @@ BIN_DIR = bin
 
 
 # libraries
-LIB_FILE_NAME = $(LIB_NAME)
+LIB_FILE_NAME = $(LIB_ENV_NAME)
 LIB_FULL_NAME = $(LIB_FILE_NAME).so.$(VERSION)
 INCLUDE_LIBS = $(addsuffix .a, $(addprefix $(BIN_DIR)/lib, $(BUILD_DIRS)))
 
@@ -49,8 +53,6 @@ all:
 install:
 	@$(call cmd,cmd_lib_install)
 	@$(call cmd,cmd_h_install)
-	$(Q)$(INSTALL) -d $(H_INSTALL_DIR)/$(PROJECT_NAME)/ttcn3
-	$(Q)$(INSTALL) -m 644 $(LOCAL_FREETTCN_H_DIR)/ttcn3/*.h $(H_INSTALL_DIR)/$(PROJECT_NAME)/ttcn3
 
 clean:
 	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_clean,$(dir)))

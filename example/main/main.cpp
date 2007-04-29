@@ -18,14 +18,14 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-#include "../tl/include/tl.h"
-#include "../ch/include/ch.h"
-#include "../tm/include/tm.h"
-#include "../pa/include/pa.h"
-#include "../sa/include/sa.h"
-#include "te.h"
-#include "log.h"
-#include "exception.h"
+#include <freettcn/tl/tl.h>
+#include <freettcn/ch/ch.h>
+#include <freettcn/tm/tm.h>
+#include <freettcn/pa/pa.h>
+#include <freettcn/sa/sa.h>
+#include <freettcn/te/te.h>
+#include <freettcn/te/log.h>
+#include <freettcn/tools/exception.h>
 #include <iostream>
 #include <getopt.h>
 

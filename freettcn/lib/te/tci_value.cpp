@@ -19,12 +19,11 @@
 
 
 extern "C" {
-#include "freettcn/tci_value.h"
+#include <freettcn/ttcn3/tci_value.h>
 }
-#include "value.h"
-#include "type.h"
-#include "module.h"
-#include "exception.h"
+#include <freettcn/te/value.h>
+#include <freettcn/te/type.h>
+#include <freettcn/te/module.h>
 
 
 TciModuleIdType tciGetDefiningModule(TciType inst)

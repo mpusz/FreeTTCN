@@ -27,7 +27,7 @@
  * 
  */
 
-#include "sourceData.h"
+#include <freettcn/te/sourceData.h>
 
 
 freettcn::TE::CSourceData::CSourceData(const char *src, int line):

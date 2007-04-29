@@ -29,9 +29,9 @@
  */
 
 
-#include "type.h"
-#include "value.h"
-#include "testComponent.h"
+#include <freettcn/te/type.h>
+#include <freettcn/te/value.h>
+#include <freettcn/te/testComponent.h>
 
 
 freettcn::TE::CType::CType(const CModule   *module,

@@ -32,10 +32,10 @@
 
 
 extern "C" {
-#include "freettcn/tci.h"
-#include "freettcn/tri.h"
+#include <freettcn/ttcn3/tci.h>
+#include <freettcn/ttcn3/tri.h>
 }
-#include "tools.h"
+#include <freettcn/tools/tools.h>
 
 
 namespace freettcn {

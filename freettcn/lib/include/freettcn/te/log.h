@@ -30,7 +30,7 @@
 #ifndef __LOG_H__
 #define __LOG_H__
 
-#include "tools.h"
+#include <freettcn/tools/tools.h>
 
 
 namespace freettcn {

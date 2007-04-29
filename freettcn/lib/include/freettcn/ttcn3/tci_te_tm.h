@@ -31,8 +31,8 @@
 #define __TCI_TE_TM_H__
 
 
-#include "freettcn/tci.h"
-#include "freettcn/tri.h"
+#include <freettcn/ttcn3/tci.h>
+#include <freettcn/ttcn3/tri.h>
 
 
 /**

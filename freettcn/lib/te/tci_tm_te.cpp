@@ -29,9 +29,9 @@
 
 
 extern "C" {
-#include "freettcn/tci_tm_te.h"
+#include <freettcn/ttcn3/tci_tm_te.h>
 }
-#include "te.h"
+#include <freettcn/te/te.h>
 
 
 void tciRootModule(String moduleId)
