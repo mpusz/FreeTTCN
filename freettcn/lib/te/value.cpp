@@ -28,8 +28,8 @@
  */
 
 
-#include <freettcn/te/value.h>
-#include <freettcn/te/type.h>
+#include "freettcn/te/value.h"
+#include "freettcn/te/type.h"
 #include <cstdlib>
 
 

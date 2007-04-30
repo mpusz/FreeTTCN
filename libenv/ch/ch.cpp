@@ -27,7 +27,7 @@
  * 
  */
 
-#include <freettcn/ch/ch.h>
+#include "freettcn/ch/ch.h"
 extern "C" {
 #include <freettcn/ttcn3/tci_ch_te.h>
 }

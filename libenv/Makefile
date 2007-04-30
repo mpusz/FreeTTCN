@@ -40,7 +40,7 @@ BIN_DIR = bin
 # libraries
 LIB_FILE_NAME = $(LIB_ENV_NAME)
 LIB_FULL_NAME = $(LIB_FILE_NAME).so.$(VERSION)
-INCLUDE_LIBS = $(addsuffix .a, $(addprefix $(BIN_DIR)/lib, $(BUILD_DIRS)))
+INCLUDE_LIBS = $(addsuffix .a, $(addprefix lib, $(BUILD_DIRS)))
 
 
 # targets

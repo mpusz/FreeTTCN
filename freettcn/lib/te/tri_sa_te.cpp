@@ -30,9 +30,9 @@
 
 
 extern "C" {
-#include <freettcn/ttcn3/tri_sa_te.h>
+#include "freettcn/ttcn3/tri_sa_te.h"
   /// @todo Remove header below
-#include <freettcn/ttcn3/tci_te_cd.h>
+#include "freettcn/ttcn3/tci_te_cd.h"
 }
 
 

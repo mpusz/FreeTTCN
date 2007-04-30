@@ -18,7 +18,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-#include <freettcn/pa/pa.h>
+#include "freettcn/pa/pa.h"
 
 extern "C" {
   //#include "freettcn/tri_pa_te.h"

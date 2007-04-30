@@ -35,7 +35,7 @@ quiet_cmd_dist = DIST $(2)
 
 
 # targets
-.PHONY: help freettcn freettcn_install env env_install example clean distclean dist
+.PHONY: help all freettcn freettcn_install env env_install example clean distclean dist
 
 
 help:
@@ -49,6 +49,8 @@ help:
 	@$(ECHO) " - su -c 'make env_install'    (optional)"
 	@$(ECHO) " - make example                (optional)"
 	@$(ECHO) ""
+
+all: freettcn freettcn_install env env_install example
 
 freettcn:
 	@$(ECHO) ""

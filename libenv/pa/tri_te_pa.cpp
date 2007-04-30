@@ -21,7 +21,7 @@
 extern "C" {
 #include <freettcn/ttcn3/tri_te_pa.h>
 }
-#include <freettcn/pa/pa.h>
+#include "freettcn/pa/pa.h"
 
 
 

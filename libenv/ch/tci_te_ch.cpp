@@ -31,7 +31,7 @@
 extern "C" {
 #include <freettcn/ttcn3/tci_te_ch.h>
 }
-#include <freettcn/ch/ch.h>
+#include "freettcn/ch/ch.h"
 
 
 TriComponentId tciCreateTestComponentReq(TciTestComponentKindType kind,

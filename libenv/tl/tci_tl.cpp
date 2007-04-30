@@ -21,7 +21,7 @@
 extern "C" {
 #include <freettcn/ttcn3/tci_tl.h>
 }
-#include <freettcn/tl/tl.h>
+#include "freettcn/tl/tl.h"
 
 
 /** 

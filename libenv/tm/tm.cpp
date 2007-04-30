@@ -27,7 +27,7 @@
  * 
  */
 
-#include <freettcn/tm/tm.h>
+#include "freettcn/tm/tm.h"
 extern "C" {
 #include <freettcn/ttcn3/tci_tm_te.h>
 #include <freettcn/ttcn3/tci_value.h>

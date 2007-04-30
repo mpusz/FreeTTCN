@@ -27,9 +27,9 @@
  * 
  */
 
-#include <freettcn/te/testComponent.h>
-#include <freettcn/te/module.h>
-#include <freettcn/te/type.h>
+#include "freettcn/te/testComponent.h"
+#include "freettcn/te/module.h"
+#include "freettcn/te/type.h"
 
 
 freettcn::TE::CTestComponent::CTestComponent(const CType &type):

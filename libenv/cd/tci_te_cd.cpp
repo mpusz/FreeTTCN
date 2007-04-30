@@ -23,7 +23,7 @@ extern "C" {
 #include <freettcn/ttcn3/tci_value.h>
 }
 
-#include <freettcn/cd/decoder.h>
+#include "freettcn/cd/decoder.h"
 #include <cstring>
 #include <cstdio>
 

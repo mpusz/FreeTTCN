@@ -37,6 +37,7 @@ LIB_ENV_NAME = lib$(PROJECT_NAME)env
 MAKE = make
 CPP = g++ -g -Wall
 AR = ar -c
+CD = cd
 CP = cp
 LD = ld
 RM = rm
@@ -140,9 +141,17 @@ quiet_cmd_cc_d_o = CC_D_O     $<
 quiet_cmd_ttcn_cc = TTCN_CC    $<
       cmd_ttcn_cc = $(TOUCH) $@
 
+
+cmd_tmp = $(subst '\n','',`$(foreach lib,$(INCLUDE_LIBS),$(AR) -t $(BIN_DIR)/$(lib);)`)
+
 # link library
 quiet_cmd_lib_link = LINK $(BIN_DIR)/$(LIB_FULL_NAME)
-      cmd_lib_link = $(LD) -shared -whole-archive -export-dynamic -soname $(LIB_FILE_NAME).so.$(VERSION_1) -o $(BIN_DIR)/$(LIB_FULL_NAME) $(INCLUDE_LIBS)
+#      cmd_lib_link = $(LD) -shared -export-dynamic -soname $(LIB_FILE_NAME).so.$(VERSION_1) -o $(BIN_DIR)/$(LIB_FULL_NAME) -whole-archive $(INCLUDE_LIBS)
+      cmd_lib_link = $(CD) $(BIN_DIR) && \
+                     $(RM) -f *.o && \
+                     $(foreach lib,$(INCLUDE_LIBS),$(AR) -x $(lib);); \
+                     $(CPP) -shared -Wl,-export-dynamic,-soname,$(LIB_FILE_NAME).so.$(VERSION_1) -o $(LIB_FULL_NAME) *.o && \
+		     $(RM) -f *.o
 
 # link example
 quiet_cmd_example_link = LINK       $(BIN_DIR)/$(PROG_NAME)

@@ -31,7 +31,7 @@
 extern "C" {
 #include <freettcn/ttcn3/tci_te_tm.h>
 }
-#include <freettcn/tm/tm.h>
+#include "freettcn/tm/tm.h"
 #include <iostream>
 #include <assert.h>
 

@@ -18,7 +18,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 extern "C" {
-#include <freettcn/ttcn3/tci_cd_te.h>
+#include "freettcn/ttcn3/tci_cd_te.h"
 }
 
 

@@ -18,7 +18,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-#include <freettcn/sa/sa.h>
+#include "freettcn/sa/sa.h"
 
 extern "C" {
 #include <freettcn/ttcn3/tri_sa_te.h>

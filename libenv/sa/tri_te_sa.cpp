@@ -21,7 +21,7 @@
 extern "C" {
 #include <freettcn/ttcn3/tri_te_sa.h>
 }
-#include <freettcn/sa/sa.h>
+#include "freettcn/sa/sa.h"
 
 
 

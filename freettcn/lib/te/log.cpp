@@ -28,7 +28,7 @@
  */
 
 
-#include <freettcn/te/log.h>
+#include "freettcn/te/log.h"
 
 
 freettcn::TE::CLogMask::CLogMask(bool enabled /* true */):
