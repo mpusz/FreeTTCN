@@ -26,6 +26,7 @@
 #include <freettcn/te/te.h>
 #include <freettcn/te/log.h>
 #include <freettcn/tools/exception.h>
+#include <freettcn/tools/timeStamp.h>
 #include <iostream>
 #include <getopt.h>
 

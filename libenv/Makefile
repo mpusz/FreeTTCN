@@ -60,6 +60,7 @@ clean:
 
 distclean:
 	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_distclean,$(dir)))
+	$(Q)$(RM) -f $(BIN_DIR)/*~
 	$(Q)$(RM) -f $(BIN_DIR)/$(LIB_FULL_NAME)
 
 # 	$(Q)$(MAKE) -C $(SRC_DIR) TOP_DIR=$(TOP_DIR)/.. clobber;

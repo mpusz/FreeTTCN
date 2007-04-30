@@ -34,7 +34,7 @@ MODULE_O_FILE = $(BIN_DIR)/$(patsubst %.ttcn,%.o,$(MODULE))
 mod: $(MODULE_O_FILE)
 
 clean:
-	$(Q)$(RM) -f $(MODULE_O_FILE) $(MODULE_DEPEND_FILE)
+	$(Q)$(RM) -f $(BIN_DIR)/$(patsubst %.ttcn,%.o,$(MOD_FILES)) $(patsubst %.ttcn,%.d,$(MOD_FILES))
 
 distclean: clean
 	$(Q)$(RM) -f *~ include/*~

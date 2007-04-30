@@ -18,34 +18,58 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /**
- * @file   log.h
+ * @file   timeStamp.h
  * @author Mateusz Pusz
- * @date   Wed Apr 25 14:20:53 2007
+ * @date   Mon Apr 30 20:28:52 2007
  * 
  * @brief  
  * 
  * 
  */
 
-#ifndef __LOG_H__
-#define __LOG_H__
+#ifndef __TIMESTAMP_H__
+#define __TIMESTAMP_H__
 
-#include <freettcn/tools/logMask.h>
-
+#include <string>
 
 namespace freettcn {
 
-  namespace TE {
-    
-    class CLogMask : public freettcn::CLogMask {
-    public:
-      CLogMask(bool enabled = true);
-      ~CLogMask();
+  class CTimeStamp {
+  public:
+    enum TMode {
+      MODE_ABSOLUTE,
+      MODE_RELATIVE
     };
     
-  } // namespace TE
-  
+    struct TTime {
+      int sec;
+      int usec;
+    };
+  private:
+    const unsigned short _precision;
+    TMode _mode;
+    TTime _absTimeOffset;
+    
+  protected:
+    virtual void Set(TTime &ts) const;
+    void Sub(TTime &value, const TTime &delta) const;
+    void Add(TTime &value, const TTime &delta) const;
+    virtual int Convert(TTime &value) const;
+    virtual void Convert(int ts, TTime &ts) const;
+    
+  public:
+    CTimeStamp(unsigned short precision = 4, TMode initMode = MODE_RELATIVE);
+    virtual ~CTimeStamp();
+    
+    void Mode(TMode mode);
+    TMode Mode() const;
+    void Reset();
+    
+    int Get() const;
+    virtual std::string String(int ts) const;
+  };
+
 } // namespace freettcn
 
 
-#endif /* __LOG_H__ */
+#endif /* __TIMESTAMP_H__ */

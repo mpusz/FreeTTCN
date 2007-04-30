@@ -29,6 +29,7 @@
 
 
 #include "freettcn/tl/tl.h"
+#include <freettcn/tools/timeStamp.h>
 #include <iostream>
 #include <sstream>
 #include <iomanip>

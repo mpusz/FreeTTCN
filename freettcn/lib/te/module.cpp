@@ -36,6 +36,8 @@
 #include "freettcn/te/testCase.h"
 #include "freettcn/te/sourceData.h"
 #include "freettcn/tools/tools.h"
+#include "freettcn/tools/logMask.h"
+#include "freettcn/tools/timeStamp.h"
 #include <iostream>
 extern "C" {
 #include "freettcn/ttcn3/tci_te_tm.h"

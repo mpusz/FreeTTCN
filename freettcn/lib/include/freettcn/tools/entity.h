@@ -18,13 +18,43 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /**
- * @file   tools.cpp
+ * @file   entity.h
  * @author Mateusz Pusz
- * @date   Fri Apr 20 11:25:58 2007
+ * @date   Mon Apr 30 20:38:47 2007
  * 
  * @brief  
  * 
  * 
  */
 
-#include "freettcn/tools/tools.h"
+#ifndef __ENTITY_H__
+#define __ENTITY_H__
+
+
+#include <freettcn/tools/exception.h>
+
+namespace freettcn {
+
+  class CTimeStamp;
+  class CLogMask;
+
+  class CEntity {
+    CTimeStamp *_ts;
+    CLogMask *_logMask;
+    bool _logging;
+  public:
+    CEntity();
+    virtual ~CEntity() = 0;
+    
+    CTimeStamp &TimeStamp() const throw(ENotFound);
+    CLogMask &LogMask() const throw(ENotFound);
+    
+    void LogEnable(CTimeStamp &ts, CLogMask &logMask);
+    void LogDisable();
+    bool Logging() const;
+  };
+  
+} // namespace freettcn
+
+
+#endif /* __ENTITY_H__ */

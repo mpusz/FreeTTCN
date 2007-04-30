@@ -35,15 +35,17 @@ extern "C" {
 #include <freettcn/ttcn3/tci.h>
 #include <freettcn/ttcn3/tri.h>
 }
-#include <freettcn/tools/tools.h>
+#include <freettcn/tools/exception.h>
+#include <freettcn/tools/logMask.h>
 #include <string>
-//#include <vector>
 
 
 namespace freettcn {
   
-  namespace TL {
+  class CTimeStamp;
     
+  namespace TL {
+
     class CLogger {
     public:
       class CData {

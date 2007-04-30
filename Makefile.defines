@@ -142,8 +142,6 @@ quiet_cmd_ttcn_cc = TTCN_CC    $<
       cmd_ttcn_cc = $(TOUCH) $@
 
 
-cmd_tmp = $(subst '\n','',`$(foreach lib,$(INCLUDE_LIBS),$(AR) -t $(BIN_DIR)/$(lib);)`)
-
 # link library
 quiet_cmd_lib_link = LINK $(BIN_DIR)/$(LIB_FULL_NAME)
 #      cmd_lib_link = $(LD) -shared -export-dynamic -soname $(LIB_FILE_NAME).so.$(VERSION_1) -o $(BIN_DIR)/$(LIB_FULL_NAME) -whole-archive $(INCLUDE_LIBS)
@@ -168,7 +166,9 @@ quiet_cmd_h_install = INSTALL_H
       cmd_h_install = $(INSTALL) -d $(addprefix $(H_INSTALL_DIR)/$(PROJECT_NAME)/, $(BUILD_DIRS)) && \
                       $(foreach dir, $(BUILD_DIRS), $(INSTALL) -m 644 $(LOCAL_FREETTCN_H_DIR)/$(dir)/*.h $(H_INSTALL_DIR)/$(PROJECT_NAME)/$(dir);)
 
-
+# make distribution
+quiet_cmd_dist = MAKE_DIST
+      cmd_dist = $(TAR) -cvz --exclude ".svn" -f ../$(PROJECT_NAME)-$(VERSION).tar.gz . 
 
 # # make tags
 # quiet_cmd_tags = TAGS

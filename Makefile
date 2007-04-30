@@ -28,12 +28,6 @@ EXAMPLE_DIR = example
 BUILD_DIRS = $(FREETTCN_DIR) $(ENV_DIR) $(EXAMPLE_DIR)
 
 
-# dist
-quiet_cmd_dist = DIST $(2)
-      cmd_dist = 
-
-
-
 # targets
 .PHONY: help all freettcn freettcn_install env env_install example clean distclean dist
 
@@ -82,6 +76,7 @@ clean:
 
 distclean:
 	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_distclean,$(dir)))
+	$(Q)$(RM) -f *~
 
 dist: distclean
 	@$(call cmd,cmd_dist)

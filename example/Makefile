@@ -50,6 +50,7 @@ clean:
 
 distclean:
 	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_distclean,$(dir)))
+	$(Q)$(RM) -f $(BIN_DIR)/*~
 
 tags:
 # 	$(Q)for dir in $(LIB_DIRS); do \

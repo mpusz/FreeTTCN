@@ -33,6 +33,7 @@ extern "C" {
 #include <freettcn/ttcn3/tci_value.h>
 #include <freettcn/ttcn3/tci_tl.h>
 }
+#include <freettcn/tools/timeStamp.h>
 #include <iostream>
 
 
