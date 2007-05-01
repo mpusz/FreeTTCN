@@ -45,8 +45,11 @@ namespace freettcn {
      * Singleton design pattern
      */
     class CModulesContainer {
-      typedef std::vector<CModule *> ModuleList;
-      ModuleList _modList;
+    public:
+      typedef std::vector<CModule *> TModuleList;
+      
+    private:
+      TModuleList _modList;
       
       CModulesContainer();
       CModulesContainer &operator=(CModulesContainer &);  // Disallowed
@@ -56,6 +59,7 @@ namespace freettcn {
       
       void Register(CModule &module);
       CModule &Get(const std::string &moduleId) const throw(ENotFound);
+      const TModuleList &List() const;
     };
 
   } // namespace TE

@@ -59,12 +59,6 @@ TciTestCaseIdType freettcn::TM::CTestManagement::CTestCase::Id() const
   return _id;
 }
 
-void freettcn::TM::CTestManagement::CTestCase::Print() const
-{
-  std::cout << _id.moduleName << "." << _id.objectName << std::endl;
-}
-
-
 void freettcn::TM::CTestManagement::CTestCase::Start(const TciParameterListType &parameterlist)
 {
 //   TciTestCaseIdType testCaseId;
@@ -123,11 +117,6 @@ TciValue freettcn::TM::CTestManagement::CModuleParameter::Value() throw(freettcn
   return _value;
 }
 
-void freettcn::TM::CTestManagement::CModuleParameter::Print() const
-{
-  std::cout << _parName << std::endl;
-}
-
 
 
 // ********************************** L O G   M A S K *************************************
@@ -170,12 +159,12 @@ freettcn::TM::CTestManagement::~CTestManagement()
 void freettcn::TM::CTestManagement::Clear()
 {
   // clear module parameters list
-  for(ModuleParList::iterator it=_modParList.begin(); it != _modParList.end(); ++it)
+  for(TModuleParList::iterator it=_modParList.begin(); it != _modParList.end(); ++it)
     delete *it;
   _modParList.clear();
   
   // clear test cases list
-  for(TCList::iterator it=_tcList.begin(); it != _tcList.end(); ++it)
+  for(TTCList::iterator it=_tcList.begin(); it != _tcList.end(); ++it)
     delete *it;
   _tcList.clear();
   
@@ -184,7 +173,7 @@ void freettcn::TM::CTestManagement::Clear()
 
 freettcn::TM::CTestManagement::CTestCase &freettcn::TM::CTestManagement::TestCaseGet(const std::string &testCaseId) const throw(freettcn::ENotFound)
 {
-  for(TCList::const_iterator it = _tcList.begin(); it != _tcList.end(); ++it) {
+  for(TTCList::const_iterator it = _tcList.begin(); it != _tcList.end(); ++it) {
     if ((*it)->Name() == testCaseId)
       return *(*it);
   }
@@ -196,6 +185,16 @@ freettcn::TM::CTestManagement::CTestCase &freettcn::TM::CTestManagement::TestCas
 
 void freettcn::TM::CTestManagement::ModuleParamsSet()
 {
+}
+
+const freettcn::TM::CTestManagement::TTCList &freettcn::TM::CTestManagement::TCList() const
+{
+  return _tcList;
+}
+
+const freettcn::TM::CTestManagement::TModuleParList &freettcn::TM::CTestManagement::ModuleParameterList() const
+{
+  return _modParList;
 }
 
 void freettcn::TM::CTestManagement::Init(const std::string &moduleId) throw(freettcn::EOperationFailed)
@@ -257,7 +256,7 @@ void freettcn::TM::CTestManagement::Abort()
 
 TciValue freettcn::TM::CTestManagement::ModuleParameterGet(const TciModuleParameterIdType &parameterId) const
 {
-  for(ModuleParList::const_iterator it = _modParList.begin(); it != _modParList.end(); ++it) {
+  for(TModuleParList::const_iterator it = _modParList.begin(); it != _modParList.end(); ++it) {
     if ((*it)->Name() == parameterId)
       return (*it);
   }

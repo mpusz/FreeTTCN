@@ -64,7 +64,7 @@ namespace freettcn {
 
 
 //   class Parameter {
-//     enum PassingMode {
+//     enum TPassingMode {
 //       IN = 0,
 //       INOUT = 1,
 //       OUT = 2
@@ -96,7 +96,7 @@ namespace freettcn {
   
 //   class Port {
 //   public:
-//     enum Mode {
+//     enum TMode {
 //       FREE,
 //       MAPPED,
 //       CONNECTED

@@ -25,6 +25,8 @@
 #include <freettcn/sa/sa.h>
 #include <freettcn/te/te.h>
 #include <freettcn/te/log.h>
+#include <freettcn/te/module.h>
+#include <freettcn/te/modulesContainer.h>
 #include <freettcn/tools/exception.h>
 #include <freettcn/tools/timeStamp.h>
 #include <iostream>
@@ -34,11 +36,22 @@
 using namespace std;
 
 
-void Run(const std::string &testCase)
+class CTestManagement : public freettcn::TM::CTestManagement {
+public:
+  void TestCasesPrint() const
+  {
+    const freettcn::TM::CTestManagement::TTCList &tcList = TCList();
+    for(TTCList::const_iterator it=tcList.begin(); it != tcList.end(); ++it) {
+      TciTestCaseIdType id = (*it)->Id();
+      std::cout << " - " << id.moduleName << "." << id.objectName << std::endl;
+    }
+  }
+};
+
+
+void Run(CTestManagement &tm, const std::string &testCase)
 {
   try {
-    freettcn::TM::CTestManagement &tm = freettcn::TM::CTestManagement::Instance();
-    
     if (testCase != "") {
       // init specified test cases
       try {
@@ -169,6 +182,12 @@ int main (int argc, char **argv)
   
   if (list && module == "") {
     // list modules
+    freettcn::TE::CModulesContainer &modules = freettcn::TE::CModulesContainer::Instance();
+    const freettcn::TE::CModulesContainer::TModuleList &list = modules.List();
+    
+    for(freettcn::TE::CModulesContainer::TModuleList::const_iterator it=list.begin(); it != list.end(); ++it)
+      std::cout << " - " << (*it)->Name() << std::endl;
+    
     exit(0);
   }
   
@@ -178,7 +197,7 @@ int main (int argc, char **argv)
   }
   
   // init test management
-  freettcn::TM::CTestManagement tm;
+  CTestManagement tm;
   
   try {
     // init module
@@ -191,20 +210,10 @@ int main (int argc, char **argv)
   
   if (list) {
     // list test cases
-    
+    tm.TestCasesPrint();
     exit(0);
   }
   
   // run TTCN module
-  Run(testCase);
+  Run(tm, testCase);
 }
-
-
-// void freettcn::TM::CTestManagement::TestCasesPrint() const
-// {
-//   std::cout << "Test cases:" << std::endl;
-//   for(TCList::const_iterator it=_tcList.begin(); it != _tcList.end(); ++it) {
-//     std::cout << " - ";
-//     (*it)->Print();
-//   }
-// }

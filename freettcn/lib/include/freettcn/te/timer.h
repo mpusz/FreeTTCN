@@ -44,7 +44,7 @@ namespace freettcn {
 
   namespace TE {
     
-//     enum VerdictType_t {
+//     enum TVerdictType_t {
 //       VERDICT_NONE,
 //       VERDICT_PASS,
 //       VERDICT_INCONC,

@@ -39,7 +39,7 @@
 using namespace std;
 
 
-freettcn::TL::CLogger::CData::CData(int ts, const char *src, int line, const char *am, freettcn::CEntity::Type entity, unsigned short logIdx, const char *title):
+freettcn::TL::CLogger::CData::CData(int ts, const char *src, int line, const char *am, freettcn::CEntity::TType entity, unsigned short logIdx, const char *title):
   _ts(ts), _src(src ? src : ""), _line(line), _am(am ? am : ""), _entity(entity), _logIdx(logIdx), _title(title)
 {
 }
@@ -65,7 +65,7 @@ const std::string &freettcn::TL::CLogger::CData::AdditionalMessage() const
   return _am;
 }
 
-freettcn::CEntity::Type freettcn::TL::CLogger::CData::Entity() const
+freettcn::CEntity::TType freettcn::TL::CLogger::CData::Entity() const
 {
   return _entity;
 }
@@ -83,7 +83,7 @@ const std::string &freettcn::TL::CLogger::CData::Title() const
 
 void freettcn::TL::CLogger::CData::LineAdd(const char *title, const char *value)
 {
-  LineData data;
+  TLineData data;
   data._title = title;
   data._value = value;
   

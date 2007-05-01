@@ -40,7 +40,7 @@ namespace freettcn {
   
   class CEntity {
   public:
-    enum Type {
+    enum TType {
       TYPE_TE,
       TYPE_TM,
       TYPE_CH,

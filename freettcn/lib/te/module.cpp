@@ -190,7 +190,7 @@ void freettcn::TE::CModule::Register(const freettcn::TE::CBehavior *ctrlBehavior
 void freettcn::TE::CModule::ParametersSet() throw(freettcn::EOperationFailed)
 {
   // obtain and set module parameters values
-  for(ParameterList::iterator it=_parameterList.begin(); it != _parameterList.end(); ++it) {
+  for(TParameterList::iterator it=_parameterList.begin(); it != _parameterList.end(); ++it) {
     TciValue val = tciGetModulePar(const_cast<char *>((*it)->Name()));
 //     if (!val && (*it)->DefaultValue())
 //       val = new((*it)->DefaultValue());
@@ -211,7 +211,7 @@ TciModuleParameterListType freettcn::TE::CModule::Parameters() const
   modParList.modParList = __modParList = new TciModuleParameterType[modParList.length];
   
   unsigned int i=0;
-  for(ParameterList::const_iterator it=_parameterList.begin(); it != _parameterList.end(); ++it, i++) {
+  for(TParameterList::const_iterator it=_parameterList.begin(); it != _parameterList.end(); ++it, i++) {
     modParList.modParList[i].parName = const_cast<char *>((*it)->Name());
     modParList.modParList[i].defaultValue = ((*it)->DefaultValue());
   }
@@ -229,7 +229,7 @@ TciTestCaseIdListType freettcn::TE::CModule::TestCases() const
   tcList.idList = __testCaseIdList = new TciTestCaseIdType[tcList.length];
   
   unsigned int i=0;
-  for(TestCaseList::const_iterator it=_testCaseList.begin(); it!=_testCaseList.end(); ++it, i++) {
+  for(TTestCaseList::const_iterator it=_testCaseList.begin(); it!=_testCaseList.end(); ++it, i++) {
     tcList.idList[i].moduleName = const_cast<char *>(Name());
     tcList.idList[i].objectName = const_cast<char *>((*it)->Name());
     tcList.idList[i].aux = 0;
@@ -240,7 +240,7 @@ TciTestCaseIdListType freettcn::TE::CModule::TestCases() const
 
 freettcn::TE::CTestCase &freettcn::TE::CModule::TestCase(const char *tcId) const throw(ENotFound)
 {
-  for(TestCaseList::const_iterator it=_testCaseList.begin(); it != _testCaseList.end(); ++it)
+  for(TTestCaseList::const_iterator it=_testCaseList.begin(); it != _testCaseList.end(); ++it)
     if ((*it)->Name() == tcId)
       return *(*it);
   std::cout << "ERROR: Test Case not found" << std::endl;
@@ -307,7 +307,7 @@ void freettcn::TE::CModule::BehaviorAdd(freettcn::TE::CBehavior *behavior)
 
 const freettcn::TE::CBehavior &freettcn::TE::CModule::Behavior(const TciBehaviourIdType &behavior) const throw(freettcn::ENotFound)
 {
-  for(BehaviorList::const_iterator it=_behaviorList.begin(); it!=_behaviorList.end(); ++it) {
+  for(TBehaviorList::const_iterator it=_behaviorList.begin(); it!=_behaviorList.end(); ++it) {
     TciBehaviourIdType id = (*it)->Id();
     if (!strcmp(behavior.objectName, id.objectName))
       return *(*it);
@@ -327,7 +327,7 @@ void freettcn::TE::CModule::TestComponentAdd(freettcn::TE::CTestComponent &compo
 
 freettcn::TE::CTestComponent &freettcn::TE::CModule::TestComponent(const TriComponentId &component) const throw(freettcn::ENotFound)
 {
-  for(TestCompList::const_iterator it=_allEntityStates.begin(); it!=_allEntityStates.end(); ++it) {
+  for(TTestCompList::const_iterator it=_allEntityStates.begin(); it!=_allEntityStates.end(); ++it) {
     TriComponentId id = (*it)->Id();
     if (component.compInst.aux == id.compInst.aux)
       return *(*it);

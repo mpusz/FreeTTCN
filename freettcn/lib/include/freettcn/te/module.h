@@ -74,22 +74,22 @@ namespace freettcn {
       };
       
       // types
-      typedef std::vector<CParameter *> ParameterList;
-      typedef std::vector<CTestCase *> TestCaseList;
-      typedef std::list<CTestComponent *> TestCompList;
-      typedef std::list<const CBehavior *> BehaviorList;
+      typedef std::vector<CParameter *> TParameterList;
+      typedef std::vector<CTestCase *> TTestCaseList;
+      typedef std::list<CTestComponent *> TTestCompList;
+      typedef std::list<const CBehavior *> TBehaviorList;
       
       // module info
       const CBehavior * _ctrlBehavior;
       const CSourceData * _ctrlSrcData;
       TciModuleIdType _id;
-      ParameterList _parameterList;
-      TestCaseList _testCaseList;
-      BehaviorList _behaviorList;
+      TParameterList _parameterList;
+      TTestCaseList _testCaseList;
+      TBehaviorList _behaviorList;
       
       // module dynamic state
       bool _ctrlRunning;
-      TestCompList _allEntityStates;              /**< list of all entities that was used in a test case - M-CONTROL (must be the first), MTC, PTCs */
+      TTestCompList _allEntityStates;              /**< list of all entities that was used in a test case - M-CONTROL (must be the first), MTC, PTCs */
       CTestCase *_currTestCase;                   /**< current test case pointer */
 //       TestCompList _done;                         /**< a list of all currently stopped test components during test case execution (filled when TC is stopped or killed, removed when TC is started) */
 //       TestCompList _killed;                       /**< a list of all terminated test components during test case execution (filled when TC is killed) */

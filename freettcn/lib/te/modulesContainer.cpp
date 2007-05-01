@@ -50,10 +50,14 @@ void freettcn::TE::CModulesContainer::Register(CModule &module)
 
 freettcn::TE::CModule &freettcn::TE::CModulesContainer::Get(const std::string &moduleId) const throw(ENotFound)
 {
-  for(ModuleList::const_iterator it=_modList.begin(); it != _modList.end(); ++it)
+  for(TModuleList::const_iterator it=_modList.begin(); it != _modList.end(); ++it)
     if ((*it)->Name() == moduleId)
       return *(*it);
   std::cout << "ERROR: Module not found" << std::endl;
   throw freettcn::ENotFound();
 }
 
+const freettcn::TE::CModulesContainer::TModuleList &freettcn::TE::CModulesContainer::List() const
+{
+  return _modList;
+}

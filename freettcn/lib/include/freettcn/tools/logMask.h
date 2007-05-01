@@ -36,7 +36,7 @@ namespace freettcn {
 
   class CLogMask {
   public:
-    enum TECommands {
+    enum TTECommands {
       CMD_TE_TC_EXECUTE,
       CMD_TE_TC_START,
       CMD_TE_TC_STOP,
@@ -108,7 +108,7 @@ namespace freettcn {
       CMD_TE_NUM                                    /**< should be the last one on the list */
     };
   
-    enum TMCommands {
+    enum TTMCommands {
       CMD_TM_TC_STARTED,
       CMD_TM_TC_TERMINATED,
     
@@ -119,7 +119,7 @@ namespace freettcn {
       CMD_TM_NUM                                    /**< should be the last one on the list */
     };
   
-    enum CHCommands {
+    enum TCHCommands {
       CMD_CH_M_SEND_C,
       CMD_CH_M_SEND_C_BC,
       CMD_CH_M_SEND_C_MC,
@@ -145,7 +145,7 @@ namespace freettcn {
       CMD_CH_NUM                                    /**< should be the last one on the list */
     };
   
-    enum SACommands {
+    enum TSACommands {
       CMD_SA_M_SEND_M,
       CMD_SA_M_SEND_M_BC,
       CMD_SA_M_SEND_M_MC,
@@ -171,7 +171,7 @@ namespace freettcn {
       CMD_SA_NUM                                    /**< should be the last one on the list */
     };
   
-    enum PACommands {
+    enum TPACommands {
       CMD_PA_PR_CATCH_TIMEOUT_DETECTED,
     
       CMD_PA_T_TIMEOUT_DETECTED,

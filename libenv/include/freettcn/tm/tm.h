@@ -55,6 +55,7 @@ namespace freettcn {
     
     class CTestManagement : public freettcn::CEntity {
       
+    protected:
       class CTestCase {
         TciTestCaseIdType _id;
       public:
@@ -62,7 +63,6 @@ namespace freettcn {
         ~CTestCase();
         std::string Name() const;
         TciTestCaseIdType Id() const;
-        void Print() const;
         
         void Start(const TciParameterListType &parameterlist);
         void Started(const TciParameterListType &parameterList, double timer);
@@ -79,19 +79,19 @@ namespace freettcn {
         ~CModuleParameter();
         std::string Name() const;
         TciValue Value() throw(EOperationFailed);
-        void Print() const;
       };
       
-      typedef std::vector<CTestCase *> TCList;
-      typedef std::vector<CModuleParameter *> ModuleParList;
+      typedef std::vector<CTestCase *> TTCList;
+      typedef std::vector<CModuleParameter *> TModuleParList;
       
+    private:
       static CTestManagement *_instance;
       
       bool _moduleRunning;                        /**< specifies if a test case or control part is running */
       TriComponentId _ctrlCompId;                 /**< component Id of running Control part */
       CTestCase *_tc;                             /**< currently started test case */
-      ModuleParList _modParList;
-      TCList _tcList;
+      TModuleParList _modParList;
+      TTCList _tcList;
       
       CTestManagement& operator=(CTestManagement&);  // Disallowed
       CTestManagement(const CTestManagement&);       // Disallowed
@@ -99,6 +99,10 @@ namespace freettcn {
       void Clear();
       CTestCase &TestCaseGet(const std::string &testCaseId) const throw(ENotFound);
       void ModuleParamsSet();
+      
+    protected:
+      const TTCList &TCList() const;
+      const TModuleParList &ModuleParameterList() const;
       
     public:
       static CTestManagement &Instance() throw(ENotFound);

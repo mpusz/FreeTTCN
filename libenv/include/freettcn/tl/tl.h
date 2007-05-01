@@ -50,7 +50,7 @@ namespace freettcn {
     class CLogger {
     public:
       class CData {
-        struct LineData {
+        struct TLineData {
           std::string _title;
           std::string _value;
         };
@@ -59,19 +59,19 @@ namespace freettcn {
         std::string _src;
         int _line;
         std::string _am;
-        CEntity::Type _entity;
+        CEntity::TType _entity;
         unsigned short _logIdx;
         std::string _title;
         
-        std::vector<LineData> lines;
+        std::vector<TLineData> lines;
       public:
-        CData(int ts, const char *src, int line, const char *am, CEntity::Type entity, unsigned short logIdx, const char *title);
+        CData(int ts, const char *src, int line, const char *am, CEntity::TType entity, unsigned short logIdx, const char *title);
         
         int TimeStamp() const;
         const std::string &Source() const;
         int SourceLine() const;
         const std::string &AdditionalMessage() const;
-        CEntity::Type Entity() const;
+        CEntity::TType Entity() const;
         unsigned short LogIdx() const;
         const std::string &Title() const;
         
