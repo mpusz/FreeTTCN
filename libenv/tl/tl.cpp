@@ -29,6 +29,7 @@
 
 
 #include "freettcn/tl/tl.h"
+#include <freettcn/tools/logMask.h>
 #include <freettcn/tools/timeStamp.h>
 #include <iostream>
 #include <sstream>
@@ -38,7 +39,7 @@
 using namespace std;
 
 
-freettcn::TL::CLogger::CData::CData(int ts, const char *src, int line, const char *am, TTCNEntity entity, unsigned short logIdx, const char *title):
+freettcn::TL::CLogger::CData::CData(int ts, const char *src, int line, const char *am, freettcn::CEntity::Type entity, unsigned short logIdx, const char *title):
   _ts(ts), _src(src ? src : ""), _line(line), _am(am ? am : ""), _entity(entity), _logIdx(logIdx), _title(title)
 {
 }
@@ -64,7 +65,7 @@ const std::string &freettcn::TL::CLogger::CData::AdditionalMessage() const
   return _am;
 }
 
-freettcn::TTCNEntity freettcn::TL::CLogger::CData::Entity() const
+freettcn::CEntity::Type freettcn::TL::CLogger::CData::Entity() const
 {
   return _entity;
 }
@@ -192,7 +193,9 @@ void freettcn::TL::CTestLogging::TcExecute(const char *am, int ts, const char *s
                                            const TriParameterList &pars,
                                            TriTimerDuration dur) const
 {
-  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, ENTITY_TE, LOG_TE_TC_EXECUTE, "Testcase execute request");
+  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, freettcn::CEntity::TYPE_TE,
+                                                                        freettcn::CLogMask::CMD_TE_TC_EXECUTE,
+                                                                        "Testcase execute request");
   
   char str[256];
   
@@ -223,7 +226,9 @@ void freettcn::TL::CTestLogging::TcStart(const char *am, int ts, const char *src
                                          const TriParameterList &pars,
                                          TriTimerDuration dur) const
 {
-  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, ENTITY_TE, LOG_TE_TC_START, "Testcase START");
+  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, freettcn::CEntity::TYPE_TE,
+                                                                        freettcn::CLogMask::CMD_TE_TC_START,
+                                                                        "Testcase START");
   
   char str[256];
   
@@ -251,7 +256,9 @@ void freettcn::TL::CTestLogging::TcStart(const char *am, int ts, const char *src
 void freettcn::TL::CTestLogging::TcStop(const char *am, int ts, const char *src, int line,
                                         const TriComponentId &c) const
 {
-  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, ENTITY_TE, LOG_TE_TC_STOP, "Testcase STOP");
+  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, freettcn::CEntity::TYPE_TE,
+                                                                        freettcn::CLogMask::CMD_TE_TC_STOP,
+                                                                        "Testcase STOP");
   
   char str[256];
   
@@ -268,7 +275,9 @@ void freettcn::TL::CTestLogging::TcStarted(const char *am, int ts, const char *s
                                            const TriParameterList &pars,
                                            TriTimerDuration dur) const
 {
-  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, ENTITY_TM, LOG_TM_TC_STARTED, "Testcase STARTED");
+  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, freettcn::CEntity::TYPE_TM,
+                                                                        freettcn::CLogMask::CMD_TM_TC_STARTED,
+                                                                        "Testcase STARTED");
   
   char str[256];
   
@@ -299,7 +308,9 @@ void freettcn::TL::CTestLogging::TcTerminated(const char *am, int ts, const char
                                               const TriParameterList &pars,
                                               TciVerdictValue outcome) const
 {
-  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, ENTITY_TM, LOG_TM_TC_STARTED, "Testcase TERMINATED");
+  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, freettcn::CEntity::TYPE_TM,
+                                                                        freettcn::CLogMask::CMD_TM_TC_STARTED,
+                                                                        "Testcase TERMINATED");
   
   char str[256];
   
@@ -327,7 +338,9 @@ void freettcn::TL::CTestLogging::TcTerminated(const char *am, int ts, const char
 void freettcn::TL::CTestLogging::CtrlStart(const char *am, int ts, const char *src, int line,
                                            const TriComponentId &c) const
 {
-  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, ENTITY_TE, LOG_TE_CTRL_START, "Control START");
+  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, freettcn::CEntity::TYPE_TE,
+                                                                        freettcn::CLogMask::CMD_TE_CTRL_START,
+                                                                        "Control START");
   
   char str[256];
   
@@ -341,7 +354,9 @@ void freettcn::TL::CTestLogging::CtrlStart(const char *am, int ts, const char *s
 void freettcn::TL::CTestLogging::CtrlStop(const char *am, int ts, const char *src, int line,
                                           const TriComponentId &c) const
 {
-  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, ENTITY_TE, LOG_TE_CTRL_STOP, "Control STOP");
+  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, freettcn::CEntity::TYPE_TE,
+                                                                        freettcn::CLogMask::CMD_TE_CTRL_STOP,
+                                                                        "Control STOP");
   
   char str[256];
   
@@ -355,7 +370,9 @@ void freettcn::TL::CTestLogging::CtrlStop(const char *am, int ts, const char *sr
 void freettcn::TL::CTestLogging::CtrlTerminated(const char *am, int ts, const char *src, int line,
                                                 const TriComponentId &c) const
 {
-  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, ENTITY_TM, LOG_TM_CTRL_TERMINATED, "Control TERMINATED");
+  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, freettcn::CEntity::TYPE_TM,
+                                                                        freettcn::CLogMask::CMD_TM_CTRL_TERMINATED,
+                                                                        "Control TERMINATED");
   
   char str[256];
   
@@ -408,7 +425,9 @@ void freettcn::TL::CTestLogging::CCreate(const char *am, int ts, const char *src
                                          const TriComponentId &comp,
                                          const char *name) const
 {
-  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, ENTITY_TE, LOG_TE_C_CREATE, "Component CREATE");
+  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, freettcn::CEntity::TYPE_TE,
+                                                                        freettcn::CLogMask::CMD_TE_C_CREATE,
+                                                                        "Component CREATE");
   
   char str[256];
   
@@ -428,7 +447,9 @@ void freettcn::TL::CTestLogging::CStart(const char *am, int ts, const char *src,
                                         const TciBehaviourIdType &name,
                                         const TciParameterListType &parsValue) const
 {
-  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, ENTITY_TE, LOG_TE_C_START, "Component START");
+  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, freettcn::CEntity::TYPE_TE,
+                                                                        freettcn::CLogMask::CMD_TE_C_START,
+                                                                        "Component START");
   
   char str[256];
   
@@ -453,7 +474,9 @@ void freettcn::TL::CTestLogging::CTerminated(const char *am, int ts, const char 
                                              const TriComponentId &c,
                                              TciVerdictValue verdict) const
 {
-  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, ENTITY_TE, LOG_TE_C_START, "Component START");
+  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, freettcn::CEntity::TYPE_TE,
+                                                                        freettcn::CLogMask::CMD_TE_C_START,
+                                                                        "Component START");
   
   char str[256];
   

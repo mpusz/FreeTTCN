@@ -347,7 +347,7 @@ void freettcn::TE::CTTCNExecutable::TestComponentTerminated(const TriComponentId
 //     }
 //   }
 
-  if (Logging() && LogMask().Get(LOG_TE_C_TERMINATED)) {
+  if (Logging() && LogMask().Get(freettcn::CLogMask::CMD_TE_C_TERMINATED)) {
     // log
     TriComponentId ctrlId;
     ctrlId.compInst.data = 0;

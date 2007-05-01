@@ -133,7 +133,7 @@ void freettcn::TM::CTestManagement::CModuleParameter::Print() const
 // ********************************** L O G   M A S K *************************************
 
 freettcn::TM::CLogMask::CLogMask(bool enabled /* true */):
-  freettcn::CLogMask(freettcn::LOG_TM_NUM, enabled)
+  freettcn::CLogMask(CMD_TM_NUM, enabled)
 {
 }
 
@@ -294,7 +294,7 @@ void freettcn::TM::CTestManagement::TestCaseStarted(const TciTestCaseIdType &tes
   _tc = &TestCaseGet(testCaseId.objectName);
   _tc->Started(parameterList, timer);
   
-  if (Logging() && LogMask().Get(freettcn::LOG_TM_TC_STARTED)) {
+  if (Logging() && LogMask().Get(freettcn::CLogMask::CMD_TM_TC_STARTED)) {
     TriComponentId comp = { { 0 } };
     comp.compName = "";
     comp.compType.moduleName = "";
@@ -312,7 +312,7 @@ void freettcn::TM::CTestManagement::TestCaseTerminated(TciVerdictValue verdict, 
   if (_tc) {
     _tc->Terminated(verdict, parameterlist);
     
-    if (Logging() && LogMask().Get(freettcn::LOG_TM_TC_TERMINATED)) {
+    if (Logging() && LogMask().Get(freettcn::CLogMask::CMD_TM_TC_TERMINATED)) {
       TriComponentId comp = { { 0 } };
       comp.compName = "";
       comp.compType.moduleName = "";
@@ -372,6 +372,6 @@ void freettcn::TM::CTestManagement::ControlTerminated()
 {
   _moduleRunning = false;
   
-  if (Logging() && LogMask().Get(freettcn::LOG_TM_CTRL_TERMINATED))
+  if (Logging() && LogMask().Get(freettcn::CLogMask::CMD_TM_CTRL_TERMINATED))
     tliCtrlTerminated(0, TimeStamp().Get(), 0, 0, _ctrlCompId);
 }

@@ -36,7 +36,8 @@ extern "C" {
 #include <freettcn/ttcn3/tri.h>
 }
 #include <freettcn/tools/exception.h>
-#include <freettcn/tools/logMask.h>
+#include <freettcn/tools/entity.h>
+#include <vector>
 #include <string>
 
 
@@ -58,19 +59,19 @@ namespace freettcn {
         std::string _src;
         int _line;
         std::string _am;
-        TTCNEntity _entity;
+        CEntity::Type _entity;
         unsigned short _logIdx;
         std::string _title;
         
         std::vector<LineData> lines;
       public:
-        CData(int ts, const char *src, int line, const char *am, TTCNEntity entity, unsigned short logIdx, const char *title);
+        CData(int ts, const char *src, int line, const char *am, CEntity::Type entity, unsigned short logIdx, const char *title);
         
         int TimeStamp() const;
         const std::string &Source() const;
         int SourceLine() const;
         const std::string &AdditionalMessage() const;
-        TTCNEntity Entity() const;
+        CEntity::Type Entity() const;
         unsigned short LogIdx() const;
         const std::string &Title() const;
         

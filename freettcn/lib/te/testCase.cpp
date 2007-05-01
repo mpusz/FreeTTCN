@@ -98,7 +98,7 @@ void freettcn::TE::CTestCase::Start(const char *src, int line,
   }
   
   freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
-  if (te.Logging() && te.LogMask().Get(LOG_TE_TC_START)) {
+  if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_TC_START)) {
     // log
     TriParameterList parList;                     /**< @todo Paramters list should be translated */
     parList.length = 0;
@@ -114,7 +114,7 @@ void freettcn::TE::CTestCase::Start(const char *src, int line,
   _systemId = _module.TestComponentCreateReq(src, line, _mtcId, TCI_SYS_COMP, &_systemType, "SYSTEM");
   
   // give a chance to create static connections and the initialization of TSI ports
-  if (te.Logging() && te.LogMask().Get(LOG_TE_TC_EXECUTE)) {
+  if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_TC_EXECUTE)) {
     // log
     TriTimerDuration dur = 0.0;                   /**< @todo Timer duration should be set */
     TriParameterList parList;                     /**< @todo Paramters list should be translated */
@@ -151,7 +151,7 @@ void freettcn::TE::CTestCase::Stop()
   _module.TestCase(0);
   
   freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
-  if (te.Logging() && te.LogMask().Get(LOG_TE_TC_STOP))
+  if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_TC_STOP))
     // log
     tliTcStop(0, te.TimeStamp().Get(), 0, 0, _mtcId);
   

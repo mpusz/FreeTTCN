@@ -39,7 +39,7 @@ CPP = g++ -g -Wall
 AR = ar -c
 CD = cd
 CP = cp
-LD = ld
+# LD = ld
 RM = rm
 LN = ln
 SED = sed
@@ -91,7 +91,7 @@ endif
 #
 # If quiet is set, only print short version of command
 #
-cmd = $(subst ;;,;,$(if $($(quiet)$(1)),printf "$($(quiet)$(1))\n" &&) $($(1));)
+cmd = $(subst ;;,;,$(if $($(quiet)$(1)),$(ECHO) "$($(quiet)$(1))" &&) $($(1));)
 
 
 
@@ -126,7 +126,7 @@ quiet_cmd_make_distclean = MAKE_DIST_CLEAN $(LONG_DIR_NAME)/$(2)
 
 # compile source file, create depend file *.d, insert *.o file to library <bindir>\<dirname>.a
 quiet_cmd_cc_d_a = CC_D_A     $<
-      cmd_cc_d_a = $(CPP) $(CPPFLAGS) -MMD -MF $*.d_ $(INCLUDE_DIRS) -c $< -o $(@D)/$% && \
+      cmd_cc_d_a = $(CPP) $(CPPFLAGS) -MD -MF $*.d_ $(INCLUDE_DIRS) -c $< -o $(@D)/$% && \
 	           $(AR) -rs $@ $(@D)/$% && \
                    $(RM) -f $(@D)/$% && \
                    $(SED) -i 's,^.*/\(.*\.o\):,$(LIB_PATH)(\1):,' $*.d_ && \
@@ -134,7 +134,7 @@ quiet_cmd_cc_d_a = CC_D_A     $<
 
 # compile source file, create depend file *.d
 quiet_cmd_cc_d_o = CC_D_O     $<
-      cmd_cc_d_o = $(CPP) -MMD -MF $*.d_ $(INCLUDE_DIRS) -c $< -o $@ && \
+      cmd_cc_d_o = $(CPP) -MD -MF $*.d_ $(INCLUDE_DIRS) -c $< -o $@ && \
                    $(tmp_cmd_d)
 
 # translate source TTCN module file to *.cpp
@@ -157,14 +157,14 @@ quiet_cmd_example_link = LINK       $(BIN_DIR)/$(PROG_NAME)
 
 # install library
 quiet_cmd_lib_install = INSTALL $(LIB_FULL_NAME)
-      cmd_lib_install = $(INSTALL) $(BIN_DIR)/$(LIB_FULL_NAME) $(LIB_INSTALL_DIR) && \
+      cmd_lib_install = $(INSTALL) -p $(BIN_DIR)/$(LIB_FULL_NAME) $(LIB_INSTALL_DIR) && \
 		        $(LDCONFIG) -n $(LIB_INSTALL_DIR) && \
 			$(LN) -sf $(LIB_FILE_NAME).so.$(VERSION_1) $(LIB_INSTALL_DIR)/$(LIB_FILE_NAME).so
 
 # header install
 quiet_cmd_h_install = INSTALL_H
       cmd_h_install = $(INSTALL) -d $(addprefix $(H_INSTALL_DIR)/$(PROJECT_NAME)/, $(BUILD_DIRS)) && \
-                      $(foreach dir, $(BUILD_DIRS), $(INSTALL) -m 644 $(LOCAL_FREETTCN_H_DIR)/$(dir)/*.h $(H_INSTALL_DIR)/$(PROJECT_NAME)/$(dir);)
+                      $(foreach dir, $(BUILD_DIRS), $(INSTALL) -p -m 644 $(LOCAL_FREETTCN_H_DIR)/$(dir)/*.h $(H_INSTALL_DIR)/$(PROJECT_NAME)/$(dir);)
 
 # make distribution
 quiet_cmd_dist = MAKE_DIST

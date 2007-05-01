@@ -37,7 +37,7 @@ extern "C" {
 
 
 freettcn::CH::CLogMask::CLogMask(bool enabled /* true */):
-  freettcn::CLogMask(freettcn::LOG_CH_NUM, enabled)
+  freettcn::CLogMask(CMD_CH_NUM, enabled)
 {
 }
 

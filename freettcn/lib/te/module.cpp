@@ -272,7 +272,7 @@ TriComponentId freettcn::TE::CModule::ControlStart()
 void freettcn::TE::CModule::ControlStop() throw(EOperationFailed)
 {
   freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
-  if (te.Logging() && te.LogMask().Get(LOG_TE_CTRL_STOP))
+  if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_CTRL_STOP))
     // log
     tliCtrlStop(0, te.TimeStamp().Get(), 0, 0, ModuleComponentId());
   
@@ -347,7 +347,7 @@ TriComponentId freettcn::TE::CModule::TestComponentCreateReq(const char *src, in
   TriComponentId compId = tciCreateTestComponentReq(kind, const_cast<void *>(reinterpret_cast<const void*>(compType)), name);
   freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
   
-  if (te.Logging() && te.LogMask().Get(LOG_TE_C_CREATE))
+  if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_C_CREATE))
     // log
     tliCCreate(0, te.TimeStamp().Get(), const_cast<char *>(src), line, creatorId, compId, name);
   
@@ -359,7 +359,7 @@ TriComponentId freettcn::TE::CModule::TestComponentCreateReq(const char *src, in
     parameterList.length = 0;
     parameterList.parList = 0;
     
-    if (te.Logging() && te.LogMask().Get(LOG_TE_CTRL_START))
+    if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_CTRL_START))
       // log
       tliCtrlStart(0, te.TimeStamp().Get(), const_cast<char *>(src), line, creatorId);
     
@@ -379,7 +379,7 @@ void freettcn::TE::CModule::TestComponentStartReq(const char *src, int line,
   tciStartTestComponentReq(componentId, behaviorId, parameterList);
   
   freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
-  if (te.Logging() && te.LogMask().Get(LOG_TE_C_START))
+  if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_C_START))
     // log
     tliCStart(0, te.TimeStamp().Get(), const_cast<char *>(src), line, creatorId, componentId, behaviorId, parameterList);
 }

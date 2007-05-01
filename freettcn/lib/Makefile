@@ -50,7 +50,7 @@ install:
 	@$(call cmd,cmd_lib_install)
 	@$(call cmd,cmd_h_install)
 	$(Q)$(INSTALL) -d $(H_INSTALL_DIR)/$(PROJECT_NAME)/ttcn3
-	$(Q)$(INSTALL) -m 644 $(LOCAL_FREETTCN_H_DIR)/ttcn3/*.h $(H_INSTALL_DIR)/$(PROJECT_NAME)/ttcn3
+	$(Q)$(INSTALL) -p -m 644 $(LOCAL_FREETTCN_H_DIR)/ttcn3/*.h $(H_INSTALL_DIR)/$(PROJECT_NAME)/ttcn3
 
 clean:
 	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_clean,$(dir)))

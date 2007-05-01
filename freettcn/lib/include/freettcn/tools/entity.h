@@ -34,11 +34,23 @@
 #include <freettcn/tools/exception.h>
 
 namespace freettcn {
-
+  
   class CTimeStamp;
   class CLogMask;
-
+  
   class CEntity {
+  public:
+    enum Type {
+      TYPE_TE,
+      TYPE_TM,
+      TYPE_CH,
+      TYPE_CD,
+      TYPE_SA,
+      TYPE_PA,
+      TYPE_TL
+    };
+    
+  private:
     CTimeStamp *_ts;
     CLogMask *_logMask;
     bool _logging;

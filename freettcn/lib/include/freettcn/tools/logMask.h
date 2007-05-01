@@ -34,165 +34,156 @@
 
 namespace freettcn {
 
-  enum TTCNEntity {
-    ENTITY_TE,
-    ENTITY_TM,
-    ENTITY_TL,
-    ENTITY_CH,
-    ENTITY_CD,
-    ENTITY_SA,
-    ENTITY_PA
-  };
-  
-  enum LogTECommands {
-    LOG_TE_TC_EXECUTE,
-    LOG_TE_TC_START,
-    LOG_TE_TC_STOP,
-    
-    LOG_TE_CTRL_START,
-    LOG_TE_CTRL_STOP,
-    
-    LOG_TE_M_MISMATCH_M,                          /**< communication with the SUT */
-    LOG_TE_M_MISMATCH_C,                          /**< intercomponent communication */
-    LOG_TE_M_RECEIVE_M,                           /**< communication with the SUT */
-    LOG_TE_M_RECEIVE_C,                           /**< intercomponent communication */
-    
-    LOG_TE_PR_GET_CALL_MISMATCH_M,                /**< communication with the SUT */
-    LOG_TE_PR_GET_CALL_MISMATCH_C,                /**< intercomponent communication */
-    LOG_TE_PR_GET_CALL_M,                         /**< communication with the SUT */
-    LOG_TE_PR_GET_CALL_C,                         /**< intercomponent communication */
-    LOG_TE_PR_GET_REPLY_MISMATCH_M,               /**< communication with the SUT */
-    LOG_TE_PR_GET_REPLY_MISMATCH_C,               /**< intercomponent communication */
-    LOG_TE_PR_GET_REPLY_M,                        /**< communication with the SUT */
-    LOG_TE_PR_GET_REPLY_C,                        /**< intercomponent communication */
-    LOG_TE_PR_GET_CATCH_MISMATCH_M,               /**< communication with the SUT */
-    LOG_TE_PR_GET_CATCH_MISMATCH_C,               /**< intercomponent communication */
-    LOG_TE_PR_GET_CATCH_TIMEOUT,
-    
-    LOG_TE_C_CREATE,
-    LOG_TE_C_START,
-    LOG_TE_C_RUNNING,
-    LOG_TE_C_ALIVE,
-    LOG_TE_C_STOP,
-    LOG_TE_C_DONE_MISMATCH,
-    LOG_TE_C_DONE,
-    LOG_TE_C_KILLED_MISMATCH,
-    LOG_TE_C_KILLED,
-    LOG_TE_C_TERMINATED,
-    
-    LOG_TE_P_CLEAR,
-    LOG_TE_P_STOP,
-    LOG_TE_P_HALT,
-    
-    LOG_TE_T_TIMEOUT_MISMATCH,
-    LOG_TE_T_TIMEOUT,
-    
-    LOG_TE_S_ENTER,
-    LOG_TE_S_LEAVE,
-    
-    LOG_TE_VAR,
-    
-    LOG_TE_MODULE_PAR,
-    
-    LOG_TE_GET_VERDICT,
-    LOG_TE_SET_VERDICT,
-    
-    LOG_TE_A_ENTER,
-    LOG_TE_A_LEAVE,
-    LOG_TE_A_NOMATCH,
-    LOG_TE_A_REPEAT,
-    LOG_TE_A_DEFAULTS,
-    LOG_TE_A_ACTIVATE,
-    LOG_TE_A_DEACTIVATE,
-    LOG_TE_A_WAIT,
-    
-    LOG_TE_ACTION,
-    
-    LOG_TE_MATCH,
-    LOG_TE_MATCH_MISMATCH,
-    
-    LOG_TE_INFO,
-    
-    LOG_TE_NUM                                    /**< should be the last one on the list */
-  };
-  
-  enum LogTMCommands {
-    LOG_TM_TC_STARTED,
-    LOG_TM_TC_TERMINATED,
-    
-    LOG_TM_CTRL_TERMINATED,
-    
-    LOG_TM_LOG,
-    
-    LOG_TM_NUM                                    /**< should be the last one on the list */
-  };
-  
-  enum LogCHCommands {
-    LOG_CH_M_SEND_C,
-    LOG_CH_M_SEND_C_BC,
-    LOG_CH_M_SEND_C_MC,
-    LOG_CH_M_DETECTED_C,
-    
-    LOG_CH_PR_CALL_C,
-    LOG_CH_PR_CALL_C_BC,
-    LOG_CH_PR_CALL_C_MC,
-    LOG_CH_PR_GET_CALL_DETECTED_C,
-    LOG_CH_PR_REPLY_C,
-    LOG_CH_PR_REPLY_C_BC,
-    LOG_CH_PR_REPLY_C_MC,
-    LOG_CH_PR_GET_REPLY_DETECTED_C,
-    LOG_CH_PR_RAISE_C,
-    LOG_CH_PR_RAISE_C_BC,
-    LOG_CH_PR_RAISE_C_MC,
-    LOG_CH_PR_CATCH_DETECTED_C,
-    LOG_CH_PR_CATCH_C,
-    
-    LOG_CH_P_CONNECT,
-    LOG_CH_P_DISCONNECT,
-
-    LOG_CH_NUM                                    /**< should be the last one on the list */
-  };
-  
-  enum LogSACommands {
-    LOG_SA_M_SEND_M,
-    LOG_SA_M_SEND_M_BC,
-    LOG_SA_M_SEND_M_MC,
-    LOG_SA_M_DETECTED_M,
-    
-    LOG_SA_PR_CALL_M,
-    LOG_SA_PR_CALL_M_BC,
-    LOG_SA_PR_CALL_M_MC,
-    LOG_SA_PR_GET_CALL_DETECTED_M,
-    LOG_SA_PR_REPLY_M,
-    LOG_SA_PR_REPLY_M_BC,
-    LOG_SA_PR_REPLY_M_MC,
-    LOG_SA_PR_GET_REPLY_DETECTED_M,
-    LOG_SA_PR_RAISE_M,
-    LOG_SA_PR_RAISE_M_BC,
-    LOG_SA_PR_RAISE_M_MC,
-    LOG_SA_PR_CATCH_DETECTED_M,
-    LOG_SA_PR_CATCH_M,
-    
-    LOG_SA_P_MAP,
-    LOG_SA_P_UNMAP,
-    
-    LOG_SA_NUM                                    /**< should be the last one on the list */
-  };
-  
-  enum LogPACommands {
-    LOG_PA_PR_CATCH_TIMEOUT_DETECTED,
-    
-    LOG_PA_T_TIMEOUT_DETECTED,
-    LOG_PA_T_START,
-    LOG_PA_T_STOP,
-    LOG_PA_T_READ,
-    LOG_PA_T_RUNNING,
-    
-    LOG_PA_NUM                                    /**< should be the last one on the list */
-  };
-
-
   class CLogMask {
+  public:
+    enum TECommands {
+      CMD_TE_TC_EXECUTE,
+      CMD_TE_TC_START,
+      CMD_TE_TC_STOP,
+    
+      CMD_TE_CTRL_START,
+      CMD_TE_CTRL_STOP,
+    
+      CMD_TE_M_MISMATCH_M,                          /**< communication with the SUT */
+      CMD_TE_M_MISMATCH_C,                          /**< intercomponent communication */
+      CMD_TE_M_RECEIVE_M,                           /**< communication with the SUT */
+      CMD_TE_M_RECEIVE_C,                           /**< intercomponent communication */
+    
+      CMD_TE_PR_GET_CALL_MISMATCH_M,                /**< communication with the SUT */
+      CMD_TE_PR_GET_CALL_MISMATCH_C,                /**< intercomponent communication */
+      CMD_TE_PR_GET_CALL_M,                         /**< communication with the SUT */
+      CMD_TE_PR_GET_CALL_C,                         /**< intercomponent communication */
+      CMD_TE_PR_GET_REPLY_MISMATCH_M,               /**< communication with the SUT */
+      CMD_TE_PR_GET_REPLY_MISMATCH_C,               /**< intercomponent communication */
+      CMD_TE_PR_GET_REPLY_M,                        /**< communication with the SUT */
+      CMD_TE_PR_GET_REPLY_C,                        /**< intercomponent communication */
+      CMD_TE_PR_GET_CATCH_MISMATCH_M,               /**< communication with the SUT */
+      CMD_TE_PR_GET_CATCH_MISMATCH_C,               /**< intercomponent communication */
+      CMD_TE_PR_GET_CATCH_TIMEOUT,
+    
+      CMD_TE_C_CREATE,
+      CMD_TE_C_START,
+      CMD_TE_C_RUNNING,
+      CMD_TE_C_ALIVE,
+      CMD_TE_C_STOP,
+      CMD_TE_C_DONE_MISMATCH,
+      CMD_TE_C_DONE,
+      CMD_TE_C_KILLED_MISMATCH,
+      CMD_TE_C_KILLED,
+      CMD_TE_C_TERMINATED,
+    
+      CMD_TE_P_CLEAR,
+      CMD_TE_P_STOP,
+      CMD_TE_P_HALT,
+    
+      CMD_TE_T_TIMEOUT_MISMATCH,
+      CMD_TE_T_TIMEOUT,
+    
+      CMD_TE_S_ENTER,
+      CMD_TE_S_LEAVE,
+    
+      CMD_TE_VAR,
+    
+      CMD_TE_MODULE_PAR,
+    
+      CMD_TE_GET_VERDICT,
+      CMD_TE_SET_VERDICT,
+    
+      CMD_TE_A_ENTER,
+      CMD_TE_A_LEAVE,
+      CMD_TE_A_NOMATCH,
+      CMD_TE_A_REPEAT,
+      CMD_TE_A_DEFAULTS,
+      CMD_TE_A_ACTIVATE,
+      CMD_TE_A_DEACTIVATE,
+      CMD_TE_A_WAIT,
+    
+      CMD_TE_ACTION,
+    
+      CMD_TE_MATCH,
+      CMD_TE_MATCH_MISMATCH,
+    
+      CMD_TE_INFO,
+    
+      CMD_TE_NUM                                    /**< should be the last one on the list */
+    };
+  
+    enum TMCommands {
+      CMD_TM_TC_STARTED,
+      CMD_TM_TC_TERMINATED,
+    
+      CMD_TM_CTRL_TERMINATED,
+    
+      CMD_TM_LOG,
+    
+      CMD_TM_NUM                                    /**< should be the last one on the list */
+    };
+  
+    enum CHCommands {
+      CMD_CH_M_SEND_C,
+      CMD_CH_M_SEND_C_BC,
+      CMD_CH_M_SEND_C_MC,
+      CMD_CH_M_DETECTED_C,
+    
+      CMD_CH_PR_CALL_C,
+      CMD_CH_PR_CALL_C_BC,
+      CMD_CH_PR_CALL_C_MC,
+      CMD_CH_PR_GET_CALL_DETECTED_C,
+      CMD_CH_PR_REPLY_C,
+      CMD_CH_PR_REPLY_C_BC,
+      CMD_CH_PR_REPLY_C_MC,
+      CMD_CH_PR_GET_REPLY_DETECTED_C,
+      CMD_CH_PR_RAISE_C,
+      CMD_CH_PR_RAISE_C_BC,
+      CMD_CH_PR_RAISE_C_MC,
+      CMD_CH_PR_CATCH_DETECTED_C,
+      CMD_CH_PR_CATCH_C,
+    
+      CMD_CH_P_CONNECT,
+      CMD_CH_P_DISCONNECT,
+
+      CMD_CH_NUM                                    /**< should be the last one on the list */
+    };
+  
+    enum SACommands {
+      CMD_SA_M_SEND_M,
+      CMD_SA_M_SEND_M_BC,
+      CMD_SA_M_SEND_M_MC,
+      CMD_SA_M_DETECTED_M,
+    
+      CMD_SA_PR_CALL_M,
+      CMD_SA_PR_CALL_M_BC,
+      CMD_SA_PR_CALL_M_MC,
+      CMD_SA_PR_GET_CALL_DETECTED_M,
+      CMD_SA_PR_REPLY_M,
+      CMD_SA_PR_REPLY_M_BC,
+      CMD_SA_PR_REPLY_M_MC,
+      CMD_SA_PR_GET_REPLY_DETECTED_M,
+      CMD_SA_PR_RAISE_M,
+      CMD_SA_PR_RAISE_M_BC,
+      CMD_SA_PR_RAISE_M_MC,
+      CMD_SA_PR_CATCH_DETECTED_M,
+      CMD_SA_PR_CATCH_M,
+    
+      CMD_SA_P_MAP,
+      CMD_SA_P_UNMAP,
+    
+      CMD_SA_NUM                                    /**< should be the last one on the list */
+    };
+  
+    enum PACommands {
+      CMD_PA_PR_CATCH_TIMEOUT_DETECTED,
+    
+      CMD_PA_T_TIMEOUT_DETECTED,
+      CMD_PA_T_START,
+      CMD_PA_T_STOP,
+      CMD_PA_T_READ,
+      CMD_PA_T_RUNNING,
+    
+      CMD_PA_NUM                                    /**< should be the last one on the list */
+    };
+
+  private:
     unsigned short _num;
     std::vector<bool> _array;
   public:
