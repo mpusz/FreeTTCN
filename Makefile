@@ -29,7 +29,7 @@ BUILD_DIRS = $(FREETTCN_DIR) $(ENV_DIR) $(EXAMPLE_DIR)
 
 
 # targets
-.PHONY: help all freettcn freettcn_install env env_install example clean distclean dist
+.PHONY: help freettcn freettcn_install env env_install example clean distclean dist all tags classes
 
 
 help:
@@ -43,8 +43,6 @@ help:
 	@$(ECHO) " - su -c 'make env_install'    (optional)"
 	@$(ECHO) " - make example                (optional)"
 	@$(ECHO) ""
-
-all: freettcn freettcn_install env env_install example
 
 freettcn:
 	@$(ECHO) ""
@@ -76,7 +74,16 @@ clean:
 
 distclean:
 	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_distclean,$(dir)))
-	$(Q)$(RM) -f *~
+	$(Q)$(RM) -f TAGS BROWSE *~
 
 dist: distclean
 	@$(call cmd,cmd_dist)
+
+all: freettcn freettcn_install env env_install example
+
+tags:
+	$(Q)$(RM) -f TAGS
+	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_tags,$(dir)))
+
+classes:
+	$(Q)$(EBROWSE) -s freettcn/lib/include/freettcn/*/*.h freettcn/lib/*/*.cpp libenv/include/freettcn/*/*.h example/*/*.cpp #libenv/*/*.cpp

@@ -30,7 +30,7 @@ BUILD_DIRS = $(LIB_DIR)
 
 
 # targets
-.PHONY: all install clean distclean
+.PHONY: all install clean distclean tags
 
 all:
 	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make,$(dir)))
@@ -43,3 +43,6 @@ clean:
 
 distclean:
 	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_distclean,$(dir)))
+
+tags:
+	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_tags,$(dir)))

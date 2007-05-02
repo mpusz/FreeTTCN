@@ -35,14 +35,14 @@ LIB_PARTS = $(foreach file, $(CPP_FILES), $(LIB_PATH)($(patsubst %.cpp,%.o,$(fil
 
 all: $(LIB_PATH)
 
-tags:
-	$(TAGS) --append --output=$(TAG_DIR)/TAGS *.cpp
-
 clean:
 	$(Q)$(RM) -f $(LIB_PATH) $(O_FILES) $(DEPEND_FILES)
 
 distclean: clean
 	$(Q)$(RM) -f *~ ../include/freettcn/$(DIR_NAME)/*~
+
+tags:
+	@$(call cmd,cmd_tags_cpp)
 
 
 # rules

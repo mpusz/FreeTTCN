@@ -69,7 +69,8 @@ distclean:
 #	$(RM) -f $(DIR_NAME).tar.gz
 
 tags:
-# 	$(Q)$(MAKE) -C $(SRC_DIR) TOP_DIR=$(TOP_DIR)/.. TAG_DIR=$(PWD) tags;
+	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_tags,$(dir)))
+	@$(call cmd,cmd_tags_h)
 
 # doc:
 # 	$(DOXYGEN) $(DOC_DIR)/Doxyfile

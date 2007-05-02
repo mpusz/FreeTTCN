@@ -27,6 +27,8 @@ MODULE_CPP_FILE = $(patsubst %.ttcn,%.cpp,$(MODULE))
 MODULE_DEPEND_FILE = $(patsubst %.ttcn,%.d,$(MODULE))
 MODULE_O_FILE = $(BIN_DIR)/$(patsubst %.ttcn,%.o,$(MODULE))
 
+CPP_FILES = $(patsubst %.ttcn,%.cpp,$(MOD_FILES))
+
 
 # targets
 .PHONY: mod tags distclean clean
@@ -40,7 +42,7 @@ distclean: clean
 	$(Q)$(RM) -f *~ include/*~
 
 tags:
-#	$(TAGS) --append --output=$(TAG_DIR)/TAGS *.cpp
+	@$(call cmd,cmd_tags_cpp)
 
 
 # rules

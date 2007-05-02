@@ -53,13 +53,7 @@ distclean:
 	$(Q)$(RM) -f $(BIN_DIR)/*~
 
 tags:
-# 	$(Q)for dir in $(LIB_DIRS); do \
-# 	  $(MAKE) -C $$dir TOP_DIR=$(TOP_DIR)/.. DIR_NAME=$$dir TAG_DIR=$(PWD) tags; \
-# 	done
-# 	$(Q)for mod in $(MOD_FILES); do \
-# 	  $(MAKE) -C $(MOD_DIR) TOP_DIR=$(TOP_DIR)/.. MODULE=$$mod tags; \
-# 	done
-# 	$(MAKE) -C $(MAIN_DIR) TOP_DIR=$(TOP_DIR)/.. tags;
+	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_tags,$(dir)))
 
 # doc:
 # 	$(DOXYGEN) $(DOC_DIR)/Doxyfile

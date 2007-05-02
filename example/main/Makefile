@@ -50,7 +50,7 @@ distclean: clean
 	$(Q)$(RM) -f *~ include/*~
 
 tags:
-#	$(TAGS) --append --output=$(TAG_DIR)/TAGS *.cpp
+	@$(call cmd,cmd_tags_cpp)
 
 
 # rules
