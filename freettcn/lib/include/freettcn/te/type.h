@@ -43,7 +43,7 @@ namespace freettcn {
     
     class CType {
       const CModule *_module;
-      char *_name;
+      QualifiedName _id;
       TciTypeClassType _class;
       String _encoding;
       String _encodingVariant;
@@ -60,6 +60,7 @@ namespace freettcn {
       
       const CModule *DefiningModule() const;
       String Name() const;
+      const QualifiedName &Id() const;
       TciTypeClassType Class() const;
       
       String Encoding() const;

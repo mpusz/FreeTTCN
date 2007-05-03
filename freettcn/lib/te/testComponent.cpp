@@ -52,12 +52,7 @@ void freettcn::TE::CTestComponent::Init(freettcn::TE::CModule &module, TciTestCo
   _id.compInst.bits = 0;
   _id.compInst.aux = this;
   _id.compName = name;
-  if (Type().DefiningModule())
-    _id.compType.moduleName = const_cast<char *>(Type().DefiningModule()->Name());
-  else
-    _id.compType.moduleName = "<freettcn>";
-  _id.compType.objectName = Type().Name();
-  _id.compType.aux = const_cast<void *>(reinterpret_cast<const void *>(&Type()));
+  _id.compType = Type().Id();
   
   // register in a module
   _module->TestComponentAdd(*this);

@@ -31,6 +31,7 @@
 
 #include "freettcn/te/type.h"
 #include "freettcn/te/value.h"
+#include "freettcn/te/module.h"
 #include "freettcn/te/testComponent.h"
 
 
@@ -40,8 +41,14 @@ freettcn::TE::CType::CType(const CModule   *module,
                            String          encoding,
                            String          encodingVariant,
                            String          extension) :
-  _module(module), _name(name), _class(typeClass), _encoding(encoding), _encodingVariant(encodingVariant), _extension(extension)
+  _module(module), _class(typeClass), _encoding(encoding), _encodingVariant(encodingVariant), _extension(extension)
 {
+  if (_module)
+    _id.moduleName = const_cast<char *>(_module->Name());
+  else
+    _id.moduleName = "<freettcn>";
+  _id.objectName = name;
+  _id.aux = this;
 }
 
 freettcn::TE::CType::~CType()
@@ -55,7 +62,12 @@ const freettcn::TE::CModule *freettcn::TE::CType::DefiningModule() const
 
 String freettcn::TE::CType::Name() const
 {
-  return _name;
+  return _id.objectName;
+}
+
+const QualifiedName &freettcn::TE::CType::Id() const
+{
+  return _id;
 }
 
 TciTypeClassType freettcn::TE::CType::Class() const

@@ -89,7 +89,15 @@ namespace freettcn {
     
     // ********** PORTS ***********
     
+    class CICMPPortType : public freettcn::TE::CPortType {
+    public:
+      CICMPPortType(const freettcn::TE::CModule &module) :
+        freettcn::TE::CPortType(module, "ICMPPort") {};
+    };
+
     class CICMPPort : public freettcn::TE::CPort {
+    public:
+      CICMPPort(const freettcn::TE::CTestComponent &component, const char *name);
     };
 
     
@@ -98,13 +106,15 @@ namespace freettcn {
     class CICMPComponent : public freettcn::TE::CTestComponent {
     public:
       CICMPPort icmpPort;
-      CICMPComponent(const freettcn::TE::CType &type) : freettcn::TE::CTestComponent(type) {};
+      CICMPComponent(const freettcn::TE::CType &type) :
+        freettcn::TE::CTestComponent(type), icmpPort(*this, "icmpPort") {};
     };
     
     class CIPStack : public freettcn::TE::CTestComponent {
     public:
       CICMPPort icmpPort;
-      CIPStack(const freettcn::TE::CType &type) : freettcn::TE::CTestComponent(type) {};
+      CIPStack(const freettcn::TE::CType &type) :
+        freettcn::TE::CTestComponent(type), icmpPort(*this, "icmpPort") {};
     };
 
     
@@ -254,6 +264,7 @@ namespace freettcn {
       class CType {
         static CType *_instance;
         
+        const CICMPPortType _icmpPort;
         const CICMPComponentType _icmpComponent;
         const CIPStackType _ipStack;
         
@@ -267,6 +278,7 @@ namespace freettcn {
         ~CType() { _instance = 0; }
         void Init();
         
+        const CICMPPortType &ICMPPort() const { return _icmpPort; }
         const CICMPComponentType &ICMPComponent() const { return _icmpComponent; }
         const CIPStackType &IPStack() const { return _ipStack; }
       };
@@ -294,6 +306,14 @@ namespace freettcn {
     CModule CModule::_instance;
     CModule::CType *CModule::CType::_instance = 0;
     
+    
+    
+    // ********** PORTS ***********
+
+    CICMPPort::CICMPPort(const freettcn::TE::CTestComponent &component, const char *name) :
+        freettcn::TE::CPort(CModule::CType::Instance().ICMPPort(), component, name)
+    {
+    }
     
     
     // ********************* T E S T   C A S E *************************
@@ -410,6 +430,7 @@ namespace freettcn {
 
 
     CModule::CType::CType():
+      _icmpPort(CModule::Instance()),
       _icmpComponent(CModule::Instance()),
       _ipStack(CModule::Instance())
     {

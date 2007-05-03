@@ -31,8 +31,8 @@
 #define __PORT_H__
 
 extern "C" {
-// #include "freettcn/tci.h"
-// #include "freettcn/tri.h"
+  // #include "freettcn/tci.h"
+#include <freettcn/ttcn3/tri.h>
 }
 // #include "tools.h"
 // #include "ttcn_values.h"
@@ -44,7 +44,20 @@ namespace freettcn {
   
   namespace TE {
     
+    class CModule;
+    class CTestComponent;
+    
+    class CPortType {
+      QualifiedName _id;
+      
+    public:
+      CPortType(const CModule &module, const char *name);
+      const QualifiedName &Id() const;
+    };
+    
     class CPort {
+      TriPortId _id;
+      
       class CState {
         // STATUS
         //  - STARTED
@@ -54,7 +67,10 @@ namespace freettcn {
         // SNAP_VALUE - when a snapshot is taken the first element from VALUE_QUEUE is copied (NULL if VALUE_QUEUE is empty or STATUS = STOPPED)
       };
     public:
-      void Send();
+      CPort(const CPortType &type, const CTestComponent &component, const char *name, int portIdx = -1);
+//       void Send();
+      
+      const TriPortId &Id() const;
     };
     
   } // namespace TE
