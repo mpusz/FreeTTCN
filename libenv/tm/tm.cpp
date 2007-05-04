@@ -277,6 +277,20 @@ void freettcn::TM::CTestManagement::TestCaseInit(const std::string &testCaseId) 
   
   // obtain Test System Interfaces used by the test case 
   TriPortIdList portList = tciGetTestCaseTSI(tc.Id());
+  
+  /// @todo Remove temporary solution
+  std::cout << "Test case TSI:" << std::endl;
+  for(int i=0; i<portList.length; i++) {
+    std::cout << " - " <<
+      portList.portIdList[i]->compInst.compName <<
+      " <" << portList.portIdList[i]->compInst.compType.moduleName << "." <<
+      portList.portIdList[i]->compInst.compType.objectName << "> " <<
+      portList.portIdList[i]->portName << "[" <<
+      portList.portIdList[i]->portIndex << "] <" <<
+      portList.portIdList[i]->portType.moduleName << "." <<
+      portList.portIdList[i]->portType.objectName << ">" <<
+      std::endl;
+  }
 }
 
 

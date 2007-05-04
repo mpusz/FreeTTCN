@@ -17,39 +17,32 @@
 // along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+
 /**
- * @file   initObject.cpp
+ * @file   boolean.cpp
  * @author Mateusz Pusz
- * @date   Wed Apr 25 11:15:08 2007
+ * @date   Fri May  4 09:24:05 2007
  * 
  * @brief  
  * 
  * 
  */
 
-#include "freettcn/te/initObject.h"
+#include "freettcn/te/boolean.h"
 
 
-
-freettcn::TE::CInitObject::CInitObject(const char *name):
-  _name(name), _inited(false)
+freettcn::TE::CBooleanType::CBooleanType() :
+  CType(0, "boolean", TCI_BOOLEAN_TYPE, "", "", "")
 {
 }
 
-freettcn::TE::CInitObject::~CInitObject()
+freettcn::TE::CBooleanType::CInstance *freettcn::TE::CBooleanType::InstanceCreate(bool omit /* false */) const
 {
+  return new freettcn::TE::CBooleanType::CInstance(*this, omit);
 }
 
-const char *freettcn::TE::CInitObject::Name() const
-{
-  return _name;
-}
 
-void freettcn::TE::CInitObject::Init()
+freettcn::TE::CBooleanType::CInstance::CInstance(const CType &type, bool omit) :
+  freettcn::TE::CType::CInstance(type, omit)
 {
-  if (!_inited) {
-    // perform object specific initialization
-    Initialize();
-    _inited = true;
-  }
 }

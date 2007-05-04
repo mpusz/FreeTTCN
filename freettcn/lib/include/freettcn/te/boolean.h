@@ -18,38 +18,42 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /**
- * @file   initObject.cpp
+ * @file   boolean.h
  * @author Mateusz Pusz
- * @date   Wed Apr 25 11:15:08 2007
+ * @date   Fri May  4 09:10:30 2007
  * 
  * @brief  
  * 
  * 
  */
 
-#include "freettcn/te/initObject.h"
+#ifndef __BOOLEAN_H__
+#define __BOOLEAN_H__
+
+#include <freettcn/te/type.h>
+
+namespace freettcn {
+
+  namespace TE {
+    
+    class CBooleanType : public CType {
+    public:
+      class CInstance : public CType::CInstance {
+        bool _value;
+      public:
+        CInstance(const CType &type, bool omit);
+        bool Value() const;
+        void Value(bool value);
+      };
+      
+    public:
+      CBooleanType();
+      virtual CInstance *InstanceCreate(bool omit = false) const;
+    };
+    
+  } // namespace TE
+  
+} // namespace freettcn
 
 
-
-freettcn::TE::CInitObject::CInitObject(const char *name):
-  _name(name), _inited(false)
-{
-}
-
-freettcn::TE::CInitObject::~CInitObject()
-{
-}
-
-const char *freettcn::TE::CInitObject::Name() const
-{
-  return _name;
-}
-
-void freettcn::TE::CInitObject::Init()
-{
-  if (!_inited) {
-    // perform object specific initialization
-    Initialize();
-    _inited = true;
-  }
-}
+#endif /* __BOOLEAN_H__ */

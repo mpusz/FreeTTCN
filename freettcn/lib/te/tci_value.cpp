@@ -21,7 +21,6 @@
 extern "C" {
 #include "freettcn/ttcn3/tci_value.h"
 }
-#include "freettcn/te/value.h"
 #include "freettcn/te/type.h"
 #include "freettcn/te/module.h"
 
@@ -84,63 +83,63 @@ TciType tciGetType(TciValue inst)
   if (!inst)
     throw freettcn::ECastFailed();
   
-  freettcn::TE::CValue *val = static_cast<freettcn::TE::CValue *>(inst);
+  freettcn::TE::CType::CInstance *val = static_cast<freettcn::TE::CType::CInstance *>(inst);
   return &const_cast<freettcn::TE::CType &>(val->Type());
 }
 
 
 
-void tciSetIntAbs(TciValue inst, String value)
-{
-  if (!inst)
-    throw freettcn::ECastFailed();
+// void tciSetIntAbs(TciValue inst, String value)
+// {
+//   if (!inst)
+//     throw freettcn::ECastFailed();
   
-  freettcn::TE::CValue *val = static_cast<freettcn::TE::CValue *>(inst);
-  freettcn::TE::CIntegerValue *integer = dynamic_cast<freettcn::TE::CIntegerValue *>(val);
-  if (!integer)
-    throw freettcn::ECastFailed();
+//   freettcn::TE::CType::CInstance *val = static_cast<freettcn::TE::CType::CInstance *>(inst);
+//   freettcn::TE::CIntegerValue *integer = dynamic_cast<freettcn::TE::CIntegerValue *>(val);
+//   if (!integer)
+//     throw freettcn::ECastFailed();
   
-  integer->AbsValue(value);
-}
+//   integer->AbsValue(value);
+// }
 
 
-void tciSetIntNumberOfDigits(TciValue inst, unsigned long int dig_num)
-{
-  if (!inst)
-    throw freettcn::ECastFailed();
+// void tciSetIntNumberOfDigits(TciValue inst, unsigned long int dig_num)
+// {
+//   if (!inst)
+//     throw freettcn::ECastFailed();
   
-  freettcn::TE::CValue *val = static_cast<freettcn::TE::CValue *>(inst);
-  freettcn::TE::CIntegerValue *integer = dynamic_cast<freettcn::TE::CIntegerValue *>(val);
-  if (!integer)
-    throw freettcn::ECastFailed();
+//   freettcn::TE::CType::CInstance *val = static_cast<freettcn::TE::CType::CInstance *>(inst);
+//   freettcn::TE::CIntegerValue *integer = dynamic_cast<freettcn::TE::CIntegerValue *>(val);
+//   if (!integer)
+//     throw freettcn::ECastFailed();
   
-  integer->DigitsNum(dig_num);
-}
+//   integer->DigitsNum(dig_num);
+// }
 
 
-void tciSetIntSign(TciValue inst, Boolean sign)
-{
-  if (!inst)
-    throw freettcn::ECastFailed();
+// void tciSetIntSign(TciValue inst, Boolean sign)
+// {
+//   if (!inst)
+//     throw freettcn::ECastFailed();
   
-  freettcn::TE::CValue *val = static_cast<freettcn::TE::CValue *>(inst);
-  freettcn::TE::CIntegerValue *integer = dynamic_cast<freettcn::TE::CIntegerValue *>(val);
-  if (!integer)
-    throw freettcn::ECastFailed();
+//   freettcn::TE::CType::CInstance *val = static_cast<freettcn::TE::CType::CInstance *>(inst);
+//   freettcn::TE::CIntegerValue *integer = dynamic_cast<freettcn::TE::CIntegerValue *>(val);
+//   if (!integer)
+//     throw freettcn::ECastFailed();
   
-  integer->Sign(sign);
-}
+//   integer->Sign(sign);
+// }
 
 
-TciValue tciGetRecFieldValue(TciValue inst, String fieldName)
-{
-  if (!inst)
-    throw freettcn::ECastFailed();
+// TciValue tciGetRecFieldValue(TciValue inst, String fieldName)
+// {
+//   if (!inst)
+//     throw freettcn::ECastFailed();
   
-  const freettcn::TE::CValue *val = static_cast<const freettcn::TE::CValue *>(inst);
-  const freettcn::TE::CRecordValue *record = dynamic_cast<const freettcn::TE::CRecordValue *>(val);
-  if (!record)
-    throw freettcn::ECastFailed();
+//   const freettcn::TE::CType::CInstance *val = static_cast<const freettcn::TE::CType::CInstance *>(inst);
+//   const freettcn::TE::CRecordValue *record = dynamic_cast<const freettcn::TE::CRecordValue *>(val);
+//   if (!record)
+//     throw freettcn::ECastFailed();
   
-  return record->Field(fieldName);
-}
+//   return record->Field(fieldName);
+// }

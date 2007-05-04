@@ -29,30 +29,98 @@
 
 #include "freettcn/te/testComponent.h"
 #include "freettcn/te/module.h"
-#include "freettcn/te/type.h"
+#include "freettcn/te/port.h"
+#include "freettcn/tools/tools.h"
 
 
-freettcn::TE::CTestComponent::CTestComponent(const CType &type):
-  freettcn::TE::CValue(type, false), _inited(false), _module(0)
+
+
+freettcn::TE::CTestComponentType::CTestComponentType(const freettcn::TE::CModule *module, String name) :
+  freettcn::TE::CType(module, name, TCI_COMPONENT_TYPE, "", "", ""),
+  __portIdList(0)
 {
 }
 
 
-freettcn::TE::CTestComponent::~CTestComponent()
+freettcn::TE::CTestComponentType::~CTestComponentType()
+{
+  Purge(_portIdList);
+  
+  if (__portIdList)
+    delete[] __portIdList;
+}
+
+
+void freettcn::TE::CTestComponentType::Register(const CPortType &portType, const char *name, int portIdx /* -1 */)
+{
+  TriPortId *portId = new TriPortId;
+  
+  memset(&portId->compInst, 0, sizeof(TriComponentId));
+  portId->portName = const_cast<char *>(name);
+  portId->portIndex = portIdx;
+  portId->portType = portType.Id();
+  portId->aux = 0;
+  
+  _portIdList.push_back(portId);
+}
+
+
+TriPortIdList freettcn::TE::CTestComponentType::Ports() const
+{
+  TriPortIdList portList;
+  portList.length = _portIdList.size();
+  if (!__portIdList) {
+    __portIdList = new TriPortId *[portList.length];
+    
+    unsigned int i=0;
+    for(TPortIdList::const_iterator it=_portIdList.begin(); it!=_portIdList.end(); ++it, i++)
+      __portIdList[i] = const_cast<TriPortId*>(*it);
+  }
+  portList.portIdList = __portIdList;
+  
+  return portList;
+}
+
+
+
+
+freettcn::TE::CTestComponentType::CInstance::CInstance(const CType &type):
+  freettcn::TE::CType::CInstance(type, false), _inited(false), _module(0)
 {
 }
 
 
-void freettcn::TE::CTestComponent::Init(freettcn::TE::CModule &module, TciTestComponentKindType kind, String name)
+freettcn::TE::CTestComponentType::CInstance::~CInstance()
+{
+}
+
+
+void freettcn::TE::CTestComponentType::CInstance::Init(freettcn::TE::CModule &module, TciTestComponentKindType kind, String name)
 {
   _module = &module;
   _kind = kind;
   
-  _id.compInst.data = 0;                          /**< @todo Create unique identifier */
-  _id.compInst.bits = 0;
+//   char str[32];
+//   sprintf(str, "%p", static_cast<void *>(this));
+//   printf("@@: %p\n", static_cast<void *>(this));
+//   _instId = str;
+  
+//   _id.compInst.data = reinterpret_cast<unsigned char *>(const_cast<char *>(_instId.c_str())); /**< @todo Create unique identifier */
+  
+  unsigned char *instId = new unsigned char[4];
+  instId[0] = 0x01;
+  instId[1] = 0x02;
+  instId[2] = 0x03;
+  instId[3] = 0x04;
+  
+  _id.compInst.data = instId;
+  _id.compInst.bits = 4 * 8;
   _id.compInst.aux = this;
   _id.compName = name;
   _id.compType = Type().Id();
+  
+  // perform component specific initialization
+  Initialize();
   
   // register in a module
   _module->TestComponentAdd(*this);
@@ -61,26 +129,51 @@ void freettcn::TE::CTestComponent::Init(freettcn::TE::CModule &module, TciTestCo
 }
 
 
-const TriComponentId &freettcn::TE::CTestComponent::Id() const throw(freettcn::TE::CTestComponent::ENotInited)
+const TriComponentId &freettcn::TE::CTestComponentType::CInstance::Id() const throw(freettcn::TE::CTestComponentType::CInstance::ENotInited)
 {
   return _id;
 }
 
 
-void freettcn::TE::CTestComponent::Start(const freettcn::TE::CBehavior &behavior, TciParameterListType parameterList) throw(freettcn::TE::CTestComponent::ENotInited)
+void freettcn::TE::CTestComponentType::CInstance::Start(const freettcn::TE::CBehavior &behavior, TciParameterListType parameterList) throw(freettcn::TE::CTestComponentType::CInstance::ENotInited)
 {
   // schedule executing test component
   //   Timer().Start();
 }
 
 
-// void freettcn::TE::CTestComponent::Map(const freettcn::TE::CPort &fromPort, const freettcn::TE::CPort &toPort) throw(freettcn::TE::CTestComponent::ENotInited)
+// void freettcn::TE::CTestComponentType::CInstance::Map(const freettcn::TE::CPort &fromPort, const freettcn::TE::CPort &toPort) throw(freettcn::TE::CTestComponentType::CInstance::ENotInited)
 // {
 // }
 
 
-// void freettcn::TE::CTestComponent::Verdict(VerdictType_t value)
+// void freettcn::TE::CTestComponentType::CInstance::Verdict(VerdictType_t value)
 // {
 // }
 
+
+
+
+
+
+freettcn::TE::CControlComponentType::CControlComponentType():
+  freettcn::TE::CTestComponentType(0 , "_ControlComponentType_")
+{
+}
+
+freettcn::TE::CControlComponentType::CInstance *freettcn::TE::CControlComponentType::InstanceCreate(bool omit /* false */) const
+{
+  return new freettcn::TE::CControlComponentType::CInstance(*this);
+}
+
+
+
+freettcn::TE::CControlComponentType::CInstance::CInstance(const freettcn::TE::CType &type):
+  freettcn::TE::CTestComponentType::CInstance(type)
+{
+}
+
+void freettcn::TE::CControlComponentType::CInstance::Initialize()
+{
+}
 

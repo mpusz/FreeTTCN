@@ -112,6 +112,9 @@ namespace freettcn {
       CTestLogging(CLogger &logger);
       virtual ~CTestLogging();
       
+      virtual const char *BinaryString2String(const BinaryString &binStr, char *str) const;
+      virtual const char *TriComponentId2String(const TriComponentId &comp, char *str) const;
+
       virtual void TcExecute(const char *am, int ts, const char *src, int line,
                              const TriComponentId &c,
                              const TciTestCaseIdType &tcId,

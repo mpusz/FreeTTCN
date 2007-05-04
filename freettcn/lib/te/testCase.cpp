@@ -31,7 +31,6 @@
 #include "freettcn/te/te.h"
 #include "freettcn/te/module.h"
 #include "freettcn/te/behavior.h"
-#include "freettcn/te/testComponent.h"
 #include "freettcn/te/sourceData.h"
 #include "freettcn/tools/logMask.h"
 #include "freettcn/tools/timeStamp.h"
@@ -73,16 +72,20 @@ TciParameterTypeListType freettcn::TE::CTestCase::Parameters() const
 
 TriPortIdList freettcn::TE::CTestCase::Ports() const
 {
-  TriPortIdList portList;
-  portList.portIdList = 0;
-  portList.length = 0;
+  TriPortIdList portList = _systemType.Ports();
+  
+  // add component data to port list
+  for(int i=0; i<portList.length; i++) {
+    portList.portIdList[i]->compInst.compName = "SYSTEM";
+    portList.portIdList[i]->compInst.compType = _systemType.Id();
+  }
   
   return portList;
 }
 
 
 void freettcn::TE::CTestCase::Start(const char *src, int line,
-                                    const freettcn::TE::CTestComponent *creator,
+                                    const freettcn::TE::CTestComponentType::CInstance *creator,
                                     TciParameterListType parameterlist,
                                     TriTimerDuration dur)
 {

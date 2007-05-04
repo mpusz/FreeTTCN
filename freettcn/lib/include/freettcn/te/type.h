@@ -37,11 +37,27 @@ extern "C" {
 namespace freettcn {
 
   namespace TE {
-
-    class CValue;
+    
     class CModule;
     
     class CType {
+    public:
+      class CInstance {
+        const CType &_type;
+        const bool _omit;
+        
+      public:
+        CInstance(const CType &type, bool omit);
+        virtual ~CInstance();
+        
+        const CType &Type() const;
+        bool Omit() const;
+        const String Encoding() const;
+        const String EncodingVariant() const;
+        const String Extension() const;
+      };
+      
+    private:
       const CModule *_module;
       QualifiedName _id;
       TciTypeClassType _class;
@@ -67,14 +83,7 @@ namespace freettcn {
       String EncodingVariant() const;
       String Extension() const;
       
-      virtual CValue *InstanceCreate(bool omit = false) const = 0;
-    };
-    
-    
-    class CBooleanType : public CType {
-    public:
-      CBooleanType();
-      virtual CValue *InstanceCreate(bool omit = false) const;
+      virtual CInstance *InstanceCreate(bool omit = false) const = 0;
     };
     
     
@@ -89,30 +98,146 @@ namespace freettcn {
 
 
 
+//     class CIntegerValue : public CValue {
+//       unsigned long _absValue;
+//       bool _sign;
+//     public:
+//       //     Integer Value() const;
+//       //    void Value(Integer value);
+//       void AbsValue(String value) throw(freettcn::EOperationFailed);
+//       void DigitsNum(unsigned long dig_num);
+//       void Sign(bool sign);
+//     };
+  
+//     class CFloatValue : public CValue {
+//       float _value;
+//     public:
+//       float Value() const;
+//       void Value(float value);
+//     };
+  
+//     class CObjIdValue : public CValue {
+//       TciObjidValue _value;
+//     public:
+//       TciObjidValue Value() const;
+//       void Value(TciObjidValue value);
+//     };
+  
+//     class CEnumeratedValue : public CValue {
+//       String _value;
+//     public:
+//       String Value() const;
+//       void Value(String value);
+//     };
+  
+//     class CVerdictValue : public CValue {
+//       unsigned long _value;
+//     public:
+//       unsigned long Value() const;
+//       void Value(unsigned long value);
+//     };
+  
+//     class CAddressValue : public CValue {
+//       TciValue _value;
+//     public:
+//       TciValue Value() const;
+//       void Value(TciValue value);
+//     };
+  
+//     class CCharstringValue : public CValue {
+//       String _value;
+//     public:
+//       const String Value() const;
+//       void Value(const String value);
+    
+//       char Element(unsigned long position) const;
+//       void Element(unsigned long position, char value);
+    
+//       unsigned long Length() const;
+//       void Length(unsigned long len);
+//     };
+  
+//     class CUniversalCharstringValue : public CValue {
+//       String _value;
+//     public:
+//       String Value() const;
+//       void Value(String value);
+    
+//       TciUCValue *Element(unsigned long position) const;
+//       void Element(unsigned long position, TciUCValue value);
+    
+//       unsigned long Length() const;
+//       void Length(unsigned long len);
+//     };
+  
+//     class CHexstringValue : public CValue {
+//       String _value;
+//     public:
+//       String Value() const;
+//       void Value(String value);
+    
+//       unsigned long Element(unsigned long position) const;
+//       void Element(unsigned long position, unsigned long value);
+    
+//       unsigned long Length() const;
+//       void Length(unsigned long len);
+//     };
+  
+//     class COctetstringValue : public CValue {
+//       String _value;
+//     public:
+//       String Value() const;
+//       void Value(String value);
+    
+//       unsigned long Element(unsigned long position) const;
+//       void Element(unsigned long position, unsigned long value);
+    
+//       unsigned long Length() const;
+//       void Length(unsigned long len);
+//     };
+  
+//     class CBitstringValue : public CValue {
+//       String _value;
+//     public:
+//       String Value() const;
+//       void Value(String value);
+    
+//       unsigned long Element(unsigned long position) const;
+//       void Element(unsigned long position, unsigned long value);
+    
+//       unsigned long Length() const;
+//       void Length(unsigned long len);
+//     };
+  
+//     class CUnionValue : public CValue {
+//       TciValue _value;
+//     public:
+//       TciValue Variant(String variantName) const;
+//       void Variant(String variantName, TciValue value);
+//       String PresentVariantName() const;
+//       char** VariantNames() const;
+//     };
+  
+//     class CRecordValue : public CValue {
+//       TciValue _value;
+//     public:
+//       CRecordValue(const CType &type, bool omit);
+//       TciValue Field(String fieldName) const;
+//       void Field(String fieldName, TciValue value);
+//       char** FieldNames() const;
+//     };
+    
+//     class CRecordOfValue : public CValue {
+//       TciValue _value;
+//     public:
+//       TciValue Field(unsigned long position) const;
+//       void Field(unsigned long position, TciValue value);
+//       void Append(TciValue value);
+//       TciType ElementType() const;
+//       unsigned long Length() const;
+//       void Length(unsigned long len);
+//     };
 
-    class CTestComponentType : public CType {
-    public:
-      CTestComponentType(const CModule *module, String name);
-    };
-    
-    class CControlComponentType : public CTestComponentType {
-    public:
-      CControlComponentType();
-      virtual CValue *InstanceCreate(bool omit = false) const;
-    };
-    
-    
-    
-    
-    
-    
-    class CBasicType {
-      static const CBooleanType _boolean;
-      static const CControlComponentType _control;
-    public:
-      static const CBooleanType &Boolean();
-      static const CControlComponentType &ControlComponent();
-    };
     
   } // namespace TE
   

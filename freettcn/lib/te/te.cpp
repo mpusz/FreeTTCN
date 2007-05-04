@@ -29,12 +29,11 @@
 
 
 #include "freettcn/te/te.h"
+#include "freettcn/te/basicTypes.h"
 #include "freettcn/te/module.h"
 #include "freettcn/te/modulesContainer.h"
-#include "freettcn/te/testComponent.h"
 #include "freettcn/te/behavior.h"
 #include "freettcn/te/testCase.h"
-#include "freettcn/te/type.h"
 #include "freettcn/tools/logMask.h"
 #include "freettcn/tools/timeStamp.h"
 extern "C" {
@@ -267,25 +266,25 @@ TriComponentId freettcn::TE::CTTCNExecutable::TestComponentCreate(TciTestCompone
     return ctrlId;
   }
   
-  const freettcn::TE::CType *cType = 0;
+  const freettcn::TE::CType *type = 0;
   if (componentType)
-    cType = static_cast<const freettcn::TE::CType *>(componentType);
+    type = static_cast<const freettcn::TE::CType *>(componentType);
   else if (kind == TCI_CTRL_COMP)
-    cType = &freettcn::TE::CBasicType::ControlComponent();
+    type = &freettcn::TE::CBasicTypes::ControlComponent();
   else {
     std::cout << "ERROR!!! TciType not defined" << std::endl;
     throw EOperationFailed();
   }
   
-  freettcn::TE::CValue *value = cType->InstanceCreate();
-  freettcn::TE::CTestComponent *cValue = dynamic_cast<freettcn::TE::CTestComponent *>(value);
-  if (!cValue) {
+  freettcn::TE::CType::CInstance *instance = type->InstanceCreate();
+  freettcn::TE::CTestComponentType::CInstance *cInstance = dynamic_cast<freettcn::TE::CTestComponentType::CInstance *>(instance);
+  if (!cInstance) {
     std::cout << "ERROR!!! TciType does not specify Component type" << std::endl;
     throw EOperationFailed();
   }
   
-  cValue->Init(RootModule(), kind, name);
-  TriComponentId compId = cValue->Id();
+  cInstance->Init(RootModule(), kind, name);
+  TriComponentId compId = cInstance->Id();
   
   return compId;
 }
@@ -295,7 +294,7 @@ void freettcn::TE::CTTCNExecutable::TestComponentStart(const TriComponentId &com
                                                        const TciBehaviourIdType &behaviorId,
                                                        const TciParameterListType &parameterList) const
 {
-  freettcn::TE::CTestComponent &component = RootModule().TestComponent(componentId);
+  freettcn::TE::CTestComponentType::CInstance &component = RootModule().TestComponent(componentId);
   const freettcn::TE::CBehavior &behavior = RootModule().Behavior(behaviorId);
   component.Start(behavior, parameterList);
 }

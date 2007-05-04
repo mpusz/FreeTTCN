@@ -18,38 +18,36 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /**
- * @file   initObject.cpp
+ * @file   basicTypes.h
  * @author Mateusz Pusz
- * @date   Wed Apr 25 11:15:08 2007
+ * @date   Fri May  4 09:19:29 2007
  * 
  * @brief  
  * 
  * 
  */
 
-#include "freettcn/te/initObject.h"
+#ifndef __BASICTYPES_H__
+#define __BASICTYPES_H__
+
+#include <freettcn/te/boolean.h>
+#include <freettcn/te/testComponent.h>
+
+namespace freettcn {
+
+  namespace TE {
+    
+    class CBasicTypes {
+      static const CBooleanType _boolean;
+      static const CControlComponentType _control;
+    public:
+      static const CBooleanType &Boolean();
+      static const CControlComponentType &ControlComponent();
+    };
+    
+  } // namespace TE
+  
+} // namespace freettcn
 
 
-
-freettcn::TE::CInitObject::CInitObject(const char *name):
-  _name(name), _inited(false)
-{
-}
-
-freettcn::TE::CInitObject::~CInitObject()
-{
-}
-
-const char *freettcn::TE::CInitObject::Name() const
-{
-  return _name;
-}
-
-void freettcn::TE::CInitObject::Init()
-{
-  if (!_inited) {
-    // perform object specific initialization
-    Initialize();
-    _inited = true;
-  }
-}
+#endif /* __BASICTYPES_H__ */

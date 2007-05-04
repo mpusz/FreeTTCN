@@ -37,7 +37,7 @@ extern "C" {
 #include <freettcn/ttcn3/tri.h>
 }
 #include <freettcn/te/initObject.h>
-#include <freettcn/tools/exception.h>
+#include <freettcn/te/testComponent.h>
 #include <vector>
 #include <list>
 
@@ -48,8 +48,6 @@ namespace freettcn {
 
     class CBehavior;
     class CTestCase;
-    class CTestComponent;
-    class CTestComponentType;
     class CSourceData;
     
     class CModule : public CInitObject {
@@ -76,7 +74,7 @@ namespace freettcn {
       // types
       typedef std::vector<CParameter *> TParameterList;
       typedef std::vector<CTestCase *> TTestCaseList;
-      typedef std::list<CTestComponent *> TTestCompList;
+      typedef std::list<CTestComponentType::CInstance *> TTestCompList;
       typedef std::list<const CBehavior *> TBehaviorList;
       
       // module info
@@ -134,8 +132,8 @@ namespace freettcn {
       void BehaviorAdd(CBehavior *behavior);
       const CBehavior &Behavior(const TciBehaviourIdType &behavior) const throw(ENotFound);
       
-      void TestComponentAdd(CTestComponent &component);
-      CTestComponent &TestComponent(const TriComponentId &component) const throw(ENotFound);
+      void TestComponentAdd(CTestComponentType::CInstance &component);
+      CTestComponentType::CInstance &TestComponent(const TriComponentId &component) const throw(ENotFound);
       TriComponentId TestComponentCreateReq(const char *src, int line, const TriComponentId &creatorId, TciTestComponentKindType kind, const CTestComponentType *compType, String name);
       void TestComponentStartReq(const char *src, int line, const TriComponentId &creatorId, const TriComponentId &componentId, const TciBehaviourIdType &behaviorId, const TciParameterListType &parameterList);
     };

@@ -30,9 +30,7 @@
 
 
 #include "freettcn/te/type.h"
-#include "freettcn/te/value.h"
 #include "freettcn/te/module.h"
-#include "freettcn/te/testComponent.h"
 
 
 freettcn::TE::CType::CType(const CModule   *module,
@@ -46,7 +44,7 @@ freettcn::TE::CType::CType(const CModule   *module,
   if (_module)
     _id.moduleName = const_cast<char *>(_module->Name());
   else
-    _id.moduleName = "<freettcn>";
+    _id.moduleName = "{freettcn}";
   _id.objectName = name;
   _id.aux = this;
 }
@@ -93,68 +91,65 @@ String freettcn::TE::CType::Extension() const
 
 
 
-freettcn::TE::CBooleanType::CBooleanType() :
-  CType(0, "boolean", TCI_BOOLEAN_TYPE, "", "", "")
+freettcn::TE::CType::CInstance::CInstance(const CType &type, bool omit) :
+  _type(type), _omit(omit)
 {
 }
 
-freettcn::TE::CValue *freettcn::TE::CBooleanType::InstanceCreate(bool omit /* false */) const
+freettcn::TE::CType::CInstance::~CInstance()
 {
-  return new freettcn::TE::CBooleanValue(*this, omit);
+}
+
+const freettcn::TE::CType &freettcn::TE::CType::CInstance::Type() const
+{
+  return _type;
+}
+
+bool freettcn::TE::CType::CInstance::Omit() const
+{
+  return _omit;
+}
+
+const String freettcn::TE::CType::CInstance::Encoding() const
+{
+  return Type().Encoding();
+}
+
+const String freettcn::TE::CType::CInstance::EncodingVariant() const
+{
+  return Type().EncodingVariant();
+}
+
+const String freettcn::TE::CType::CInstance::Extension() const
+{
+  return Type().Extension();
 }
 
 
 
 
-// freettcn::TE::CRecordType::CRecordType(const CModule    &module,
-//                                        String           encoding,
-//                                        String           encodingVariant,
-//                                        String           extension) :
-//   CType(&module, "record", TCI_RECORD_TYPE, encoding, encodingVariant, extension)
+// void freettcn::TE::CIntegerValue::AbsValue(String value) throw(freettcn::EOperationFailed)
+// {
+//   if (*value == '\0')
+//     throw freettcn::EOperationFailed();
+  
+//   char *endPtr;
+//   //  std::errno = 0;    /* To distinguish success/failure after call */
+//   unsigned long val = strtoul(value, &endPtr, 10);
+//   if (*endPtr != '\0' || value == endPtr) // ||
+// //       (errno == ERANGE && (val == LONG_MAX || val == LONG_MIN)))
+//     throw freettcn::EOperationFailed();
+  
+//   _absValue = val;
+// }
+
+
+// void freettcn::TE::CIntegerValue::DigitsNum(unsigned long int dig_num)
 // {
 // }
 
-// freettcn::TE::CValue *freettcn::TE::CRecordType::InstanceCreate(bool omit /* false */) const
+
+// void freettcn::TE::CIntegerValue::Sign(bool sign)
 // {
-//   return new freettcn::TE::CRecordValue(*this, omit);
+//   _sign = sign;
 // }
-
-
-
-
-freettcn::TE::CTestComponentType::CTestComponentType(const freettcn::TE::CModule *module, String name) :
-  freettcn::TE::CType(module, name, TCI_COMPONENT_TYPE, "", "", "")
-{
-}
-
-
-
-freettcn::TE::CControlComponentType::CControlComponentType():
-  freettcn::TE::CTestComponentType(0 , "_ControlComponentType_")
-{
-}
-
-freettcn::TE::CValue *freettcn::TE::CControlComponentType::InstanceCreate(bool omit /* false */) const
-{
-  return new freettcn::TE::CTestComponent(*this);
-}
-
-
-
-
-
-/* *************************** B A S I C   T Y P E *************************** */
-
-const freettcn::TE::CBooleanType freettcn::TE::CBasicType::_boolean;
-const freettcn::TE::CControlComponentType freettcn::TE::CBasicType::_control;
-
-const freettcn::TE::CBooleanType &freettcn::TE::CBasicType::Boolean()
-{
-  return _boolean;
-}
-
-
-const freettcn::TE::CControlComponentType &freettcn::TE::CBasicType::ControlComponent()
-{
-  return _control;
-}

@@ -17,39 +17,31 @@
 // along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+
 /**
- * @file   initObject.cpp
+ * @file   basicTypes.cpp
  * @author Mateusz Pusz
- * @date   Wed Apr 25 11:15:08 2007
+ * @date   Fri May  4 09:29:40 2007
  * 
  * @brief  
  * 
  * 
  */
 
-#include "freettcn/te/initObject.h"
+
+#include "freettcn/te/basicTypes.h"
 
 
+const freettcn::TE::CBooleanType freettcn::TE::CBasicTypes::_boolean;
+const freettcn::TE::CControlComponentType freettcn::TE::CBasicTypes::_control;
 
-freettcn::TE::CInitObject::CInitObject(const char *name):
-  _name(name), _inited(false)
+const freettcn::TE::CBooleanType &freettcn::TE::CBasicTypes::Boolean()
 {
+  return _boolean;
 }
 
-freettcn::TE::CInitObject::~CInitObject()
-{
-}
 
-const char *freettcn::TE::CInitObject::Name() const
+const freettcn::TE::CControlComponentType &freettcn::TE::CBasicTypes::ControlComponent()
 {
-  return _name;
-}
-
-void freettcn::TE::CInitObject::Init()
-{
-  if (!_inited) {
-    // perform object specific initialization
-    Initialize();
-    _inited = true;
-  }
+  return _control;
 }

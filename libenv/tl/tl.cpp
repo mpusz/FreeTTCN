@@ -186,6 +186,41 @@ freettcn::TL::CLogger &freettcn::TL::CTestLogging::Logger() const
 
 /* ********************** L O G   F U N C T I O N S *********************************** */
 
+const char *freettcn::TL::CTestLogging::BinaryString2String(const BinaryString &binStr, char *str) const
+{
+  str[0] = 0;
+  
+  for(int i=0; i<binStr.bits / 8; i++) {
+    if (!(i % 8)) {
+      if (!(i % 16))
+        sprintf(str, "%s\n", str);
+      else
+        sprintf(str, "%s ", str);
+    }
+    else
+      sprintf(str, "%s ", str);
+    sprintf(str, "%s %02x", str, static_cast<unsigned short>(binStr.data[i]));
+  }
+  
+  return str;
+}
+
+
+const char *freettcn::TL::CTestLogging::TriComponentId2String(const TriComponentId &comp, char *str) const
+{
+  sprintf(str, "<%s.%s>", comp.compType.moduleName, comp.compType.objectName);
+  
+  if (comp.compInst.bits) {
+    for(int i=0; i<comp.compInst.bits / 8; i++)
+      sprintf(str, "%s%s%02x", str, i ? "" : " 0x", static_cast<unsigned short>(comp.compInst.data[i]));
+  }
+  
+  if (strcmp(comp.compName, ""))
+    sprintf(str, "%s ('%s')", str, comp.compName);
+  
+  return str;
+}
+
 
 void freettcn::TL::CTestLogging::TcExecute(const char *am, int ts, const char *src, int line,
                                            const TriComponentId &c,
@@ -198,9 +233,7 @@ void freettcn::TL::CTestLogging::TcExecute(const char *am, int ts, const char *s
                                                                         "Testcase execute request");
   
   char str[256];
-  
-  sprintf(str, "%s [%s.%s]", c.compName, c.compType.moduleName, c.compType.objectName);
-  data->LineAdd("From", str);
+  data->LineAdd("From", TriComponentId2String(c, str));
   
   sprintf(str, "%s.%s", tcId.moduleName, tcId.objectName);
   data->LineAdd("Testcase Id", str);
@@ -231,9 +264,7 @@ void freettcn::TL::CTestLogging::TcStart(const char *am, int ts, const char *src
                                                                         "Testcase START");
   
   char str[256];
-  
-  sprintf(str, "%s [%s.%s]", c.compName, c.compType.moduleName, c.compType.objectName);
-  data->LineAdd("From", str);
+  data->LineAdd("From", TriComponentId2String(c, str));
   
   sprintf(str, "%s.%s", tcId.moduleName, tcId.objectName);
   data->LineAdd("Testcase Id", str);
@@ -261,9 +292,7 @@ void freettcn::TL::CTestLogging::TcStop(const char *am, int ts, const char *src,
                                                                         "Testcase STOP");
   
   char str[256];
-  
-  sprintf(str, "%s [%s.%s]", c.compName, c.compType.moduleName, c.compType.objectName);
-  data->LineAdd("From", str);
+  data->LineAdd("From", TriComponentId2String(c, str));
   
   Logger().Push(data);
 } 
@@ -343,9 +372,7 @@ void freettcn::TL::CTestLogging::CtrlStart(const char *am, int ts, const char *s
                                                                         "Control START");
   
   char str[256];
-  
-  sprintf(str, "%s [%s.%s]", c.compName, c.compType.moduleName, c.compType.objectName);
-  data->LineAdd("From", str);
+  data->LineAdd("From", TriComponentId2String(c, str));
   
   Logger().Push(data);
 }
@@ -359,9 +386,7 @@ void freettcn::TL::CTestLogging::CtrlStop(const char *am, int ts, const char *sr
                                                                         "Control STOP");
   
   char str[256];
-  
-  sprintf(str, "%s [%s.%s]", c.compName, c.compType.moduleName, c.compType.objectName);
-  data->LineAdd("From", str);
+  data->LineAdd("From", TriComponentId2String(c, str));
   
   Logger().Push(data);
 }
@@ -375,9 +400,7 @@ void freettcn::TL::CTestLogging::CtrlTerminated(const char *am, int ts, const ch
                                                                         "Control TERMINATED");
   
   char str[256];
-  
-  sprintf(str, "%s [%s.%s]", c.compName, c.compType.moduleName, c.compType.objectName);
-  data->LineAdd("From", str);
+  data->LineAdd("From", TriComponentId2String(c, str));
   
   Logger().Push(data);
 }
@@ -430,12 +453,8 @@ void freettcn::TL::CTestLogging::CCreate(const char *am, int ts, const char *src
                                                                         "Component CREATE");
   
   char str[256];
-  
-  sprintf(str, "%s [%s.%s]", c.compName, c.compType.moduleName, c.compType.objectName);
-  data->LineAdd("From", str);
-  
-  sprintf(str, "%s [%s.%s]", comp.compName, comp.compType.moduleName, comp.compType.objectName);
-  data->LineAdd("Component", str);
+  data->LineAdd("From", TriComponentId2String(c, str));
+  data->LineAdd("Component", TriComponentId2String(comp, str));
   
   Logger().Push(data);
 }
@@ -453,12 +472,9 @@ void freettcn::TL::CTestLogging::CStart(const char *am, int ts, const char *src,
   
   char str[256];
   
-  sprintf(str, "%s [%s.%s]", c.compName, c.compType.moduleName, c.compType.objectName);
-  data->LineAdd("From", str);
-  
-  sprintf(str, "%s [%s.%s]", comp.compName, comp.compType.moduleName, comp.compType.objectName);
-  data->LineAdd("Component", str);
-  
+  data->LineAdd("From", TriComponentId2String(c, str));
+  data->LineAdd("Component", TriComponentId2String(comp, str));
+
   sprintf(str, "%s.%s", name.moduleName, name.objectName);
   data->LineAdd("Behaviour", str);
   
@@ -479,9 +495,7 @@ void freettcn::TL::CTestLogging::CTerminated(const char *am, int ts, const char 
                                                                         "Component START");
   
   char str[256];
-  
-  sprintf(str, "%s [%s.%s]", c.compName, c.compType.moduleName, c.compType.objectName);
-  data->LineAdd("From", str);
+  data->LineAdd("From", TriComponentId2String(c, str));
   
   sprintf(str, "%p", verdict);                    /**< @todo Obtain verdict value */
   data->LineAdd("Verdict", str);

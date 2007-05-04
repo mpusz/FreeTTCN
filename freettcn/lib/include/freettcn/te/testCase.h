@@ -36,7 +36,7 @@ extern "C" {
 #include <freettcn/ttcn3/tri.h>
 }
 #include <freettcn/te/initObject.h>
-#include <freettcn/tools/exception.h>
+#include <freettcn/te/testComponent.h>
 
 
 namespace freettcn {
@@ -46,8 +46,6 @@ namespace freettcn {
     class CModule;
     class CBehavior;
     class CSourceData;
-    class CTestComponent;
-    class CTestComponentType;
     
     class CTestCase : public CInitObject {
       class CState {
@@ -78,7 +76,7 @@ namespace freettcn {
       TriPortIdList Ports() const;
       
       void Start(const char *src, int line,
-                 const CTestComponent *creator,
+                 const CTestComponentType::CInstance *creator,
                  TciParameterListType parameterlist,
                  TriTimerDuration dur);
       void Execute(TciTestCaseIdType testCaseId, TriPortIdList tsiPortList);

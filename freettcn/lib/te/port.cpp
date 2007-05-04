@@ -29,7 +29,6 @@
 
 #include "freettcn/te/port.h"
 #include "freettcn/te/module.h"
-#include "freettcn/te/testComponent.h"
 
 
 freettcn::TE::CPortType::CPortType(const freettcn::TE::CModule &module, const char *name)
@@ -48,9 +47,9 @@ const QualifiedName &freettcn::TE::CPortType::Id() const
 
 
 
-freettcn::TE::CPort::CPort(const freettcn::TE::CPortType &type,
-                           const freettcn::TE::CTestComponent &component,
-                           const char *name, int portIdx /* -1 */)
+freettcn::TE::CPortType::CInstance::CInstance(const freettcn::TE::CPortType &type,
+                                              const freettcn::TE::CTestComponentType::CInstance &component,
+                                              const char *name, int portIdx /* -1 */)
 {
   _id.compInst = component.Id();
   _id.portName = const_cast<char *>(name);
@@ -60,7 +59,7 @@ freettcn::TE::CPort::CPort(const freettcn::TE::CPortType &type,
 }
 
 
-const TriPortId &freettcn::TE::CPort::Id() const
+const TriPortId &freettcn::TE::CPortType::CInstance::Id() const
 {
   return _id;
 }

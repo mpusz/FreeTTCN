@@ -106,26 +106,26 @@ TciValue tciDecode(BinaryString message,
       TciValue icmpMsg = tciNewInstance(decHypothesis);
       char str[10];
 
-      TciValue msgType = tciGetRecFieldValue(icmpMsg, "msgType");
-      if (!msgType)
-        throw freettcn::CD::EDecodeFailure();
-      tciSetIntSign(msgType, 1);
-      sprintf(str, "%lu", buffer.UIntGet(8));
-      tciSetIntAbs(msgType, str);
+//       TciValue msgType = tciGetRecFieldValue(icmpMsg, "msgType");
+//       if (!msgType)
+//         throw freettcn::CD::EDecodeFailure();
+//       tciSetIntSign(msgType, 1);
+//       sprintf(str, "%lu", buffer.UIntGet(8));
+//       tciSetIntAbs(msgType, str);
       
-      TciValue code = tciGetRecFieldValue(icmpMsg, "code");
-      if (!code)
-        throw freettcn::CD::EDecodeFailure();
-      tciSetIntSign(code, 1);
-      sprintf(str, "%lu", buffer.UIntGet(8));
-      tciSetIntAbs(msgType, str);
+//       TciValue code = tciGetRecFieldValue(icmpMsg, "code");
+//       if (!code)
+//         throw freettcn::CD::EDecodeFailure();
+//       tciSetIntSign(code, 1);
+//       sprintf(str, "%lu", buffer.UIntGet(8));
+//       tciSetIntAbs(msgType, str);
       
-      TciValue crc = tciGetRecFieldValue(icmpMsg, "crc");
-      if (!crc)
-        throw freettcn::CD::EDecodeFailure();
-      tciSetIntSign(crc, 1);
-      sprintf(str, "%lu", buffer.UIntGet(16));
-      tciSetIntAbs(msgType, str);
+//       TciValue crc = tciGetRecFieldValue(icmpMsg, "crc");
+//       if (!crc)
+//         throw freettcn::CD::EDecodeFailure();
+//       tciSetIntSign(crc, 1);
+//       sprintf(str, "%lu", buffer.UIntGet(16));
+//       tciSetIntAbs(msgType, str);
 
       return icmpMsg;
     }

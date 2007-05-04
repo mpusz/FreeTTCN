@@ -31,7 +31,6 @@
 #include "freettcn/te/module.h"
 #include "freettcn/te/modulesContainer.h"
 #include "freettcn/te/te.h"
-#include "freettcn/te/testComponent.h"
 #include "freettcn/te/behavior.h"
 #include "freettcn/te/testCase.h"
 #include "freettcn/te/sourceData.h"
@@ -97,19 +96,7 @@ freettcn::TE::CModule::CModule(const char *name):
 
 freettcn::TE::CModule::~CModule()
 {
-  Purge(_testCaseList);
-  Purge(_parameterList);
-  Purge(_allEntityStates);
-  Purge(_behaviorList);
-  
-  if (_ctrlSrcData)
-    delete _ctrlSrcData;
-  
-  // delete temporary variables
-  if (__modParList)
-    delete[] __modParList;
-  if (__testCaseIdList)
-    delete[] __testCaseIdList;
+  Cleanup();
 }
 
 
@@ -134,14 +121,21 @@ TriComponentId freettcn::TE::CModule::ModuleComponentId() const
 }
 
 
-// const freettcn::TE::CControlComponentType &freettcn::TE::CModule::ControlComponentType() const
-// {
-//   return _ctrlCompType;
-// }
-
-
 void freettcn::TE::CModule::Cleanup()
 {
+  Purge(_testCaseList);
+  Purge(_parameterList);
+  Purge(_allEntityStates);
+  Purge(_behaviorList);
+  
+  if (_ctrlSrcData)
+    delete _ctrlSrcData;
+  
+  // delete temporary variables
+  if (__modParList)
+    delete[] __modParList;
+  if (__testCaseIdList)
+    delete[] __testCaseIdList;
 }
 
 
@@ -206,15 +200,16 @@ TciModuleParameterListType freettcn::TE::CModule::Parameters() const
 {
   TciModuleParameterListType modParList;
   modParList.length = _parameterList.size();
-  if (__modParList)
-    delete[] __modParList;
-  modParList.modParList = __modParList = new TciModuleParameterType[modParList.length];
-  
-  unsigned int i=0;
-  for(TParameterList::const_iterator it=_parameterList.begin(); it != _parameterList.end(); ++it, i++) {
-    modParList.modParList[i].parName = const_cast<char *>((*it)->Name());
-    modParList.modParList[i].defaultValue = ((*it)->DefaultValue());
+  if (!__modParList) {
+    __modParList = new TciModuleParameterType[modParList.length];
+    
+    unsigned int i=0;
+    for(TParameterList::const_iterator it=_parameterList.begin(); it != _parameterList.end(); ++it, i++) {
+      __modParList[i].parName = const_cast<char *>((*it)->Name());
+      __modParList[i].defaultValue = ((*it)->DefaultValue());
+    }
   }
+  modParList.modParList = __modParList;
   
   return modParList;
 }
@@ -224,16 +219,17 @@ TciTestCaseIdListType freettcn::TE::CModule::TestCases() const
 {
   TciTestCaseIdListType tcList;
   tcList.length = _testCaseList.size();
-  if (__testCaseIdList)
-    delete[] __testCaseIdList;
-  tcList.idList = __testCaseIdList = new TciTestCaseIdType[tcList.length];
-  
-  unsigned int i=0;
-  for(TTestCaseList::const_iterator it=_testCaseList.begin(); it!=_testCaseList.end(); ++it, i++) {
-    tcList.idList[i].moduleName = const_cast<char *>(Name());
-    tcList.idList[i].objectName = const_cast<char *>((*it)->Name());
-    tcList.idList[i].aux = 0;
+  if (!__testCaseIdList) {
+     __testCaseIdList = new TciTestCaseIdType[tcList.length];
+     
+     unsigned int i=0;
+     for(TTestCaseList::const_iterator it=_testCaseList.begin(); it!=_testCaseList.end(); ++it, i++) {
+       __testCaseIdList[i].moduleName = const_cast<char *>(Name());
+       __testCaseIdList[i].objectName = const_cast<char *>((*it)->Name());
+       __testCaseIdList[i].aux = 0;
+     }
   }
+  tcList.idList = __testCaseIdList;
   
   return tcList;
 }
@@ -319,13 +315,13 @@ const freettcn::TE::CBehavior &freettcn::TE::CModule::Behavior(const TciBehaviou
 
 
 
-void freettcn::TE::CModule::TestComponentAdd(freettcn::TE::CTestComponent &component)
+void freettcn::TE::CModule::TestComponentAdd(freettcn::TE::CTestComponentType::CInstance &component)
 {
   _allEntityStates.push_back(&component);
 }
 
 
-freettcn::TE::CTestComponent &freettcn::TE::CModule::TestComponent(const TriComponentId &component) const throw(freettcn::ENotFound)
+freettcn::TE::CTestComponentType::CInstance &freettcn::TE::CModule::TestComponent(const TriComponentId &component) const throw(freettcn::ENotFound)
 {
   for(TTestCompList::const_iterator it=_allEntityStates.begin(); it!=_allEntityStates.end(); ++it) {
     TriComponentId id = (*it)->Id();
