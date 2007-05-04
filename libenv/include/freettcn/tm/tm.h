@@ -64,6 +64,9 @@ namespace freettcn {
         std::string Name() const;
         TciTestCaseIdType Id() const;
         
+        TciParameterTypeListType Parameters() const;
+        TriPortIdList Interface() const;
+        
         void Start(const TciParameterListType &parameterlist);
         void Started(const TciParameterListType &parameterList, double timer);
         void Terminated(TciVerdictValue verdict, const TciParameterListType &parameterlist);
@@ -97,11 +100,10 @@ namespace freettcn {
       CTestManagement(const CTestManagement&);       // Disallowed
       
       void Clear();
-      CTestCase &TestCaseGet(const std::string &testCaseId) const throw(ENotFound);
-      void ModuleParamsSet();
       
     protected:
       const TTCList &TCList() const;
+      CTestCase &TestCaseGet(const std::string &testCaseId) const throw(ENotFound);
       const TModuleParList &ModuleParameterList() const;
       
     public:
@@ -118,13 +120,11 @@ namespace freettcn {
       
       virtual TciValue ModuleParameterGet(const TciModuleParameterIdType &parameterId) const;
       
-      void TestCaseInit(const std::string &testCaseId) throw(ENotFound);
       void TestCaseStart(const std::string &testCaseId, const TciParameterListType &parameterlist) throw(ENotFound);
       void TestCaseStarted(const TciTestCaseIdType &testCaseId, const TciParameterListType &parameterList, double timer);
       void TestCaseTerminated(TciVerdictValue verdict, const TciParameterListType &parameterlist);
       void TestCaseStop() throw(EOperationFailed);
 
-      void ControlInit();
       void ControlStart();
       void ControlStop() throw(EOperationFailed);
       void ControlTerminated();

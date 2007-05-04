@@ -46,23 +46,67 @@ public:
       std::cout << " - " << id.moduleName << "." << id.objectName << std::endl;
     }
   }
+  
+  void TestCasesInfoPrint(const std::string &testCaseId) const throw(freettcn::ENotFound)
+  {
+    CTestCase &tc = TestCaseGet(testCaseId);
+    
+    // obtain test case parameters
+//     TciParameterTypeListType parList = tc.Parameters();
+    
+    // obtain Test System Interfaces used by the test case 
+    TriPortIdList portList = tc.Interface();
+    
+    std::cout << "Test System Interface:" << std::endl;
+    for(int i=0; i<portList.length; i++) {
+      std::cout << " - " <<
+        portList.portIdList[i]->compInst.compName <<
+        " <" << portList.portIdList[i]->compInst.compType.moduleName << "." <<
+        portList.portIdList[i]->compInst.compType.objectName << "> " <<
+        portList.portIdList[i]->portName << "[" <<
+        portList.portIdList[i]->portIndex << "] <" <<
+        portList.portIdList[i]->portType.moduleName << "." <<
+        portList.portIdList[i]->portType.objectName << ">" <<
+        std::endl;
+    }
+  }
 };
+
+
+void Usage()
+{
+  std::cout << "Usage:" << std::endl;
+  std::cout << " -m, --module      Select module" << std::endl;
+  std::cout << " -t, --testcase    Select testcase of specified module" << std::endl;
+  std::cout << " -l, --list        List modules/testcases" << std::endl;
+  std::cout << " -i, --info        Print module/testcase information" << std::endl;
+  std::cout << " -h, --help        Print that usage" << std::endl;
+  std::cout << "" << std::endl;
+  std::cout << "" << std::endl;
+  std::cout << "Examples:" << std::endl;
+  std::cout << " - list modules:" << std::endl;
+  std::cout << "    ./ttcn_example -l" << std::endl;
+  std::cout << "" << std::endl;
+  std::cout << " - print specified module information:" << std::endl;
+  std::cout << "    ./ttcn_example -m <module_name> -i" << std::endl;
+  std::cout << "" << std::endl;
+  std::cout << " - run control part of specified module:" << std::endl;
+  std::cout << "    ./ttcn_example -m <module_name>" << std::endl;
+  std::cout << "" << std::endl;
+  std::cout << " - list test cases of specified module:" << std::endl;
+  std::cout << "    ./ttcn_example -m <module_name> -l" << std::endl;
+  std::cout << "" << std::endl;
+  std::cout << " - print specified test case information:" << std::endl;
+  std::cout << "    ./ttcn_example -m <module_name> -t <testcase_id> -i" << std::endl;
+  std::cout << "" << std::endl;
+  std::cout << " - run specified test case:" << std::endl;
+  std::cout << "    ./ttcn_example -m <module_name> -t <testcase_id>" << std::endl;
+}
 
 
 void Run(CTestManagement &tm, const std::string &testCase)
 {
   try {
-    if (testCase != "") {
-      // init specified test cases
-      try {
-        tm.TestCaseInit(testCase);
-      }
-      catch(freettcn::Exception) {
-        std::cout << "Error: Could not init test case '" << testCase << "'" << std::endl;
-        exit(0);
-      }
-    }
-    
     // init timestamping
     freettcn::CTimeStamp ts(4);
     
@@ -99,12 +143,17 @@ void Run(CTestManagement &tm, const std::string &testCase)
       parameterlist.length = 0;
       parameterlist.parList = 0;
       
-      tm.TestCaseStart(testCase, parameterlist);
+      try {
+        tm.TestCaseStart(testCase, parameterlist);
       //      tm.TestCaseStop();
+      }
+      catch(freettcn::Exception) {
+        std::cout << "Error: Could not init test case '" << testCase << "'" << std::endl;
+        exit(0);
+      }
     }
     else {
       // run control part
-      tm.ControlInit();
       tm.ControlStart();
       //      tm.ControlStop();
     }
@@ -124,6 +173,7 @@ int main (int argc, char **argv)
   std::string module;
   std::string testCase;
   bool list = false;
+  bool info = false;
   bool help = false;
   
   // get options
@@ -134,11 +184,12 @@ int main (int argc, char **argv)
       {"module",   1, 0, 'm'},
       {"testcase", 1, 0, 't'},
       {"list",     0, 0, 'l'},
+      {"info",     0, 0, 'i'},
       {"help",     0, 0, 'h'},
       {0, 0, 0, 0}
     };
     
-    c = getopt_long(argc, argv, "m:t:lh", long_options, &option_index);
+    c = getopt_long(argc, argv, "m:t:lih", long_options, &option_index);
     if (c == -1)
       break;
     
@@ -153,6 +204,10 @@ int main (int argc, char **argv)
       
     case 'l':
       list = true;
+      break;
+      
+    case 'i':
+      info = true;
       break;
       
     case 'h':
@@ -176,7 +231,7 @@ int main (int argc, char **argv)
   }
   
   if (help) {
-    std::cout << "Usage:" << std::endl;
+    Usage();
     exit(0);
   }
   
@@ -211,6 +266,22 @@ int main (int argc, char **argv)
   if (list) {
     // list test cases
     tm.TestCasesPrint();
+    exit(0);
+  }
+
+  if (info) {
+    if (testCase == "") {
+    }
+    else {
+      // init specified test cases
+      try {
+        tm.TestCasesInfoPrint(testCase);
+      }
+      catch(freettcn::Exception) {
+        std::cout << "Error: Could not init test case '" << testCase << "'" << std::endl;
+      }      
+    }
+    
     exit(0);
   }
   

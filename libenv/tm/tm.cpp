@@ -59,6 +59,16 @@ TciTestCaseIdType freettcn::TM::CTestManagement::CTestCase::Id() const
   return _id;
 }
 
+TciParameterTypeListType freettcn::TM::CTestManagement::CTestCase::Parameters() const
+{
+  return tciGetTestCaseParameters(Id());
+}
+
+TriPortIdList freettcn::TM::CTestManagement::CTestCase::Interface() const
+{
+  return tciGetTestCaseTSI(Id());
+}
+
 void freettcn::TM::CTestManagement::CTestCase::Start(const TciParameterListType &parameterlist)
 {
 //   TciTestCaseIdType testCaseId;
@@ -183,10 +193,6 @@ freettcn::TM::CTestManagement::CTestCase &freettcn::TM::CTestManagement::TestCas
 }
 
 
-void freettcn::TM::CTestManagement::ModuleParamsSet()
-{
-}
-
 const freettcn::TM::CTestManagement::TTCList &freettcn::TM::CTestManagement::TCList() const
 {
   return _tcList;
@@ -265,35 +271,6 @@ TciValue freettcn::TM::CTestManagement::ModuleParameterGet(const TciModuleParame
 }
 
 
-void freettcn::TM::CTestManagement::TestCaseInit(const std::string &testCaseId) throw(freettcn::ENotFound)
-{
-  CTestCase &tc = TestCaseGet(testCaseId);
-
-  // set module parameters
-  ModuleParamsSet();
-  
-  // obtain test case parameters
-  TciParameterTypeListType parList = tciGetTestCaseParameters(tc.Id());
-  
-  // obtain Test System Interfaces used by the test case 
-  TriPortIdList portList = tciGetTestCaseTSI(tc.Id());
-  
-  /// @todo Remove temporary solution
-  std::cout << "Test case TSI:" << std::endl;
-  for(int i=0; i<portList.length; i++) {
-    std::cout << " - " <<
-      portList.portIdList[i]->compInst.compName <<
-      " <" << portList.portIdList[i]->compInst.compType.moduleName << "." <<
-      portList.portIdList[i]->compInst.compType.objectName << "> " <<
-      portList.portIdList[i]->portName << "[" <<
-      portList.portIdList[i]->portIndex << "] <" <<
-      portList.portIdList[i]->portType.moduleName << "." <<
-      portList.portIdList[i]->portType.objectName << ">" <<
-      std::endl;
-  }
-}
-
-
 void freettcn::TM::CTestManagement::TestCaseStart(const std::string &testCaseId, const TciParameterListType &parameterlist) throw(ENotFound)
 {
   _tc = &TestCaseGet(testCaseId);
@@ -351,13 +328,6 @@ void freettcn::TM::CTestManagement::TestCaseStop()  throw(EOperationFailed)
     std::cout << "ERROR: Test Case not set" << std::endl;
     throw freettcn::EOperationFailed();
   }
-}
-
-
-void freettcn::TM::CTestManagement::ControlInit()
-{
-  // set module parameters
-  ModuleParamsSet();
 }
 
 
