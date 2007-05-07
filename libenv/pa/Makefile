@@ -25,6 +25,6 @@ BIN_DIR = ../bin
 CPPFLAGS += -fPIC
 
 # files
-CPP_FILES = tri_te_pa.cpp pa.cpp log.cpp timer.cpp
+CPP_FILES = tri_te_pa.cpp pa.cpp paLogMask.cpp timer.cpp
 
 include ../../Makefile.rules

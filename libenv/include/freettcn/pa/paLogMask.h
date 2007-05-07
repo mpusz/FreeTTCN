@@ -1,7 +1,7 @@
 //
 // Copyright (C) 2007 Mateusz Pusz
 //
-// This file is part of freettcn (Free TTCN) library.
+// This file is part of freettcnenv (Free TTCN Environment) library.
 
 // This library is free software; you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -17,25 +17,25 @@
 // along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+
 /**
- * @file   log.h
+ * @file   paLogMask.h
  * @author Mateusz Pusz
- * @date   Wed Apr 25 14:20:53 2007
+ * @date   Mon May  7 13:57:52 2007
  * 
  * @brief  
  * 
  * 
  */
 
-#ifndef __LOG_H__
-#define __LOG_H__
+#ifndef __PALOGMASK_H__
+#define __PALOGMASK_H__
 
 #include <freettcn/tools/logMask.h>
 
-
 namespace freettcn {
-
-  namespace TE {
+  
+  namespace PA {
     
     class CLogMask : public freettcn::CLogMask {
     public:
@@ -43,9 +43,9 @@ namespace freettcn {
       ~CLogMask();
     };
     
-  } // namespace TE
+  } // namespace PA
   
 } // namespace freettcn
 
 
-#endif /* __LOG_H__ */
+#endif /* __PALOGMASK_H__ */

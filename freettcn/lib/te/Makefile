@@ -25,7 +25,7 @@ BIN_DIR = ../bin
 CPPFLAGS += -fPIC
 
 # files
-CPP_FILES = log.cpp sourceData.cpp modulesContainer.cpp \
+CPP_FILES = teLogMask.cpp sourceData.cpp modulesContainer.cpp \
 	type.cpp boolean.cpp basicTypes.cpp \
 	tci_value.cpp tci_tm_te.cpp tci_ch_te.cpp \
 	tri_sa_te.cpp \

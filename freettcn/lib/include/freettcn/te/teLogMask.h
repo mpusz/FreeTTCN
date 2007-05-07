@@ -1,7 +1,7 @@
 //
 // Copyright (C) 2007 Mateusz Pusz
 //
-// This file is part of freettcnenv (Free TTCN Environment) library.
+// This file is part of freettcn (Free TTCN) library.
 
 // This library is free software; you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -17,27 +17,35 @@
 // along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-
 /**
- * @file   log.cpp
+ * @file   teLogMask.h
  * @author Mateusz Pusz
- * @date   Mon May  7 13:18:29 2007
+ * @date   Mon May  7 13:58:29 2007
  * 
  * @brief  
  * 
  * 
  */
 
+#ifndef __TELOGMASK_H__
+#define __TELOGMASK_H__
 
-#include "freettcn/pa/log.h"
+#include <freettcn/tools/logMask.h>
 
 
-freettcn::PA::CLogMask::CLogMask(bool enabled /* true */):
-  freettcn::CLogMask(CMD_PA_NUM, enabled)
-{
-}
+namespace freettcn {
 
-freettcn::PA::CLogMask::~CLogMask()
-{
-}
+  namespace TE {
+    
+    class CLogMask : public freettcn::CLogMask {
+    public:
+      CLogMask(bool enabled = true);
+      ~CLogMask();
+    };
+    
+  } // namespace TE
+  
+} // namespace freettcn
 
+
+#endif /* __TELOGMASK_H__ */
