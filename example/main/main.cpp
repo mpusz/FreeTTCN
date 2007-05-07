@@ -32,6 +32,7 @@
 #include <freettcn/tools/timeStamp.h>
 
 #include <iostream>
+#include <glib.h>
 #include <getopt.h>
 
 
@@ -69,7 +70,25 @@ void Usage()
 }
 
 
-void Run(CTestManagement &tm, const std::string &testCase)
+void Run()
+{
+  // create main event loop
+  GMainLoop *loop = g_main_loop_new(0, FALSE);
+  
+  // add sources
+  freettcn::PA::CPlatformAdaptor &pa = freettcn::PA::CPlatformAdaptor::Instance();
+
+  TriTimerId id;
+  pa.TimerStart(&id, 2.0);
+  
+  g_main_loop_run(loop);
+  
+  // g_main_loop_quit();
+  
+}
+
+
+void Init(CTestManagement &tm, const std::string &testCase)
 {
   try {
     // init timestamping
@@ -122,6 +141,8 @@ void Run(CTestManagement &tm, const std::string &testCase)
       tm.ControlStart();
       //      tm.ControlStop();
     }
+    
+    Run();
   }
   catch(freettcn::Exception &ex) {
     std::cout << "Error: Unhandled freettcn library exception: " << ex.what() << " caught!!!" << std::endl;
@@ -251,5 +272,5 @@ int main (int argc, char **argv)
   }
   
   // run TTCN module
-  Run(tm, testCase);
+  Init(tm, testCase);
 }

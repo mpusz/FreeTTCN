@@ -2467,6 +2467,8 @@ void tliTTimeoutDetected(String am,
                          TriComponentId c,
                          TriTimerId timer)
 {
+  freettcn::TL::CTestLogging &tl = freettcn::TL::CTestLogging::Instance();
+  tl.TTimeoutDetected(am, ts, src, line, c, timer);
 }
 
 
@@ -2536,6 +2538,8 @@ void tliTStart(String am,
                TriTimerId timer,
                TriTimerDuration dur)
 {
+  freettcn::TL::CTestLogging &tl = freettcn::TL::CTestLogging::Instance();
+  tl.TStart(am, ts, src, line, c, timer, dur);
 }
 
 
@@ -2558,6 +2562,8 @@ void tliTStop(String am,
               TriComponentId c,
               TriTimerId timer)
 {
+  freettcn::TL::CTestLogging &tl = freettcn::TL::CTestLogging::Instance();
+  tl.TStop(am, ts, src, line, c, timer);
 }
 
 
@@ -2583,6 +2589,8 @@ void tliTRead(String am,
               TriTimerId timer,
               TriTimerDuration elapsed)
 {
+  freettcn::TL::CTestLogging &tl = freettcn::TL::CTestLogging::Instance();
+  tl.TRead(am, ts, src, line, c, timer, elapsed);
 }
 
 
@@ -2608,6 +2616,8 @@ void tliTRunning(String am,
                  TriTimerId timer,
                  TimerStatus status)
 {
+  freettcn::TL::CTestLogging &tl = freettcn::TL::CTestLogging::Instance();
+  tl.TRunning(am, ts, src, line, c, timer, status);
 }
 
 

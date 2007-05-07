@@ -25,7 +25,7 @@ CPP_FILES = cliTestManagement.cpp glibPlatformAdaptor.cpp main.cpp
 
 # defines
 BIN_DIR = ../bin
-INCLUDE_DIRS = -Iinclude
+INCLUDE_DIRS = -Iinclude `pkg-config --cflags glib-2.0`
 
 # macros
 O_FILES = $(addprefix $(BIN_DIR)/, $(patsubst %.cpp,%.o,$(CPP_FILES)))

@@ -28,8 +28,12 @@
  */
 
 #include "freettcn/pa/timer.h"
+#include "freettcn/pa/pa.h"
+#include "freettcn/pa/paLogMask.h"
+#include <freettcn/tools/timeStamp.h>
 extern "C" {
 #include <freettcn/ttcn3/tri_pa_te.h>
+#include <freettcn/ttcn3/tci_tl.h>
 }
 
 
@@ -44,7 +48,13 @@ freettcn::PA::CTimer::~CTimer()
 
 void freettcn::PA::CTimer::Timeout() const
 {
-  triTimeout(&Id());
+  triTimeout(&_id);
+  
+  freettcn::PA::CPlatformAdaptor &pa = freettcn::PA::CPlatformAdaptor::Instance();
+  if (pa.Logging() && pa.LogMask().Get(freettcn::CLogMask::CMD_PA_T_TIMEOUT_DETECTED)) {
+    TriComponentId comp = { { 0 } };
+    tliTTimeoutDetected(0, pa.TimeStamp().Get(), 0, 0, comp, _id);
+  }
 }
 
 const TriTimerId &freettcn::PA::CTimer::Id() const

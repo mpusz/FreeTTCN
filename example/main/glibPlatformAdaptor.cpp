@@ -20,29 +20,69 @@
 
 #include "glibPlatformAdaptor.h"
 #include <iostream>
+#include <cmath>
 
 
 CTimer::CTimer(const TriTimerId &timerId):
-  freettcn::PA::CTimer(timerId)
+  freettcn::PA::CTimer(timerId), _state(STOPPED)
 {
 }
+
+
+CTimer::~CTimer()
+{
+//   if (gSource)
+//     ;
+}
+
+
+gboolean CTimer::CallbackFunc(gpointer data)
+{
+  CTimer *timer = static_cast<CTimer *>(data);
+  timer->Timeout();
+  timer->State(STOPPED);
+  
+  return FALSE;
+}
+
+
+CTimer::TState CTimer::State() const
+{
+  return _state;
+}
+
+
+void CTimer::State(CTimer::TState state)
+{
+  _state = state;
+}
+
 
 void CTimer::Start(TriTimerDuration duration) throw(freettcn::EOperationFailed)
 {
+  _id = g_timeout_add_full(G_PRIORITY_HIGH, static_cast<guint>(round(duration * 1000)),
+                           CallbackFunc, this, 0);
+  _state = STARTED;
 }
+
 
 void CTimer::Stop() throw(freettcn::EOperationFailed)
 {
+  if (!g_source_remove(_id))
+    throw freettcn::EOperationFailed();
+  _state = STOPPED;
 }
+
 
 TriTimerDuration CTimer::Read() const throw(freettcn::EOperationFailed)
 {
   return 0;
 }
 
+
 bool CTimer::Running() const throw(freettcn::EOperationFailed)
 {
-  return true;
+  return _state == STARTED;
 }
 
 

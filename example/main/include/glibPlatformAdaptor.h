@@ -33,12 +33,27 @@
 
 #include <freettcn/pa/pa.h>
 #include <freettcn/pa/timer.h>
+#include <glib.h>
 
 
 class CTimer : public freettcn::PA::CTimer {
+  enum TState {
+    STOPPED,
+    STARTED
+  };
+  
+  guint _id;
+  TState _state;
+
+  static gboolean CallbackFunc(gpointer data);
+  
+  TState State() const;
+  void State(TState state);
+  
 public:
   CTimer(const TriTimerId &timerId);
-
+  ~CTimer();
+  
   virtual void Start(TriTimerDuration duration) throw(freettcn::EOperationFailed);
   virtual void Stop() throw(freettcn::EOperationFailed);
   virtual TriTimerDuration Read() const throw(freettcn::EOperationFailed);

@@ -164,6 +164,28 @@ namespace freettcn {
                                const TriComponentId &c,
                                TciVerdictValue verdict) const;
 
+      virtual void TTimeoutDetected(const char *am, int ts, const char *src, int line,
+                                    const TriComponentId &c,
+                                    const TriTimerId &timer) const;
+      virtual void TStart(const char *am, int ts, const char *src, int line,
+                          const TriComponentId &c,
+                          const TriTimerId &timer,
+                          TriTimerDuration dur) const;
+      virtual void TStop(const char *am, int ts, const char *src, int line,
+                         const TriComponentId &c,
+                         const TriTimerId &timer) const;
+      virtual void TRead(const char *am, int ts, const char *src, int line,
+                         const TriComponentId &c,
+                         const TriTimerId &timer,
+                         TriTimerDuration elapsed) const;
+      virtual void TRunning(const char *am, int ts, const char *src, int line,
+                            const TriComponentId &c,
+                            const TriTimerId &timer,
+                            TimerStatus status) const;
+
+
+
+
     };
     
   } // namespace TL

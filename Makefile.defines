@@ -162,7 +162,7 @@ quiet_cmd_lib_link = LINK $(BIN_DIR)/$(LIB_FULL_NAME)
 
 # link example
 quiet_cmd_example_link = LINK       $(BIN_DIR)/$(PROG_NAME)
-      cmd_example_link = $(CPP) $(O_FILES) $(MODULES_O_FILES) -l$(PROJECT_NAME) -l$(PROJECT_NAME)env -o $(BIN_DIR)/$(PROG_NAME)
+      cmd_example_link = $(CPP) $(O_FILES) $(MODULES_O_FILES) -l$(PROJECT_NAME) -l$(PROJECT_NAME)env `pkg-config --libs glib-2.0` -o $(BIN_DIR)/$(PROG_NAME)
 
 # install library
 quiet_cmd_lib_install = INSTALL $(LIB_FULL_NAME)

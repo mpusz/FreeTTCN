@@ -31,6 +31,11 @@
 #include "freettcn/pa/pa.h"
 #include "freettcn/pa/timer.h"
 #include <freettcn/tools/tools.h>
+#include "freettcn/pa/paLogMask.h"
+#include <freettcn/tools/timeStamp.h>
+extern "C" {
+#include <freettcn/ttcn3/tci_tl.h>
+}
 #include <iostream>
 
 
@@ -88,7 +93,7 @@ TriStatus freettcn::PA::CPlatformAdaptor::TimerStart(const TriTimerId *timerId, 
   if (!timerId)
     return TRI_ERROR;
   
-  freettcn::PA::CTimer *timer;
+  freettcn::PA::CTimer *timer = 0;
   
   // check if timer running already
   for(TTimerList::const_iterator it=_timerList.begin(); it!=_timerList.end(); ++it) {
@@ -104,6 +109,11 @@ TriStatus freettcn::PA::CPlatformAdaptor::TimerStart(const TriTimerId *timerId, 
   
   timer->Start(timerDuration);
   
+  if (Logging() && LogMask().Get(freettcn::CLogMask::CMD_PA_T_START)) {
+    TriComponentId comp = { { 0 } };
+    tliTStart(0, TimeStamp().Get(), 0, 0, comp, *timerId, timerDuration);
+  }
+  
   return TRI_OK;
 }
 
@@ -117,6 +127,11 @@ TriStatus freettcn::PA::CPlatformAdaptor::TimerStop(const TriTimerId *timerId)
     freettcn::PA::CTimer &timer = TimerGet(*timerId);
     timer.Stop();
     
+    if (Logging() && LogMask().Get(freettcn::CLogMask::CMD_PA_T_STOP)) {
+      TriComponentId comp = { { 0 } };
+      tliTStop(0, TimeStamp().Get(), 0, 0, comp, *timerId);
+    }
+
     return TRI_OK;
   }
   catch(freettcn::Exception) {
@@ -137,6 +152,11 @@ TriStatus freettcn::PA::CPlatformAdaptor::TimerRead(const TriTimerId* timerId, T
     freettcn::PA::CTimer &timer = TimerGet(*timerId);
     *elapsedTime = timer.Read();
     
+    if (Logging() && LogMask().Get(freettcn::CLogMask::CMD_PA_T_READ)) {
+      TriComponentId comp = { { 0 } };
+      tliTStart(0, TimeStamp().Get(), 0, 0, comp, *timerId, *elapsedTime);
+    }
+    
     return TRI_OK;
   }
   catch(freettcn::Exception) {
@@ -156,6 +176,11 @@ TriStatus freettcn::PA::CPlatformAdaptor::TimerRunning(const TriTimerId* timerId
   try {
     freettcn::PA::CTimer &timer = TimerGet(*timerId);
     *running = timer.Running();
+
+    if (Logging() && LogMask().Get(freettcn::CLogMask::CMD_PA_T_RUNNING)) {
+      TriComponentId comp = { { 0 } };
+      tliTRunning(0, TimeStamp().Get(), 0, 0, comp, *timerId, *running ? TCI_runningT : TCI_expiredT);
+    }
   }
   catch(freettcn::Exception) {
     return TRI_ERROR;

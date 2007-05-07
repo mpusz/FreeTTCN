@@ -131,11 +131,11 @@ void freettcn::TL::CLogger::Push(const freettcn::TL::CLogger::CData *data)
   const char *entityStr[] = {
     "TE",
     "TM",
-    "TL",
     "CH",
     "CD",
     "SA",
-    "PA"
+    "PA",
+    "TL"
   };
   ostringstream ostring;
   
@@ -499,6 +499,85 @@ void freettcn::TL::CTestLogging::CTerminated(const char *am, int ts, const char 
   
   sprintf(str, "%p", verdict);                    /**< @todo Obtain verdict value */
   data->LineAdd("Verdict", str);
+  
+  Logger().Push(data);
+}
+
+
+
+
+
+
+void freettcn::TL::CTestLogging::TTimeoutDetected(const char *am, int ts, const char *src, int line,
+                                                  const TriComponentId &c,
+                                                  const TriTimerId &timer) const
+{
+  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, freettcn::CEntity::TYPE_PA,
+                                                                        freettcn::CLogMask::CMD_PA_T_TIMEOUT_DETECTED,
+                                                                        "Timeout Detected");
+  
+  Logger().Push(data);
+}
+
+
+void freettcn::TL::CTestLogging::TStart(const char *am, int ts, const char *src, int line,
+                                        const TriComponentId &c,
+                                        const TriTimerId &timer,
+                                        TriTimerDuration dur) const
+{
+  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, freettcn::CEntity::TYPE_PA,
+                                                                        freettcn::CLogMask::CMD_PA_T_START,
+                                                                        "Timer START");
+  
+//   char str[256];
+//   if (comp.compInst.bits) {
+//     for(int i=0; i<comp.compInst.bits / 8; i++)
+//       sprintf(str, "%s%s%02x", str, i ? "" : " 0x", static_cast<unsigned short>(comp.compInst.data[i]));
+//   }
+  
+
+//   data->LineAdd("From", TriComponentId2String(c, str));
+  
+//   sprintf(str, "%p", verdict);                    /**< @todo Obtain verdict value */
+//   data->LineAdd("Verdict", str);
+  
+  Logger().Push(data);
+}
+
+
+void freettcn::TL::CTestLogging::TStop(const char *am, int ts, const char *src, int line,
+                                       const TriComponentId &c,
+                                       const TriTimerId &timer) const
+{
+  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, freettcn::CEntity::TYPE_PA,
+                                                                        freettcn::CLogMask::CMD_PA_T_STOP,
+                                                                        "Timer STOP");
+  
+  Logger().Push(data);
+}
+
+
+void freettcn::TL::CTestLogging::TRead(const char *am, int ts, const char *src, int line,
+                                       const TriComponentId &c,
+                                       const TriTimerId &timer,
+                                       TriTimerDuration elapsed) const
+{
+  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, freettcn::CEntity::TYPE_PA,
+                                                                        freettcn::CLogMask::CMD_PA_T_READ,
+                                                                        "Timer READ");
+  
+  Logger().Push(data);
+}
+
+
+void freettcn::TL::CTestLogging::TRunning(const char *am, int ts, const char *src, int line,
+                                          const TriComponentId &c,
+                                          const TriTimerId &timer,
+                                          TimerStatus status) const
+{
+  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, freettcn::CEntity::TYPE_PA,
+                                                                        freettcn::CLogMask::CMD_PA_T_RUNNING,
+                                                                        "Timer RUNNING");
   
   Logger().Push(data);
 }
