@@ -60,6 +60,7 @@ freettcn::SA::CSUTAdaptor::~CSUTAdaptor()
 
 TriStatus freettcn::SA::CSUTAdaptor::Reset()
 {
+  /// @todo Reset of SA
   return TRI_OK;
 }
 
@@ -72,12 +73,14 @@ TriStatus freettcn::SA::CSUTAdaptor::TestCaseExecute(const TriTestCaseId &testCa
 
 TriStatus freettcn::SA::CSUTAdaptor::Map(const TriPortId &compPortId, const TriPortId &tsiPortId)
 {
+  /// @todo mapping on SA
   return TRI_OK;
 }
 
 
 TriStatus freettcn::SA::CSUTAdaptor::Unmap(const TriPortId &compPortId, const TriPortId &tsiPortId)
 {
+  /// @todo unmapping on SA
   return TRI_OK;
 }
 

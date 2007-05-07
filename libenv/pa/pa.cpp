@@ -17,23 +17,24 @@
 // along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+/**
+ * @file   pa.cpp
+ * @author Mateusz Pusz
+ * @date   Mon May  7 13:18:49 2007
+ * 
+ * @brief  
+ * 
+ * 
+ */
+
 
 #include "freettcn/pa/pa.h"
-
+#include "freettcn/pa/timer.h"
+#include <freettcn/tools/tools.h>
 extern "C" {
-  //#include "freettcn/tri_pa_te.h"
-  //#include "freettcn/tci_tl.h"
+#include <freettcn/ttcn3/tri_pa_te.h>
 }
-
-
-freettcn::PA::CLogMask::CLogMask(bool enabled /* true */):
-  freettcn::CLogMask(CMD_PA_NUM, enabled)
-{
-}
-
-freettcn::PA::CLogMask::~CLogMask()
-{
-}
+#include <iostream>
 
 
 
@@ -54,12 +55,139 @@ freettcn::PA::CPlatformAdaptor::CPlatformAdaptor()
 
 freettcn::PA::CPlatformAdaptor::~CPlatformAdaptor()
 {
-  //  Clear();
+  Reset();
+  
   _instance = 0;
 }
 
 
 TriStatus freettcn::PA::CPlatformAdaptor::Reset()
+{
+  // stop all timers
+  for(TTimerList::const_iterator it=_timerList.begin(); it!=_timerList.end(); ++it)
+    if ((*it)->Running())
+      (*it)->Stop();
+  
+  // clear timers list
+  Purge(_timerList);
+  
+  return TRI_OK;
+}
+
+
+
+freettcn::PA::CTimer &freettcn::PA::CPlatformAdaptor::TimerGet(const TriTimerId &timerId) const throw(freettcn::ENotFound)
+{
+  for(TTimerList::const_iterator it=_timerList.begin(); it!=_timerList.end(); ++it)
+    if (&timerId == &(*it)->Id())
+      return *(*it);
+  
+  std::cout << "ERROR: Timer not found!!!" << std::endl;
+  throw freettcn::ENotFound();
+}
+
+
+TriStatus freettcn::PA::CPlatformAdaptor::TimerStart(const TriTimerId *timerId, TriTimerDuration timerDuration)
+{
+  if (!timerId)
+    return TRI_ERROR;
+  
+  freettcn::PA::CTimer *timer;
+  
+  // check if timer running already
+  for(TTimerList::const_iterator it=_timerList.begin(); it!=_timerList.end(); ++it) {
+    if (timerId == &(*it)->Id()) {
+      timer = *it;
+      break;
+    }
+  }
+  
+  if (!timer)
+    // create new timer
+    timer = TimerCreate(*timerId);
+  
+  timer->Start(timerDuration);
+  
+  return TRI_OK;
+}
+
+
+TriStatus freettcn::PA::CPlatformAdaptor::TimerStop(const TriTimerId *timerId)
+{
+  if (!timerId)
+    return TRI_ERROR;
+  
+  try {
+    freettcn::PA::CTimer &timer = TimerGet(*timerId);
+    timer.Stop();
+    
+    return TRI_OK;
+  }
+  catch(freettcn::Exception) {
+    return TRI_ERROR;
+  }
+}
+
+
+TriStatus freettcn::PA::CPlatformAdaptor::TimerRead(const TriTimerId* timerId, TriTimerDuration* elapsedTime)
+{
+  if (!timerId)
+    return TRI_ERROR;
+  
+  if (!elapsedTime)
+    return TRI_ERROR;
+  
+  try {
+    freettcn::PA::CTimer &timer = TimerGet(*timerId);
+    *elapsedTime = timer.Read();
+    
+    return TRI_OK;
+  }
+  catch(freettcn::Exception) {
+    return TRI_ERROR;
+  }
+}
+
+
+TriStatus freettcn::PA::CPlatformAdaptor::TimerRunning(const TriTimerId* timerId, unsigned char* running)
+{
+  if (!timerId)
+    return TRI_ERROR;
+  
+  if (!running)
+    return TRI_ERROR;
+  
+  try {
+    freettcn::PA::CTimer &timer = TimerGet(*timerId);
+    *running = timer.Running();
+  }
+  catch(freettcn::Exception) {
+    return TRI_ERROR;
+  }
+  
+  return TRI_OK;
+}
+
+
+void freettcn::PA::CPlatformAdaptor::TimerTimeOut(CTimer *timer)
+{
+  for(TTimerList::iterator it=_timerList.begin(); it!=_timerList.end(); ++it) {
+    if (timer == *it) {
+      triTimeout(&(*it)->Id());
+      
+      // delete timer and remove from the list
+      delete *it;
+      _timerList.erase(it);
+      
+      break;
+    }
+  }
+}
+
+
+TriStatus freettcn::PA::CPlatformAdaptor::ExternalFunction(const TriFunctionId* functionId,
+                                                           TriParameterList* parameterList,
+                                                           TriParameter* returnValue)
 {
   return TRI_OK;
 }

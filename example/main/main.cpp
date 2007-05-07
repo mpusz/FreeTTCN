@@ -22,9 +22,10 @@
 #include <freettcn/ch/ch.h>
 #include <freettcn/tm/tm.h>
 #include <freettcn/pa/pa.h>
+#include <freettcn/pa/paLogMask.h>
 #include <freettcn/sa/sa.h>
 #include <freettcn/te/te.h>
-#include <freettcn/te/log.h>
+#include <freettcn/te/teLogMask.h>
 #include <freettcn/te/module.h>
 #include <freettcn/te/modulesContainer.h>
 #include <freettcn/tools/exception.h>

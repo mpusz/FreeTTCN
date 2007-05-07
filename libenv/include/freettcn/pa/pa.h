@@ -34,22 +34,26 @@
 extern "C" {
 #include <freettcn/ttcn3/tri.h>
 }
-#include <freettcn/tools/logMask.h>
 #include <freettcn/tools/entity.h>
+#include <list>
+
 
 namespace freettcn {
   
   namespace PA {
     
-    class CLogMask : public freettcn::CLogMask {
-    public:
-      CLogMask(bool enabled = true);
-      ~CLogMask();
-    };
-
+    class CTimer;
     
     class CPlatformAdaptor : public freettcn::CEntity {
+      typedef std::list<CTimer *> TTimerList;
+      
       static CPlatformAdaptor *_instance;
+      
+      CTimer &TimerGet(const TriTimerId &timerId) const throw(ENotFound);
+      virtual CTimer *TimerCreate(const TriTimerId &timerId) const = 0;
+
+    protected:
+      TTimerList _timerList;
       
       CPlatformAdaptor& operator=(CPlatformAdaptor&);  // Disallowed
       CPlatformAdaptor(const CPlatformAdaptor&);       // Disallowed
@@ -60,6 +64,17 @@ namespace freettcn {
       virtual ~CPlatformAdaptor();
       
       TriStatus Reset();
+      
+      TriStatus TimerStart(const TriTimerId *timerId, TriTimerDuration timerDuration);
+      TriStatus TimerStop(const TriTimerId *timerId);
+      TriStatus TimerRead(const TriTimerId* timerId, TriTimerDuration* elapsedTime);
+      TriStatus TimerRunning(const TriTimerId* timerId, unsigned char* running);
+      
+      void TimerTimeOut(CTimer *timer);
+      
+      TriStatus ExternalFunction(const TriFunctionId* functionId,
+                                 TriParameterList* parameterList,
+                                 TriParameter* returnValue);
     };
     
   } // namespace PA
@@ -68,36 +83,3 @@ namespace freettcn {
 
 
 #endif /* __PA_H__ */
-
-
-// #include "ttcn3.h"
-
-// extern "C" {
-// #include "tri_pa_te.h"
-// }
-
-
-// namespace PA {
-  
-//   class Timer : public TTCN3::Timer {
-//     void Start(double duration) throw(EOperationFailed);
-//     void Stop() throw(EOperationFailed);
-//     double Read() const throw(EOperationFailed);
-//     bool Running() const throw(EOperationFailed);
-    
-//   public:
-//     friend TriStatus triStartTimer(const TriTimerId*, TriTimerDuration);
-//     friend TriStatus triStopTimer(const TriTimerId*);
-//     friend TriStatus triReadTimer(const TriTimerId*, TriTimerDuration*);
-//     friend TriStatus triTimerRunning(const TriTimerId*, unsigned char*);
-    
-//     void TimeOut() const;
-//   };
-  
-// }
-
-
-// void PA::Timer::TimeOut() const
-// {
-//   triTimeout(Id());
-// }

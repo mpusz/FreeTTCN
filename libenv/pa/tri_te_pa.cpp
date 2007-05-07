@@ -25,8 +25,48 @@ extern "C" {
 
 
 
+TriStatus triStartTimer(const TriTimerId* timerId,
+                        TriTimerDuration timerDuration)
+{
+  freettcn::PA::CPlatformAdaptor &pa = freettcn::PA::CPlatformAdaptor::Instance();
+  return pa.TimerStart(timerId, timerDuration);
+}
+
+
+TriStatus triStopTimer(const TriTimerId* timerId)
+{
+  freettcn::PA::CPlatformAdaptor &pa = freettcn::PA::CPlatformAdaptor::Instance();
+  return pa.TimerStop(timerId);
+}
+
+
+TriStatus triReadTimer(const TriTimerId* timerId,
+                       TriTimerDuration* elapsedTime)
+{
+  freettcn::PA::CPlatformAdaptor &pa = freettcn::PA::CPlatformAdaptor::Instance();
+  return pa.TimerRead(timerId, elapsedTime);
+}
+
+
+TriStatus triTimerRunning(const TriTimerId* timerId,
+                          unsigned char* running)
+{
+  freettcn::PA::CPlatformAdaptor &pa = freettcn::PA::CPlatformAdaptor::Instance();
+  return pa.TimerRunning(timerId, running);
+}
+
+
 TriStatus triPAReset()
 {
   freettcn::PA::CPlatformAdaptor &pa = freettcn::PA::CPlatformAdaptor::Instance();
   return pa.Reset();
+}
+
+
+TriStatus triExternalFunction(const TriFunctionId* functionId,
+                              TriParameterList* parameterList,
+                              TriParameter* returnValue)
+{
+  freettcn::PA::CPlatformAdaptor &pa = freettcn::PA::CPlatformAdaptor::Instance();
+  return pa.ExternalFunction(functionId, parameterList, returnValue);
 }

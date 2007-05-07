@@ -88,7 +88,8 @@ namespace freettcn {
         CModule *_module;
         TciTestComponentKindType _kind;
         TriComponentId _id;
-        std::string _instId;
+//         TTimerList explicitTimers;
+//         TTimerList implicitTimers;
         
         virtual void Initialize() = 0;
       public:
