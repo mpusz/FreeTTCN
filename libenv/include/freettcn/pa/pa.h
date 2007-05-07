@@ -70,8 +70,6 @@ namespace freettcn {
       TriStatus TimerRead(const TriTimerId* timerId, TriTimerDuration* elapsedTime);
       TriStatus TimerRunning(const TriTimerId* timerId, unsigned char* running);
       
-      void TimerTimeOut(CTimer *timer);
-      
       TriStatus ExternalFunction(const TriFunctionId* functionId,
                                  TriParameterList* parameterList,
                                  TriParameter* returnValue);

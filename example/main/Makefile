@@ -21,7 +21,7 @@ include ../../Makefile.defines
 
 
 # files
-CPP_FILES = main.cpp
+CPP_FILES = cliTestManagement.cpp glibPlatformAdaptor.cpp main.cpp
 
 # defines
 BIN_DIR = ../bin

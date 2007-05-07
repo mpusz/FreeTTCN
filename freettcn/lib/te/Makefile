@@ -28,7 +28,7 @@ CPPFLAGS += -fPIC
 CPP_FILES = teLogMask.cpp sourceData.cpp modulesContainer.cpp \
 	type.cpp boolean.cpp basicTypes.cpp \
 	tci_value.cpp tci_tm_te.cpp tci_ch_te.cpp \
-	tri_sa_te.cpp \
+	tri_pa_te.cpp tri_sa_te.cpp \
 	te.cpp initObject.cpp module.cpp testCase.cpp testComponent.cpp behavior.cpp port.cpp
 
 

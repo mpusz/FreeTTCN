@@ -382,3 +382,10 @@ void freettcn::TE::CTTCNExecutable::Reset() const
   // stop running module
   RootModule().Reset();
 }
+
+
+
+// PA requests
+void freettcn::TE::CTTCNExecutable::Timeout(const TriTimerId* timerId)
+{
+}

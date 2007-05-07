@@ -44,7 +44,7 @@ namespace freettcn {
       const TriTimerId &_id;
       
     protected:
-      void TimeOut() const;
+      void Timeout() const;
       
     public:
       CTimer(const TriTimerId &timerId);

@@ -1,7 +1,7 @@
 //
 // Copyright (C) 2007 Mateusz Pusz
 //
-// This file is part of freettcnenv (Free TTCN Environment) library.
+// This file is part of freettcn (Free TTCN) library.
 
 // This library is free software; you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -18,37 +18,24 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /**
- * @file   timer.cpp
+ * @file   tri_pa_te.cpp
  * @author Mateusz Pusz
- * @date   Mon May  7 13:20:13 2007
+ * @date   Mon May  7 14:36:01 2007
  * 
  * @brief  
  * 
  * 
  */
 
-#include "freettcn/pa/timer.h"
+
 extern "C" {
-#include <freettcn/ttcn3/tri_pa_te.h>
+#include "freettcn/ttcn3/tri_pa_te.h"
 }
+#include "freettcn/te/te.h"
 
 
-freettcn::PA::CTimer::CTimer(const TriTimerId &timerId):
-  _id(timerId)
+void triTimeout(const TriTimerId* timerId)
 {
+  freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
+  te.Timeout(timerId);
 }
-
-freettcn::PA::CTimer::~CTimer()
-{
-}
-
-void freettcn::PA::CTimer::Timeout() const
-{
-  triTimeout(&Id());
-}
-
-const TriTimerId &freettcn::PA::CTimer::Id() const
-{
-  return _id;
-}
-

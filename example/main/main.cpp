@@ -18,60 +18,24 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
+#include "cliTestManagement.h"
+#include "glibPlatformAdaptor.h"
+
 #include <freettcn/tl/tl.h>
 #include <freettcn/ch/ch.h>
-#include <freettcn/tm/tm.h>
-#include <freettcn/pa/pa.h>
 #include <freettcn/pa/paLogMask.h>
 #include <freettcn/sa/sa.h>
 #include <freettcn/te/te.h>
 #include <freettcn/te/teLogMask.h>
 #include <freettcn/te/module.h>
 #include <freettcn/te/modulesContainer.h>
-#include <freettcn/tools/exception.h>
 #include <freettcn/tools/timeStamp.h>
+
 #include <iostream>
 #include <getopt.h>
 
 
 using namespace std;
-
-
-class CTestManagement : public freettcn::TM::CTestManagement {
-public:
-  void TestCasesPrint() const
-  {
-    const freettcn::TM::CTestManagement::TTCList &tcList = TCList();
-    for(TTCList::const_iterator it=tcList.begin(); it != tcList.end(); ++it) {
-      TciTestCaseIdType id = (*it)->Id();
-      std::cout << " - " << id.moduleName << "." << id.objectName << std::endl;
-    }
-  }
-  
-  void TestCasesInfoPrint(const std::string &testCaseId) const throw(freettcn::ENotFound)
-  {
-    CTestCase &tc = TestCaseGet(testCaseId);
-    
-    // obtain test case parameters
-//     TciParameterTypeListType parList = tc.Parameters();
-    
-    // obtain Test System Interfaces used by the test case 
-    TriPortIdList portList = tc.Interface();
-    
-    std::cout << "Test System Interface:" << std::endl;
-    for(int i=0; i<portList.length; i++) {
-      std::cout << " - " <<
-        portList.portIdList[i]->compInst.compName <<
-        " <" << portList.portIdList[i]->compInst.compType.moduleName << "." <<
-        portList.portIdList[i]->compInst.compType.objectName << "> " <<
-        portList.portIdList[i]->portName << "[" <<
-        portList.portIdList[i]->portIndex << "] <" <<
-        portList.portIdList[i]->portType.moduleName << "." <<
-        portList.portIdList[i]->portType.objectName << ">" <<
-        std::endl;
-    }
-  }
-};
 
 
 void Usage()
@@ -120,7 +84,7 @@ void Run(CTestManagement &tm, const std::string &testCase)
     // initiate all entities
     freettcn::CH::CComponentHandler ch;
 //     freettcn::CD::CComponentHandler cd;
-    freettcn::PA::CPlatformAdaptor pa;
+    CPlatformAdaptor pa;
     freettcn::SA::CSUTAdaptor sa;
     freettcn::TL::CTestLogging tl(logger);
     

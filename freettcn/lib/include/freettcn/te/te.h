@@ -81,6 +81,9 @@ namespace freettcn {
       void TestComponentTerminated(const TriComponentId &componentId, TciVerdictValue verdict) const;
       void TestCaseExecute(const TciTestCaseIdType &testCaseId, const TriPortIdList &tsiPortList) const;
       void Reset() const;
+      
+      // PA requests
+      void Timeout(const TriTimerId* timerId);
     };
     
   } // namespace TE

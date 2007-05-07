@@ -31,11 +31,7 @@
 #include "freettcn/pa/pa.h"
 #include "freettcn/pa/timer.h"
 #include <freettcn/tools/tools.h>
-extern "C" {
-#include <freettcn/ttcn3/tri_pa_te.h>
-}
 #include <iostream>
-
 
 
 freettcn::PA::CPlatformAdaptor *freettcn::PA::CPlatformAdaptor::_instance = 0;
@@ -166,22 +162,6 @@ TriStatus freettcn::PA::CPlatformAdaptor::TimerRunning(const TriTimerId* timerId
   }
   
   return TRI_OK;
-}
-
-
-void freettcn::PA::CPlatformAdaptor::TimerTimeOut(CTimer *timer)
-{
-  for(TTimerList::iterator it=_timerList.begin(); it!=_timerList.end(); ++it) {
-    if (timer == *it) {
-      triTimeout(&(*it)->Id());
-      
-      // delete timer and remove from the list
-      delete *it;
-      _timerList.erase(it);
-      
-      break;
-    }
-  }
 }
 
 
