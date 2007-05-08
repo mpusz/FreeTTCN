@@ -30,6 +30,7 @@
 #include "freettcn/te/testComponent.h"
 #include "freettcn/te/module.h"
 #include "freettcn/te/port.h"
+#include "freettcn/te/timer.h"
 #include "freettcn/tools/tools.h"
 
 
@@ -92,6 +93,8 @@ freettcn::TE::CTestComponentType::CInstance::CInstance(const CType &type):
 
 freettcn::TE::CTestComponentType::CInstance::~CInstance()
 {
+  Purge(_explicitTimers);
+  Purge(_implicitTimers);
 }
 
 
@@ -100,22 +103,7 @@ void freettcn::TE::CTestComponentType::CInstance::Init(freettcn::TE::CModule &mo
   _module = &module;
   _kind = kind;
   
-//   char str[32];
-//   sprintf(str, "%p", static_cast<void *>(this));
-//   printf("@@: %p\n", static_cast<void *>(this));
-//   _instId = str;
-  
-//   _id.compInst.data = reinterpret_cast<unsigned char *>(const_cast<char *>(_instId.c_str())); /**< @todo Create unique identifier */
-  
-  unsigned char *instId = new unsigned char[4];
-  instId[0] = 0x01;
-  instId[1] = 0x02;
-  instId[2] = 0x03;
-  instId[3] = 0x04;
-  
-  _id.compInst.data = instId;
-  _id.compInst.bits = 4 * 8;
-  _id.compInst.aux = this;
+  _id.compInst = InstanceId();
   _id.compName = name;
   _id.compType = Type().Id();
   

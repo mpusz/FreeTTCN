@@ -103,9 +103,11 @@ TriStatus freettcn::PA::CPlatformAdaptor::TimerStart(const TriTimerId *timerId, 
     }
   }
   
-  if (!timer)
+  if (!timer) {
     // create new timer
     timer = TimerCreate(*timerId);
+    _timerList.push_back(timer);
+  }
   
   timer->Start(timerDuration);
   

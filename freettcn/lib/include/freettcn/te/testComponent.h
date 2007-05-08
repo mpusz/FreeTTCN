@@ -36,9 +36,11 @@ extern "C" {
 #include <freettcn/ttcn3/tri.h>
 }
 #include <freettcn/te/type.h>
+#include <freettcn/te/idObject.h>
 #include <freettcn/tools/exception.h>
 #include <string>
 #include <vector>
+#include <list>
 
 
 namespace freettcn {
@@ -55,10 +57,11 @@ namespace freettcn {
     
     class CBehavior;
     class CPortType;
+    class CTimer;
     
     class CTestComponentType : public CType {
     public:
-      class CInstance : public CType::CInstance {
+      class CInstance : public CType::CInstance, public CIdObject {
       public:
         class ENotInited : public freettcn::EOperationFailed {};
         
@@ -83,13 +86,15 @@ namespace freettcn {
           // SNAP_KILLED (supports snapshot semantics of test component; when a snapshot is taken, a copy of the KILLED list of module state will be assigned)
           // KEEP_ALIVE (indicated wheter the entity can be restarted after its termination or not; 'true' if the entity can be restarted)
         };
-                
+        
+        typedef std::list<CTimer *> TTimerList;
+        
         bool _inited;
         CModule *_module;
         TciTestComponentKindType _kind;
         TriComponentId _id;
-//         TTimerList explicitTimers;
-//         TTimerList implicitTimers;
+        TTimerList _explicitTimers;
+        TTimerList _implicitTimers;
         
         virtual void Initialize() = 0;
       public:

@@ -52,7 +52,7 @@ namespace freettcn {
 //       VERDICT_ERROR
 //     };
     
-    class CTimer {
+    class CTimer : public CIdObject {
       class CState {
         // STATUS:
         //  - IDLE
@@ -64,9 +64,19 @@ namespace freettcn {
         // SNAP_VALUE - when taking a snapshot it gets the actual value of ACT_DURATION - TIME_LEFT
         // SNAP_STATUS - when taking a snapshot it gets the same value as STATUS
       };
+      
     public:
       CTimer();
       CTimer(double val);
+      
+      const TriTimerId &Id() const;
+      
+      void Start(TriTimerDuration duration) throw(EOperationFailed);
+      void Stop() throw(EOperationFailed);
+      TriTimerDuration Read() const throw(EOperationFailed);
+      bool Running() const throw(EOperationFailed);
+      
+      void Timeout() const;
     };
     
   } // namespace TE

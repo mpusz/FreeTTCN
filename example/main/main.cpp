@@ -75,81 +75,72 @@ void Run()
   // create main event loop
   GMainLoop *loop = g_main_loop_new(0, FALSE);
   
-  // add sources
   freettcn::PA::CPlatformAdaptor &pa = freettcn::PA::CPlatformAdaptor::Instance();
-
   TriTimerId id;
-  pa.TimerStart(&id, 2.0);
+  pa.TimerStart(&id, 1.234);
   
   g_main_loop_run(loop);
   
   // g_main_loop_quit();
-  
 }
 
 
-void Init(CTestManagement &tm, const std::string &testCase)
+
+void Start(CTestManagement &tm, const std::string &testCase)
 {
-  try {
-    // init timestamping
-    freettcn::CTimeStamp ts(4);
+  // init timestamping
+  freettcn::CTimeStamp ts(4);
     
-    // init logger
-    freettcn::TL::CLogger logger(ts);
+  // init logger
+  freettcn::TL::CLogger logger(ts);
     
-    // get TE
-    freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
+  // get TE
+  freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
     
-    // initiate all entities
-    freettcn::CH::CComponentHandler ch;
-//     freettcn::CD::CComponentHandler cd;
-    CPlatformAdaptor pa;
-    freettcn::SA::CSUTAdaptor sa;
-    freettcn::TL::CTestLogging tl(logger);
+  // initiate all entities
+  freettcn::CH::CComponentHandler ch;
+  //     freettcn::CD::CComponentHandler cd;
+  CPlatformAdaptor pa;
+  freettcn::SA::CSUTAdaptor sa;
+  freettcn::TL::CTestLogging tl(logger);
     
-    // create log masks for all entities
-    freettcn::TE::CLogMask teLogMask(true);
-    freettcn::TM::CLogMask tmLogMask(true);
-    freettcn::CH::CLogMask chLogMask(true);
-    freettcn::PA::CLogMask paLogMask(true);
-    freettcn::SA::CLogMask saLogMask(true);
+  // create log masks for all entities
+  freettcn::TE::CLogMask teLogMask(true);
+  freettcn::TM::CLogMask tmLogMask(true);
+  freettcn::CH::CLogMask chLogMask(true);
+  freettcn::PA::CLogMask paLogMask(true);
+  freettcn::SA::CLogMask saLogMask(true);
     
-    // set logging in all entities
-    te.LogEnable(ts, teLogMask);
-    tm.LogEnable(ts, tmLogMask);
-    ch.LogEnable(ts, chLogMask);
-    pa.LogEnable(ts, paLogMask);
-    sa.LogEnable(ts, saLogMask);
+  // set logging in all entities
+  te.LogEnable(ts, teLogMask);
+  tm.LogEnable(ts, tmLogMask);
+  ch.LogEnable(ts, chLogMask);
+  pa.LogEnable(ts, paLogMask);
+  sa.LogEnable(ts, saLogMask);
     
-    if (testCase != "") {
-      // run specified test case
-      TciParameterListType parameterlist;
-      parameterlist.length = 0;
-      parameterlist.parList = 0;
+  if (testCase != "") {
+    // run specified test case
+    TciParameterListType parameterlist;
+    parameterlist.length = 0;
+    parameterlist.parList = 0;
       
-      try {
-        tm.TestCaseStart(testCase, parameterlist);
+    try {
+      tm.TestCaseStart(testCase, parameterlist);
       //      tm.TestCaseStop();
-      }
-      catch(freettcn::Exception) {
-        std::cout << "Error: Could not init test case '" << testCase << "'" << std::endl;
-        exit(0);
-      }
     }
-    else {
-      // run control part
-      tm.ControlStart();
-      //      tm.ControlStop();
+    catch(freettcn::Exception) {
+      std::cout << "Error: Could not init test case '" << testCase << "'" << std::endl;
+      exit(0);
     }
-    
-    Run();
   }
-  catch(freettcn::Exception &ex) {
-    std::cout << "Error: Unhandled freettcn library exception: " << ex.what() << " caught!!!" << std::endl;
+  else {
+    // run control part
+    tm.ControlStart();
+    //      tm.ControlStop();
   }
-  catch(exception &ex) {
-    std::cout << "Error: Unhandled system exception: " << ex.what() << " caught!!!" << std::endl;
-  }
+  
+  // run
+  Run();
 }
 
 
@@ -271,6 +262,14 @@ int main (int argc, char **argv)
     exit(0);
   }
   
-  // run TTCN module
-  Init(tm, testCase);
+  try {
+    // start TTCN module
+    Start(tm, testCase);
+  }
+  catch(freettcn::Exception &ex) {
+    std::cout << "Error: Unhandled freettcn library exception: " << ex.what() << " caught!!!" << std::endl;
+  }
+  catch(exception &ex) {
+    std::cout << "Error: Unhandled system exception: " << ex.what() << " caught!!!" << std::endl;
+  }
 }

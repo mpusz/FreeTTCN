@@ -89,7 +89,7 @@ int freettcn::CTimeStamp::Convert(TTime &value) const
     Sub(value, _absTimeOffset);
 
     int base = static_cast<int>(pow(10, _precision));
-    return value.sec * base + value.usec * base / 1000000;
+    return value.sec * base + static_cast<int>(value.usec * (base / 1000000.0));
   }
   else {
     return value.sec - _absTimeOffset.sec;
@@ -102,7 +102,7 @@ void freettcn::CTimeStamp::Convert(int ts, TTime &value) const
   if (_precision) {
     int base = static_cast<int>(pow(10, _precision));
     value.sec = ts / base;
-    value.usec = (ts - value.sec * base) * 1000000 / base;
+    value.usec = (ts - value.sec * base) * (1000000 / base);
     
     if (_mode == MODE_ABSOLUTE)
       Add(value, _absTimeOffset);
