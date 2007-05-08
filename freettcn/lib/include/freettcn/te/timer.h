@@ -30,18 +30,15 @@
 #ifndef __TIMER_H__
 #define __TIMER_H__
 
+#include <freettcn/te/idObject.h>
 extern "C" {
-// #include "freettcn/tci.h"
-// #include "freettcn/tri.h"
+#include <freettcn/ttcn3/tri.h>
 }
-// #include "tools.h"
-// #include "ttcn_values.h"
-// #include <string>
-// #include <vector>
+#include <freettcn/tools/exception.h>
 
 
 namespace freettcn {
-
+  
   namespace TE {
     
 //     enum TVerdictType_t {
@@ -65,12 +62,17 @@ namespace freettcn {
         // SNAP_STATUS - when taking a snapshot it gets the same value as STATUS
       };
       
+      const bool _defaultDurationValid;
+      TriTimerDuration _defaultDuration;
+      
     public:
       CTimer();
-      CTimer(double val);
+      CTimer(TriTimerDuration defaultDuration) throw(EOperationFailed);
+      ~CTimer();
       
       const TriTimerId &Id() const;
       
+      void Start() throw(EOperationFailed);
       void Start(TriTimerDuration duration) throw(EOperationFailed);
       void Stop() throw(EOperationFailed);
       TriTimerDuration Read() const throw(EOperationFailed);

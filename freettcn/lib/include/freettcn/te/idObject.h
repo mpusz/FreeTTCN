@@ -61,6 +61,7 @@ namespace freettcn {
         
       public:
         CIdManager();
+        ~CIdManager();
         void Allocate(CIdObject &object, BinaryString &id);
         CIdObject &Object(const BinaryString &id) throw(ENotFound);
         void Free(const BinaryString &id) throw(ENotFound);

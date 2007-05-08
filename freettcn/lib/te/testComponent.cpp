@@ -126,7 +126,9 @@ const TriComponentId &freettcn::TE::CTestComponentType::CInstance::Id() const th
 void freettcn::TE::CTestComponentType::CInstance::Start(const freettcn::TE::CBehavior &behavior, TciParameterListType parameterList) throw(freettcn::TE::CTestComponentType::CInstance::ENotInited)
 {
   // schedule executing test component
-  //   Timer().Start();
+  freettcn::TE::CTimer *timer = new freettcn::TE::CTimer(0);
+  _implicitTimers.push_back(timer);
+  timer->Start();
 }
 
 

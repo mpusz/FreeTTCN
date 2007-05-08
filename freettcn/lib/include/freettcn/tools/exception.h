@@ -17,8 +17,18 @@
 // along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef EXCEPTION_H
-#define EXCEPTION_H
+/**
+ * @file   exception.h
+ * @author Mateusz Pusz
+ * @date   Tue May  8 11:19:20 2007
+ * 
+ * @brief  
+ * 
+ * 
+ */
+
+#ifndef __EXCEPTION_H__
+#define __EXCEPTION_H__
 
 #include <exception>
 
@@ -53,4 +63,4 @@ namespace freettcn {
 
 }
 
-#endif /* EXCEPTION_H */
+#endif /* __EXCEPTION_H__ */

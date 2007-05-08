@@ -83,7 +83,7 @@ namespace freettcn {
       void Reset() const;
       
       // PA requests
-      void Timeout(const TriTimerId* timerId);
+      void Timeout(const TriTimerId* timerId) throw(ENotFound);
     };
     
   } // namespace TE

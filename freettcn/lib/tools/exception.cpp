@@ -17,6 +17,16 @@
 // along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+/**
+ * @file   exception.cpp
+ * @author Mateusz Pusz
+ * @date   Tue May  8 11:19:39 2007
+ * 
+ * @brief  
+ * 
+ * 
+ */
+
 #include "freettcn/tools/exception.h"
 #include <cxxabi.h>
 #include <cstdio>

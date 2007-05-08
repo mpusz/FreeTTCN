@@ -186,7 +186,7 @@ freettcn::TL::CLogger &freettcn::TL::CTestLogging::Logger() const
 
 /* ********************** L O G   F U N C T I O N S *********************************** */
 
-const char *freettcn::TL::CTestLogging::BinaryString2String(const BinaryString &binStr, char *str) const
+const char *freettcn::TL::CTestLogging::Buffer2String(const BinaryString &binStr, char *str) const
 {
   str[0] = 0;
   
@@ -206,14 +206,23 @@ const char *freettcn::TL::CTestLogging::BinaryString2String(const BinaryString &
 }
 
 
+const char *freettcn::TL::CTestLogging::InstanceId2String(const BinaryString &inst, char *str) const
+{
+  str[0] = 0;
+  
+  if (inst.bits)
+    for(int i=0; i<inst.bits / 8; i++)
+      sprintf(str, "%s%s%02x", str, i ? "" : "0x", static_cast<unsigned short>(inst.data[i]));
+  
+  return str;
+}
+
+
 const char *freettcn::TL::CTestLogging::TriComponentId2String(const TriComponentId &comp, char *str) const
 {
-  sprintf(str, "<%s.%s>", comp.compType.moduleName, comp.compType.objectName);
-  
-  if (comp.compInst.bits) {
-    for(int i=0; i<comp.compInst.bits / 8; i++)
-      sprintf(str, "%s%s%02x", str, i ? "" : " 0x", static_cast<unsigned short>(comp.compInst.data[i]));
-  }
+  char str1[256];
+  sprintf(str, "<%s.%s> %s", comp.compType.moduleName, comp.compType.objectName,
+          InstanceId2String(comp.compInst, str1));
   
   if (strcmp(comp.compName, ""))
     sprintf(str, "%s ('%s')", str, comp.compName);
@@ -516,6 +525,9 @@ void freettcn::TL::CTestLogging::TTimeoutDetected(const char *am, int ts, const 
                                                                         freettcn::CLogMask::CMD_PA_T_TIMEOUT_DETECTED,
                                                                         "Timeout Detected");
   
+  char str[256];
+  data->LineAdd("Timer Id", InstanceId2String(timer, str));
+  
   Logger().Push(data);
 }
 
@@ -529,17 +541,11 @@ void freettcn::TL::CTestLogging::TStart(const char *am, int ts, const char *src,
                                                                         freettcn::CLogMask::CMD_PA_T_START,
                                                                         "Timer START");
   
-//   char str[256];
-//   if (comp.compInst.bits) {
-//     for(int i=0; i<comp.compInst.bits / 8; i++)
-//       sprintf(str, "%s%s%02x", str, i ? "" : " 0x", static_cast<unsigned short>(comp.compInst.data[i]));
-//   }
+  char str[256];
+  data->LineAdd("Timer Id", InstanceId2String(timer, str));
   
-
-//   data->LineAdd("From", TriComponentId2String(c, str));
-  
-//   sprintf(str, "%p", verdict);                    /**< @todo Obtain verdict value */
-//   data->LineAdd("Verdict", str);
+  sprintf(str, "%f", dur);
+  data->LineAdd("Duration", str);
   
   Logger().Push(data);
 }
@@ -552,6 +558,9 @@ void freettcn::TL::CTestLogging::TStop(const char *am, int ts, const char *src, 
   freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, freettcn::CEntity::TYPE_PA,
                                                                         freettcn::CLogMask::CMD_PA_T_STOP,
                                                                         "Timer STOP");
+  
+  char str[256];
+  data->LineAdd("Timer Id", InstanceId2String(timer, str));
   
   Logger().Push(data);
 }
@@ -566,6 +575,12 @@ void freettcn::TL::CTestLogging::TRead(const char *am, int ts, const char *src, 
                                                                         freettcn::CLogMask::CMD_PA_T_READ,
                                                                         "Timer READ");
   
+  char str[256];
+  data->LineAdd("Timer Id", InstanceId2String(timer, str));
+  
+  sprintf(str, "%f", elapsed);
+  data->LineAdd("Elapsed", str);
+  
   Logger().Push(data);
 }
 
@@ -578,6 +593,12 @@ void freettcn::TL::CTestLogging::TRunning(const char *am, int ts, const char *sr
   freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, freettcn::CEntity::TYPE_PA,
                                                                         freettcn::CLogMask::CMD_PA_T_RUNNING,
                                                                         "Timer RUNNING");
+  
+  char str[256];
+  data->LineAdd("Timer Id", InstanceId2String(timer, str));
+  
+  sprintf(str, "%s", status == TCI_runningT ? "RUNNING" : status == TCI_inactiveT ? "INACTIVE" : "EXPIRED");
+  data->LineAdd("Elapsed", str);
   
   Logger().Push(data);
 }

@@ -65,6 +65,16 @@ freettcn::TE::CIdObject::CIdManager::CIdManager()
 {
 }
 
+freettcn::TE::CIdObject::CIdManager::~CIdManager()
+{
+  for(unsigned int i=0; i<_idArray.size(); i++) {
+    if (_idArray[i].valid) {
+      std::cout << "WARNING: Object not deleted" << std::endl;
+      delete _idArray[i].ptr;
+    }
+  }
+}
+
 unsigned int freettcn::TE::CIdObject::CIdManager::Id2Index(const BinaryString &id) const
 {
   unsigned int idx = 0;

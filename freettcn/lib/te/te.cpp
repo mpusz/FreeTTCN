@@ -34,6 +34,7 @@
 #include "freettcn/te/modulesContainer.h"
 #include "freettcn/te/behavior.h"
 #include "freettcn/te/testCase.h"
+#include "freettcn/te/timer.h"
 #include "freettcn/tools/logMask.h"
 #include "freettcn/tools/timeStamp.h"
 extern "C" {
@@ -386,6 +387,19 @@ void freettcn::TE::CTTCNExecutable::Reset() const
 
 
 // PA requests
-void freettcn::TE::CTTCNExecutable::Timeout(const TriTimerId* timerId)
+void freettcn::TE::CTTCNExecutable::Timeout(const TriTimerId* timerId) throw(freettcn::ENotFound)
 {
+  if (!timerId) {
+    std::cout << "ERROR: TimerId = NULL!!!" << std::endl;
+    throw freettcn::ENotFound();
+  }
+  
+  freettcn::TE::CIdObject &object = CIdObject::Get(*timerId);
+  try {
+    dynamic_cast<freettcn::TE::CTimer &>(object).Timeout();
+  }
+  catch(std::exception &ex) {
+    std::cout << "ERROR: System exception: " << ex.what() << " caught!!!" << std::endl;
+    throw freettcn::ENotFound();
+  }
 }

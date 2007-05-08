@@ -74,11 +74,6 @@ void Run()
 {
   // create main event loop
   GMainLoop *loop = g_main_loop_new(0, FALSE);
-  
-  freettcn::PA::CPlatformAdaptor &pa = freettcn::PA::CPlatformAdaptor::Instance();
-  TriTimerId id;
-  pa.TimerStart(&id, 1.234);
-  
   g_main_loop_run(loop);
   
   // g_main_loop_quit();
