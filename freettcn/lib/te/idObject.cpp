@@ -69,7 +69,7 @@ unsigned int freettcn::TE::CIdObject::CIdManager::Id2Index(const BinaryString &i
 {
   unsigned int idx = 0;
   
-  for(unsigned short i=0; i<ceil(id.bits / 8) + 1; i++) {
+  for(unsigned short i=0; i<ceil(id.bits / 8); i++) {
     if (i)
       idx <<= 8;
     idx |= id.data[i];
@@ -113,7 +113,7 @@ freettcn::TE::CIdObject &freettcn::TE::CIdObject::CIdManager::Object(const Binar
 {
   unsigned int idx = Id2Index(id);
   
-  if (_idArray[idx].valid)
+  if (idx < _idArray.size() && _idArray[idx].valid)
     return *_idArray[idx].ptr;
   
   std::cout << "ERROR: Id not found" << std::endl;
@@ -124,7 +124,7 @@ void freettcn::TE::CIdObject::CIdManager::Free(const BinaryString &id) throw(fre
 {
   unsigned int idx = Id2Index(id);
   
-  if (_idArray[idx].valid) {
+  if (idx < _idArray.size() && _idArray[idx].valid) {
     _idArray[idx].valid = false;
     _idArray[idx].ptr = 0;
     delete[] id.data;

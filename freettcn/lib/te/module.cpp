@@ -323,14 +323,14 @@ void freettcn::TE::CModule::TestComponentAdd(freettcn::TE::CTestComponentType::C
 
 freettcn::TE::CTestComponentType::CInstance &freettcn::TE::CModule::TestComponent(const TriComponentId &component) const throw(freettcn::ENotFound)
 {
-  for(TTestCompList::const_iterator it=_allEntityStates.begin(); it!=_allEntityStates.end(); ++it) {
-    TriComponentId id = (*it)->Id();
-    if (component.compInst.aux == id.compInst.aux)
-      return *(*it);
+  freettcn::TE::CIdObject &object = CIdObject::Get(component.compInst);
+  try {
+    return dynamic_cast<freettcn::TE::CTestComponentType::CInstance &>(object);
   }
-  
-  std::cout << "ERROR!!! Test component not found" << std::endl;
-  throw freettcn::ENotFound();
+  catch(std::exception &ex) {
+    std::cout << "Error: System exception: " << ex.what() << " caught!!!" << std::endl;
+    throw freettcn::ENotFound();
+  }
 }
 
 
