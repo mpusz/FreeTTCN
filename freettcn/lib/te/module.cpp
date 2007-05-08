@@ -123,7 +123,6 @@ TriComponentId freettcn::TE::CModule::ModuleComponentId() const
 
 void freettcn::TE::CModule::Cleanup()
 {
-  Purge(_testCaseList);
   Purge(_parameterList);
   Purge(_allEntityStates);
   Purge(_behaviorList);
@@ -169,12 +168,6 @@ void freettcn::TE::CModule::Register(CParameter *parameter)
   parameter->Init();
 }
 
-void freettcn::TE::CModule::Register(CTestCase *tc)
-{
-  _testCaseList.push_back(tc);
-  tc->Init();
-}
-
 void freettcn::TE::CModule::Register(const freettcn::TE::CBehavior *ctrlBehavior, const freettcn::TE::CSourceData *ctrlSrcData)
 {
   _ctrlBehavior = ctrlBehavior;
@@ -214,6 +207,12 @@ TciModuleParameterListType freettcn::TE::CModule::Parameters() const
   return modParList;
 }
 
+
+void freettcn::TE::CModule::TestCaseAdd(CTestCase &testCase)
+{
+  _testCaseList.push_back(&testCase);
+  testCase.Init();
+}
 
 TciTestCaseIdListType freettcn::TE::CModule::TestCases() const
 {

@@ -49,7 +49,24 @@ namespace freettcn {
 //       VERDICT_ERROR
 //     };
     
+    class CBehavior;
+    
     class CTimer : public CIdObject {
+    public:
+      class CCommand {
+      public:
+        virtual ~CCommand();
+        virtual void Run() = 0;
+      };
+      
+      class CCmdBehaviorRun : public CCommand {
+        const CBehavior &_behavior;
+      public:
+        CCmdBehaviorRun(const CBehavior &behavior);
+        virtual void Run();
+      };
+      
+    private:
       class CState {
         // STATUS:
         //  - IDLE
@@ -64,6 +81,7 @@ namespace freettcn {
       
       const bool _defaultDurationValid;
       TriTimerDuration _defaultDuration;
+      CCommand *_command;
       
     public:
       CTimer();
@@ -72,13 +90,13 @@ namespace freettcn {
       
       const TriTimerId &Id() const;
       
-      void Start() throw(EOperationFailed);
-      void Start(TriTimerDuration duration) throw(EOperationFailed);
+      void Start(CCommand *cmd) throw(EOperationFailed);
+      void Start(CCommand *cmd, TriTimerDuration duration) throw(EOperationFailed);
       void Stop() throw(EOperationFailed);
       TriTimerDuration Read() const throw(EOperationFailed);
       bool Running() const throw(EOperationFailed);
       
-      void Timeout() const;
+      void Timeout();
     };
     
   } // namespace TE

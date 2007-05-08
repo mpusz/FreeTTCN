@@ -77,7 +77,7 @@ namespace freettcn {
       
       void Start(const char *src, int line,
                  const CTestComponentType::CInstance *creator,
-                 TciParameterListType parameterlist,
+                 const TciParameterListType *parameterList,
                  TriTimerDuration dur);
       void Execute(TciTestCaseIdType testCaseId, TriPortIdList tsiPortList);
       void Stop();

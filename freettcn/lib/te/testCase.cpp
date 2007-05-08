@@ -86,7 +86,7 @@ TriPortIdList freettcn::TE::CTestCase::Ports() const
 
 void freettcn::TE::CTestCase::Start(const char *src, int line,
                                     const freettcn::TE::CTestComponentType::CInstance *creator,
-                                    TciParameterListType parameterlist,
+                                    const TciParameterListType *parameterList,
                                     TriTimerDuration dur)
 {
   TriComponentId creatorId;
@@ -129,12 +129,18 @@ void freettcn::TE::CTestCase::Start(const char *src, int line,
   tciExecuteTestCaseReq(_id, Ports());
   
   // start MTC
-  /// @todo define parameter list
-  TciParameterListType parameterList;
-  parameterList.length = 0;
-  parameterList.parList = 0;
+  TciParameterListType parList;
+  if (parameterList) {
+    parList = *parameterList;
+  }
+  else {
+    parList.length = 0;
+    parList.parList = 0;
+  }
+  _module.TestComponentStartReq(src, line, creatorId, _mtcId, _behavior->Id(), parList);
   
-  _module.TestComponentStartReq(src, line, creatorId, _mtcId, _behavior->Id(), parameterList);
+  // inform TM about TC execution
+  tciTestCaseStarted(_id, parList, dur);
 }
 
 

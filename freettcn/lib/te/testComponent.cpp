@@ -128,7 +128,7 @@ void freettcn::TE::CTestComponentType::CInstance::Start(const freettcn::TE::CBeh
   // schedule executing test component
   freettcn::TE::CTimer *timer = new freettcn::TE::CTimer(0);
   _implicitTimers.push_back(timer);
-  timer->Start();
+  timer->Start(new CTimer::CCmdBehaviorRun(behavior));
 }
 
 

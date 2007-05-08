@@ -73,17 +73,17 @@ namespace freettcn {
       
       // types
       typedef std::vector<CParameter *> TParameterList;
+      typedef std::list<const CBehavior *> TBehaviorList;
       typedef std::vector<CTestCase *> TTestCaseList;
       typedef std::list<CTestComponentType::CInstance *> TTestCompList;
-      typedef std::list<const CBehavior *> TBehaviorList;
       
       // module info
       const CBehavior * _ctrlBehavior;
       const CSourceData * _ctrlSrcData;
       TciModuleIdType _id;
       TParameterList _parameterList;
-      TTestCaseList _testCaseList;
       TBehaviorList _behaviorList;
+      TTestCaseList _testCaseList;
       
       // module dynamic state
       bool _ctrlRunning;
@@ -101,8 +101,9 @@ namespace freettcn {
       
     protected:
       void Register(CParameter *parameter);
-      void Register(CTestCase *tc);
       void Register(const CBehavior *ctrlBehavior, const CSourceData *ctrlSrcData);
+      
+      void TestCaseAdd(CTestCase &testCase);
       
       void ParametersSet() throw(freettcn::EOperationFailed);
       

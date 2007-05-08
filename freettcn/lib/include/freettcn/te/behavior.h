@@ -52,7 +52,7 @@ namespace freettcn {
       
       const TciBehaviourIdType &Id() const;
       
-      virtual void Run() = 0;
+      virtual void Run() const = 0;
     };
 
   } // namespace TE

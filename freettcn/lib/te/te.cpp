@@ -219,7 +219,7 @@ void freettcn::TE::CTTCNExecutable::TestCaseStart(const TciTestCaseIdType &testC
   module.TestCase(&tc);
   
   // start test case
-  tc.Start(0, 0, 0, parameterlist, 0);
+  tc.Start(0, 0, 0, &parameterlist, 0);
 }
 
 
