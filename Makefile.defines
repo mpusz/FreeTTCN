@@ -177,7 +177,9 @@ quiet_cmd_h_install = INSTALL_H
 
 # make distribution
 quiet_cmd_dist = MAKE_DIST
-      cmd_dist = $(TAR) -cvz --exclude ".svn" -f ../$(PROJECT_NAME)-$(VERSION).tar.gz . 
+      cmd_dist = $(LN) -snf $(PWD) /tmp/$(PROJECT_NAME)-$(VERSION) && \
+                 $(TAR) -cvzh --exclude ".svn" --exclude $(PROJECT_NAME)-$(VERSION).tar.gz -f $(PROJECT_NAME)-$(VERSION).tar.gz -C /tmp $(PROJECT_NAME)-$(VERSION) && \
+                 $(RM) -f /tmp/$(PROJECT_NAME)-$(VERSION)
 
 # tags for *.cpp files
 quiet_cmd_tags_cpp = TAGS_CPP

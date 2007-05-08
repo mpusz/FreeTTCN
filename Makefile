@@ -74,7 +74,7 @@ clean:
 
 distclean:
 	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_distclean,$(dir)))
-	$(Q)$(RM) -f TAGS BROWSE *~
+	$(Q)$(RM) -f TAGS BROWSE $(PROJECT_NAME)-$(VERSION).tar.gz *~
 
 dist: distclean
 	@$(call cmd,cmd_dist)
