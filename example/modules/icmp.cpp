@@ -480,7 +480,8 @@ namespace freettcn {
     
     CModule::CType::CType():
       _icmpPort(0),
-      _icmpComponent(0), _ipStack(0)
+      _icmpComponent(0), _ipStack(0),
+      _tc_ICMPPing_1(0), _tc_ICMPPing_2(0)
     {
     }
     
@@ -488,10 +489,17 @@ namespace freettcn {
     {
       if (_icmpPort)
         delete _icmpPort;
+
       if (_icmpComponent)
         delete _icmpComponent;
       if (_ipStack)
         delete _ipStack;
+
+      if (_tc_ICMPPing_1)
+        delete _tc_ICMPPing_1;
+      if (_tc_ICMPPing_2)
+        delete _tc_ICMPPing_2;
+      
       _instance = 0;
     }
 
