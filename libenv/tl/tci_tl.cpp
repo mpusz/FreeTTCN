@@ -2154,6 +2154,8 @@ void tliCKilled(String am,
                 TriComponentId c,
                 TciNonValueTemplate compTmpl)
 {
+  freettcn::TL::CTestLogging &tl = freettcn::TL::CTestLogging::Instance();
+  tl.CKilled(am, ts, src, line, c, compTmpl);
 }
 
 

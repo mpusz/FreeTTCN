@@ -560,12 +560,8 @@ namespace freettcn {
 //       comp.CmdQueue().Enqueue(new CCmdInitComponentScope(comp));
       
 //       // <statement-block>
-      
-//       freettcn::TE::CTestComponentType::CInstance::TStatus status = NOT_INITED;
-//       state = comp.Status();
-//       comp.Status(freettcn::TE::CTestComponentType::CInstance::BLOCKED);
-//       //       CModule::CType::Instance().TC_ICMPPing_1().Start("icmp.ttcn", 116, 0, 0, 0);
-//       comp.Status() = status;
+      comp.Enqueue(new freettcn::TE::CCmdExecuteWithoutTimeout(comp, new freettcn::TE::CSourceData("icmp.ttcn", 116),
+                                                               CModule::CType::Instance().TC_ICMPPing_1(), 0));
       
       // add automatically if 'stop' not included in *.ttcn file
       comp.Enqueue(new freettcn::TE::CCmdStopEntityOp(comp, new freettcn::TE::CSourceData("icmp.ttcn", 115)));

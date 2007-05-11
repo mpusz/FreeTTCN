@@ -279,6 +279,12 @@ void freettcn::TE::CTTCNExecutable::TestComponentStart(const TriComponentId &com
 }
 
 
+void freettcn::TE::CTTCNExecutable::TestComponentKill(const TriComponentId &componentId)
+{
+  RootModule().TestComponentKill(componentId);
+}
+
+
 void freettcn::TE::CTTCNExecutable::Connect(const TriPortId &fromPort, const TriPortId &toPort)
 {
 

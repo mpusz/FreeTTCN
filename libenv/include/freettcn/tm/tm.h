@@ -56,6 +56,12 @@ namespace freettcn {
     class CTestManagement : public freettcn::CEntity {
       
     protected:
+      enum TStatus {
+        NOT_RUNNING,
+        RUNNING_CONTROL,
+        RUNNING_TEST_CASE
+      };
+      
       class CTestCase {
         TciTestCaseIdType _id;
       public:
@@ -90,7 +96,7 @@ namespace freettcn {
     private:
       static CTestManagement *_instance;
       
-      bool _moduleRunning;                        /**< specifies if a test case or control part is running */
+      TStatus _status;                            /**< specifies if a test case or control part is running */
       TriComponentId _ctrlCompId;                 /**< component Id of running Control part */
       CTestCase *_tc;                             /**< currently started test case */
       TModuleParList _modParList;
@@ -102,6 +108,7 @@ namespace freettcn {
       void Clear();
       
     protected:
+      TStatus Status() const;
       const TTCList &TCList() const;
       CTestCase &TestCaseGet(const std::string &testCaseId) const throw(ENotFound);
       const TModuleParList &ModuleParameterList() const;

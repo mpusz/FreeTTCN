@@ -84,7 +84,7 @@ namespace freettcn {
         typedef std::list<const CTimer *> TTimerList;
         typedef CQueue<CCommand *> CCommandQueue;
         
-        const CModule *_module;
+        CModule *_module;
         TciTestComponentKindType _kind;
         TriComponentId _id;
         CTimer *_startTimer;
@@ -111,7 +111,7 @@ namespace freettcn {
         virtual void Initialize() = 0;
 
       protected:
-        const CModule &Module() const throw(ENotInited);
+        CModule &Module() const throw(ENotInited);
 
       public:
         CInstance(const CType &type);
@@ -120,8 +120,9 @@ namespace freettcn {
         TStatus Status() const;
         void Status(TStatus status);
         
-        void Init(const CModule &module, TciTestComponentKindType kind, const char *name);
+        void Init(CModule &module, TciTestComponentKindType kind, const char *name);
         const TriComponentId &Id() const throw(ENotInited);
+        TciTestComponentKindType Kind() const throw(ENotInited);
         
         virtual void Start(const CBehavior &behavior, TciParameterListType parameterList) throw(ENotInited);
         void Run();

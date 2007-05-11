@@ -105,3 +105,10 @@ void tciReset()
   freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
   te.Reset();
 }
+
+
+void tciKillTestComponent(TriComponentId component)
+{
+  freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
+  te.TestComponentKill(component);
+}

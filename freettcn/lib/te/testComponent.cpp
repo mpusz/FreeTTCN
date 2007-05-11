@@ -107,10 +107,13 @@ freettcn::TE::CTestComponentType::CInstance::~CInstance()
     delete _startTimer;
   
   _controlStack.Clear();
+  
+  if (_status != NOT_INITED)
+    _module->TestComponentLocalRemove(*this);
 }
 
 
-const freettcn::TE::CModule &freettcn::TE::CTestComponentType::CInstance::Module() const throw(ENotInited)
+freettcn::TE::CModule &freettcn::TE::CTestComponentType::CInstance::Module() const throw(ENotInited)
 {
   if (_status == NOT_INITED)
     throw CTestComponentType::CInstance::ENotInited();
@@ -119,7 +122,17 @@ const freettcn::TE::CModule &freettcn::TE::CTestComponentType::CInstance::Module
 }
 
 
-void freettcn::TE::CTestComponentType::CInstance::Init(const CModule &module, TciTestComponentKindType kind, const char *name)
+freettcn::TE::CTestComponentType::CInstance::TStatus freettcn::TE::CTestComponentType::CInstance::Status() const
+{
+  return _status;
+}
+
+void freettcn::TE::CTestComponentType::CInstance::Status(TStatus status)
+{
+  _status = status;
+}
+
+void freettcn::TE::CTestComponentType::CInstance::Init(CModule &module, TciTestComponentKindType kind, const char *name)
 {
   _module = &module;
   _kind = kind;
@@ -136,6 +149,8 @@ void freettcn::TE::CTestComponentType::CInstance::Init(const CModule &module, Tc
   
   // perform component specific initialization
   Initialize();
+  
+  _module->TestComponentLocalAdd(*this);
 }
 
 
@@ -147,6 +162,14 @@ const TriComponentId &freettcn::TE::CTestComponentType::CInstance::Id() const th
 }
 
 
+TciTestComponentKindType freettcn::TE::CTestComponentType::CInstance::Kind() const throw(CTestComponentType::CInstance::ENotInited)
+{
+  if (_status == NOT_INITED)
+    throw CTestComponentType::CInstance::ENotInited();
+  return _kind;
+}
+
+
 void freettcn::TE::CTestComponentType::CInstance::Start(const CBehavior &behavior, TciParameterListType parameterList) throw(CTestComponentType::CInstance::ENotInited)
 {
   if (_status == NOT_INITED)
@@ -155,15 +178,29 @@ void freettcn::TE::CTestComponentType::CInstance::Start(const CBehavior &behavio
   // schedule executing test component
   _startTimer = new freettcn::TE::CTimer(*this, true, new CTimer::CCmdComponentRun(behavior), 0);
   _startTimer->Start();
+  _status = ACTIVE;
 }
 
 
 void freettcn::TE::CTestComponentType::CInstance::Run()
 {
+  if (_status == BLOCKED)
+    // blocked components do not run commands
+    return;
+  
+  // get top command from the stack
   while(CCommand *cmd = _controlStack.First())
-    if (cmd->Run())
+    // run the command
+    if (cmd->Run()) {
+      // next command should be run - dequeue finished command
       _controlStack.Dequeue();
+      
+      if (_status == BLOCKED)
+        // blocked components do not run commands
+        return;
+    }
     else
+      // command did not finish
       return;
   
   // test component done

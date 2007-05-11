@@ -155,7 +155,7 @@ freettcn::TM::CTestManagement &freettcn::TM::CTestManagement::Instance() throw(E
 }
 
 freettcn::TM::CTestManagement::CTestManagement() :
-  _moduleRunning(false), _tc(0)
+  _status(NOT_RUNNING), _tc(0)
 {
   _instance = this;
 }
@@ -164,6 +164,11 @@ freettcn::TM::CTestManagement::~CTestManagement()
 {
   Clear();
   _instance = 0;
+}
+
+freettcn::TM::CTestManagement::TStatus freettcn::TM::CTestManagement::Status() const
+{
+  return _status;
 }
 
 void freettcn::TM::CTestManagement::Clear()
@@ -178,7 +183,7 @@ void freettcn::TM::CTestManagement::Clear()
     delete *it;
   _tcList.clear();
   
-  _moduleRunning = false;
+  _status = NOT_RUNNING;
 }
 
 freettcn::TM::CTestManagement::CTestCase &freettcn::TM::CTestManagement::TestCaseGet(const std::string &testCaseId) const throw(freettcn::ENotFound)
@@ -205,7 +210,7 @@ const freettcn::TM::CTestManagement::TModuleParList &freettcn::TM::CTestManageme
 
 void freettcn::TM::CTestManagement::Init(const std::string &moduleId) throw(freettcn::EOperationFailed)
 {
-  if (_moduleRunning) {
+  if (_status != NOT_RUNNING) {
     std::cout << "ERROR: Module already running" << std::endl;
     throw freettcn::EOperationFailed();
   }
@@ -248,7 +253,7 @@ void freettcn::TM::CTestManagement::Error(String message)
 void freettcn::TM::CTestManagement::Abort()
 {
   try {
-    if (_moduleRunning) {
+    if (_status != NOT_RUNNING) {
       if (_tc)
         TestCaseStop();
       else
@@ -273,6 +278,7 @@ TciValue freettcn::TM::CTestManagement::ModuleParameterGet(const TciModuleParame
 
 void freettcn::TM::CTestManagement::TestCaseStart(const std::string &testCaseId, const TciParameterListType &parameterlist) throw(ENotFound)
 {
+  _status = RUNNING_TEST_CASE;
   _tc = &TestCaseGet(testCaseId);
   _tc->Start(parameterlist);
 }
@@ -280,7 +286,6 @@ void freettcn::TM::CTestManagement::TestCaseStart(const std::string &testCaseId,
 
 void freettcn::TM::CTestManagement::TestCaseStarted(const TciTestCaseIdType &testCaseId, const TciParameterListType &parameterList, double timer)
 {
-  _moduleRunning = true;
   _tc = &TestCaseGet(testCaseId.objectName);
   _tc->Started(parameterList, timer);
   
@@ -316,16 +321,23 @@ void freettcn::TM::CTestManagement::TestCaseTerminated(TciVerdictValue verdict, 
     _tc = 0;
   }
   
-  _moduleRunning = false;
+  if (_status == RUNNING_TEST_CASE)
+    _status = NOT_RUNNING;
 }
 
 
 void freettcn::TM::CTestManagement::TestCaseStop()  throw(EOperationFailed)
 {
-  if (_tc)
-    _tc->Stop();
+  if (_status == RUNNING_TEST_CASE) {
+    if (_tc)
+      _tc->Stop();
+    else {
+      std::cout << "ERROR: Test Case not set" << std::endl;
+      throw freettcn::EOperationFailed();
+    }
+  }
   else {
-    std::cout << "ERROR: Test Case not set" << std::endl;
+    std::cout << "ERROR: TestCase not running" << std::endl;
     throw freettcn::EOperationFailed();
   }
 }
@@ -333,19 +345,19 @@ void freettcn::TM::CTestManagement::TestCaseStop()  throw(EOperationFailed)
 
 void freettcn::TM::CTestManagement::ControlStart()
 {
-  _moduleRunning = true;
+  _status = RUNNING_CONTROL;
   _ctrlCompId = tciStartControl();
 }
 
 
 void freettcn::TM::CTestManagement::ControlStop() throw(EOperationFailed)
 {
-  if (_moduleRunning) {
-    _moduleRunning = false;
+  if (_status == RUNNING_CONTROL) {
+    _status = NOT_RUNNING;
     tciStopControl();
   }
   else {
-    std::cout << "ERROR: Module not running" << std::endl;
+    std::cout << "ERROR: Control not running" << std::endl;
     throw freettcn::EOperationFailed();
   }
 }
@@ -356,5 +368,5 @@ void freettcn::TM::CTestManagement::ControlTerminated()
   if (Logging() && LogMask().Get(freettcn::CLogMask::CMD_TM_CTRL_TERMINATED))
     tliCtrlTerminated(0, TimeStamp().Get(), 0, 0, _ctrlCompId);
   
-  _moduleRunning = false;
+  _status = NOT_RUNNING;
 }

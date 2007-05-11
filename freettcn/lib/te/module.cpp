@@ -370,7 +370,7 @@ const freettcn::TE::CTestComponentId &freettcn::TE::CModule::TestComponentCreate
 
 const TriComponentId &freettcn::TE::CModule::TestComponentCreate(TciTestComponentKindType kind,
                                                                  TciType componentType,
-                                                                 const char *name) const
+                                                                 const char *name)
 {
   const freettcn::TE::CType *type = 0;
   if (componentType)
@@ -390,6 +390,7 @@ const TriComponentId &freettcn::TE::CModule::TestComponentCreate(TciTestComponen
   }
   
   cInstance->Init(*this, kind, name);
+  
   return cInstance->Id();
 }
 
@@ -440,21 +441,38 @@ void freettcn::TE::CModule::TestComponentDone(const TriComponentId &componentId,
     // control terminated
     tciControlTerminated();
     break;
-
+    
   case TCI_MTC_COMP:
     {
-      // kill SYSTEM component
-      /// @todo kill SYSTEM
-
+      // get SYSTEM component
+      for(TTestCompList::iterator it=_allEntityStates.begin(); it!=_allEntityStates.end(); ++it) {
+        if ((*it)->Kind() == TCI_SYS_COMP) {
+          // kill SYSTEM component
+          tciKillTestComponentReq((*it)->Id().Id());
+          _allEntityStates.erase(it);
+          break;
+        }
+      }
+      
       TciParameterListType parms;
       parms.length = 0;
       parms.parList = 0;
       
       // test case terminated
       tciTestCaseTerminated(verdict, parms);
+      
+      // get control component
+      if (_localTestComponents.size()) {
+        CTestComponentType::CInstance *ctrlCmp = *_localTestComponents.begin();
+        if (ctrlCmp->Kind() == TCI_CTRL_COMP) {
+          // unblock Control component
+          ctrlCmp->Status(CTestComponentType::CInstance::ACTIVE);
+          ctrlCmp->Run();
+        }
+      }
     }
     break;
-
+    
   case TCI_SYS_COMP:
     // do nothing
     break;
@@ -475,6 +493,37 @@ void freettcn::TE::CModule::TestComponentDone(const TriComponentId &componentId,
 //     }
     break;
   }
+}
+
+
+void freettcn::TE::CModule::TestComponentKill(const TriComponentId &componentId) throw(ENotFound)
+{
+  delete &TestComponent(componentId);
+  
+  freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
+  if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_C_KILLED))
+    // log
+    tliCKilled(0, te.TimeStamp().Get(), 0, 0, componentId, 0);
+}
+
+
+void freettcn::TE::CModule::TestComponentLocalAdd(CTestComponentType::CInstance &comp)
+{
+  _localTestComponents.push_back(&comp);
+}
+
+
+void freettcn::TE::CModule::TestComponentLocalRemove(CTestComponentType::CInstance &comp) throw(ENotFound)
+{
+  for(TLocalTestCompList::iterator it=_localTestComponents.begin(); it!=_localTestComponents.end(); ++it) {
+    if (*it == &comp) {
+      _localTestComponents.erase(it);
+      return;
+    }
+  }
+  
+  std::cout << "ERROR: Local test component not found" << std::endl;
+  throw ENotFound();
 }
 
 

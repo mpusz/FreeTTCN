@@ -74,6 +74,7 @@ namespace freettcn {
       // CH requests
       const TriComponentId &TestComponentCreate(TciTestComponentKindType kind, TciType componentType, String name) const;
       void TestComponentStart(const TriComponentId &componentId, const TciBehaviourIdType &behaviorId, const TciParameterListType &parameterList) const;
+      void TestComponentKill(const TriComponentId &component);
       void Connect(const TriPortId &fromPort, const TriPortId &toPort);
       void Disconnect(const TriPortId &fromPort, const TriPortId &toPort);
       void Map(const TriPortId &fromPort, const TriPortId &toPort);

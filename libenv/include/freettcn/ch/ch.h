@@ -58,6 +58,7 @@ namespace freettcn {
       virtual TriComponentId TestComponentCreate(TciTestComponentKindType kind, TciType componentType, String name);
       virtual void TestComponentStart(const TriComponentId &component, const TciBehaviourIdType &behavior, const TciParameterListType &parameterList);
       virtual void TestComponentTerminated(const TriComponentId &component, TciVerdictValue verdict);
+      virtual void TestComponentKill(const TriComponentId &component);
 
       virtual void TestCaseExecute(const TciTestCaseIdType &testCaseId, const TriPortIdList &tsiPortList);
 
@@ -76,6 +77,7 @@ namespace freettcn {
       TriComponentId TestComponentCreateReq(TciTestComponentKindType kind, TciType componentType, String name);
       void TestComponentStartReq(const TriComponentId &component, const TciBehaviourIdType &behavior, const TciParameterListType &parameterList); 
       void TestComponentTerminatedReq(const TriComponentId &component, TciVerdictValue verdict);
+      void TestComponentKillReq(const TriComponentId &component); 
       
       void TestCaseExecuteReq(const TciTestCaseIdType &testCaseId, const TriPortIdList &tsiPortList);
 

@@ -81,6 +81,7 @@ namespace freettcn {
       typedef std::list<const CBehavior *> TBehaviorList;
       typedef std::vector<CTestCase *> TTestCaseList;
       typedef std::list<const CTestComponentData *> TTestCompList;
+      typedef std::list<CTestComponentType::CInstance *> TLocalTestCompList;
       
       // module info
       const CBehavior * _ctrlBehavior;
@@ -96,6 +97,8 @@ namespace freettcn {
       CTestCase *_currTestCase;                   /**< current test case pointer */
       TTestCompList _done;                         /**< a list of all currently stopped test components during test case execution (filled when TC is stopped or killed, removed when TC is started) */
       TTestCompList _killed;                       /**< a list of all terminated test components during test case execution (filled when TC is killed) */
+      
+      TLocalTestCompList _localTestComponents;
       
       // temporary variables
       mutable TciModuleParameterType *__modParList;
@@ -141,10 +144,14 @@ namespace freettcn {
       void BehaviorAdd(CBehavior *behavior);
       
       const CTestComponentId &TestComponentCreateReq(const char *src, int line, const TriComponentId &creatorId, TciTestComponentKindType kind, const CTestComponentType *compType, const char *name);
-      const TriComponentId &TestComponentCreate(TciTestComponentKindType kind, TciType componentType, const char *name) const;
+      const TriComponentId &TestComponentCreate(TciTestComponentKindType kind, TciType componentType, const char *name);
       void TestComponentStartReq(const char *src, int line, const TriComponentId &creatorId, const TriComponentId &componentId, const TciBehaviourIdType &behaviorId, const TciParameterListType &parameterList);
       void TestComponentStart(const TriComponentId &componentId, const TciBehaviourIdType &behaviorId, const TciParameterListType &parameterList) throw(ENotFound);
       void TestComponentDone(const TriComponentId &componentId, TciVerdictValue verdict) throw(ENotFound);
+      void TestComponentKill(const TriComponentId &componentId) throw(ENotFound);
+      
+      void TestComponentLocalAdd(CTestComponentType::CInstance &comp);
+      void TestComponentLocalRemove(CTestComponentType::CInstance &comp) throw(ENotFound);
     };
 
   } // namespace TE

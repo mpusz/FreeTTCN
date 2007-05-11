@@ -72,15 +72,19 @@ void CCLITestManagement::TestCaseStart(const std::string &testCaseId, const TciP
 
 void CCLITestManagement::TestCaseTerminated(TciVerdictValue verdict, const TciParameterListType &parameterlist)
 {
+  TStatus status = Status();
   freettcn::TM::CTestManagement::TestCaseTerminated(verdict, parameterlist);
-  _mainLoop.Stop();
+  if (status == RUNNING_TEST_CASE)
+    _mainLoop.Stop();
 }
 
 
 void CCLITestManagement::TestCaseStop() throw(freettcn::EOperationFailed)
 {
+  TStatus status = Status();
   freettcn::TM::CTestManagement::TestCaseStop();
-  _mainLoop.Stop();
+  if (status == RUNNING_TEST_CASE)
+    _mainLoop.Stop();
 }
 
 

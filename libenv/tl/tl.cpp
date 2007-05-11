@@ -495,6 +495,24 @@ void freettcn::TL::CTestLogging::CStart(const char *am, int ts, const char *src,
 }
 
 
+void freettcn::TL::CTestLogging::CKilled(const char *am, int ts, const char *src, int line,
+                                         const TriComponentId &c,
+                                         TciNonValueTemplate compTmpl) const
+{
+  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, freettcn::CEntity::TYPE_TE,
+                                                                        freettcn::CLogMask::CMD_TE_C_KILLED,
+                                                                        "Component KILLED");
+  
+  char str[256];
+  data->LineAdd("From", TriComponentId2String(c, str));
+  
+  sprintf(str, "%p", compTmpl);                   /**< @todo Print template */
+  data->LineAdd("Template", str);
+  
+  Logger().Push(data);
+}
+
+
 void freettcn::TL::CTestLogging::CTerminated(const char *am, int ts, const char *src, int line,
                                              const TriComponentId &c,
                                              TciVerdictValue verdict) const

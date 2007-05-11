@@ -102,3 +102,10 @@ void tciResetReq()
   freettcn::CH::CComponentHandler &ch = freettcn::CH::CComponentHandler::Instance();
   return ch.ResetReq();
 }
+
+
+void tciKillTestComponentReq(TriComponentId component)
+{
+  freettcn::CH::CComponentHandler &ch = freettcn::CH::CComponentHandler::Instance();
+  return ch.TestComponentKillReq(component);
+}

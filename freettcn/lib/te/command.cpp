@@ -28,51 +28,83 @@
  */
 
 #include "freettcn/te/command.h"
+#include "freettcn/te/testCase.h"
 #include "freettcn/te/sourceData.h"
 
 
-
-freettcn::TE::CCommand::~CCommand()
-{
-}
-
-
-
-freettcn::TE::CCmdStopEntityOp::CCmdStopEntityOp(CTestComponentType::CInstance &comp, const CSourceData *srcData):
+freettcn::TE::CCommand::CCommand(CTestComponentType::CInstance &comp, const CSourceData *srcData):
   _comp(comp), _srcData(srcData)
 {
 }
 
 
-freettcn::TE::CCmdStopEntityOp::~CCmdStopEntityOp()
+freettcn::TE::CCommand::~CCommand()
 {
   if (_srcData)
     delete _srcData;
 }
 
+
+
+
+freettcn::TE::CCmdExecuteWithoutTimeout::CCmdExecuteWithoutTimeout(CTestComponentType::CInstance &comp, const CSourceData *srcData,
+                                                                   freettcn::TE::CTestCase &testCase,
+                                                                   const TciParameterListType *parameterList):
+  CCommand(comp, srcData), _testCase(testCase), _parameterList(parameterList)
+{
+}
+
+
+bool freettcn::TE::CCmdExecuteWithoutTimeout::Run()
+{
+  // create MTC and start MTC
+  _testCase.Start(const_cast<char *>(SrcData()->Source()), SrcData()->Line(), &Component(), _parameterList, 0);
+  
+  // block Control component for the time of testcase execution
+  Component().Status(CTestComponentType::CInstance::BLOCKED);
+  
+  return true;
+}
+
+
+
+freettcn::TE::CCmdExecuteTimeout::CCmdExecuteTimeout(CTestComponentType::CInstance &comp, const CSourceData *srcData):
+  CCommand(comp, srcData)
+{
+}
+
+
+bool freettcn::TE::CCmdExecuteTimeout::Run()
+{
+  // if timeout test case is stopped and an error veridct is returned
+  // TestCase().Stop();
+  
+  return true;
+}
+
+
+
+freettcn::TE::CCmdStopEntityOp::CCmdStopEntityOp(CTestComponentType::CInstance &comp, const CSourceData *srcData):
+  CCommand(comp, srcData)
+{
+}
+
 bool freettcn::TE::CCmdStopEntityOp::Run()
 {
-  _comp.Done(*_srcData);
+  Component().Done(*SrcData());
   return true;
 }
       
 
 
 freettcn::TE::CCmdStopMTC::CCmdStopMTC(CTestComponentType::CInstance &comp, const CSourceData *srcData):
-  _comp(comp), _srcData(srcData)
+  CCommand(comp, srcData)
 {
-}
-
-
-freettcn::TE::CCmdStopMTC::~CCmdStopMTC()
-{
-  if (_srcData)
-    delete _srcData;
 }
 
 bool freettcn::TE::CCmdStopMTC::Run()
 {
-  _comp.Done(*_srcData);
+  Component().Done(*SrcData());
   return true;
 }
       

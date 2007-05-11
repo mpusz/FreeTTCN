@@ -120,6 +120,18 @@ void freettcn::CH::CComponentHandler::TestComponentTerminated(const TriComponent
 
 
 
+void freettcn::CH::CComponentHandler::TestComponentKillReq(const TriComponentId &component)
+{
+  TestComponentKill(component);
+}
+
+void freettcn::CH::CComponentHandler::TestComponentKill(const TriComponentId &component)
+{
+  tciKillTestComponent(component);
+}
+
+
+
 void freettcn::CH::CComponentHandler::TestCaseExecuteReq(const TciTestCaseIdType &testCaseId, const TriPortIdList &tsiPortList)
 {
   const unsigned int teNum = 1;                     /**< @todo define TEs for the test case (having system ports of the indicated TC) */

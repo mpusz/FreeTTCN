@@ -101,6 +101,9 @@ void freettcn::TE::CTestCase::Start(const char *src, int line,
 {
   TriComponentId creatorId;
   
+  // set current test case
+  _module.TestCase(this);
+  
   if (creator) {
     creatorId = creator->Id();
   }

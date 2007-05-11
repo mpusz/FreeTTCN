@@ -161,6 +161,9 @@ namespace freettcn {
                           const TriComponentId &comp,
                           const TciBehaviourIdType &name,
                           const TciParameterListType &parsValue) const;
+      virtual void CKilled(const char *am, int ts, const char *src, int line,
+                           const TriComponentId &c,
+                           TciNonValueTemplate compTmpl) const;
       virtual void CTerminated(const char *am, int ts, const char *src, int line,
                                const TriComponentId &c,
                                TciVerdictValue verdict) const;
