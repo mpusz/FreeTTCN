@@ -110,7 +110,7 @@ freettcn::TE::CTestComponentType::CInstance::~CInstance()
 }
 
 
-freettcn::TE::CModule &freettcn::TE::CTestComponentType::CInstance::Module() const throw(ENotInited)
+const freettcn::TE::CModule &freettcn::TE::CTestComponentType::CInstance::Module() const throw(ENotInited)
 {
   if (_status == NOT_INITED)
     throw CTestComponentType::CInstance::ENotInited();
@@ -119,7 +119,7 @@ freettcn::TE::CModule &freettcn::TE::CTestComponentType::CInstance::Module() con
 }
 
 
-void freettcn::TE::CTestComponentType::CInstance::Init(CModule &module, TciTestComponentKindType kind, const char *name)
+void freettcn::TE::CTestComponentType::CInstance::Init(const CModule &module, TciTestComponentKindType kind, const char *name)
 {
   _module = &module;
   _kind = kind;
@@ -160,13 +160,13 @@ void freettcn::TE::CTestComponentType::CInstance::Start(const CBehavior &behavio
 
 void freettcn::TE::CTestComponentType::CInstance::Run()
 {
-  if (CCommand *cmd = _controlStack.First()) {
+  while(CCommand *cmd = _controlStack.First())
     if (cmd->Run())
       _controlStack.Dequeue();
-  }
-  else {
-    // test component done
-  }
+    else
+      return;
+  
+  // test component done
 }
 
 
@@ -174,13 +174,18 @@ void freettcn::TE::CTestComponentType::CInstance::Done(const CSourceData &srcDat
 {
   /// @todo Return verdict
   TciVerdictValue verdictVal = 0;
-  tciTestComponentTerminatedReq(Id(), verdictVal);
   
   freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
   if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_C_TERMINATED)) {
     // log
     tliCTerminated(0, te.TimeStamp().Get(), const_cast<char *>(srcData.Source()), srcData.Line(), Id(), verdictVal);
   }
+  
+  tciTestComponentTerminatedReq(Id(), verdictVal);
+  
+  // clear control stack
+  /// @todo May be a problem with the last command
+//   _controlStack.Clear();
 }
 
 

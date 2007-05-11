@@ -48,13 +48,13 @@ freettcn::PA::CTimer::~CTimer()
 
 void freettcn::PA::CTimer::Timeout() const
 {
-  triTimeout(&_id);
-  
   freettcn::PA::CPlatformAdaptor &pa = freettcn::PA::CPlatformAdaptor::Instance();
   if (pa.Logging() && pa.LogMask().Get(freettcn::CLogMask::CMD_PA_T_TIMEOUT_DETECTED)) {
     TriComponentId comp = { { 0 } };
     tliTTimeoutDetected(0, pa.TimeStamp().Get(), 0, 0, comp, _id);
   }
+
+  triTimeout(&_id);
 }
 
 const TriTimerId &freettcn::PA::CTimer::Id() const

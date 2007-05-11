@@ -18,7 +18,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-#include "cliTestManagement.h"
+#include "glibMainLoop.h"
 #include "glibPlatformAdaptor.h"
 
 #include <freettcn/tl/tl.h>
@@ -32,7 +32,6 @@
 #include <freettcn/tools/timeStamp.h>
 
 #include <iostream>
-#include <glib.h>
 #include <getopt.h>
 
 
@@ -70,18 +69,7 @@ void Usage()
 }
 
 
-void Run()
-{
-  // create main event loop
-  GMainLoop *loop = g_main_loop_new(0, FALSE);
-  g_main_loop_run(loop);
-  
-  // g_main_loop_quit();
-}
-
-
-
-void Start(CTestManagement &tm, const std::string &testCase)
+void Start(CCLITestManagement &tm, const std::string &testCase)
 {
   // init timestamping
   freettcn::CTimeStamp ts(4);
@@ -95,7 +83,7 @@ void Start(CTestManagement &tm, const std::string &testCase)
   // initiate all entities
   freettcn::CH::CComponentHandler ch;
   //     freettcn::CD::CComponentHandler cd;
-  CPlatformAdaptor pa;
+  CGlibPlatformAdaptor pa;
   freettcn::SA::CSUTAdaptor sa;
   freettcn::TL::CTestLogging tl(logger);
     
@@ -133,9 +121,6 @@ void Start(CTestManagement &tm, const std::string &testCase)
     tm.ControlStart();
     //      tm.ControlStop();
   }
-  
-  // run
-  Run();
 }
 
 
@@ -224,7 +209,8 @@ int main (int argc, char **argv)
   }
   
   // init test management
-  CTestManagement tm;
+  CGlibMainLoop mainLoop;
+  CCLITestManagement tm(mainLoop);
   
   try {
     // init module

@@ -300,8 +300,6 @@ void freettcn::TM::CTestManagement::TestCaseStarted(const TciTestCaseIdType &tes
 void freettcn::TM::CTestManagement::TestCaseTerminated(TciVerdictValue verdict, const TciParameterListType &parameterlist)
 {
   if (_tc) {
-    _tc->Terminated(verdict, parameterlist);
-    
     if (Logging() && LogMask().Get(freettcn::CLogMask::CMD_TM_TC_TERMINATED)) {
       TriComponentId comp = { { 0 } };
       comp.compName = "";
@@ -312,6 +310,8 @@ void freettcn::TM::CTestManagement::TestCaseTerminated(TciVerdictValue verdict, 
       parList.parList = 0;
       tliTcTerminated(0, TimeStamp().Get(), 0, 0, comp, _tc->Id(), parList, verdict);
     }
+    
+    _tc->Terminated(verdict, parameterlist);
     
     _tc = 0;
   }
@@ -353,8 +353,8 @@ void freettcn::TM::CTestManagement::ControlStop() throw(EOperationFailed)
 
 void freettcn::TM::CTestManagement::ControlTerminated()
 {
-  _moduleRunning = false;
-  
   if (Logging() && LogMask().Get(freettcn::CLogMask::CMD_TM_CTRL_TERMINATED))
     tliCtrlTerminated(0, TimeStamp().Get(), 0, 0, _ctrlCompId);
+  
+  _moduleRunning = false;
 }

@@ -23,20 +23,20 @@
 #include <cmath>
 
 
-CTimer::CTimer(const TriTimerId &timerId):
+CGlibPlatformAdaptor::CTimer::CTimer(const TriTimerId &timerId):
   freettcn::PA::CTimer(timerId), _state(STOPPED)
 {
 }
 
 
-CTimer::~CTimer()
+CGlibPlatformAdaptor::CTimer::~CTimer()
 {
 //   if (gSource)
 //     ;
 }
 
 
-gboolean CTimer::CallbackFunc(gpointer data)
+gboolean CGlibPlatformAdaptor::CTimer::CallbackFunc(gpointer data)
 {
   CTimer *timer = static_cast<CTimer *>(data);
   timer->Timeout();
@@ -46,19 +46,19 @@ gboolean CTimer::CallbackFunc(gpointer data)
 }
 
 
-CTimer::TState CTimer::State() const
+CGlibPlatformAdaptor::CTimer::TState CGlibPlatformAdaptor::CTimer::State() const
 {
   return _state;
 }
 
 
-void CTimer::State(CTimer::TState state)
+void CGlibPlatformAdaptor::CTimer::State(TState state)
 {
   _state = state;
 }
 
 
-void CTimer::Start(TriTimerDuration duration) throw(freettcn::EOperationFailed)
+void CGlibPlatformAdaptor::CTimer::Start(TriTimerDuration duration) throw(freettcn::EOperationFailed)
 {
   _id = g_timeout_add_full(G_PRIORITY_HIGH, static_cast<guint>(round(duration * 1000)),
                            CallbackFunc, this, 0);
@@ -66,7 +66,7 @@ void CTimer::Start(TriTimerDuration duration) throw(freettcn::EOperationFailed)
 }
 
 
-void CTimer::Stop() throw(freettcn::EOperationFailed)
+void CGlibPlatformAdaptor::CTimer::Stop() throw(freettcn::EOperationFailed)
 {
   if (!g_source_remove(_id))
     throw freettcn::EOperationFailed();
@@ -74,13 +74,13 @@ void CTimer::Stop() throw(freettcn::EOperationFailed)
 }
 
 
-TriTimerDuration CTimer::Read() const throw(freettcn::EOperationFailed)
+TriTimerDuration CGlibPlatformAdaptor::CTimer::Read() const throw(freettcn::EOperationFailed)
 {
   return 0;
 }
 
 
-bool CTimer::Running() const throw(freettcn::EOperationFailed)
+bool CGlibPlatformAdaptor::CTimer::Running() const throw(freettcn::EOperationFailed)
 {
   return _state == STARTED;
 }
@@ -88,7 +88,7 @@ bool CTimer::Running() const throw(freettcn::EOperationFailed)
 
 
 
-CTimer *CPlatformAdaptor::TimerCreate(const TriTimerId &timerId) const
+CGlibPlatformAdaptor::CTimer *CGlibPlatformAdaptor::TimerCreate(const TriTimerId &timerId) const
 {
   return new CTimer(timerId);
 }

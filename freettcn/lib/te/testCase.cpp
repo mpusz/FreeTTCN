@@ -123,7 +123,7 @@ void freettcn::TE::CTestCase::Start(const char *src, int line,
   // create MTC
   _mtc = &_module.TestComponentCreateReq(src, line, creatorId, TCI_MTC_COMP, &_mtcType, "MTC");
   
-  // create SYSTEM
+  // create SYSTEM component
   _module.TestComponentCreateReq(src, line, _mtc->Id(), TCI_SYS_COMP, &_systemType, "SYSTEM");
   
   // give a chance to create static connections and the initialization of TSI ports

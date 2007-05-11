@@ -29,7 +29,6 @@
 
 
 #include "freettcn/te/te.h"
-#include "freettcn/te/basicTypes.h"
 #include "freettcn/te/module.h"
 #include "freettcn/te/modulesContainer.h"
 #include "freettcn/te/behavior.h"
@@ -268,26 +267,7 @@ const TriComponentId &freettcn::TE::CTTCNExecutable::TestComponentCreate(TciTest
     return ctrlId;
   }
   
-  const freettcn::TE::CType *type = 0;
-  if (componentType)
-    type = static_cast<const freettcn::TE::CType *>(componentType);
-  else if (kind == TCI_CTRL_COMP)
-    type = &freettcn::TE::CBasicTypes::ControlComponent();
-  else {
-    std::cout << "ERROR!!! TciType not defined" << std::endl;
-    throw EOperationFailed();
-  }
-  
-  freettcn::TE::CType::CInstance *instance = type->InstanceCreate();
-  freettcn::TE::CTestComponentType::CInstance *cInstance = dynamic_cast<freettcn::TE::CTestComponentType::CInstance *>(instance);
-  if (!cInstance) {
-    std::cout << "ERROR!!! TciType does not specify Component type" << std::endl;
-    throw EOperationFailed();
-  }
-  
-  cInstance->Init(RootModule(), kind, name);
-  
-  return cInstance->Id();
+  return RootModule().TestComponentCreate(kind, componentType, name);
 }
 
 

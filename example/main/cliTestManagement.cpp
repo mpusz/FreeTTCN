@@ -22,7 +22,13 @@
 #include <iostream>
 
 
-void CTestManagement::TestCasesPrint() const
+CCLITestManagement::CCLITestManagement(CMainLoop &mainLoop):
+  _mainLoop(mainLoop)
+{
+}
+
+
+void CCLITestManagement::TestCasesPrint() const
 {
   const freettcn::TM::CTestManagement::TTCList &tcList = TCList();
   for(TTCList::const_iterator it=tcList.begin(); it != tcList.end(); ++it) {
@@ -32,7 +38,7 @@ void CTestManagement::TestCasesPrint() const
 }
 
 
-void CTestManagement::TestCasesInfoPrint(const std::string &testCaseId) const throw(freettcn::ENotFound)
+void CCLITestManagement::TestCasesInfoPrint(const std::string &testCaseId) const throw(freettcn::ENotFound)
 {
   CTestCase &tc = TestCaseGet(testCaseId);
   
@@ -54,4 +60,56 @@ void CTestManagement::TestCasesInfoPrint(const std::string &testCaseId) const th
       portList.portIdList[i]->portType.objectName << ">" <<
       std::endl;
   }
+}
+
+
+void CCLITestManagement::TestCaseStart(const std::string &testCaseId, const TciParameterListType &parameterlist) throw(freettcn::ENotFound)
+{
+  freettcn::TM::CTestManagement::TestCaseStart(testCaseId, parameterlist);
+  _mainLoop.Start();
+}
+
+
+void CCLITestManagement::TestCaseTerminated(TciVerdictValue verdict, const TciParameterListType &parameterlist)
+{
+  freettcn::TM::CTestManagement::TestCaseTerminated(verdict, parameterlist);
+  _mainLoop.Stop();
+}
+
+
+void CCLITestManagement::TestCaseStop() throw(freettcn::EOperationFailed)
+{
+  freettcn::TM::CTestManagement::TestCaseStop();
+  _mainLoop.Stop();
+}
+
+
+
+
+void CCLITestManagement::ControlStart()
+{
+  freettcn::TM::CTestManagement::ControlStart();
+  _mainLoop.Start();
+}
+
+
+void CCLITestManagement::ControlStop() throw(freettcn::EOperationFailed)
+{
+  freettcn::TM::CTestManagement::ControlStop();
+  _mainLoop.Stop();
+}
+
+
+void CCLITestManagement::ControlTerminated()
+{
+  freettcn::TM::CTestManagement::ControlTerminated();
+  _mainLoop.Stop();
+}
+
+
+
+
+
+CCLITestManagement::CMainLoop::~CMainLoop()
+{
 }

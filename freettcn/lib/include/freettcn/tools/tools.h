@@ -125,7 +125,7 @@ namespace freettcn {
     
     Item First() const
     {
-      return _queue.front();
+      return _queue.empty() ? 0 : _queue.front();
     }
     
     void Clear()

@@ -38,6 +38,7 @@ extern "C" {
 }
 #include <freettcn/te/initObject.h>
 #include <freettcn/te/testComponent.h>
+#include <freettcn/te/ttcnWrappers.h>
 #include <freettcn/tools/exception.h>
 #include <vector>
 #include <list>
@@ -50,7 +51,6 @@ namespace freettcn {
     class CBehavior;
     class CTestCase;
     class CSourceData;
-    class CTestComponentId;
     
     class CModule : public CInitObject {
     public:
@@ -66,11 +66,21 @@ namespace freettcn {
       };
       
     private:
+      class CTestComponentData {
+        CTestComponentId _id;
+        TciTestComponentKindType _kind;
+      public:
+        CTestComponentData(const TriComponentId &id, TciTestComponentKindType kind);
+        const CTestComponentId &Id() const;
+        TciTestComponentKindType Kind() const;
+        bool operator==(const TriComponentId &id) const;
+      };
+      
       // types
       typedef std::vector<CParameter *> TParameterList;
       typedef std::list<const CBehavior *> TBehaviorList;
       typedef std::vector<CTestCase *> TTestCaseList;
-      typedef std::list<const CTestComponentId *> TTestCompList;
+      typedef std::list<const CTestComponentData *> TTestCompList;
       
       // module info
       const CBehavior * _ctrlBehavior;
@@ -130,10 +140,11 @@ namespace freettcn {
       const CBehavior &ControlBehavior() const throw(ENotFound);
       void BehaviorAdd(CBehavior *behavior);
       
-      const CTestComponentId &TestComponentCreateReq(const char *src, int line, const TriComponentId &creatorId, TciTestComponentKindType kind, const CTestComponentType *compType, String name);
+      const CTestComponentId &TestComponentCreateReq(const char *src, int line, const TriComponentId &creatorId, TciTestComponentKindType kind, const CTestComponentType *compType, const char *name);
+      const TriComponentId &TestComponentCreate(TciTestComponentKindType kind, TciType componentType, const char *name) const;
       void TestComponentStartReq(const char *src, int line, const TriComponentId &creatorId, const TriComponentId &componentId, const TciBehaviourIdType &behaviorId, const TciParameterListType &parameterList);
       void TestComponentStart(const TriComponentId &componentId, const TciBehaviourIdType &behaviorId, const TciParameterListType &parameterList) throw(ENotFound);
-      void TestComponentDone(const TriComponentId &component, TciVerdictValue verdict) throw(ENotFound);
+      void TestComponentDone(const TriComponentId &componentId, TciVerdictValue verdict) throw(ENotFound);
     };
 
   } // namespace TE

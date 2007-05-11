@@ -120,14 +120,14 @@ namespace freettcn {
       
       virtual TciValue ModuleParameterGet(const TciModuleParameterIdType &parameterId) const;
       
-      void TestCaseStart(const std::string &testCaseId, const TciParameterListType &parameterlist) throw(ENotFound);
-      void TestCaseStarted(const TciTestCaseIdType &testCaseId, const TciParameterListType &parameterList, double timer);
-      void TestCaseTerminated(TciVerdictValue verdict, const TciParameterListType &parameterlist);
-      void TestCaseStop() throw(EOperationFailed);
-
-      void ControlStart();
-      void ControlStop() throw(EOperationFailed);
-      void ControlTerminated();
+      virtual void TestCaseStart(const std::string &testCaseId, const TciParameterListType &parameterlist) throw(ENotFound);
+      virtual void TestCaseStarted(const TciTestCaseIdType &testCaseId, const TciParameterListType &parameterList, double timer);
+      virtual void TestCaseTerminated(TciVerdictValue verdict, const TciParameterListType &parameterlist);
+      virtual void TestCaseStop() throw(EOperationFailed);
+      
+      virtual void ControlStart();
+      virtual void ControlStop() throw(EOperationFailed);
+      virtual void ControlTerminated();
     };
     
   } // namespace TM
