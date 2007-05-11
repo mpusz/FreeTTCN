@@ -34,18 +34,18 @@
 
 
 freettcn::TE::CType::CType(const CModule   *module,
-                           String          name,
+                           const char      *name,
                            TciTypeClassType typeClass,
-                           String          encoding,
-                           String          encodingVariant,
-                           String          extension) :
+                           const char      *encoding,
+                           const char      *encodingVariant,
+                           const char      *extension) :
   _module(module), _class(typeClass), _encoding(encoding), _encodingVariant(encodingVariant), _extension(extension)
 {
   if (_module)
     _id.moduleName = const_cast<char *>(_module->Name());
   else
     _id.moduleName = "{freettcn}";
-  _id.objectName = name;
+  _id.objectName = const_cast<char *>(name);
   _id.aux = this;
 }
 
@@ -58,7 +58,7 @@ const freettcn::TE::CModule *freettcn::TE::CType::DefiningModule() const
   return _module;
 }
 
-String freettcn::TE::CType::Name() const
+const char *freettcn::TE::CType::Name() const
 {
   return _id.objectName;
 }
@@ -73,17 +73,17 @@ TciTypeClassType freettcn::TE::CType::Class() const
   return _class;
 }
 
-String freettcn::TE::CType::Encoding() const
+const char *freettcn::TE::CType::Encoding() const
 {
   return _encoding;
 }
 
-String freettcn::TE::CType::EncodingVariant() const
+const char *freettcn::TE::CType::EncodingVariant() const
 {
   return _encodingVariant;
 }
 
-String freettcn::TE::CType::Extension() const
+const char *freettcn::TE::CType::Extension() const
 {
   return _extension;
 }
@@ -110,17 +110,17 @@ bool freettcn::TE::CType::CInstance::Omit() const
   return _omit;
 }
 
-const String freettcn::TE::CType::CInstance::Encoding() const
+const char *freettcn::TE::CType::CInstance::Encoding() const
 {
   return Type().Encoding();
 }
 
-const String freettcn::TE::CType::CInstance::EncodingVariant() const
+const char *freettcn::TE::CType::CInstance::EncodingVariant() const
 {
   return Type().EncodingVariant();
 }
 
-const String freettcn::TE::CType::CInstance::Extension() const
+const char *freettcn::TE::CType::CInstance::Extension() const
 {
   return Type().Extension();
 }

@@ -28,15 +28,24 @@
  */
 
 #include "freettcn/te/testComponent.h"
+#include "freettcn/te/te.h"
 #include "freettcn/te/module.h"
 #include "freettcn/te/port.h"
 #include "freettcn/te/timer.h"
+#include "freettcn/te/command.h"
+#include "freettcn/te/sourceData.h"
+#include "freettcn/tools/logMask.h"
+#include "freettcn/tools/timeStamp.h"
 #include "freettcn/tools/tools.h"
+extern "C" {
+#include "freettcn/ttcn3/tci_te_ch.h"
+#include "freettcn/ttcn3/tci_tl.h"
+}
+#include <iostream>
 
 
 
-
-freettcn::TE::CTestComponentType::CTestComponentType(const freettcn::TE::CModule *module, String name) :
+freettcn::TE::CTestComponentType::CTestComponentType(const freettcn::TE::CModule *module, const char *name) :
   freettcn::TE::CType(module, name, TCI_COMPONENT_TYPE, "", "", ""),
   __portIdList(0)
 {
@@ -86,60 +95,136 @@ TriPortIdList freettcn::TE::CTestComponentType::Ports() const
 
 
 freettcn::TE::CTestComponentType::CInstance::CInstance(const CType &type):
-  freettcn::TE::CType::CInstance(type, false), _inited(false), _module(0)
+  freettcn::TE::CType::CInstance(type, false), _module(0), _startTimer(0),
+  _status(NOT_INITED), _verdict(VERDICT_NONE)
 {
 }
 
 
 freettcn::TE::CTestComponentType::CInstance::~CInstance()
 {
-  Purge(_explicitTimers);
-  Purge(_implicitTimers);
+  if (_startTimer)
+    delete _startTimer;
+  
+  _controlStack.Clear();
 }
 
 
-void freettcn::TE::CTestComponentType::CInstance::Init(freettcn::TE::CModule &module, TciTestComponentKindType kind, String name)
+freettcn::TE::CModule &freettcn::TE::CTestComponentType::CInstance::Module() const throw(ENotInited)
+{
+  if (_status == NOT_INITED)
+    throw CTestComponentType::CInstance::ENotInited();
+  
+  return *_module;
+}
+
+
+void freettcn::TE::CTestComponentType::CInstance::Init(CModule &module, TciTestComponentKindType kind, const char *name)
 {
   _module = &module;
   _kind = kind;
   
   _id.compInst = InstanceId();
-  _id.compName = name;
+  _id.compName = const_cast<char *>(name);
   _id.compType = Type().Id();
+  
+  /// @todo init var scope
+  /// @todo init timer scope
+  /// @todo init port scope
   
   // perform component specific initialization
   Initialize();
   
-  // register in a module
-  _module->TestComponentAdd(*this);
-  
-  _inited = true;
+  _status = BLOCKED;
 }
 
 
-const TriComponentId &freettcn::TE::CTestComponentType::CInstance::Id() const throw(freettcn::TE::CTestComponentType::CInstance::ENotInited)
+const TriComponentId &freettcn::TE::CTestComponentType::CInstance::Id() const throw(CTestComponentType::CInstance::ENotInited)
 {
+  if (_status == NOT_INITED)
+    throw CTestComponentType::CInstance::ENotInited();
   return _id;
 }
 
 
-void freettcn::TE::CTestComponentType::CInstance::Start(const freettcn::TE::CBehavior &behavior, TciParameterListType parameterList) throw(freettcn::TE::CTestComponentType::CInstance::ENotInited)
+void freettcn::TE::CTestComponentType::CInstance::Start(const CBehavior &behavior, TciParameterListType parameterList) throw(CTestComponentType::CInstance::ENotInited)
 {
+  if (_status == NOT_INITED)
+    throw CTestComponentType::CInstance::ENotInited();
+  
   // schedule executing test component
-  freettcn::TE::CTimer *timer = new freettcn::TE::CTimer(0);
-  _implicitTimers.push_back(timer);
-  timer->Start(new CTimer::CCmdBehaviorRun(behavior));
+  _startTimer = new freettcn::TE::CTimer(*this, true, new CTimer::CCmdComponentRun(behavior), 0);
+  _startTimer->Start();
+}
+
+
+void freettcn::TE::CTestComponentType::CInstance::Run()
+{
+  if (CCommand *cmd = _controlStack.First()) {
+    if (cmd->Run())
+      _controlStack.Dequeue();
+  }
+  else {
+    // test component done
+  }
+}
+
+
+void freettcn::TE::CTestComponentType::CInstance::Done(const CSourceData &srcData)
+{
+  /// @todo Return verdict
+  TciVerdictValue verdictVal = 0;
+  tciTestComponentTerminatedReq(Id(), verdictVal);
+  
+  freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
+  if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_C_TERMINATED)) {
+    // log
+    tliCTerminated(0, te.TimeStamp().Get(), const_cast<char *>(srcData.Source()), srcData.Line(), Id(), verdictVal);
+  }
+}
+
+
+void freettcn::TE::CTestComponentType::CInstance::TimerAdd(const CTimer &timer, bool implicit /* false */)
+{
+  TTimerList &list = implicit ? _implicitTimers : _explicitTimers;
+  list.push_back(&timer);
+}
+
+
+void freettcn::TE::CTestComponentType::CInstance::TimerRemove(const CTimer &timer, bool implicit /* false */) throw(ENotFound)
+{
+  TTimerList &list = implicit ? _implicitTimers : _explicitTimers;
+  
+  for(TTimerList::iterator it=list.begin(); it!=list.end(); ++it) {
+    if (*it == &timer) {
+      list.erase(it);
+      return;
+    }
+  }
+  
+  std::cout << "ERROR: Timer not found!!!" << std::endl;
+  throw ENotFound();
 }
 
 
 // void freettcn::TE::CTestComponentType::CInstance::Map(const freettcn::TE::CPort &fromPort, const freettcn::TE::CPort &toPort) throw(freettcn::TE::CTestComponentType::CInstance::ENotInited)
 // {
+//   if (_status == NOT_INITED)
+//     throwfreettcn::TE::CTestComponentType::CInstance::ENotInited();
 // }
 
 
 // void freettcn::TE::CTestComponentType::CInstance::Verdict(VerdictType_t value)
 // {
+//   if (_status == NOT_INITED)
+//     throwfreettcn::TE::CTestComponentType::CInstance::ENotInited();
 // }
+
+
+void freettcn::TE::CTestComponentType::CInstance::Enqueue(CCommand *cmd)
+{
+  _controlStack.Enqueue(cmd);
+}
 
 
 

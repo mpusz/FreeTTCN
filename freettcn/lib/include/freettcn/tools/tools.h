@@ -31,6 +31,7 @@
 #define __TOOLS_H__
 
 #include <algorithm>
+#include <queue>
 
 namespace freettcn {
 
@@ -106,15 +107,35 @@ namespace freettcn {
 //     void ClearUntil(item);
   };
   
-  
-  class CQueue {
-  public:
-//     void Enqueue(item);
-//     void Dequeue();
-//     Item *First() const;
-//     void Clear();
-  };
 
+  template <class Item>
+  class CQueue {
+    std::queue<Item> _queue;
+  public:
+    void Enqueue(Item item)
+    {
+      _queue.push(item);
+    }
+    
+    void Dequeue()
+    {
+      delete First();
+      _queue.pop();
+    }
+    
+    Item First() const
+    {
+      return _queue.front();
+    }
+    
+    void Clear()
+    {
+      while(First())
+        Dequeue();
+    }
+  };
+    
+  
 } // namespace freettcn
 
 

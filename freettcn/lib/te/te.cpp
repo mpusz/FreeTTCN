@@ -35,6 +35,7 @@
 #include "freettcn/te/behavior.h"
 #include "freettcn/te/testCase.h"
 #include "freettcn/te/timer.h"
+#include "freettcn/te/ttcnWrappers.h"
 #include "freettcn/tools/logMask.h"
 #include "freettcn/tools/timeStamp.h"
 extern "C" {
@@ -192,7 +193,7 @@ TriPortIdList freettcn::TE::CTTCNExecutable::TestCaseTSIGet(const TciTestCaseIdT
     return portList;
   }
   
-  return module.TestCase(testCaseId.objectName).Ports();
+  return module.TestCase(testCaseId.objectName).SystemInterface();
 }
 
 
@@ -233,9 +234,9 @@ void freettcn::TE::CTTCNExecutable::TestCaseStop() const
 }
 
 
-TriComponentId freettcn::TE::CTTCNExecutable::ControlStart() const
+const TriComponentId &freettcn::TE::CTTCNExecutable::ControlStart() const
 {
-  return RootModule().ControlStart();
+  return RootModule().ControlStart().Id();
 }
 
 
@@ -247,9 +248,9 @@ void freettcn::TE::CTTCNExecutable::ControlStop() const
 }
 
 
-TriComponentId freettcn::TE::CTTCNExecutable::TestComponentCreate(TciTestComponentKindType kind,
-                                                                  TciType componentType,
-                                                                  String name) const
+const TriComponentId &freettcn::TE::CTTCNExecutable::TestComponentCreate(TciTestComponentKindType kind,
+                                                                         TciType componentType,
+                                                                         String name) const
 {
   if (kind == TCI_CTRL_COMP && componentType) {
     std::cout << "ERROR: 'componentType' given for Control component!!!" << std::endl;
@@ -285,9 +286,8 @@ TriComponentId freettcn::TE::CTTCNExecutable::TestComponentCreate(TciTestCompone
   }
   
   cInstance->Init(RootModule(), kind, name);
-  TriComponentId compId = cInstance->Id();
   
-  return compId;
+  return cInstance->Id();
 }
 
 
@@ -295,9 +295,7 @@ void freettcn::TE::CTTCNExecutable::TestComponentStart(const TriComponentId &com
                                                        const TciBehaviourIdType &behaviorId,
                                                        const TciParameterListType &parameterList) const
 {
-  freettcn::TE::CTestComponentType::CInstance &component = RootModule().TestComponent(componentId);
-  const freettcn::TE::CBehavior &behavior = RootModule().Behavior(behaviorId);
-  component.Start(behavior, parameterList);
+  RootModule().TestComponentStart(componentId, behaviorId, parameterList);
 }
 
 
@@ -328,41 +326,7 @@ void freettcn::TE::CTTCNExecutable::Unmap(const TriPortId &fromPort, const TriPo
 void freettcn::TE::CTTCNExecutable::TestComponentTerminated(const TriComponentId &componentId,
                                                             TciVerdictValue verdict) const
 {
-//   cmp.Terminated();
-
-//   if (cmp.Type() == MTC) {
-//     tciTestCaseTerminated(verdict, parms);
-//   }
-//   else {
-//     bool terminated = true;
-//     for(ptc) {
-//       if (!ptc.Terminated()) {
-//         terminated = false;
-//         break;
-//       }
-//     }
-//     if (terminated) {
-//       /// @todo not sure
-//       tciTestComponentTerminatedReq(mtc, verdict);
-//     }
-//   }
-
-  if (Logging() && LogMask().Get(freettcn::CLogMask::CMD_TE_C_TERMINATED)) {
-    // log
-    TriComponentId ctrlId;
-    ctrlId.compInst.data = 0;
-    ctrlId.compInst.bits = 0;
-    ctrlId.compInst.aux = 0;
-    ctrlId.compName = "saComp";
-    ctrlId.compType.moduleName = "IP";
-    ctrlId.compType.objectName = "IP_SA";
-    ctrlId.compType.aux = 0;
-    
-    tliCTerminated(0, TimeStamp().Get(), "ip.ttcn", 122, ctrlId, 0);
-  }
-  
-  // reset current test case
-  RootModule().TestCase(0);
+  RootModule().TestComponentDone(componentId, verdict);
 }
 
 

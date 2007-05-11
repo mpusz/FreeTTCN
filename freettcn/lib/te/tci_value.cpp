@@ -52,7 +52,7 @@ String tciGetName(TciType inst)
     throw freettcn::ECastFailed();
   
   const freettcn::TE::CType *type = static_cast<const freettcn::TE::CType *>(inst);
-  return type->Name();
+  return const_cast<char *>(type->Name());
 }
 
 

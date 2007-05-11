@@ -49,9 +49,10 @@ const QualifiedName &freettcn::TE::CPortType::Id() const
 
 freettcn::TE::CPortType::CInstance::CInstance(const freettcn::TE::CPortType &type,
                                               const freettcn::TE::CTestComponentType::CInstance &component,
-                                              const char *name, int portIdx /* -1 */)
+                                              const char *name, int portIdx /* -1 */):
+  _component(component), _status(STARTED)
 {
-  _id.compInst = component.Id();
+  _id.compInst = _component.Id();
   _id.portName = const_cast<char *>(name);
   _id.portIndex = portIdx;
   _id.portType = type.Id();
@@ -59,7 +60,18 @@ freettcn::TE::CPortType::CInstance::CInstance(const freettcn::TE::CPortType &typ
 }
 
 
+freettcn::TE::CPortType::CInstance::~CInstance()
+{
+}
+
+
 const TriPortId &freettcn::TE::CPortType::CInstance::Id() const
 {
   return _id;
+}
+
+
+void freettcn::TE::CPortType::CInstance::Init()
+{
+  Initialize();
 }

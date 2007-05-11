@@ -38,6 +38,7 @@ extern "C" {
 }
 #include <freettcn/te/initObject.h>
 #include <freettcn/te/testComponent.h>
+#include <freettcn/tools/exception.h>
 #include <vector>
 #include <list>
 
@@ -49,6 +50,7 @@ namespace freettcn {
     class CBehavior;
     class CTestCase;
     class CSourceData;
+    class CTestComponentId;
     
     class CModule : public CInitObject {
     public:
@@ -64,18 +66,11 @@ namespace freettcn {
       };
       
     private:
-      class CState {
-        // ALL_ENTITY_STATES - (CList) list of all entities that was used in a test case - M-CONTROL (must be the first), MTC, PTCs
-        // current test case pointer
-        // DONE - (CList) a list of all currently stopped test components during test case execution (filled when TC is stopped or killed, removed when TC is started)
-        // KILLED - (CList) a list of all terminated test components during test case execution (filled when TC is killed)
-      };
-      
       // types
       typedef std::vector<CParameter *> TParameterList;
       typedef std::list<const CBehavior *> TBehaviorList;
       typedef std::vector<CTestCase *> TTestCaseList;
-      typedef std::list<CTestComponentType::CInstance *> TTestCompList;
+      typedef std::list<const CTestComponentId *> TTestCompList;
       
       // module info
       const CBehavior * _ctrlBehavior;
@@ -87,10 +82,10 @@ namespace freettcn {
       
       // module dynamic state
       bool _ctrlRunning;
-      TTestCompList _allEntityStates;              /**< list of all entities that was used in a test case - M-CONTROL (must be the first), MTC, PTCs */
+      TTestCompList _allEntityStates;             /**< list of all entities that was used in a test case - M-CONTROL (must be the first) */
       CTestCase *_currTestCase;                   /**< current test case pointer */
-//       TestCompList _done;                         /**< a list of all currently stopped test components during test case execution (filled when TC is stopped or killed, removed when TC is started) */
-//       TestCompList _killed;                       /**< a list of all terminated test components during test case execution (filled when TC is killed) */
+      TTestCompList _done;                         /**< a list of all currently stopped test components during test case execution (filled when TC is stopped or killed, removed when TC is started) */
+      TTestCompList _killed;                       /**< a list of all terminated test components during test case execution (filled when TC is killed) */
       
       // temporary variables
       mutable TciModuleParameterType *__modParList;
@@ -98,6 +93,9 @@ namespace freettcn {
       
       CModule& operator=(CModule&);  // Disallowed
       CModule(const CModule&);       // Disallowed
+      
+      CTestComponentType::CInstance &TestComponent(const TriComponentId &component) const throw(ENotFound);
+      const CBehavior &Behavior(const TciBehaviourIdType &behavior) const throw(ENotFound);
       
     protected:
       void Register(CParameter *parameter);
@@ -126,17 +124,16 @@ namespace freettcn {
       void TestCase(CTestCase *tc);
       CTestCase *TestCase() const;
       
-      TriComponentId ControlStart();
+      const CTestComponentId &ControlStart();
       void ControlStop() throw(EOperationFailed);
       
       const CBehavior &ControlBehavior() const throw(ENotFound);
       void BehaviorAdd(CBehavior *behavior);
-      const CBehavior &Behavior(const TciBehaviourIdType &behavior) const throw(ENotFound);
       
-      void TestComponentAdd(CTestComponentType::CInstance &component);
-      CTestComponentType::CInstance &TestComponent(const TriComponentId &component) const throw(ENotFound);
-      TriComponentId TestComponentCreateReq(const char *src, int line, const TriComponentId &creatorId, TciTestComponentKindType kind, const CTestComponentType *compType, String name);
+      const CTestComponentId &TestComponentCreateReq(const char *src, int line, const TriComponentId &creatorId, TciTestComponentKindType kind, const CTestComponentType *compType, String name);
       void TestComponentStartReq(const char *src, int line, const TriComponentId &creatorId, const TriComponentId &componentId, const TciBehaviourIdType &behaviorId, const TciParameterListType &parameterList);
+      void TestComponentStart(const TriComponentId &componentId, const TciBehaviourIdType &behaviorId, const TciParameterListType &parameterList) throw(ENotFound);
+      void TestComponentDone(const TriComponentId &component, TciVerdictValue verdict) throw(ENotFound);
     };
 
   } // namespace TE

@@ -500,8 +500,8 @@ void freettcn::TL::CTestLogging::CTerminated(const char *am, int ts, const char 
                                              TciVerdictValue verdict) const
 {
   freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, freettcn::CEntity::TYPE_TE,
-                                                                        freettcn::CLogMask::CMD_TE_C_START,
-                                                                        "Component START");
+                                                                        freettcn::CLogMask::CMD_TE_C_TERMINATED,
+                                                                        "Component TERMINATED");
   
   char str[256];
   data->LineAdd("From", TriComponentId2String(c, str));

@@ -18,47 +18,39 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /**
- * @file   behavior.h
+ * @file   ttcnWrappers.h
  * @author Mateusz Pusz
- * @date   Wed Apr 25 11:01:46 2007
+ * @date   Fri May 11 08:03:56 2007
  * 
  * @brief  
  * 
  * 
  */
 
-#ifndef __BEHAVIOR_H__
-#define __BEHAVIOR_H__
+#ifndef __TTCNWRAPPERS_H__
+#define __TTCNWRAPPERS_H__
 
-#include <freettcn/te/testComponent.h>
+
 extern "C" {
-#include <freettcn/ttcn3/tci.h>
+#include <freettcn/ttcn3/tri.h>
 }
-#include <string>
-
 
 namespace freettcn {
-
+  
   namespace TE {
     
-    class CModule;
-    
-    class CBehavior {
-      CModule &_module;
-      TciBehaviourIdType _id;
-      //      VerdictType_t _verdict;
+    class CTestComponentId {
+      TriComponentId _id;
     public:
-      CBehavior(CModule &module, const char *name);
-      virtual ~CBehavior();
-      
-      const TciBehaviourIdType &Id() const;
-      
-      virtual void Enqueue(CTestComponentType::CInstance &comp) const = 0;
+      CTestComponentId(const TriComponentId &id);
+      ~CTestComponentId();
+      const TriComponentId &Id() const;
     };
+        
 
   } // namespace TE
   
 } // namespace freettcn
 
 
-#endif /* __BEHAVIOR_H__ */
+#endif /* __TTCNWRAPPERS_H__ */

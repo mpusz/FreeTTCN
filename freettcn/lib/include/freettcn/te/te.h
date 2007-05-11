@@ -68,11 +68,11 @@ namespace freettcn {
       TriPortIdList TestCaseTSIGet(const TciTestCaseIdType &testCaseId) const;
       void TestCaseStart(const TciTestCaseIdType &testCaseId, const TciParameterListType &parameterlist) const;
       void TestCaseStop() const;
-      TriComponentId ControlStart() const;
+      const TriComponentId &ControlStart() const;
       void ControlStop() const;
       
       // CH requests
-      TriComponentId TestComponentCreate(TciTestComponentKindType kind, TciType componentType, String name) const;
+      const TriComponentId &TestComponentCreate(TciTestComponentKindType kind, TciType componentType, String name) const;
       void TestComponentStart(const TriComponentId &componentId, const TciBehaviourIdType &behaviorId, const TciParameterListType &parameterList) const;
       void Connect(const TriPortId &fromPort, const TriPortId &toPort);
       void Disconnect(const TriPortId &fromPort, const TriPortId &toPort);

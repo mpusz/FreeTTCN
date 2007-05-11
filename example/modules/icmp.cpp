@@ -32,6 +32,7 @@
 #include <freettcn/te/testCase.h>
 #include <freettcn/te/behavior.h>
 #include <freettcn/te/port.h>
+#include <freettcn/te/command.h>
 #include <freettcn/te/sourceData.h>
 
 
@@ -92,9 +93,11 @@ namespace freettcn {
     class CICMPPortType : public freettcn::TE::CPortType {
     public:
       class CInstance : public freettcn::TE::CPortType::CInstance {
+        virtual void Initialize();
       public:
         CInstance(const freettcn::TE::CTestComponentType::CInstance &component,
                   const char *name);
+        ~CInstance();
       };
       
     public:
@@ -227,7 +230,7 @@ namespace freettcn {
       class CBehavior : public freettcn::TE::CBehavior {
       public:
         CBehavior(freettcn::TE::CModule &module);
-        virtual void Run() const;
+        virtual void Enqueue(freettcn::TE::CTestComponentType::CInstance &comp) const;
       };
       
       virtual void Initialize();
@@ -239,7 +242,7 @@ namespace freettcn {
       class CBehavior : public freettcn::TE::CBehavior {
       public:
         CBehavior(freettcn::TE::CModule &module);
-        virtual void Run() const;
+        virtual void Enqueue(freettcn::TE::CTestComponentType::CInstance &comp) const;
       };
       
       virtual void Initialize();
@@ -283,7 +286,7 @@ namespace freettcn {
       class CBehavior : public freettcn::TE::CBehavior {
       public:
         CBehavior(freettcn::TE::CModule &module);
-        virtual void Run() const;
+        virtual void Enqueue(freettcn::TE::CTestComponentType::CInstance &comp) const;
       };
       
     private:
@@ -320,7 +323,13 @@ namespace freettcn {
     {
     }
     
-    
+    CICMPPortType::CInstance::~CInstance()
+    {
+    }
+
+    void CICMPPortType::CInstance::Initialize()
+    {
+    }
     
     
     
@@ -343,13 +352,19 @@ namespace freettcn {
     
     CICMPComponentType::CInstance::~CInstance()
     {
-      if (icmpPort)
-        delete icmpPort;
     }
     
     void CICMPComponentType::CInstance::Initialize()
     {
+      // ports declaration
       icmpPort = new CICMPPortType::CInstance(*this, "icmpPort");
+      Module().TestCase()->Register(icmpPort);
+      
+      // constant definition
+      
+      // variable declaration
+      
+      // timer declaration
     }
     
     
@@ -377,6 +392,7 @@ namespace freettcn {
     void CIPStackType::CInstance::Initialize()
     {
       icmpPort = new CICMPPortType::CInstance(*this, "icmpPort");
+      Module().TestCase()->Register(icmpPort);
     }
     
     
@@ -407,9 +423,16 @@ namespace freettcn {
     {
     }
     
-    void CTC_ICMPPing_1::CBehavior::Run() const
+    void CTC_ICMPPing_1::CBehavior::Enqueue(freettcn::TE::CTestComponentType::CInstance &comp) const
     {
-      printf("\n\n@@@@@@@ YES @@@@@@@@@@\n\n\n");
+//       comp.CmdQueue().Enqueue(new CCmdInitScopeWithRunsOn(comp));
+      
+      // <parameter-handling>
+      
+      // <statement-block>
+      
+      // add automatically if 'self.stop' not included in *.ttcn file
+      comp.Enqueue(new freettcn::TE::CCmdStopMTC(comp, new freettcn::TE::CSourceData("icmp.ttcn", 115)));
     }
     
     
@@ -433,8 +456,11 @@ namespace freettcn {
     {
     }
     
-    void CTC_ICMPPing_2::CBehavior::Run() const
+    void CTC_ICMPPing_2::CBehavior::Enqueue(freettcn::TE::CTestComponentType::CInstance &comp) const
     {
+      printf("\n\n@@@@@@@ TEST CASE 2 @@@@@@@@@@\n\n\n");
+      
+//       self.stop();
     }
     
 
@@ -529,13 +555,21 @@ namespace freettcn {
     {
     }
     
-    void CModule::CBehavior::Run() const
+    void CModule::CBehavior::Enqueue(freettcn::TE::CTestComponentType::CInstance &comp) const
     {
-      CModule::CType::Instance().TC_ICMPPing_1().Start("icmp.ttcn", 116, 0, 0, 0);
-//       _module.TestCase(0).Execute();
-//       _module.TestCase(1).Execute(3.0);
+//       comp.CmdQueue().Enqueue(new CCmdInitComponentScope(comp));
+      
+//       // <statement-block>
+      
+//       freettcn::TE::CTestComponentType::CInstance::TStatus status = NOT_INITED;
+//       state = comp.Status();
+//       comp.Status(freettcn::TE::CTestComponentType::CInstance::BLOCKED);
+//       //       CModule::CType::Instance().TC_ICMPPing_1().Start("icmp.ttcn", 116, 0, 0, 0);
+//       comp.Status() = status;
+      
+      // add automatically if 'stop' not included in *.ttcn file
+      comp.Enqueue(new freettcn::TE::CCmdStopEntityOp(comp, new freettcn::TE::CSourceData("icmp.ttcn", 115)));
     }
-    
     
   } // namespace icmp
 

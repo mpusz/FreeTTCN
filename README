@@ -46,3 +46,12 @@ Chapter II - Compilation and instalation
  - make env                    (optional)
  - su -c 'make env_install'    (optional)
  - make example                (optional)
+
+
+
+Chapter III - TODO
+------------------
+
+4 - 8.2.4 Flow graph representation of functions
+4 - 8.2.5 Flow graph representation of altsteps
+4 - 8.2.6 Flow graph representation of component type definitions

@@ -52,36 +52,36 @@ namespace freettcn {
         
         const CType &Type() const;
         bool Omit() const;
-        const String Encoding() const;
-        const String EncodingVariant() const;
-        const String Extension() const;
+        const char *Encoding() const;
+        const char *EncodingVariant() const;
+        const char *Extension() const;
       };
       
     private:
       const CModule *_module;
       QualifiedName _id;
       TciTypeClassType _class;
-      String _encoding;
-      String _encodingVariant;
-      String _extension;
+      const char *_encoding;
+      const char *_encodingVariant;
+      const char *_extension;
       
     public:
       CType(const CModule    *module,
-            String           name,
+            const char       *name,
             TciTypeClassType typeClass,
-            String          encoding,
-            String          encodingVariant,
-            String          extension);
+            const char       *encoding,
+            const char       *encodingVariant,
+            const char       *extension);
       virtual ~CType();
       
       const CModule *DefiningModule() const;
-      String Name() const;
+      const char *Name() const;
       const QualifiedName &Id() const;
       TciTypeClassType Class() const;
       
-      String Encoding() const;
-      String EncodingVariant() const;
-      String Extension() const;
+      const char *Encoding() const;
+      const char *EncodingVariant() const;
+      const char *Extension() const;
       
       virtual CInstance *InstanceCreate(bool omit = false) const = 0;
     };

@@ -18,47 +18,63 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /**
- * @file   behavior.h
+ * @file   command.cpp
  * @author Mateusz Pusz
- * @date   Wed Apr 25 11:01:46 2007
+ * @date   Thu May 10 20:05:58 2007
  * 
  * @brief  
  * 
  * 
  */
 
-#ifndef __BEHAVIOR_H__
-#define __BEHAVIOR_H__
+#include "freettcn/te/command.h"
+#include "freettcn/te/sourceData.h"
 
-#include <freettcn/te/testComponent.h>
-extern "C" {
-#include <freettcn/ttcn3/tci.h>
+
+
+freettcn::TE::CCommand::~CCommand()
+{
 }
-#include <string>
 
 
-namespace freettcn {
 
-  namespace TE {
-    
-    class CModule;
-    
-    class CBehavior {
-      CModule &_module;
-      TciBehaviourIdType _id;
-      //      VerdictType_t _verdict;
-    public:
-      CBehavior(CModule &module, const char *name);
-      virtual ~CBehavior();
+freettcn::TE::CCmdStopEntityOp::CCmdStopEntityOp(CTestComponentType::CInstance &comp, const CSourceData *srcData):
+  _comp(comp), _srcData(srcData)
+{
+}
+
+
+freettcn::TE::CCmdStopEntityOp::~CCmdStopEntityOp()
+{
+  if (_srcData)
+    delete _srcData;
+}
+
+bool freettcn::TE::CCmdStopEntityOp::Run()
+{
+  _comp.Done(*_srcData);
+  return true;
+}
       
-      const TciBehaviourIdType &Id() const;
+
+
+freettcn::TE::CCmdStopMTC::CCmdStopMTC(CTestComponentType::CInstance &comp, const CSourceData *srcData):
+  _comp(comp), _srcData(srcData)
+{
+}
+
+
+freettcn::TE::CCmdStopMTC::~CCmdStopMTC()
+{
+  if (_srcData)
+    delete _srcData;
+}
+
+bool freettcn::TE::CCmdStopMTC::Run()
+{
+  _comp.Done(*_srcData);
+  return true;
+}
       
-      virtual void Enqueue(CTestComponentType::CInstance &comp) const = 0;
-    };
-
-  } // namespace TE
-  
-} // namespace freettcn
 
 
-#endif /* __BEHAVIOR_H__ */

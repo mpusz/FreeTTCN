@@ -38,16 +38,16 @@ extern "C" {
 #include <freettcn/te/type.h>
 #include <freettcn/te/idObject.h>
 #include <freettcn/tools/exception.h>
+#include <freettcn/tools/tools.h>
 #include <string>
 #include <vector>
 #include <list>
-
 
 namespace freettcn {
   
   namespace TE {
     
-    enum TVerdictType_t {
+    enum TVerdict {
       VERDICT_NONE,
       VERDICT_PASS,
       VERDICT_INCONC,
@@ -58,56 +58,82 @@ namespace freettcn {
     class CBehavior;
     class CPortType;
     class CTimer;
+    class CSourceData;
+    class CCommand;
     
     class CTestComponentType : public CType {
     public:
       class CInstance : public CType::CInstance, public CIdObject {
       public:
+        enum TStatus {
+          NOT_INITED,                             /**< created but Init() not run */
+          ACTIVE,
+          SNAPSHOT,                               /**< active but in the evaluation phase of a snapshot */
+          REPEAT,                                 /**< active and in an 'alt' statement that should be
+                                                     reevaluated due to a 'repeat' statement */
+          BLOCKED                                 /**< module control is blocked during the execution of
+                                                     the test case;
+                                                     test components are blocked during the creation of
+                                                     other test components, and when they wait for being
+                                                     started */
+        };
+        
         class ENotInited : public freettcn::EOperationFailed {};
         
       private:
-        class CState {
-          // STATUS:
-          // - ACTIVE
-          // - SNAPSHOT (active but in the evaluation phase of a snapshot)
-          // - REPEAT (active and in an 'alt' statement that should be reevaluated due to a 'repeat' statement)
-          // - BLOCKED (module control is blocked during the execution of the test case; test components are blocked during the creation of other test components, and when they wait for being started)
-          // CONTROL_STACK (CStack) (a stack of flow graph node references; the top element is the flow graph node that has to be interpreted next)
-          // DEFAULT_LIST (CList) (a list of activated defaults; a list of pointers to the start nodes of activated defaults; the list in reverse order of activation)
-          // DEFAULT_POINTER (next default that has to be evaluated if the actual default terminates unsuccessfully)
-          // VALUE_STACK (CStack) (not used)
-          // E_VERDICT (actual local verdict of a test component; ignored if an entity state represents the module control)
-          // TIMER_GUARD (special timer which is necessary to guard the execution time of test cases and the duration of call operations; modelled as a timer binding)
-          // DATA_STATE (CList) (list of list of variable bindings)
-          // TIMER_STATE (wtf ???)
-          // PORT_REF (wtf ???)
-          // SNAP_ALIVE (supports snapshot semantics of test component; when a snapshot is taken, a copy of the ALL_ENTITY_STATES list of module state will be assigned)
-          // SNAP_DONE (supports snapshot semantics of test component; when a snapshot is taken, a copy of the DONE list of module state will be assigned)
-          // SNAP_KILLED (supports snapshot semantics of test component; when a snapshot is taken, a copy of the KILLED list of module state will be assigned)
-          // KEEP_ALIVE (indicated wheter the entity can be restarted after its termination or not; 'true' if the entity can be restarted)
-        };
+        typedef std::list<const CTimer *> TTimerList;
+        typedef CQueue<CCommand *> CCommandQueue;
         
-        typedef std::list<CTimer *> TTimerList;
-        
-        bool _inited;
         CModule *_module;
         TciTestComponentKindType _kind;
         TriComponentId _id;
+        CTimer *_startTimer;
+        
+        // test comopnent dynamic state
+        TStatus _status;                          /**< describes the status of test component */
+        CCommandQueue _controlStack;              /**< a stack of flow graph node references; the top element is the flow graph node that has to be interpreted next */
+//         TDefaultList _defaultList;                /**< a list of activated defaults; a list of pointers to the start nodes of activated defaults; the list in reverse order of activation */
+        // DEFAULT_POINTER (next default that has to be evaluated if the actual default terminates unsuccessfully)
+        // VALUE_STACK (CStack) (not used)
+        TVerdict _verdict;                        /**< actual local verdict of a test component;
+                                                     ignored if an entity state represents the module control */
+        // TIMER_GUARD (special timer which is necessary to guard the execution time of test cases and the duration of call operations; modelled as a timer binding)
+        // DATA_STATE (CList) (list of list of variable bindings)
+        // TIMER_STATE (wtf ???)
+        // PORT_REF (wtf ???)
+        // SNAP_ALIVE (supports snapshot semantics of test component; when a snapshot is taken, a copy of the ALL_ENTITY_STATES list of module state will be assigned)
+        // SNAP_DONE (supports snapshot semantics of test component; when a snapshot is taken, a copy of the DONE list of module state will be assigned)
+        // SNAP_KILLED (supports snapshot semantics of test component; when a snapshot is taken, a copy of the KILLED list of module state will be assigned)
+        // KEEP_ALIVE (indicated wheter the entity can be restarted after its termination or not; 'true' if the entity can be restarted)
         TTimerList _explicitTimers;
         TTimerList _implicitTimers;
         
         virtual void Initialize() = 0;
+
+      protected:
+        CModule &Module() const throw(ENotInited);
+
       public:
         CInstance(const CType &type);
         ~CInstance();
         
-        void Init(CModule &module, TciTestComponentKindType kind, String name);
+        TStatus Status() const;
+        void Status(TStatus status);
+        
+        void Init(CModule &module, TciTestComponentKindType kind, const char *name);
         const TriComponentId &Id() const throw(ENotInited);
         
         virtual void Start(const CBehavior &behavior, TciParameterListType parameterList) throw(ENotInited);
+        void Run();
+        void Done(const CSourceData &srcData);
+        
+        void TimerAdd(const CTimer &timer, bool implicit = false);
+        void TimerRemove(const CTimer &timer, bool implicit = false) throw(ENotFound);
         
         //       void Map(const CPort &fromPort, const CPort &toPort) throw(ENotInited);
         //       void Verdict(VerdictType_t value);
+        
+        void Enqueue(CCommand *cmd);
       };
 
       
@@ -125,27 +151,12 @@ namespace freettcn {
       void Register(const CPortType &portType, const char *name, int portIdx = -1);
       
     public:
-      CTestComponentType(const CModule *module, String name);
+      CTestComponentType(const CModule *module, const char *name);
       ~CTestComponentType();
       
       TriPortIdList Ports() const;
     };
     
-    
-    
-//     CTestComponent::CTestComponent(flowGraphNode, bool keepAlive):
-//       STATUS(ACTIVE), DEFAULT_POINTER(0), E_VERDICT(NONE), TIMER_GUARD(binding("GUARD", IDLE, 0)), KEEP_ALIVE(keepAlive)
-//     {
-//       controlStack.push(flowGraphNode);
-//     }
-    
-//     CTestComponent::NextControl(bool)
-//     {
-//       successorNode = controlStack.Next(bool).Top();
-//       controlStack.Pop();
-//       controlStack.Push(successorNode);
-//     }
-
     
     class CControlComponentType : public CTestComponentType {
       class CInstance : public CTestComponentType::CInstance {
@@ -159,7 +170,6 @@ namespace freettcn {
       virtual CInstance *InstanceCreate(bool omit = false) const;
     };
     
-
 
   } // namespace TE
   

@@ -33,11 +33,11 @@
 #include "freettcn/te/te.h"
 #include "freettcn/te/behavior.h"
 #include "freettcn/te/testCase.h"
+#include "freettcn/te/ttcnWrappers.h"
 #include "freettcn/te/sourceData.h"
 #include "freettcn/tools/tools.h"
 #include "freettcn/tools/logMask.h"
 #include "freettcn/tools/timeStamp.h"
-#include <iostream>
 extern "C" {
 #include "freettcn/ttcn3/tci_te_tm.h"
 #include "freettcn/ttcn3/tci_te_ch.h"
@@ -45,6 +45,7 @@ extern "C" {
 #include "freettcn/ttcn3/tri_te_pa.h"
 #include "freettcn/ttcn3/tci_tl.h"
 }
+#include <iostream>
 
 
 freettcn::TE::CModule::CParameter::CParameter(const char *name):
@@ -253,7 +254,7 @@ freettcn::TE::CTestCase *freettcn::TE::CModule::TestCase() const
 }
 
 
-TriComponentId freettcn::TE::CModule::ControlStart()
+const freettcn::TE::CTestComponentId &freettcn::TE::CModule::ControlStart()
 {
   // obtain module parameters
 //   ParametersSet();
@@ -314,12 +315,6 @@ const freettcn::TE::CBehavior &freettcn::TE::CModule::Behavior(const TciBehaviou
 
 
 
-void freettcn::TE::CModule::TestComponentAdd(freettcn::TE::CTestComponentType::CInstance &component)
-{
-  _allEntityStates.push_back(&component);
-}
-
-
 freettcn::TE::CTestComponentType::CInstance &freettcn::TE::CModule::TestComponent(const TriComponentId &component) const throw(freettcn::ENotFound)
 {
   freettcn::TE::CIdObject &object = CIdObject::Get(component.compInst);
@@ -334,13 +329,16 @@ freettcn::TE::CTestComponentType::CInstance &freettcn::TE::CModule::TestComponen
 
 
 
-TriComponentId freettcn::TE::CModule::TestComponentCreateReq(const char *src, int line,
-                                                             const TriComponentId &creatorId,
-                                                             TciTestComponentKindType kind,
-                                                             const CTestComponentType *compType, String name)
+const freettcn::TE::CTestComponentId &freettcn::TE::CModule::TestComponentCreateReq(const char *src, int line,
+                                                                                                      const TriComponentId &creatorId,
+                                                                                                      TciTestComponentKindType kind,
+                                                                                                      const CTestComponentType *compType, String name)
 {
   TriComponentId compId = tciCreateTestComponentReq(kind, const_cast<void *>(reinterpret_cast<const void*>(compType)), name);
-  freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
+  const CTestComponentId *id = new CTestComponentId(compId);
+  _allEntityStates.push_back(id);
+  
+  CTTCNExecutable &te = CTTCNExecutable::Instance();
   
   if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_C_CREATE))
     // log
@@ -361,7 +359,7 @@ TriComponentId freettcn::TE::CModule::TestComponentCreateReq(const char *src, in
     TestComponentStartReq(src, line, creatorId, compId, ControlBehavior().Id(), parameterList);
   }
   
-  return compId;
+  return *id;
 }
 
 
@@ -377,4 +375,35 @@ void freettcn::TE::CModule::TestComponentStartReq(const char *src, int line,
   if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_C_START))
     // log
     tliCStart(0, te.TimeStamp().Get(), const_cast<char *>(src), line, creatorId, componentId, behaviorId, parameterList);
+}
+
+
+void freettcn::TE::CModule::TestComponentStart(const TriComponentId &componentId,
+                                               const TciBehaviourIdType &behaviorId,
+                                               const TciParameterListType &parameterList) throw(ENotFound)
+{
+  TestComponent(componentId).Start(Behavior(behaviorId), parameterList);
+}
+
+
+void freettcn::TE::CModule::TestComponentDone(const TriComponentId &component, TciVerdictValue verdict) throw(ENotFound)
+{
+//   cmp.Terminated();
+
+//   if (cmp.Type() == MTC) {
+//     tciTestCaseTerminated(verdict, parms);
+//   }
+//   else {
+//     bool terminated = true;
+//     for(ptc) {
+//       if (!ptc.Terminated()) {
+//         terminated = false;
+//         break;
+//       }
+//     }
+//     if (terminated) {
+//       /// @todo not sure
+//       tciTestComponentTerminatedReq(mtc, verdict);
+//     }
+//   }
 }

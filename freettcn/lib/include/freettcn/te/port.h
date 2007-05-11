@@ -40,26 +40,51 @@ namespace freettcn {
   
   namespace TE {
     
+    class CMessage {
+      const TriComponentId &sender;
+      const CType::CInstance &value;
+    };
+
     class CModule;
     
     class CPortType {
     public:
       class CInstance {
+      public:
+        enum TStatus {
+          STARTED,
+          STOPPED
+        };
+
+      private:
+        typedef CQueue<CMessage *> CMessageQueue;
+        
+        const CTestComponentType::CInstance &_component;
         TriPortId _id;
         
-        class CState {
-          // STATUS
-          //  - STARTED
-          //  - STOPPED
-          // CONNECTIONS_LIST - keeps track of connections between the different ports in the test system
-          // VALUE_QUEUE - not yet consumed messages, calls, replies and exceptions
-          // SNAP_VALUE - when a snapshot is taken the first element from VALUE_QUEUE is copied (NULL if VALUE_QUEUE is empty or STATUS = STOPPED)
-        };
+        // port dynamic state
+        TStatus _status;                          /**< actual status of a port */
+        // CONNECTIONS_LIST - keeps track of connections between the different ports in the test system
+        CMessageQueue _valueQueue;                /**< not yet consumed messages, calls, replies and exceptions */
+        // SNAP_VALUE - when a snapshot is taken the first element from VALUE_QUEUE is copied (NULL if VALUE_QUEUE is empty or STATUS = STOPPED)
+      
+      protected:
+        virtual void Initialize() = 0;
+        
       public:
         CInstance(const CPortType &type, const CTestComponentType::CInstance &component, const char *name, int portIdx = -1);
-        //       void Send();
+        virtual ~CInstance() = 0;
         
         const TriPortId &Id() const;
+        void Init();
+        
+        //       void Send();
+        
+//         const TriPortId &RemoteId(const CTestComponentType::CInstance &component) const throw(ENotFound);
+//         TStatus Status() const;
+//         void Connect(const TriPortId &remoteId);
+//         void Disconnect(const TriPortId &remoteId);
+        
       };
       
     private:

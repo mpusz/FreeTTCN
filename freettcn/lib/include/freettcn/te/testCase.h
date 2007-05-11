@@ -36,7 +36,7 @@ extern "C" {
 #include <freettcn/ttcn3/tri.h>
 }
 #include <freettcn/te/initObject.h>
-#include <freettcn/te/testComponent.h>
+#include <freettcn/te/port.h>
 
 
 namespace freettcn {
@@ -46,13 +46,10 @@ namespace freettcn {
     class CModule;
     class CBehavior;
     class CSourceData;
+    class CTestComponentId;
     
     class CTestCase : public CInitObject {
-      class CState {
-        // ALL_PORT_STATES - a list of states of different ports
-        // MTC - MTC reference
-        // TC_VERDICT - actual global test verdict of a test case, updated after every test component termination
-      };
+      typedef std::list<CPortType::CInstance *> TPortList;
       
       CModule &_module;
       CSourceData const * const _srcData;
@@ -62,9 +59,12 @@ namespace freettcn {
       
       TciTestCaseIdType _id;
       
-      // state
-      TriComponentId _mtcId;
-      TriComponentId _systemId;
+      // test case dynamic state
+      TPortList _allPortStates;                   /**< a list of states of different ports */
+      const CTestComponentId *_mtc;               /**< MTC reference */
+//       TVerdict _verdict;                          /**< actual global test verdict of a test case,
+//                                                      updated after every test component termination */
+      void Cleanup();
       
     public:
       CTestCase(CModule &module, const char *name, const CSourceData *srcData,
@@ -73,7 +73,7 @@ namespace freettcn {
       virtual ~CTestCase();
       
       TciParameterTypeListType Parameters() const;
-      TriPortIdList Ports() const;
+      TriPortIdList SystemInterface() const;
       
       void Start(const char *src, int line,
                  const CTestComponentType::CInstance *creator,
@@ -81,6 +81,8 @@ namespace freettcn {
                  TriTimerDuration dur);
       void Execute(TciTestCaseIdType testCaseId, TriPortIdList tsiPortList);
       void Stop();
+      
+      void Register(CPortType::CInstance *port);
     };
     
   } // namespace TE

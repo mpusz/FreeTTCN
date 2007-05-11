@@ -30,7 +30,7 @@
 #ifndef __TIMER_H__
 #define __TIMER_H__
 
-#include <freettcn/te/idObject.h>
+#include <freettcn/te/testComponent.h>
 extern "C" {
 #include <freettcn/ttcn3/tri.h>
 }
@@ -41,57 +41,58 @@ namespace freettcn {
   
   namespace TE {
     
-//     enum TVerdictType_t {
-//       VERDICT_NONE,
-//       VERDICT_PASS,
-//       VERDICT_INCONC,
-//       VERDICT_FAIL,
-//       VERDICT_ERROR
-//     };
-    
     class CBehavior;
     
     class CTimer : public CIdObject {
     public:
+      enum TStatus {
+        IDLE,
+        RUNNING,
+        TIMEOUT
+      };
+
       class CCommand {
       public:
         virtual ~CCommand();
-        virtual void Run() = 0;
+        virtual void Run(CTestComponentType::CInstance &comp) = 0;
       };
       
-      class CCmdBehaviorRun : public CCommand {
+      class CCmdComponentRun : public CCommand {
         const CBehavior &_behavior;
       public:
-        CCmdBehaviorRun(const CBehavior &behavior);
-        virtual void Run();
+        CCmdComponentRun(const CBehavior &behavior);
+        virtual void Run(CTestComponentType::CInstance &comp);
+      };
+      
+      class CCmdGuard : public CCommand {
+      public:
+        CCmdGuard();
+        virtual void Run(CTestComponentType::CInstance &comp);
       };
       
     private:
-      class CState {
-        // STATUS:
-        //  - IDLE
-        //  - RUNNING
-        //  - TIMEOUT
-        // DEF_DURATION - default duration of a timer (undefined if not inited during declaration)
-        // ACT_DURATION - stores the actual duration with which a running timer has been started (0.0 - if timer is stopped or timed out) (if a timer is started without duration, DEF_DURATION is copied) - error if no value defined when starting;
-        // TIME_LEFT - describes the actual duration that a running timer has to run before it times out (0.0 - if timer is stopped or timed out)
-        // SNAP_VALUE - when taking a snapshot it gets the actual value of ACT_DURATION - TIME_LEFT
-        // SNAP_STATUS - when taking a snapshot it gets the same value as STATUS
-      };
+      CTestComponentType::CInstance &_component;
+      const bool _implicit;
+      CCommand * const _command;
       
-      const bool _defaultDurationValid;
-      TriTimerDuration _defaultDuration;
-      CCommand *_command;
+      // timer dynamic state
+      TStatus _status;                            /**< denotes whether a timer is active, inactive or has timed out */
+      const bool _defaultDurationValid;           /**< specifies if default duration have been given during timer declaration */
+      TriTimerDuration _defaultDuration;          /**< default duration of a timer */
+      TriTimerDuration _activeDuration;           /**< stores the actual duration with which a running timer has been started */
+      // TIME_LEFT - describes the actual duration that a running timer has to run before it times out (0.0 - if timer is stopped or timed out)
+      // SNAP_VALUE - when taking a snapshot it gets the actual value of ACT_DURATION - TIME_LEFT
+      // SNAP_STATUS - when taking a snapshot it gets the same value as STATUS
       
     public:
-      CTimer();
-      CTimer(TriTimerDuration defaultDuration) throw(EOperationFailed);
+      CTimer(CTestComponentType::CInstance &comp, bool implicit, CCommand *cmd);
+      CTimer(CTestComponentType::CInstance &comp, bool implicit, CCommand *cmd, TriTimerDuration defaultDuration) throw(EOperationFailed);
       ~CTimer();
       
       const TriTimerId &Id() const;
       
-      void Start(CCommand *cmd) throw(EOperationFailed);
-      void Start(CCommand *cmd, TriTimerDuration duration) throw(EOperationFailed);
+      void Start() throw(EOperationFailed);
+      void Start(TriTimerDuration duration) throw(EOperationFailed);
       void Stop() throw(EOperationFailed);
       TriTimerDuration Read() const throw(EOperationFailed);
       bool Running() const throw(EOperationFailed);

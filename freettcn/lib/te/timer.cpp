@@ -35,102 +35,102 @@ extern "C" {
 #include <iostream>
 
 
-freettcn::TE::CTimer::CTimer():
-  _defaultDurationValid(false)
+freettcn::TE::CTimer::CTimer(CTestComponentType::CInstance &comp, bool implicit, CCommand *cmd):
+  _component(comp), _implicit(implicit), _command(cmd),
+  _status(IDLE), _defaultDurationValid(false)
 {
+  _component.TimerAdd(*this, _implicit);
 }
 
-freettcn::TE::CTimer::CTimer(TriTimerDuration defaultDuration) throw(EOperationFailed):
-  _defaultDurationValid(true), _defaultDuration(defaultDuration), _command(0)
+freettcn::TE::CTimer::CTimer(CTestComponentType::CInstance &comp, bool implicit, CCommand *cmd, TriTimerDuration defaultDuration) throw(EOperationFailed):
+  _component(comp), _implicit(implicit), _command(cmd),
+  _status(IDLE), _defaultDurationValid(true), _defaultDuration(defaultDuration)
 {
+  if (!cmd) {
+    std::cout << "ERROR: Timer command not set!!!" << std::endl;
+    throw freettcn::EOperationFailed();
+  }
+  
   if (_defaultDuration < 0) {
     std::cout << "ERROR: Timer default duration < 0!!!" << std::endl;
     throw freettcn::EOperationFailed();
   }
+  
+  _component.TimerAdd(*this, _implicit);
 }
 
 freettcn::TE::CTimer::~CTimer()
 {
   if (_command)
     delete _command;
+  _component.TimerRemove(*this, _implicit);
 }
-      
+
 const TriTimerId &freettcn::TE::CTimer::Id() const
 {
   return InstanceId();
 }
 
-void freettcn::TE::CTimer::Start(freettcn::TE::CTimer::CCommand *cmd) throw(freettcn::EOperationFailed)
+void freettcn::TE::CTimer::Start() throw(freettcn::EOperationFailed)
 {
   if (!_defaultDurationValid) {
     std::cout << "ERROR: Default duration not set!!!" << std::endl;
     throw freettcn::EOperationFailed();
   }
   
-  if (!cmd) {
-    std::cout << "ERROR: Timer command not set!!!" << std::endl;
+  _activeDuration = _defaultDuration;
+  if (triStartTimer(&InstanceId(), _activeDuration) == TRI_ERROR)
     throw freettcn::EOperationFailed();
-  }
   
-  // set timer command
-  _command = cmd;
-  
-  if (triStartTimer(&InstanceId(), _defaultDuration) == TRI_ERROR)
-    throw freettcn::EOperationFailed();
+  _status = RUNNING;
 }
 
-void freettcn::TE::CTimer::Start(freettcn::TE::CTimer::CCommand *cmd, TriTimerDuration duration) throw(freettcn::EOperationFailed)
+void freettcn::TE::CTimer::Start(TriTimerDuration duration) throw(freettcn::EOperationFailed)
 {
   if (duration < 0) {
     std::cout << "ERROR: Timer duration < 0!!!" << std::endl;
     throw freettcn::EOperationFailed();
   }
   
-  if (!cmd) {
-    std::cout << "ERROR: Timer command not set!!!" << std::endl;
+  _activeDuration = duration;
+  if (triStartTimer(&InstanceId(), _activeDuration) == TRI_ERROR)
     throw freettcn::EOperationFailed();
-  }
   
-  // set new timer command
-  if (_command)
-    delete _command;
-  _command = cmd;
-  
-  if (triStartTimer(&InstanceId(), duration) == TRI_ERROR)
-    throw freettcn::EOperationFailed();
+  _status = RUNNING;
 }
 
 void freettcn::TE::CTimer::Stop() throw(freettcn::EOperationFailed)
 {
-  delete _command;
-  _command = 0;
-  
   if (triStopTimer(&InstanceId()) == TRI_ERROR)
     throw freettcn::EOperationFailed();
 }
 
 TriTimerDuration freettcn::TE::CTimer::Read() const throw(freettcn::EOperationFailed)
 {
-  TriTimerDuration dur;
-  if (triReadTimer(&InstanceId(), &dur) == TRI_ERROR)
-    throw freettcn::EOperationFailed();
-  return dur;
+  if (_status == RUNNING) {
+    TriTimerDuration dur;
+    if (triReadTimer(&InstanceId(), &dur) == TRI_ERROR)
+      throw freettcn::EOperationFailed();
+    return dur;
+  }
+  else
+    return 0;
 }
 
 bool freettcn::TE::CTimer::Running() const throw(freettcn::EOperationFailed)
 {
-  unsigned char running;
-  if (triTimerRunning(&InstanceId(), &running) == TRI_ERROR)
-    throw freettcn::EOperationFailed();
-  return running;
+//   unsigned char running;
+//   if (triTimerRunning(&InstanceId(), &running) == TRI_ERROR)
+//     throw freettcn::EOperationFailed();
+//   return running;
+  return _status == RUNNING;
 }
 
 void freettcn::TE::CTimer::Timeout()
 {
-  _command->Run();
+  _status = TIMEOUT;
   
-  delete _command;
-  _command = 0;
+  _command->Run(_component);
 }
 
 
@@ -142,12 +142,13 @@ freettcn::TE::CTimer::CCommand::~CCommand()
 {
 }
 
-freettcn::TE::CTimer::CCmdBehaviorRun::CCmdBehaviorRun(const CBehavior &behavior):
+freettcn::TE::CTimer::CCmdComponentRun::CCmdComponentRun(const CBehavior &behavior):
   _behavior(behavior)
 {
 }
 
-void freettcn::TE::CTimer::CCmdBehaviorRun::Run()
+void freettcn::TE::CTimer::CCmdComponentRun::Run(CTestComponentType::CInstance &comp)
 {
-  _behavior.Run();
+  _behavior.Enqueue(comp);
+  comp.Run();
 }

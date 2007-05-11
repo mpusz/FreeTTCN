@@ -31,7 +31,10 @@
 #include "freettcn/te/te.h"
 #include "freettcn/te/module.h"
 #include "freettcn/te/behavior.h"
+#include "freettcn/te/port.h"
+#include "freettcn/te/ttcnWrappers.h"
 #include "freettcn/te/sourceData.h"
+#include "freettcn/tools/tools.h"
 #include "freettcn/tools/logMask.h"
 #include "freettcn/tools/timeStamp.h"
 extern "C" {
@@ -59,6 +62,13 @@ freettcn::TE::CTestCase::~CTestCase()
 {
   if (_srcData)
     delete _srcData;
+  
+  Cleanup();
+}
+
+void freettcn::TE::CTestCase::Cleanup()
+{
+  Purge(_allPortStates);
 }
 
 TciParameterTypeListType freettcn::TE::CTestCase::Parameters() const
@@ -70,7 +80,7 @@ TciParameterTypeListType freettcn::TE::CTestCase::Parameters() const
   return tcParams;
 }
 
-TriPortIdList freettcn::TE::CTestCase::Ports() const
+TriPortIdList freettcn::TE::CTestCase::SystemInterface() const
 {
   TriPortIdList portList = _systemType.Ports();
   
@@ -111,22 +121,21 @@ void freettcn::TE::CTestCase::Start(const char *src, int line,
   }
   
   // create MTC
-  _mtcId = _module.TestComponentCreateReq(src, line, creatorId, TCI_MTC_COMP, &_mtcType, "MTC");
+  _mtc = &_module.TestComponentCreateReq(src, line, creatorId, TCI_MTC_COMP, &_mtcType, "MTC");
   
   // create SYSTEM
-  _systemId = _module.TestComponentCreateReq(src, line, _mtcId, TCI_SYS_COMP, &_systemType, "SYSTEM");
+  _module.TestComponentCreateReq(src, line, _mtc->Id(), TCI_SYS_COMP, &_systemType, "SYSTEM");
   
   // give a chance to create static connections and the initialization of TSI ports
   if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_TC_EXECUTE)) {
     // log
-    TriTimerDuration dur = 0.0;                   /**< @todo Timer duration should be set */
     TriParameterList parList;                     /**< @todo Paramters list should be translated */
     parList.length = 0;
     parList.parList = 0;
     
-    tliTcExecute(0, te.TimeStamp().Get(), const_cast<char *>(src), line, _mtcId, _id, parList, dur);
+    tliTcExecute(0, te.TimeStamp().Get(), const_cast<char *>(src), line, _mtc->Id(), _id, parList, dur);
   }
-  tciExecuteTestCaseReq(_id, Ports());
+  tciExecuteTestCaseReq(_id, SystemInterface());
   
   // start MTC
   TciParameterListType parList;
@@ -137,7 +146,7 @@ void freettcn::TE::CTestCase::Start(const char *src, int line,
     parList.length = 0;
     parList.parList = 0;
   }
-  _module.TestComponentStartReq(src, line, creatorId, _mtcId, _behavior->Id(), parList);
+  _module.TestComponentStartReq(src, line, creatorId, _mtc->Id(), _behavior->Id(), parList);
   
   // inform TM about TC execution
   tciTestCaseStarted(_id, parList, dur);
@@ -162,7 +171,7 @@ void freettcn::TE::CTestCase::Stop()
   freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
   if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_TC_STOP))
     // log
-    tliTcStop(0, te.TimeStamp().Get(), 0, 0, _mtcId);
+    tliTcStop(0, te.TimeStamp().Get(), 0, 0, _mtc->Id());
   
   tciResetReq();
   
@@ -174,4 +183,12 @@ void freettcn::TE::CTestCase::Stop()
   parList.length = 0;
   parList.parList = 0;
   tciTestCaseTerminated(error, parList);
+}
+
+
+
+void freettcn::TE::CTestCase::Register(CPortType::CInstance *port)
+{
+  _allPortStates.push_back(port);
+  port->Init();
 }
