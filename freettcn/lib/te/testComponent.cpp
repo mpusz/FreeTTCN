@@ -132,10 +132,10 @@ void freettcn::TE::CTestComponentType::CInstance::Init(CModule &module, TciTestC
   /// @todo init timer scope
   /// @todo init port scope
   
+  _status = BLOCKED;
+  
   // perform component specific initialization
   Initialize();
-  
-  _status = BLOCKED;
 }
 
 
