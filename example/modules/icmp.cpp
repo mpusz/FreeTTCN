@@ -352,13 +352,15 @@ namespace freettcn {
     
     CICMPComponentType::CInstance::~CInstance()
     {
+      if (icmpPort)
+        delete icmpPort;
     }
     
     void CICMPComponentType::CInstance::Initialize()
     {
       // ports declaration
       icmpPort = new CICMPPortType::CInstance(*this, "icmpPort");
-      Module().TestCase()->Register(icmpPort);
+      Module().TestCase()->PortAdd(*icmpPort);
       
       // constant definition
       
@@ -392,7 +394,7 @@ namespace freettcn {
     void CIPStackType::CInstance::Initialize()
     {
       icmpPort = new CICMPPortType::CInstance(*this, "icmpPort");
-      Module().TestCase()->Register(icmpPort);
+      Module().TestCase()->PortAdd(*icmpPort);
     }
     
     
@@ -458,9 +460,8 @@ namespace freettcn {
     
     void CTC_ICMPPing_2::CBehavior::Enqueue(freettcn::TE::CTestComponentType::CInstance &comp) const
     {
-      printf("\n\n@@@@@@@ TEST CASE 2 @@@@@@@@@@\n\n\n");
-      
-//       self.stop();
+      // add automatically if 'self.stop' not included in *.ttcn file
+      comp.Enqueue(new freettcn::TE::CCmdStopMTC(comp, new freettcn::TE::CSourceData("icmp.ttcn", 115)));
     }
     
 
@@ -560,11 +561,14 @@ namespace freettcn {
 //       comp.CmdQueue().Enqueue(new CCmdInitComponentScope(comp));
       
 //       // <statement-block>
-      comp.Enqueue(new freettcn::TE::CCmdExecuteWithoutTimeout(comp, new freettcn::TE::CSourceData("icmp.ttcn", 116),
-                                                               CModule::CType::Instance().TC_ICMPPing_1(), 0));
+      comp.Enqueue(new freettcn::TE::CCmdExecuteWithoutTimeout(comp, CModule::CType::Instance().TC_ICMPPing_1(), 0,
+                                                               new freettcn::TE::CSourceData("icmp.ttcn", 116)));
+      
+      comp.Enqueue(new freettcn::TE::CCmdExecuteTimeout(comp, CModule::CType::Instance().TC_ICMPPing_2(), 0, 3.0,
+                                                        new freettcn::TE::CSourceData("icmp.ttcn", 117)));
       
       // add automatically if 'stop' not included in *.ttcn file
-      comp.Enqueue(new freettcn::TE::CCmdStopEntityOp(comp, new freettcn::TE::CSourceData("icmp.ttcn", 115)));
+      comp.Enqueue(new freettcn::TE::CCmdStopEntityOp(comp, new freettcn::TE::CSourceData("icmp.ttcn", 118)));
     }
     
   } // namespace icmp

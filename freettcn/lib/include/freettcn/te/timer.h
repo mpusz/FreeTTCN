@@ -42,6 +42,7 @@ namespace freettcn {
   namespace TE {
     
     class CBehavior;
+    class CTestCase;
     
     class CTimer : public CIdObject {
     public:
@@ -64,9 +65,10 @@ namespace freettcn {
         virtual void Run(CTestComponentType::CInstance &comp);
       };
       
-      class CCmdGuard : public CCommand {
+      class CCmdTestCaseGuard : public CCommand {
+        CTestCase &_testCase;
       public:
-        CCmdGuard();
+        CCmdTestCaseGuard(CTestCase &testCase);
         virtual void Run(CTestComponentType::CInstance &comp);
       };
       

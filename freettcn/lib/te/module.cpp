@@ -150,6 +150,8 @@ void freettcn::TE::CModule::Reset()
   if (Running()) {
     if (_currTestCase) {
       _currTestCase->Stop();
+      _currTestCase->Reset();
+      _currTestCase = 0;
       
       // reset SA only if test case is running
       triSAReset();
@@ -460,6 +462,8 @@ void freettcn::TE::CModule::TestComponentDone(const TriComponentId &componentId,
       
       // test case terminated
       tciTestCaseTerminated(verdict, parms);
+      _currTestCase->Reset();
+      _currTestCase = 0;
       
       // get control component
       if (_localTestComponents.size()) {

@@ -29,6 +29,7 @@
 
 #include "freettcn/te/timer.h"
 #include "freettcn/te/behavior.h"
+#include "freettcn/te/testCase.h"
 extern "C" {
 #include <freettcn/ttcn3/tri_te_pa.h>
 }
@@ -142,6 +143,9 @@ freettcn::TE::CTimer::CCommand::~CCommand()
 {
 }
 
+
+
+
 freettcn::TE::CTimer::CCmdComponentRun::CCmdComponentRun(const CBehavior &behavior):
   _behavior(behavior)
 {
@@ -151,4 +155,16 @@ void freettcn::TE::CTimer::CCmdComponentRun::Run(CTestComponentType::CInstance &
 {
   _behavior.Enqueue(comp);
   comp.Run();
+}
+
+
+
+freettcn::TE::CTimer::CCmdTestCaseGuard::CCmdTestCaseGuard(CTestCase &testCase):
+  _testCase(testCase)
+{
+}
+
+void freettcn::TE::CTimer::CCmdTestCaseGuard::Run(CTestComponentType::CInstance &comp)
+{
+  _testCase.Stop();
 }

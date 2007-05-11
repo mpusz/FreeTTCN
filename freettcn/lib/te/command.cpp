@@ -47,18 +47,19 @@ freettcn::TE::CCommand::~CCommand()
 
 
 
-freettcn::TE::CCmdExecuteWithoutTimeout::CCmdExecuteWithoutTimeout(CTestComponentType::CInstance &comp, const CSourceData *srcData,
-                                                                   freettcn::TE::CTestCase &testCase,
-                                                                   const TciParameterListType *parameterList):
-  CCommand(comp, srcData), _testCase(testCase), _parameterList(parameterList)
+freettcn::TE::CCmdExecuteTimeout::CCmdExecuteTimeout(CTestComponentType::CInstance &comp,
+                                                     freettcn::TE::CTestCase &testCase,
+                                                     const TciParameterListType *parameterList,
+                                                     TriTimerDuration duration, 
+                                                     const CSourceData *srcData):
+  CCommand(comp, srcData), _testCase(testCase), _parameterList(parameterList), _duration(duration)
 {
 }
 
-
-bool freettcn::TE::CCmdExecuteWithoutTimeout::Run()
+bool freettcn::TE::CCmdExecuteTimeout::Run()
 {
   // create MTC and start MTC
-  _testCase.Start(const_cast<char *>(SrcData()->Source()), SrcData()->Line(), &Component(), _parameterList, 0);
+  _testCase.Start(const_cast<char *>(SrcData()->Source()), SrcData()->Line(), &Component(), _parameterList, _duration);
   
   // block Control component for the time of testcase execution
   Component().Status(CTestComponentType::CInstance::BLOCKED);
@@ -68,19 +69,14 @@ bool freettcn::TE::CCmdExecuteWithoutTimeout::Run()
 
 
 
-freettcn::TE::CCmdExecuteTimeout::CCmdExecuteTimeout(CTestComponentType::CInstance &comp, const CSourceData *srcData):
-  CCommand(comp, srcData)
+freettcn::TE::CCmdExecuteWithoutTimeout::CCmdExecuteWithoutTimeout(CTestComponentType::CInstance &comp,
+                                                                   freettcn::TE::CTestCase &testCase,
+                                                                   const TciParameterListType *parameterList,
+                                                                   const CSourceData *srcData):
+  CCmdExecuteTimeout(comp, testCase, parameterList, 0, srcData)
 {
 }
 
-
-bool freettcn::TE::CCmdExecuteTimeout::Run()
-{
-  // if timeout test case is stopped and an error veridct is returned
-  // TestCase().Stop();
-  
-  return true;
-}
 
 
 

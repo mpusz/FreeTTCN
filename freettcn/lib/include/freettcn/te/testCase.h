@@ -62,27 +62,28 @@ namespace freettcn {
       // test case dynamic state
       TPortList _allPortStates;                   /**< a list of states of different ports */
       const CTestComponentId *_mtc;               /**< MTC reference */
+      CTimer *_guardTimer;                        /**< special timer which is necessary to guard the execution time of test cases */
 //       TVerdict _verdict;                          /**< actual global test verdict of a test case,
 //                                                      updated after every test component termination */
-      void Cleanup();
-      
     public:
       CTestCase(CModule &module, const char *name, const CSourceData *srcData,
                 const CTestComponentType &mtcType, CBehavior *behavior,
                 const CTestComponentType *systemType = 0);
       virtual ~CTestCase();
       
+      void Reset();
+      
       TciParameterTypeListType Parameters() const;
       TriPortIdList SystemInterface() const;
       
       void Start(const char *src, int line,
-                 const CTestComponentType::CInstance *creator,
+                 CTestComponentType::CInstance *creator,
                  const TciParameterListType *parameterList,
                  TriTimerDuration dur);
       void Execute(TciTestCaseIdType testCaseId, TriPortIdList tsiPortList);
       void Stop();
       
-      void Register(CPortType::CInstance *port);
+      void PortAdd(CPortType::CInstance &port);
     };
     
   } // namespace TE

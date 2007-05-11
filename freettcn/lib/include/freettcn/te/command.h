@@ -57,25 +57,29 @@ namespace freettcn {
       virtual bool Run() = 0;
     };
     
-    // <execute-without-timeout> [9.17.1]
-    class CCmdExecuteWithoutTimeout : public CCommand {
-      freettcn::TE::CTestCase &_testCase;
-      const TciParameterListType *_parameterList;
-      
-      bool Run();
-    public:
-      CCmdExecuteWithoutTimeout(CTestComponentType::CInstance &comp, const CSourceData *srcData,
-                                freettcn::TE::CTestCase &testCase,
-                                const TciParameterListType *parameterList);
-    };
-    
-    
     // <execute-without-timeout> [9.17.2]
     class CCmdExecuteTimeout : public CCommand {
+      freettcn::TE::CTestCase &_testCase;
+      const TciParameterListType *_parameterList;
+      TriTimerDuration _duration;
       bool Run();
     public:
-      CCmdExecuteTimeout(CTestComponentType::CInstance &comp, const CSourceData *srcData);
+      CCmdExecuteTimeout(CTestComponentType::CInstance &comp,
+                         freettcn::TE::CTestCase &testCase,
+                         const TciParameterListType *parameterList,
+                         TriTimerDuration duration, 
+                         const CSourceData *srcData);
     };
+    
+    // <execute-without-timeout> [9.17.1]
+    class CCmdExecuteWithoutTimeout : public CCmdExecuteTimeout {
+    public:
+      CCmdExecuteWithoutTimeout(CTestComponentType::CInstance &comp,
+                                freettcn::TE::CTestCase &testCase,
+                                const TciParameterListType *parameterList,
+                                const CSourceData *srcData);
+    };
+    
     
 
     // <init-component-scope> [9.20]

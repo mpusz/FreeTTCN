@@ -32,6 +32,7 @@
 #include "freettcn/te/module.h"
 #include "freettcn/te/behavior.h"
 #include "freettcn/te/port.h"
+#include "freettcn/te/timer.h"
 #include "freettcn/te/ttcnWrappers.h"
 #include "freettcn/te/sourceData.h"
 #include "freettcn/tools/tools.h"
@@ -51,7 +52,8 @@ freettcn::TE::CTestCase::CTestCase(CModule &module, const char *name, const free
                                    const freettcn::TE::CTestComponentType &mtcType, freettcn::TE::CBehavior *behavior,
                                    const freettcn::TE::CTestComponentType *systemType /* 0 */):
   CInitObject(name), _module(module), _srcData(srcData),
-  _mtcType(mtcType), _behavior(behavior), _systemType(systemType ? *systemType : mtcType)
+  _mtcType(mtcType), _behavior(behavior), _systemType(systemType ? *systemType : mtcType),
+  _mtc(0), _guardTimer(0)
 {
   _id.moduleName = const_cast<char *>(_module.Name());
   _id.objectName = const_cast<char *>(name);
@@ -63,12 +65,16 @@ freettcn::TE::CTestCase::~CTestCase()
   if (_srcData)
     delete _srcData;
   
-  Cleanup();
+  Reset();
 }
 
-void freettcn::TE::CTestCase::Cleanup()
+void freettcn::TE::CTestCase::Reset()
 {
-  Purge(_allPortStates);
+  if (_guardTimer) {
+    if (_guardTimer->Running())
+      _guardTimer->Stop();
+    delete _guardTimer;
+  }
 }
 
 TciParameterTypeListType freettcn::TE::CTestCase::Parameters() const
@@ -95,7 +101,7 @@ TriPortIdList freettcn::TE::CTestCase::SystemInterface() const
 
 
 void freettcn::TE::CTestCase::Start(const char *src, int line,
-                                    const freettcn::TE::CTestComponentType::CInstance *creator,
+                                    freettcn::TE::CTestComponentType::CInstance *creator,
                                     const TciParameterListType *parameterList,
                                     TriTimerDuration dur)
 {
@@ -125,7 +131,7 @@ void freettcn::TE::CTestCase::Start(const char *src, int line,
   
   // create MTC
   _mtc = &_module.TestComponentCreateReq(src, line, creatorId, TCI_MTC_COMP, &_mtcType, "MTC");
-  
+
   // create SYSTEM component
   _module.TestComponentCreateReq(src, line, _mtc->Id(), TCI_SYS_COMP, &_systemType, "SYSTEM");
   
@@ -150,6 +156,12 @@ void freettcn::TE::CTestCase::Start(const char *src, int line,
     parList.parList = 0;
   }
   _module.TestComponentStartReq(src, line, creatorId, _mtc->Id(), _behavior->Id(), parList);
+  
+  if (dur) {
+    // set test case guard timer
+    _guardTimer = new freettcn::TE::CTimer(*creator, true, new CTimer::CCmdTestCaseGuard(*this), dur);
+    _guardTimer->Start();
+  }
   
   // inform TM about TC execution
   tciTestCaseStarted(_id, parList, dur);
@@ -190,8 +202,8 @@ void freettcn::TE::CTestCase::Stop()
 
 
 
-void freettcn::TE::CTestCase::Register(CPortType::CInstance *port)
+void freettcn::TE::CTestCase::PortAdd(CPortType::CInstance &port)
 {
-  _allPortStates.push_back(port);
-  port->Init();
+  _allPortStates.push_back(&port);
+  port.Init();
 }
