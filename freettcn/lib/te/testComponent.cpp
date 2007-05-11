@@ -167,6 +167,8 @@ void freettcn::TE::CTestComponentType::CInstance::Run()
       return;
   
   // test component done
+  if (_kind != TCI_ALIVE_COMP)
+    delete this;
 }
 
 
@@ -184,6 +186,8 @@ void freettcn::TE::CTestComponentType::CInstance::Done(const CSourceData &srcDat
   tciTestComponentTerminatedReq(Id(), verdictVal);
   
   // clear control stack
+//   CCommand *cmd = _controlStack.First();
+//   _controlStack
   /// @todo May be a problem with the last command
 //   _controlStack.Clear();
 }
