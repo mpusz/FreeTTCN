@@ -29,29 +29,23 @@
 
 #include "freettcn/te/timer.h"
 #include "freettcn/te/behavior.h"
-#include "freettcn/te/testCase.h"
 extern "C" {
 #include <freettcn/ttcn3/tri_te_pa.h>
 }
 #include <iostream>
 
 
-freettcn::TE::CTimer::CTimer(CTestComponentType::CInstance &comp, bool implicit, CCommand *cmd):
-  _component(comp), _implicit(implicit), _command(cmd),
+freettcn::TE::CTimer::CTimer(CTestComponentType::CInstance &comp, bool implicit):
+  _component(comp), _implicit(implicit),
   _status(IDLE), _defaultDurationValid(false)
 {
   _component.TimerAdd(*this, _implicit);
 }
 
-freettcn::TE::CTimer::CTimer(CTestComponentType::CInstance &comp, bool implicit, CCommand *cmd, TriTimerDuration defaultDuration) throw(EOperationFailed):
-  _component(comp), _implicit(implicit), _command(cmd),
+freettcn::TE::CTimer::CTimer(CTestComponentType::CInstance &comp, bool implicit, TriTimerDuration defaultDuration) throw(EOperationFailed):
+  _component(comp), _implicit(implicit),
   _status(IDLE), _defaultDurationValid(true), _defaultDuration(defaultDuration)
 {
-  if (!cmd) {
-    std::cout << "ERROR: Timer command not set!!!" << std::endl;
-    throw freettcn::EOperationFailed();
-  }
-  
   if (_defaultDuration < 0) {
     std::cout << "ERROR: Timer default duration < 0!!!" << std::endl;
     throw freettcn::EOperationFailed();
@@ -62,8 +56,6 @@ freettcn::TE::CTimer::CTimer(CTestComponentType::CInstance &comp, bool implicit,
 
 freettcn::TE::CTimer::~CTimer()
 {
-  if (_command)
-    delete _command;
   _component.TimerRemove(*this, _implicit);
 }
 
@@ -130,41 +122,5 @@ bool freettcn::TE::CTimer::Running() const throw(freettcn::EOperationFailed)
 void freettcn::TE::CTimer::Timeout()
 {
   _status = TIMEOUT;
-  
-  _command->Run(_component);
-}
-
-
-
-
-
-
-freettcn::TE::CTimer::CCommand::~CCommand()
-{
-}
-
-
-
-
-freettcn::TE::CTimer::CCmdComponentRun::CCmdComponentRun(const CBehavior &behavior):
-  _behavior(behavior)
-{
-}
-
-void freettcn::TE::CTimer::CCmdComponentRun::Run(CTestComponentType::CInstance &comp)
-{
-  _behavior.Enqueue(comp);
-  comp.Run();
-}
-
-
-
-freettcn::TE::CTimer::CCmdTestCaseGuard::CCmdTestCaseGuard(CTestCase &testCase):
-  _testCase(testCase)
-{
-}
-
-void freettcn::TE::CTimer::CCmdTestCaseGuard::Run(CTestComponentType::CInstance &comp)
-{
-  _testCase.Stop();
+  _component.Run(freettcn::TE::CBehavior::OFFSET_START);
 }

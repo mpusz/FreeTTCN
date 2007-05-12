@@ -44,6 +44,16 @@ namespace freettcn {
     class CModule;
     
     class CBehavior {
+    public:
+      enum {
+        ERROR           = 0,
+        END             = 1,
+        WAIT            = 2,
+        OFFSET_AUTO     = 3,
+        OFFSET_START    = 10
+      };
+      
+    private:
       CModule &_module;
       TciBehaviourIdType _id;
       //      VerdictType_t _verdict;
@@ -53,7 +63,7 @@ namespace freettcn {
       
       const TciBehaviourIdType &Id() const;
       
-      virtual void Enqueue(CTestComponentType::CInstance &comp) const = 0;
+      virtual int Run(freettcn::TE::CTestComponentType::CInstance &comp, unsigned int offset) const = 0;
     };
 
   } // namespace TE

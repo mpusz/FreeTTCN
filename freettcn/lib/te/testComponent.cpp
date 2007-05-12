@@ -31,8 +31,9 @@
 #include "freettcn/te/te.h"
 #include "freettcn/te/module.h"
 #include "freettcn/te/port.h"
+#include "freettcn/te/behavior.h"
 #include "freettcn/te/timer.h"
-#include "freettcn/te/command.h"
+#include "freettcn/te/testCase.h"
 #include "freettcn/te/sourceData.h"
 #include "freettcn/tools/logMask.h"
 #include "freettcn/tools/timeStamp.h"
@@ -96,7 +97,8 @@ TriPortIdList freettcn::TE::CTestComponentType::Ports() const
 
 freettcn::TE::CTestComponentType::CInstance::CInstance(const CType &type):
   freettcn::TE::CType::CInstance(type, false), _module(0), _startTimer(0),
-  _status(NOT_INITED), _verdict(VERDICT_NONE)
+  _status(NOT_INITED), _verdict(VERDICT_NONE),
+  _behavior(0), _scope(0), _behaviorOffset(CBehavior::OFFSET_AUTO)
 {
 }
 
@@ -106,7 +108,9 @@ freettcn::TE::CTestComponentType::CInstance::~CInstance()
   if (_startTimer)
     delete _startTimer;
   
-  _controlStack.Clear();
+  // purge stack
+  while (_scope)
+    ScopePop();
   
   if (_status != NOT_INITED)
     _module->TestComponentLocalRemove(*this);
@@ -175,41 +179,93 @@ void freettcn::TE::CTestComponentType::CInstance::Start(const CBehavior &behavio
   if (_status == NOT_INITED)
     throw CTestComponentType::CInstance::ENotInited();
   
+  _behavior = &behavior;
+  
   // schedule executing test component
-  _startTimer = new freettcn::TE::CTimer(*this, true, new CTimer::CCmdComponentRun(behavior), 0);
+  _startTimer = new freettcn::TE::CTimer(*this, true, 0);
   _startTimer->Start();
   _status = ACTIVE;
 }
 
 
-void freettcn::TE::CTestComponentType::CInstance::Run()
+void freettcn::TE::CTestComponentType::CInstance::Execute(const char *src, int line,
+                                                          CTestCase &testCase, TriTimerDuration duration,
+                                                          int returnOffset)
 {
-  if (_status == BLOCKED)
-    // blocked components do not run commands
-    return;
+  // create and start MTC
+  testCase.Start(const_cast<char *>(src), line, this, 0, duration);
   
-  // get top command from the stack
-  while(CCommand *cmd = _controlStack.First())
-    // run the command
-    if (cmd->Run()) {
-      // next command should be run - dequeue finished command
-      _controlStack.Dequeue();
-      
-      if (_status == BLOCKED)
-        // blocked components do not run commands
-        return;
-    }
-    else
-      // command did not finish
-      return;
+  // block Control component for the time of testcase execution
+  _status = BLOCKED;
   
-  // test component done
-  if (_kind != TCI_ALIVE_COMP)
-    delete this;
+  // set offset to be run when component terminates
+  _behaviorOffset = returnOffset;
 }
 
 
-void freettcn::TE::CTestComponentType::CInstance::Done(const CSourceData &srcData)
+// void freettcn::TE::CTestComponentType::CInstance::Run()
+// {
+//   if (_status == BLOCKED)
+//     // blocked components do not run commands
+//     return;
+  
+//   // get top command from the stack
+//   while(CCommand *cmd = _controlStack.First())
+//     // run the command
+//     if (cmd->Run()) {
+//       // next command should be run - dequeue finished command
+//       _controlStack.Dequeue();
+      
+//       if (_status == BLOCKED)
+//         // blocked components do not run commands
+//         return;
+//     }
+//     else
+//       // command did not finish
+//       return;
+  
+//   // test component done
+//   if (_kind != TCI_ALIVE_COMP)
+//     delete this;
+// }
+
+
+void freettcn::TE::CTestComponentType::CInstance::Run(int offset) throw(ENotStarted)
+{
+  if (!_behavior)
+    throw ENotStarted();
+  
+  if (offset != CBehavior::OFFSET_AUTO)
+    _behaviorOffset = offset;
+  
+  int next = CBehavior::ERROR;
+  do {
+    next = _behavior->Run(*this, _behaviorOffset);
+    switch(next) {
+    case CBehavior::ERROR:
+    case CBehavior::OFFSET_START:
+      std::cout << "ERROR: Behavior running error!!!" << std::endl;
+      return;
+      
+    case CBehavior::END:
+      // test component done
+      if (_kind != TCI_ALIVE_COMP)
+        delete this;
+      return;
+      
+    case CBehavior::WAIT:
+      // _behaviorOffset already set - do not overwrite
+      return;
+      
+    default:
+      _behaviorOffset = next;
+    }
+  }
+  while(next != CBehavior::WAIT);
+}
+
+
+void freettcn::TE::CTestComponentType::CInstance::Stop(const char *src, int line)
 {
   /// @todo Return verdict
   TciVerdictValue verdictVal = 0;
@@ -217,7 +273,7 @@ void freettcn::TE::CTestComponentType::CInstance::Done(const CSourceData &srcDat
   freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
   if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_C_TERMINATED)) {
     // log
-    tliCTerminated(0, te.TimeStamp().Get(), const_cast<char *>(srcData.Source()), srcData.Line(), Id(), verdictVal);
+    tliCTerminated(0, te.TimeStamp().Get(), const_cast<char *>(src), line, Id(), verdictVal);
   }
   
   tciTestComponentTerminatedReq(Id(), verdictVal);
@@ -227,6 +283,9 @@ void freettcn::TE::CTestComponentType::CInstance::Done(const CSourceData &srcDat
 //   _controlStack
   /// @todo May be a problem with the last command
 //   _controlStack.Clear();
+
+  if (_kind == TCI_SYS_COMP)
+    delete this;
 }
 
 
@@ -267,11 +326,33 @@ void freettcn::TE::CTestComponentType::CInstance::TimerRemove(const CTimer &time
 // }
 
 
-void freettcn::TE::CTestComponentType::CInstance::Enqueue(CCommand *cmd)
+// void freettcn::TE::CTestComponentType::CInstance::Enqueue(CCommand *cmd)
+// {
+//   _controlStack.Enqueue(cmd);
+// }
+
+
+freettcn::TE::CTestComponentType::CInstance::CScope *freettcn::TE::CTestComponentType::CInstance::Scope() const
 {
-  _controlStack.Enqueue(cmd);
+  return _scope;
 }
 
+void freettcn::TE::CTestComponentType::CInstance::ScopePush(CScope &scope)
+{
+  _scope = &scope;
+}
+
+void freettcn::TE::CTestComponentType::CInstance::ScopePop() throw(EOperationFailed)
+{
+  if (!_scope) {
+    std::cout << "ERROR: Already on the top scope\n" << std::cout;
+    throw EOperationFailed();
+  }
+  
+  CScope *scope = _scope->Up();
+  delete _scope;
+  _scope = scope;
+}
 
 
 
@@ -298,3 +379,18 @@ void freettcn::TE::CControlComponentType::CInstance::Initialize()
 {
 }
 
+
+
+
+
+freettcn::TE::CTestComponentType::CInstance::CScope::CScope(CTestComponentType::CInstance &comp, CScope *up):
+  _up(up)
+{
+  comp.ScopePush(*this);
+}
+
+
+freettcn::TE::CTestComponentType::CInstance::CScope *freettcn::TE::CTestComponentType::CInstance::CScope::Up() const
+{
+  return _up;
+}

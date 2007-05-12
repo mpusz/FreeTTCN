@@ -59,7 +59,8 @@ namespace freettcn {
     class CPortType;
     class CTimer;
     class CSourceData;
-    class CCommand;
+    class CTestCase;
+    class CScope;
     
     class CTestComponentType : public CType {
     public:
@@ -79,10 +80,17 @@ namespace freettcn {
         };
         
         class ENotInited : public freettcn::EOperationFailed {};
+        class ENotStarted : public freettcn::EOperationFailed {};
+        
+        class CScope {
+          CScope * const _up;
+        public:
+          CScope(CTestComponentType::CInstance &comp, CScope *up);
+          CScope *Up() const;
+        };
         
       private:
         typedef std::list<const CTimer *> TTimerList;
-        typedef CQueue<CCommand *> CCommandQueue;
         
         CModule *_module;
         TciTestComponentKindType _kind;
@@ -91,7 +99,7 @@ namespace freettcn {
         
         // test comopnent dynamic state
         TStatus _status;                          /**< describes the status of test component */
-        CCommandQueue _controlStack;              /**< a stack of flow graph node references; the top element is the flow graph node that has to be interpreted next */
+//         CCommandQueue _controlStack;              /**< a stack of flow graph node references; the top element is the flow graph node that has to be interpreted next */
 //         TDefaultList _defaultList;                /**< a list of activated defaults; a list of pointers to the start nodes of activated defaults; the list in reverse order of activation */
         // DEFAULT_POINTER (next default that has to be evaluated if the actual default terminates unsuccessfully)
         // VALUE_STACK (CStack) (not used)
@@ -107,9 +115,12 @@ namespace freettcn {
         // KEEP_ALIVE (indicated wheter the entity can be restarted after its termination or not; 'true' if the entity can be restarted)
         TTimerList _explicitTimers;
         TTimerList _implicitTimers;
+        const CBehavior *_behavior;
+        CScope *_scope;
+        int _behaviorOffset;
         
         virtual void Initialize() = 0;
-
+        
       protected:
         CModule &Module() const throw(ENotInited);
 
@@ -125,8 +136,9 @@ namespace freettcn {
         TciTestComponentKindType Kind() const throw(ENotInited);
         
         virtual void Start(const CBehavior &behavior, TciParameterListType parameterList) throw(ENotInited);
-        void Run();
-        void Done(const CSourceData &srcData);
+        void Execute(const char *src, int line, CTestCase &testCase, TriTimerDuration duration, int returnOffset);
+        void Run(int offset) throw(ENotStarted);
+        void Stop(const char *src, int line);
         
         void TimerAdd(const CTimer &timer, bool implicit = false);
         void TimerRemove(const CTimer &timer, bool implicit = false) throw(ENotFound);
@@ -134,7 +146,9 @@ namespace freettcn {
         //       void Map(const CPort &fromPort, const CPort &toPort) throw(ENotInited);
         //       void Verdict(VerdictType_t value);
         
-        void Enqueue(CCommand *cmd);
+        CScope *Scope() const;
+        void ScopePush(CScope &scope);
+        void ScopePop() throw(EOperationFailed);
       };
 
       
@@ -171,7 +185,6 @@ namespace freettcn {
       virtual CInstance *InstanceCreate(bool omit = false) const;
     };
     
-
   } // namespace TE
   
 } // namespace freettcn

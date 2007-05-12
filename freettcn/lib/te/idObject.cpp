@@ -69,7 +69,7 @@ freettcn::TE::CIdObject::CIdManager::~CIdManager()
 {
   for(unsigned int i=0; i<_idArray.size(); i++) {
     if (_idArray[i].valid) {
-      std::cout << "WARNING: Object not deleted" << std::endl;
+      std::cout << "WARNING: Object 0x" << std::hex << i << " not deleted" << std::endl;
       delete _idArray[i].ptr;
     }
   }

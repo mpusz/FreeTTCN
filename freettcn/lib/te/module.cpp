@@ -149,7 +149,6 @@ void freettcn::TE::CModule::Reset()
 {
   if (Running()) {
     if (_currTestCase) {
-      _currTestCase->Stop();
       _currTestCase->Reset();
       _currTestCase = 0;
       
@@ -158,6 +157,19 @@ void freettcn::TE::CModule::Reset()
     }
     
     _ctrlRunning = false;
+    
+    // delete all local test components but not Control component
+    while (_localTestComponents.size()) {
+      TLocalTestCompList::reverse_iterator it = _localTestComponents.rbegin();
+      if ((*it)->Kind() == TCI_CTRL_COMP) {
+        // unblock Control component
+        (*it)->Status(CTestComponentType::CInstance::ACTIVE);
+        (*it)->Run(CBehavior::OFFSET_AUTO);
+        break;
+      }
+      else
+        delete *it;
+    }
     
     // reset PA
     triPAReset();
@@ -419,6 +431,12 @@ void freettcn::TE::CModule::TestComponentStart(const TriComponentId &componentId
 }
 
 
+void freettcn::TE::CModule::TestComponentStop(const TriComponentId &componentId) throw(ENotFound)
+{
+  TestComponent(componentId).Stop(0, 0);
+}
+
+
 void freettcn::TE::CModule::TestComponentDone(const TriComponentId &componentId, TciVerdictValue verdict) throw(ENotFound)
 {
   const CTestComponentData *comp = 0;
@@ -449,9 +467,8 @@ void freettcn::TE::CModule::TestComponentDone(const TriComponentId &componentId,
       // get SYSTEM component
       for(TTestCompList::iterator it=_allEntityStates.begin(); it!=_allEntityStates.end(); ++it) {
         if ((*it)->Kind() == TCI_SYS_COMP) {
-          // kill SYSTEM component
-          tciKillTestComponentReq((*it)->Id().Id());
-          _allEntityStates.erase(it);
+          // stop SYSTEM component
+          tciStopTestComponentReq((*it)->Id().Id());
           break;
         }
       }
@@ -471,7 +488,7 @@ void freettcn::TE::CModule::TestComponentDone(const TriComponentId &componentId,
         if (ctrlCmp->Kind() == TCI_CTRL_COMP) {
           // unblock Control component
           ctrlCmp->Status(CTestComponentType::CInstance::ACTIVE);
-          ctrlCmp->Run();
+          ctrlCmp->Run(CBehavior::OFFSET_AUTO);
         }
       }
     }

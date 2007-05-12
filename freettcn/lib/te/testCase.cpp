@@ -53,7 +53,7 @@ freettcn::TE::CTestCase::CTestCase(CModule &module, const char *name, const free
                                    const freettcn::TE::CTestComponentType *systemType /* 0 */):
   CInitObject(name), _module(module), _srcData(srcData),
   _mtcType(mtcType), _behavior(behavior), _systemType(systemType ? *systemType : mtcType),
-  _mtc(0), _guardTimer(0)
+  _mtc(0), _guardTimer(0), _verdict(VERDICT_NONE)
 {
   _id.moduleName = const_cast<char *>(_module.Name());
   _id.objectName = const_cast<char *>(name);
@@ -75,6 +75,16 @@ void freettcn::TE::CTestCase::Reset()
       _guardTimer->Stop();
     delete _guardTimer;
   }
+}
+
+freettcn::TE::TVerdict freettcn::TE::CTestCase::Verdict() const
+{
+  return _verdict;
+}
+
+void freettcn::TE::CTestCase::Verdict(TVerdict verdict)
+{
+  _verdict = verdict;
 }
 
 TciParameterTypeListType freettcn::TE::CTestCase::Parameters() const
@@ -158,9 +168,9 @@ void freettcn::TE::CTestCase::Start(const char *src, int line,
   _module.TestComponentStartReq(src, line, creatorId, _mtc->Id(), _behavior->Id(), parList);
   
   if (dur) {
-    // set test case guard timer
-    _guardTimer = new freettcn::TE::CTimer(*creator, true, new CTimer::CCmdTestCaseGuard(*this), dur);
-    _guardTimer->Start();
+//     // set test case guard timer
+//     _guardTimer = new freettcn::TE::CTimer(*creator, true, new CTimer::CCmdTestCaseGuard(*this), dur);
+//     _guardTimer->Start();
   }
   
   // inform TM about TC execution
@@ -181,14 +191,10 @@ void freettcn::TE::CTestCase::Execute(TciTestCaseIdType testCaseId, TriPortIdLis
 
 void freettcn::TE::CTestCase::Stop()
 {
-  _module.TestCase(0);
-  
   freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
   if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_TC_STOP))
     // log
     tliTcStop(0, te.TimeStamp().Get(), 0, 0, _mtc->Id());
-  
-  tciResetReq();
   
   /// @todo set verdict to ERROR
   
@@ -198,6 +204,12 @@ void freettcn::TE::CTestCase::Stop()
   parList.length = 0;
   parList.parList = 0;
   tciTestCaseTerminated(error, parList);
+  
+  // reset local module
+  _module.Reset();
+  
+  // reset other modules
+  tciResetReq();
 }
 
 

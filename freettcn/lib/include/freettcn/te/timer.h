@@ -41,9 +41,6 @@ namespace freettcn {
   
   namespace TE {
     
-    class CBehavior;
-    class CTestCase;
-    
     class CTimer : public CIdObject {
     public:
       enum TStatus {
@@ -52,30 +49,9 @@ namespace freettcn {
         TIMEOUT
       };
 
-      class CCommand {
-      public:
-        virtual ~CCommand();
-        virtual void Run(CTestComponentType::CInstance &comp) = 0;
-      };
-      
-      class CCmdComponentRun : public CCommand {
-        const CBehavior &_behavior;
-      public:
-        CCmdComponentRun(const CBehavior &behavior);
-        virtual void Run(CTestComponentType::CInstance &comp);
-      };
-      
-      class CCmdTestCaseGuard : public CCommand {
-        CTestCase &_testCase;
-      public:
-        CCmdTestCaseGuard(CTestCase &testCase);
-        virtual void Run(CTestComponentType::CInstance &comp);
-      };
-      
     private:
       CTestComponentType::CInstance &_component;
       const bool _implicit;
-      CCommand * const _command;
       
       // timer dynamic state
       TStatus _status;                            /**< denotes whether a timer is active, inactive or has timed out */
@@ -87,8 +63,8 @@ namespace freettcn {
       // SNAP_STATUS - when taking a snapshot it gets the same value as STATUS
       
     public:
-      CTimer(CTestComponentType::CInstance &comp, bool implicit, CCommand *cmd);
-      CTimer(CTestComponentType::CInstance &comp, bool implicit, CCommand *cmd, TriTimerDuration defaultDuration) throw(EOperationFailed);
+      CTimer(CTestComponentType::CInstance &comp, bool implicit);
+      CTimer(CTestComponentType::CInstance &comp, bool implicit, TriTimerDuration defaultDuration) throw(EOperationFailed);
       ~CTimer();
       
       const TriTimerId &Id() const;

@@ -34,6 +34,7 @@
 #include <freettcn/te/port.h>
 #include <freettcn/te/command.h>
 #include <freettcn/te/sourceData.h>
+#include <iostream>
 
 
 namespace freettcn {
@@ -227,24 +228,40 @@ namespace freettcn {
     // ******************** T E S T   C A S E S ************************
     
     class CTC_ICMPPing_1 : public freettcn::TE::CTestCase {
+    public:
       class CBehavior : public freettcn::TE::CBehavior {
       public:
+        class CScope : public freettcn::TE::CTestComponentType::CInstance::CScope {
+        public:
+          CScope(freettcn::TE::CTestComponentType::CInstance &comp):
+            freettcn::TE::CTestComponentType::CInstance::CScope(comp, 0) {};
+        };
+        
         CBehavior(freettcn::TE::CModule &module);
-        virtual void Enqueue(freettcn::TE::CTestComponentType::CInstance &comp) const;
+        int Run(freettcn::TE::CTestComponentType::CInstance &comp, unsigned int offset) const;
       };
       
+    private:
       virtual void Initialize();
     public:
       CTC_ICMPPing_1(freettcn::TE::CModule &module);
     };
     
     class CTC_ICMPPing_2 : public freettcn::TE::CTestCase {
+    public:
       class CBehavior : public freettcn::TE::CBehavior {
       public:
+        class CScope : public freettcn::TE::CTestComponentType::CInstance::CScope {
+        public:
+          CScope(freettcn::TE::CTestComponentType::CInstance &comp):
+            freettcn::TE::CTestComponentType::CInstance::CScope(comp, 0) {};
+        };
+        
         CBehavior(freettcn::TE::CModule &module);
-        virtual void Enqueue(freettcn::TE::CTestComponentType::CInstance &comp) const;
+        int Run(freettcn::TE::CTestComponentType::CInstance &comp, unsigned int offset) const;
       };
       
+    private:
       virtual void Initialize();
     public:
       CTC_ICMPPing_2(freettcn::TE::CModule &module);
@@ -285,8 +302,32 @@ namespace freettcn {
       
       class CBehavior : public freettcn::TE::CBehavior {
       public:
+        class CScope : public freettcn::TE::CTestComponentType::CInstance::CScope {
+        public:
+          CScope(freettcn::TE::CTestComponentType::CInstance &comp):
+            freettcn::TE::CTestComponentType::CInstance::CScope(comp, 0) {};
+        };
+        
+      private:
+        enum {
+          OFFSET_1 = freettcn::TE::CBehavior::OFFSET_START + 1,
+          OFFSET_2,
+          OFFSET_3,
+          OFFSET_4,
+          OFFSET_5
+        };
+        
+        class CScope2 : public freettcn::TE::CTestComponentType::CInstance::CScope {
+        public:
+          CScope &up;
+          int i;
+          CScope2(freettcn::TE::CTestComponentType::CInstance &comp, CScope &upScope):
+            freettcn::TE::CTestComponentType::CInstance::CScope(comp, &upScope), up(upScope) {};
+        };
+        
+      public:
         CBehavior(freettcn::TE::CModule &module);
-        virtual void Enqueue(freettcn::TE::CTestComponentType::CInstance &comp) const;
+        int Run(freettcn::TE::CTestComponentType::CInstance &comp, unsigned int offset) const;
       };
       
     private:
@@ -425,18 +466,22 @@ namespace freettcn {
     {
     }
     
-    void CTC_ICMPPing_1::CBehavior::Enqueue(freettcn::TE::CTestComponentType::CInstance &comp) const
-    {
-//       comp.CmdQueue().Enqueue(new CCmdInitScopeWithRunsOn(comp));
-      
-      // <parameter-handling>
-      
-      // <statement-block>
-      
-      // add automatically if 'self.stop' not included in *.ttcn file
-      comp.Enqueue(new freettcn::TE::CCmdStopMTC(comp, new freettcn::TE::CSourceData("icmp.ttcn", 115)));
-    }
     
+    int CTC_ICMPPing_1::CBehavior::Run(freettcn::TE::CTestComponentType::CInstance &comp, unsigned int offset) const
+    {
+// //       comp.CmdQueue().Enqueue(new CCmdInitScopeWithRunsOn(comp));
+      
+//       // <parameter-handling>
+      
+//       // <statement-block>
+      
+//       // add automatically if 'self.stop' not included in *.ttcn file
+//       comp.Enqueue(new freettcn::TE::CCmdStopMTC(comp, new freettcn::TE::CSourceData("icmp.ttcn", 115)));
+
+      CModule::CType::Instance().TC_ICMPPing_1().Verdict(freettcn::TE::VERDICT_PASS);
+      comp.Stop("icmp.ttcn", 127);
+      return freettcn::TE::CBehavior::END;
+    }
     
     
     // ICMP_Ping_2
@@ -458,10 +503,10 @@ namespace freettcn {
     {
     }
     
-    void CTC_ICMPPing_2::CBehavior::Enqueue(freettcn::TE::CTestComponentType::CInstance &comp) const
+    int CTC_ICMPPing_2::CBehavior::Run(freettcn::TE::CTestComponentType::CInstance &comp, unsigned int offset) const
     {
-      // add automatically if 'self.stop' not included in *.ttcn file
-      comp.Enqueue(new freettcn::TE::CCmdStopMTC(comp, new freettcn::TE::CSourceData("icmp.ttcn", 115)));
+      comp.Stop("icmp.ttcn", 127);
+      return freettcn::TE::CBehavior::END;
     }
     
 
@@ -556,19 +601,67 @@ namespace freettcn {
     {
     }
     
-    void CModule::CBehavior::Enqueue(freettcn::TE::CTestComponentType::CInstance &comp) const
+    
+    int CModule::CBehavior::Run(freettcn::TE::CTestComponentType::CInstance &comp, unsigned int offset) const
     {
-//       comp.CmdQueue().Enqueue(new CCmdInitComponentScope(comp));
+      freettcn::TE::CTestComponentType::CInstance::CScope *scope = comp.Scope();
       
-//       // <statement-block>
-      comp.Enqueue(new freettcn::TE::CCmdExecuteWithoutTimeout(comp, CModule::CType::Instance().TC_ICMPPing_1(), 0,
-                                                               new freettcn::TE::CSourceData("icmp.ttcn", 116)));
+      switch(offset) {
+      case freettcn::TE::CBehavior::OFFSET_START:
+        {
+          new CScope(comp);
+          
+//           CScope1 *scope1 = new CScope1(comp, scope);
+          comp.Execute("icmp.ttcn", 123, CModule::CType::Instance().TC_ICMPPing_1(), 0, OFFSET_1);
+          return freettcn::TE::CBehavior::WAIT;
+        }
+        
+      case OFFSET_1: // test case termination
+        {
+          if (CModule::CType::Instance().TC_ICMPPing_1().Verdict() == freettcn::TE::VERDICT_PASS) {
+            CScope2 *scope2 = new CScope2(comp, *scope);
+            scope2->i = 0;
+            return OFFSET_2;
+          }
+          return OFFSET_5;
+        }
+        
+      case OFFSET_2: // for loop
+        {
+          CScope2 *scope2 = static_cast<CScope2 *>(scope);
+          if (scope2->i < 3) {
+            comp.Execute("icmp.ttcn", 125, CModule::CType::Instance().TC_ICMPPing_2(), 3.0, OFFSET_3);
+            return freettcn::TE::CBehavior::WAIT;
+          }
+          return OFFSET_4;
+        }
+        
+      case OFFSET_3: // test case termination
+        {
+          CScope2 *scope2 = static_cast<CScope2 *>(scope);
+          scope2->i += 1;
+          return OFFSET_2;
+        }
+        
+      case OFFSET_4: // for end
+        {
+          comp.ScopePop();
+          // return OFFSET_5; - !!! ommited !!!
+        }
+        
+      case OFFSET_5: // if end
+        {
+//           comp.ScopePop();
+          
+          comp.Stop("icmp.ttcn", 127);
+          return freettcn::TE::CBehavior::END;
+        }
+        
+      default:
+        std::cout << "ERROR: Unknown offset: " << offset << std::endl;
+      }
       
-      comp.Enqueue(new freettcn::TE::CCmdExecuteTimeout(comp, CModule::CType::Instance().TC_ICMPPing_2(), 0, 3.0,
-                                                        new freettcn::TE::CSourceData("icmp.ttcn", 117)));
-      
-      // add automatically if 'stop' not included in *.ttcn file
-      comp.Enqueue(new freettcn::TE::CCmdStopEntityOp(comp, new freettcn::TE::CSourceData("icmp.ttcn", 118)));
+      return freettcn::TE::CBehavior::ERROR;
     }
     
   } // namespace icmp

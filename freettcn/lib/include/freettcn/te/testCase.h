@@ -63,8 +63,8 @@ namespace freettcn {
       TPortList _allPortStates;                   /**< a list of states of different ports */
       const CTestComponentId *_mtc;               /**< MTC reference */
       CTimer *_guardTimer;                        /**< special timer which is necessary to guard the execution time of test cases */
-//       TVerdict _verdict;                          /**< actual global test verdict of a test case,
-//                                                      updated after every test component termination */
+      TVerdict _verdict;                          /**< actual global test verdict of a test case,
+                                                     updated after every test component termination */
     public:
       CTestCase(CModule &module, const char *name, const CSourceData *srcData,
                 const CTestComponentType &mtcType, CBehavior *behavior,
@@ -72,6 +72,8 @@ namespace freettcn {
       virtual ~CTestCase();
       
       void Reset();
+      TVerdict Verdict() const;
+      void Verdict(TVerdict verdict);
       
       TciParameterTypeListType Parameters() const;
       TriPortIdList SystemInterface() const;

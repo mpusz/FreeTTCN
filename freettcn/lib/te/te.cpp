@@ -279,6 +279,12 @@ void freettcn::TE::CTTCNExecutable::TestComponentStart(const TriComponentId &com
 }
 
 
+void freettcn::TE::CTTCNExecutable::TestComponentStop(const TriComponentId &componentId) const
+{
+  RootModule().TestComponentStop(componentId);
+}
+
+
 void freettcn::TE::CTTCNExecutable::TestComponentKill(const TriComponentId &componentId)
 {
   RootModule().TestComponentKill(componentId);

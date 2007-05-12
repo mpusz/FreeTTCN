@@ -52,6 +52,12 @@ void tciStartTestComponent(TriComponentId component,
 }
 
 
+void tciStopTestComponent(TriComponentId component)
+{
+  freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
+  te.TestComponentStop(component);
+}
+
 
 void tciConnect(TriPortId fromPort,
                 TriPortId toPort)

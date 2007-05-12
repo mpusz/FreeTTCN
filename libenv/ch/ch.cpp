@@ -104,6 +104,19 @@ void freettcn::CH::CComponentHandler::TestComponentStart(const TriComponentId &c
 
 
 
+void freettcn::CH::CComponentHandler::TestComponentStopReq(const TriComponentId &component)
+{
+  TestComponentStop(component);
+}
+
+
+void freettcn::CH::CComponentHandler::TestComponentStop(const TriComponentId &component)
+{
+  return tciStopTestComponent(component);
+}
+
+
+
 void freettcn::CH::CComponentHandler::TestComponentTerminatedReq(const TriComponentId &component, TciVerdictValue verdict)
 {
   const unsigned int teNum = 1;                     /**< @todo define TEs for the test case */

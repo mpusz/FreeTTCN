@@ -1,119 +1,128 @@
 module icmp {
   
-    // ********** TYPES ***********
+  modulepar {
+    boolean long := true;
+    integer count;
+  }
   
-    type record ICMPPingDataType
+  
+  // ********** TYPES ***********
+  
+  type record ICMPPingDataType
+  {
+    integer id,
+    integer seqNumber,
+    hexstring data optional
+  }
+  
+  type union ICMPDataType
+  {
+    ICMPPingDataType ping
+  }
+  
+  type record ICMPMsg
+  {
+    integer msgType,
+    integer code,
+    integer crc,
+    ICMPDataType data
+  }
+  
+  
+  // ********** PORTS ***********
+  
+  type port ICMPPort message
+  {
+    inout ICMPMsg;
+  }
+  
+  
+  // ********** COMPONENTS ***********
+  
+  type component ICMPComponent
+  {
+    port ICMPPort icmpPort;
+  }
+  
+  type component IPStack
+  {
+    port ICMPPort icmpPort;
+  }
+  
+  
+  // ********** TEMPLATES ***********
+  
+  template ICMPMsg t_EchoRequest(integer seqNum) :=
+  {
+    msgType := 8,
+    code    := 0,
+    crc     := 0,
+    data    :=
     {
-      integer id,
-      integer seqNumber,
-      hexstring data optional
-    }
-  
-    type union ICMPDataType
-    {
-      ICMPPingDataType ping
-    }
-  
-    type record ICMPMsg
-    {
-      integer msgType,
-      integer code,
-      integer crc,
-      ICMPDataType data
-    }
-  
-  
-    // ********** PORTS ***********
-  
-    type port ICMPPort message
-    {
-      inout ICMPMsg;
-    }
-  
-  
-    // ********** COMPONENTS ***********
-  
-    type component ICMPComponent
-    {
-      port ICMPPort icmpPort;
-    }
-  
-    type component IPStack
-    {
-      port ICMPPort icmpPort;
-    }
-  
-  
-    // ********** TEMPLATES ***********
-  
-    template ICMPMsg t_EchoRequest(integer seqNum) :=
-    {
-      msgType := 8,
-      code    := 0,
-      crc     := 0,
-      data    :=
+      ping :=
       {
-        ping :=
-        {
-          id         := 1234,
-          seqNumber  := seqNum,
-          data       := omit
-        }
+        id         := 1234,
+        seqNumber  := seqNum,
+        data       := omit
       }
     }
+  }
   
-    template ICMPMsg t_EchoReply(ICMPMsg echoReq) :=
-    {
-      msgType := 0,
-      code    := 0,
-      crc     := ?,
-      data    := echoReq.data
-    }
+  template ICMPMsg t_EchoReply(ICMPMsg echoReq) :=
+  {
+    msgType := 0,
+    code    := 0,
+    crc     := ?,
+    data    := echoReq.data
+  }
   
   
-    // ********** TEST CASES ***********
+  // ********** TEST CASES ***********
   
-    testcase TC_ICMPPing_1() runs on ICMPComponent system IPStack
-    {
-      // init connections
-      map(mtc:icmpPort, system:icmpPort);
+  testcase TC_ICMPPing_1() runs on ICMPComponent system IPStack
+  {
+    // init connections
+    map(mtc:icmpPort, system:icmpPort);
     
-      // the test case behaviour
-      setverdict(fail);
+    // the test case behaviour
+    setverdict(fail);
     
-      timer t := 1.0;
-      var integer count := 0;
-      icmpPort.send(t_EchoRequest(count));
-      t.start;
-      alt {
-        [] icmpPort.receive(t_EchoReply(t_EchoRequest(count))) {
-          setverdict(pass);
-        }
-        [] icmpPort.receive {
-        }
-        [count < 5] t.timeout {
-          count := count + 1;
-          icmpPort.send(t_EchoRequest(count));
-          repeat;
-        }
-        [count == 5] t.timeout {
-        }
+    timer t := 1.0;
+    var integer count := 0;
+    icmpPort.send(t_EchoRequest(count));
+    t.start;
+    alt {
+      [] icmpPort.receive(t_EchoReply(t_EchoRequest(count))) {
+        setverdict(pass);
       }
+      [] icmpPort.receive {
+      }
+      [count < 5] t.timeout {
+        count := count + 1;
+        icmpPort.send(t_EchoRequest(count));
+        repeat;
+      }
+      [count == 5] t.timeout {
+      }
+    }
     
-      log("Count: " & int2str(count));
+    log("Count: " & int2str(count));
     
-      // destroy connections
-      unmap(mtc:icmpPort, system:icmpPort);
-    }
+    // destroy connections
+    unmap(mtc:icmpPort, system:icmpPort);
+  }
   
-    testcase TC_ICMPPing_2() runs on ICMPComponent
-    {
-    }
+  testcase TC_ICMPPing_2() runs on ICMPComponent
+  {
+  }
   
-    // ********** CONTROL ***********
   
-    control {
-      execute(TC_ICMPPing_1());
-      execute(TC_ICMPPing_2(), 3.0);
+  // ********** CONTROL ***********
+  
+  control {
+    if (execute(TC_ICMPPing_1()) == pass and long) {
+      for (var integer i:=0; i<count; i:=i+1)
+        execute(TC_ICMPPing_2(), 3.0);
     }
+  }
 }

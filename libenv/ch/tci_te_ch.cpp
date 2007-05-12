@@ -52,6 +52,13 @@ void tciStartTestComponentReq(TriComponentId component,
 }
 
 
+void tciStopTestComponentReq(TriComponentId component)
+{
+  freettcn::CH::CComponentHandler &ch = freettcn::CH::CComponentHandler::Instance();
+  return ch.TestComponentStopReq(component);
+}
+
+
 void tciConnectReq(TriPortId fromPort, TriPortId toPort)
 {
   freettcn::CH::CComponentHandler &ch = freettcn::CH::CComponentHandler::Instance();
