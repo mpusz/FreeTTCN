@@ -34,6 +34,7 @@
 #include "freettcn/te/port.h"
 #include "freettcn/te/timer.h"
 #include "freettcn/te/ttcnWrappers.h"
+#include "freettcn/te/basicTypes.h"
 #include "freettcn/te/sourceData.h"
 #include "freettcn/tools/tools.h"
 #include "freettcn/tools/logMask.h"
@@ -53,11 +54,13 @@ freettcn::TE::CTestCase::CTestCase(CModule &module, const char *name, const free
                                    const freettcn::TE::CTestComponentType *systemType /* 0 */):
   CInitObject(name), _module(module), _srcData(srcData),
   _mtcType(mtcType), _behavior(behavior), _systemType(systemType ? *systemType : mtcType),
-  _mtc(0), _guardTimer(0), _verdict(VERDICT_NONE)
+  _mtc(0), _guardTimer(0), _verdict(CBasicTypes::Verdict(), false)
 {
   _id.moduleName = const_cast<char *>(_module.Name());
   _id.objectName = const_cast<char *>(name);
   _id.aux = 0;
+  
+  _verdict.Value(VERDICT_NONE);
 }
 
 freettcn::TE::CTestCase::~CTestCase()
@@ -79,12 +82,14 @@ void freettcn::TE::CTestCase::Reset()
 
 freettcn::TE::TVerdict freettcn::TE::CTestCase::Verdict() const
 {
-  return _verdict;
+  return _verdict.Value();
 }
 
 void freettcn::TE::CTestCase::Verdict(TVerdict verdict)
 {
-  _verdict = verdict;
+  // update verdict
+  if (verdict > _verdict.Value())
+    _verdict.Value(verdict);
 }
 
 TciParameterTypeListType freettcn::TE::CTestCase::Parameters() const

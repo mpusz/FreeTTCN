@@ -34,6 +34,7 @@
 #include "freettcn/te/behavior.h"
 #include "freettcn/te/timer.h"
 #include "freettcn/te/testCase.h"
+#include "freettcn/te/basicTypes.h"
 #include "freettcn/te/sourceData.h"
 #include "freettcn/tools/logMask.h"
 #include "freettcn/tools/timeStamp.h"
@@ -97,9 +98,10 @@ TriPortIdList freettcn::TE::CTestComponentType::Ports() const
 
 freettcn::TE::CTestComponentType::CInstance::CInstance(const CType &type):
   freettcn::TE::CType::CInstance(type, false), _module(0), _startTimer(0),
-  _status(NOT_INITED), _verdict(VERDICT_NONE),
+  _status(NOT_INITED), _verdict(CBasicTypes::Verdict(), false),
   _behavior(0), _scope(0), _behaviorOffset(CBehavior::OFFSET_AUTO)
 {
+  _verdict.Value(VERDICT_NONE);
 }
 
 
@@ -267,23 +269,20 @@ void freettcn::TE::CTestComponentType::CInstance::Run(int offset) throw(ENotStar
 
 void freettcn::TE::CTestComponentType::CInstance::Stop(const char *src, int line)
 {
-  /// @todo Return verdict
-  TciVerdictValue verdictVal = 0;
-  
   freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
   if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_C_TERMINATED)) {
     // log
-    tliCTerminated(0, te.TimeStamp().Get(), const_cast<char *>(src), line, Id(), verdictVal);
+    tliCTerminated(0, te.TimeStamp().Get(), const_cast<char *>(src), line, Id(), &_verdict);
   }
   
-  tciTestComponentTerminatedReq(Id(), verdictVal);
+  tciTestComponentTerminatedReq(Id(), &_verdict);
   
   // clear control stack
 //   CCommand *cmd = _controlStack.First();
 //   _controlStack
   /// @todo May be a problem with the last command
 //   _controlStack.Clear();
-
+  
   if (_kind == TCI_SYS_COMP)
     delete this;
 }
@@ -319,11 +318,21 @@ void freettcn::TE::CTestComponentType::CInstance::TimerRemove(const CTimer &time
 // }
 
 
-// void freettcn::TE::CTestComponentType::CInstance::Verdict(VerdictType_t value)
-// {
-//   if (_status == NOT_INITED)
-//     throwfreettcn::TE::CTestComponentType::CInstance::ENotInited();
-// }
+void freettcn::TE::CTestComponentType::CInstance::Verdict(const char *src, int line, TVerdict verdict)
+{
+  freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
+  if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_C_TERMINATED)) {
+    // log
+    CVerdictType::CInstance tciVerdict(CBasicTypes::Verdict(), false);
+    tciVerdict.Value(verdict);
+    
+    tliSetVerdict(0, te.TimeStamp().Get(), const_cast<char *>(src), line, Id(), &tciVerdict);
+  }
+  
+  // update verdict
+  if (verdict > _verdict.Value())
+    _verdict.Value(verdict);
+}
 
 
 // void freettcn::TE::CTestComponentType::CInstance::Enqueue(CCommand *cmd)

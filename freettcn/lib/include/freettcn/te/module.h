@@ -148,7 +148,7 @@ namespace freettcn {
       void TestComponentStartReq(const char *src, int line, const TriComponentId &creatorId, const TriComponentId &componentId, const TciBehaviourIdType &behaviorId, const TciParameterListType &parameterList);
       void TestComponentStart(const TriComponentId &componentId, const TciBehaviourIdType &behaviorId, const TciParameterListType &parameterList) throw(ENotFound);
       void TestComponentStop(const TriComponentId &componentId) throw(ENotFound);
-      void TestComponentDone(const TriComponentId &componentId, TciVerdictValue verdict) throw(ENotFound);
+      void TestComponentTerminated(const TriComponentId &componentId, TciVerdictValue verdict) throw(ENotFound);
       void TestComponentKill(const TriComponentId &componentId) throw(ENotFound);
       
       void TestComponentLocalAdd(CTestComponentType::CInstance &comp);

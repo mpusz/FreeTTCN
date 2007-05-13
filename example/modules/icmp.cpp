@@ -478,7 +478,8 @@ namespace freettcn {
 //       // add automatically if 'self.stop' not included in *.ttcn file
 //       comp.Enqueue(new freettcn::TE::CCmdStopMTC(comp, new freettcn::TE::CSourceData("icmp.ttcn", 115)));
 
-      CModule::CType::Instance().TC_ICMPPing_1().Verdict(freettcn::TE::VERDICT_PASS);
+      comp.Verdict("icmp.ttcn", 127, freettcn::TE::VERDICT_PASS);
+      
       comp.Stop("icmp.ttcn", 127);
       return freettcn::TE::CBehavior::END;
     }

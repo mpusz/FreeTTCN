@@ -31,6 +31,7 @@
 #define __BASICTYPES_H__
 
 #include <freettcn/te/boolean.h>
+#include <freettcn/te/verdict.h>
 #include <freettcn/te/testComponent.h>
 
 namespace freettcn {
@@ -39,9 +40,11 @@ namespace freettcn {
     
     class CBasicTypes {
       static const CBooleanType _boolean;
+      static const CVerdictType _verdict;
       static const CControlComponentType _control;
     public:
       static const CBooleanType &Boolean();
+      static const CVerdictType &Verdict();
       static const CControlComponentType &ControlComponent();
     };
     

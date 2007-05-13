@@ -115,6 +115,7 @@ namespace freettcn {
       virtual const char *Buffer2String(const BinaryString &binStr, char *str) const;
       virtual const char *InstanceId2String(const BinaryString &inst, char *str) const;
       virtual const char *TriComponentId2String(const TriComponentId &comp, char *str) const;
+      virtual const char *TciVerdictValue2String(TciVerdictValue verdict) const;
 
       virtual void TcExecute(const char *am, int ts, const char *src, int line,
                              const TriComponentId &c,
@@ -187,9 +188,9 @@ namespace freettcn {
                             const TriTimerId &timer,
                             TimerStatus status) const;
 
-
-
-
+      virtual void VerdictSet(const char *am, int ts, const char *src, int line,
+                              const TriComponentId &c,
+                              TciVerdictValue verdict) const;
     };
     
   } // namespace TL

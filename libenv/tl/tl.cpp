@@ -31,6 +31,9 @@
 #include "freettcn/tl/tl.h"
 #include <freettcn/tools/logMask.h>
 #include <freettcn/tools/timeStamp.h>
+extern "C" {
+#include "freettcn/ttcn3/tci_value.h"
+}
 #include <iostream>
 #include <sstream>
 #include <iomanip>
@@ -231,6 +234,18 @@ const char *freettcn::TL::CTestLogging::TriComponentId2String(const TriComponent
 }
 
 
+const char *freettcn::TL::CTestLogging::TciVerdictValue2String(TciVerdictValue verdict) const
+{
+  const char *verdictStr[] = { "NONE",
+                               "PASS",
+                               "INCONC",
+                               "FAIL",
+                               "ERROR" };
+  
+  return verdictStr[tciGetVerdictValue(verdict)];
+}
+
+
 void freettcn::TL::CTestLogging::TcExecute(const char *am, int ts, const char *src, int line,
                                            const TriComponentId &c,
                                            const TciTestCaseIdType &tcId,
@@ -366,7 +381,7 @@ void freettcn::TL::CTestLogging::TcTerminated(const char *am, int ts, const char
 //   }
 //   data->LineAdd("Parameters", params);
   
-  sprintf(str, "%p", outcome);                    /**< @todo Obtain verdict value */
+  sprintf(str, "%s", TciVerdictValue2String(outcome));
   data->LineAdd("Outcome", str);
   
   Logger().Push(data);
@@ -524,7 +539,7 @@ void freettcn::TL::CTestLogging::CTerminated(const char *am, int ts, const char 
   char str[256];
   data->LineAdd("From", TriComponentId2String(c, str));
   
-  sprintf(str, "%p", verdict);                    /**< @todo Obtain verdict value */
+  sprintf(str, "%s", TciVerdictValue2String(verdict));
   data->LineAdd("Verdict", str);
   
   Logger().Push(data);
@@ -617,6 +632,25 @@ void freettcn::TL::CTestLogging::TRunning(const char *am, int ts, const char *sr
   
   sprintf(str, "%s", status == TCI_runningT ? "RUNNING" : status == TCI_inactiveT ? "INACTIVE" : "EXPIRED");
   data->LineAdd("Elapsed", str);
+  
+  Logger().Push(data);
+}
+
+
+
+void freettcn::TL::CTestLogging::VerdictSet(const char *am, int ts, const char *src, int line,
+                                            const TriComponentId &c,
+                                            TciVerdictValue verdict) const
+{
+  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, freettcn::CEntity::TYPE_TE,
+                                                                        freettcn::CLogMask::CMD_TE_SET_VERDICT,
+                                                                        "Verdict SET");
+  
+  char str[256];
+  data->LineAdd("From", TriComponentId2String(c, str));
+  
+  sprintf(str, "%s", TciVerdictValue2String(verdict));
+  data->LineAdd("Verdict", str);
   
   Logger().Push(data);
 }

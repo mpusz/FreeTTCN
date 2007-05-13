@@ -44,6 +44,7 @@ extern "C" {
 #include "freettcn/ttcn3/tri_te_sa.h"
 #include "freettcn/ttcn3/tri_te_pa.h"
 #include "freettcn/ttcn3/tci_tl.h"
+#include "freettcn/ttcn3/tci_value.h"
 }
 #include <iostream>
 
@@ -437,7 +438,7 @@ void freettcn::TE::CModule::TestComponentStop(const TriComponentId &componentId)
 }
 
 
-void freettcn::TE::CModule::TestComponentDone(const TriComponentId &componentId, TciVerdictValue verdict) throw(ENotFound)
+void freettcn::TE::CModule::TestComponentTerminated(const TriComponentId &componentId, TciVerdictValue verdict) throw(ENotFound)
 {
   const CTestComponentData *comp = 0;
   
@@ -464,6 +465,9 @@ void freettcn::TE::CModule::TestComponentDone(const TriComponentId &componentId,
     
   case TCI_MTC_COMP:
     {
+      // update testcase verdict
+      _currTestCase->Verdict(static_cast<TVerdict>(tciGetVerdictValue(verdict)));
+
       // get SYSTEM component
       for(TTestCompList::iterator it=_allEntityStates.begin(); it!=_allEntityStates.end(); ++it) {
         if ((*it)->Kind() == TCI_SYS_COMP) {
@@ -500,6 +504,9 @@ void freettcn::TE::CModule::TestComponentDone(const TriComponentId &componentId,
     
   case TCI_PTC_COMP:
   case TCI_ALIVE_COMP:
+    // update testcase verdict
+    _currTestCase->Verdict(static_cast<TVerdict>(tciGetVerdictValue(verdict)));
+      
     /// @todo PTC termination
 //     bool terminated = true;
 //     for(ptc) {

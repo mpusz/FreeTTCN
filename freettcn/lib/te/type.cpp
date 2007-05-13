@@ -153,3 +153,4 @@ const char *freettcn::TE::CType::CInstance::Extension() const
 // {
 //   _sign = sign;
 // }
+

@@ -143,3 +143,32 @@ TciType tciGetType(TciValue inst)
   
 //   return record->Field(fieldName);
 // }
+
+
+
+int tciGetVerdictValue(TciValue inst)
+{
+  if (!inst)
+    throw freettcn::ECastFailed();
+  
+  freettcn::TE::CType::CInstance *val = static_cast<freettcn::TE::CType::CInstance *>(inst);
+  freettcn::TE::CVerdictType::CInstance *verdict = dynamic_cast<freettcn::TE::CVerdictType::CInstance *>(val);
+  if (!verdict)
+    throw freettcn::ECastFailed();
+  
+  return verdict->Value();
+}
+
+
+void tciSetVerdictValue(TciValue inst, int verdict)
+{
+  if (!inst)
+    throw freettcn::ECastFailed();
+  
+  freettcn::TE::CType::CInstance *val = static_cast<freettcn::TE::CType::CInstance *>(inst);
+  freettcn::TE::CVerdictType::CInstance *verdictVal = dynamic_cast<freettcn::TE::CVerdictType::CInstance *>(val);
+  if (!verdictVal)
+    throw freettcn::ECastFailed();
+  
+  verdictVal->Value(static_cast<freettcn::TE::TVerdict>(verdict));
+}

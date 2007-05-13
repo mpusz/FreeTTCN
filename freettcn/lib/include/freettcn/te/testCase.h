@@ -37,6 +37,7 @@ extern "C" {
 }
 #include <freettcn/te/initObject.h>
 #include <freettcn/te/port.h>
+#include <freettcn/te/verdict.h>
 
 
 namespace freettcn {
@@ -63,7 +64,7 @@ namespace freettcn {
       TPortList _allPortStates;                   /**< a list of states of different ports */
       const CTestComponentId *_mtc;               /**< MTC reference */
       CTimer *_guardTimer;                        /**< special timer which is necessary to guard the execution time of test cases */
-      TVerdict _verdict;                          /**< actual global test verdict of a test case,
+      CVerdictType::CInstance _verdict;                          /**< actual global test verdict of a test case,
                                                      updated after every test component termination */
     public:
       CTestCase(CModule &module, const char *name, const CSourceData *srcData,

@@ -35,7 +35,7 @@ extern "C" {
 #include <freettcn/ttcn3/tci.h>
 #include <freettcn/ttcn3/tri.h>
 }
-#include <freettcn/te/type.h>
+#include <freettcn/te/verdict.h>
 #include <freettcn/te/idObject.h>
 #include <freettcn/tools/exception.h>
 #include <freettcn/tools/tools.h>
@@ -46,14 +46,6 @@ extern "C" {
 namespace freettcn {
   
   namespace TE {
-    
-    enum TVerdict {
-      VERDICT_NONE,
-      VERDICT_PASS,
-      VERDICT_INCONC,
-      VERDICT_FAIL,
-      VERDICT_ERROR
-    };
     
     class CBehavior;
     class CPortType;
@@ -103,7 +95,7 @@ namespace freettcn {
 //         TDefaultList _defaultList;                /**< a list of activated defaults; a list of pointers to the start nodes of activated defaults; the list in reverse order of activation */
         // DEFAULT_POINTER (next default that has to be evaluated if the actual default terminates unsuccessfully)
         // VALUE_STACK (CStack) (not used)
-        TVerdict _verdict;                        /**< actual local verdict of a test component;
+        CVerdictType::CInstance _verdict;         /**< actual local verdict of a test component;
                                                      ignored if an entity state represents the module control */
         // TIMER_GUARD (special timer which is necessary to guard the execution time of test cases and the duration of call operations; modelled as a timer binding)
         // DATA_STATE (CList) (list of list of variable bindings)
@@ -123,7 +115,7 @@ namespace freettcn {
         
       protected:
         CModule &Module() const throw(ENotInited);
-
+        
       public:
         CInstance(const CType &type);
         ~CInstance();
@@ -144,7 +136,7 @@ namespace freettcn {
         void TimerRemove(const CTimer &timer, bool implicit = false) throw(ENotFound);
         
         //       void Map(const CPort &fromPort, const CPort &toPort) throw(ENotInited);
-        //       void Verdict(VerdictType_t value);
+        void Verdict(const char *src, int line, TVerdict verdict);
         
         CScope *Scope() const;
         void ScopePush(CScope &scope);

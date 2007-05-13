@@ -46,3 +46,13 @@ freettcn::TE::CBooleanType::CInstance::CInstance(const CType &type, bool omit) :
   freettcn::TE::CType::CInstance(type, omit)
 {
 }
+
+bool freettcn::TE::CBooleanType::CInstance::Value() const
+{
+  return _value;
+}
+
+void freettcn::TE::CBooleanType::CInstance::Value(bool value)
+{
+  _value = value;
+}

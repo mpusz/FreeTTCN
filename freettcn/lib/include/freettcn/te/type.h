@@ -129,14 +129,8 @@ namespace freettcn {
 //       String Value() const;
 //       void Value(String value);
 //     };
-  
-//     class CVerdictValue : public CValue {
-//       unsigned long _value;
-//     public:
-//       unsigned long Value() const;
-//       void Value(unsigned long value);
-//     };
-  
+    
+    
 //     class CAddressValue : public CValue {
 //       TciValue _value;
 //     public:

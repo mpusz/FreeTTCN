@@ -19,35 +19,41 @@
 
 
 /**
- * @file   basicTypes.cpp
+ * @file   verdict.cpp
  * @author Mateusz Pusz
- * @date   Fri May  4 09:29:40 2007
+ * @date   Sun May 13 19:37:56 2007
  * 
  * @brief  
  * 
  * 
  */
 
+#include "freettcn/te/verdict.h"
 
-#include "freettcn/te/basicTypes.h"
 
-
-const freettcn::TE::CBooleanType freettcn::TE::CBasicTypes::_boolean;
-const freettcn::TE::CVerdictType freettcn::TE::CBasicTypes::_verdict;
-const freettcn::TE::CControlComponentType freettcn::TE::CBasicTypes::_control;
-
-const freettcn::TE::CBooleanType &freettcn::TE::CBasicTypes::Boolean()
+freettcn::TE::CVerdictType::CVerdictType():
+  CType(0, "verdicttype", TCI_VERDICT_TYPE, "", "", "")
 {
-  return _boolean;
 }
 
-const freettcn::TE::CVerdictType &freettcn::TE::CBasicTypes::Verdict()
+freettcn::TE::CVerdictType::CInstance *freettcn::TE::CVerdictType::InstanceCreate(bool omit /* false */) const
 {
-  return _verdict;
+  return new freettcn::TE::CVerdictType::CInstance(*this, omit);
 }
 
 
-const freettcn::TE::CControlComponentType &freettcn::TE::CBasicTypes::ControlComponent()
+freettcn::TE::CVerdictType::CInstance::CInstance(const CType &type, bool omit):
+  freettcn::TE::CType::CInstance(type, omit),
+  _value(VERDICT_NONE)
 {
-  return _control;
+}
+
+freettcn::TE::TVerdict freettcn::TE::CVerdictType::CInstance::Value() const
+{
+  return _value;
+}
+
+void freettcn::TE::CVerdictType::CInstance::Value(TVerdict value)
+{
+  _value = value;
 }

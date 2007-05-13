@@ -2780,6 +2780,8 @@ void tliSetVerdict(String am,
                    TriComponentId c,
                    TciVerdictValue verdict)
 {
+  freettcn::TL::CTestLogging &tl = freettcn::TL::CTestLogging::Instance();
+  tl.VerdictSet(am, ts, src, line, c, verdict);
 }
 
 

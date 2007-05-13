@@ -318,7 +318,7 @@ void freettcn::TE::CTTCNExecutable::Unmap(const TriPortId &fromPort, const TriPo
 void freettcn::TE::CTTCNExecutable::TestComponentTerminated(const TriComponentId &componentId,
                                                             TciVerdictValue verdict) const
 {
-  RootModule().TestComponentDone(componentId, verdict);
+  RootModule().TestComponentTerminated(componentId, verdict);
 }
 
 
