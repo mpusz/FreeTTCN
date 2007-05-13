@@ -228,7 +228,7 @@ const char *freettcn::TL::CTestLogging::TriComponentId2String(const TriComponent
           InstanceId2String(comp.compInst, str1));
   
   if (strcmp(comp.compName, ""))
-    sprintf(str, "%s ('%s')", str, comp.compName);
+    sprintf(str, "%s '%s'", str, comp.compName);
   
   return str;
 }
