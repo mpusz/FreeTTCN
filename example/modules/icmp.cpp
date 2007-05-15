@@ -512,15 +512,15 @@ namespace freettcn {
         {
           comp.ScopeEnter("icmp.ttcn", 122, "control");
           
+          comp.ScopeEnter("icmp.ttcn", 123, "if");
           comp.Execute("icmp.ttcn", 123, comp.Module().TestCase(TESTCASE_ICMPPing_1), 0, OFFSET_1);
           return freettcn::TE::CBehavior::WAIT;
         }
         
       case OFFSET_1: // test case termination
         {
-          if (comp.Module().TestCase(TESTCASE_ICMPPing_1).Verdict() == freettcn::TE::VERDICT_PASS) {
-            comp.ScopeEnter("icmp.ttcn", 123, "if");
-            
+          if (comp.Module().TestCase(TESTCASE_ICMPPing_1).Verdict() == freettcn::TE::VERDICT_PASS &&
+              MY_CAST<const freettcn::TE::CBooleanType::CInstance &>(comp.Module().Parameter(PAR_long).Value()).Value()) {
             comp.ScopeEnter("icmp.ttcn", 124, "for");
             {
               freettcn::TE::CIntegerType::CInstance *val = new freettcn::TE::CIntegerType::CInstance(freettcn::TE::CBasicTypes::Integer(), false);
@@ -535,7 +535,8 @@ namespace freettcn {
         
       case OFFSET_2: // for loop
         {
-          if (MY_CAST<freettcn::TE::CIntegerType::CInstance &>(comp.Scope().Value(SCOPE1_VALUE_i)).Value() < 3) {
+          if (MY_CAST<freettcn::TE::CIntegerType::CInstance &>(comp.Scope().Value(SCOPE1_VALUE_i)).Value() <
+              MY_CAST<const freettcn::TE::CIntegerType::CInstance &>(comp.Module().Parameter(PAR_count).Value()).Value()) {
             comp.Execute("icmp.ttcn", 125, comp.Module().TestCase(TESTCASE_ICMPPing_2), 3.0, OFFSET_3);
             return freettcn::TE::CBehavior::WAIT;
           }

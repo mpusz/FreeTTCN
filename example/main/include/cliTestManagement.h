@@ -49,8 +49,12 @@ private:
 public:
   CCLITestManagement(CMainLoop &mainLoop);
   
+  void ModuleInfoPrint() const;
+  
   void TestCasesPrint() const;
   void TestCasesInfoPrint(const std::string &testCaseId) const throw(freettcn::ENotFound);
+  
+  virtual void ParametersSet() const;
   
   virtual void TestCaseStart(const std::string &testCaseId, const TciParameterListType &parameterlist) throw(freettcn::ENotFound);
   virtual void TestCaseTerminated(TciVerdictValue verdict, const TciParameterListType &parameterlist);

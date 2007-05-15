@@ -100,7 +100,11 @@ void Start(CCLITestManagement &tm, const std::string &testCase)
   ch.LogEnable(ts, chLogMask);
   pa.LogEnable(ts, paLogMask);
   sa.LogEnable(ts, saLogMask);
-    
+  
+  // set module parameters
+  tm.ParametersSet();
+  
+  // run
   if (testCase != "") {
     // run specified test case
     TciParameterListType parameterlist;
@@ -229,6 +233,7 @@ int main (int argc, char **argv)
 
   if (info) {
     if (testCase == "") {
+      tm.ModuleInfoPrint();
     }
     else {
       // init specified test cases

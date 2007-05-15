@@ -50,6 +50,9 @@ namespace freettcn {
         TVerdict _value;
       public:
         CInstance(const CType &type, bool omit);
+        
+        virtual CInstance *Duplicate() const;
+        
         TVerdict Value() const;
         void Value(TVerdict value);
       };

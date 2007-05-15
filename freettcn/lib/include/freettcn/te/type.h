@@ -50,6 +50,8 @@ namespace freettcn {
         CInstance(const CType &type, bool omit);
         virtual ~CInstance();
         
+        virtual CInstance *Duplicate() const = 0;
+        
         const CType &Type() const;
         bool Omit() const;
         const char *Encoding() const;

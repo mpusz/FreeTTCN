@@ -122,8 +122,6 @@ namespace freettcn {
       void Register(CTestCase *testCase);
       void Register(CPortType *portType);
       
-//       void ParametersSet() throw(freettcn::EOperationFailed);
-      
       virtual void Cleanup();
       
     public:
@@ -135,7 +133,10 @@ namespace freettcn {
       void Reset();
       
       TriComponentId ModuleComponentId() const;
+
       TciModuleParameterListType Parameters() const;
+      void ParametersGet() const throw(EOperationFailed);
+      const CParameter &Parameter(unsigned int parameterIdx) const throw(ENotFound);
       
       const CType &Type(const char *typeName) const throw(ENotFound);
       const CType &Type(unsigned int typeIdx) const throw(ENotFound);

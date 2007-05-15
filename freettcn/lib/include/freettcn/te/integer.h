@@ -31,6 +31,7 @@
 #define __INTEGER_H__
 
 #include <freettcn/te/type.h>
+#include <freettcn/tools/exception.h>
 
 namespace freettcn {
   
@@ -42,7 +43,10 @@ namespace freettcn {
         long _value;
       public:
         CInstance(const CType &type, bool omit);
-//         void AbsValue(const char *value) throw(freettcn::EOperationFailed);
+        
+        virtual CInstance *Duplicate() const;
+        
+        void AbsValue(const char *value) throw(EOperationFailed);
 //         void DigitsNum(unsigned long dig_num);
 //         void Sign(bool sign);
         long Value() const;

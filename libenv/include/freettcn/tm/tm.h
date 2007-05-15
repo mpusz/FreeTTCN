@@ -87,6 +87,8 @@ namespace freettcn {
         CModuleParameter(const TciModuleParameterType &par);
         ~CModuleParameter();
         std::string Name() const;
+        TciValue DefaultValue() const;
+        void Value(TciValue value);
         TciValue Value() throw(EOperationFailed);
       };
       

@@ -22,6 +22,7 @@ extern "C" {
 #include "freettcn/ttcn3/tci_value.h"
 }
 #include "freettcn/te/type.h"
+#include "freettcn/te/basicTypes.h"
 #include "freettcn/te/module.h"
 
 
@@ -87,19 +88,29 @@ TciType tciGetType(TciValue inst)
 }
 
 
+Boolean tciNotPresent(TciValue inst)
+{
+  if (!inst)
+    throw freettcn::ECastFailed();
+  
+  freettcn::TE::CType::CInstance *val = static_cast<freettcn::TE::CType::CInstance *>(inst);
+  return val->Omit();
+}
 
-// void tciSetIntAbs(TciValue inst, String value)
-// {
-//   if (!inst)
-//     throw freettcn::ECastFailed();
+
+
+void tciSetIntAbs(TciValue inst, String value)
+{
+  if (!inst)
+    throw freettcn::ECastFailed();
   
-//   freettcn::TE::CType::CInstance *val = static_cast<freettcn::TE::CType::CInstance *>(inst);
-//   freettcn::TE::CIntegerValue *integer = dynamic_cast<freettcn::TE::CIntegerValue *>(val);
-//   if (!integer)
-//     throw freettcn::ECastFailed();
+  freettcn::TE::CType::CInstance *val = static_cast<freettcn::TE::CType::CInstance *>(inst);
+  freettcn::TE::CIntegerType::CInstance *integer = dynamic_cast<freettcn::TE::CIntegerType::CInstance *>(val);
+  if (!integer)
+    throw freettcn::ECastFailed();
   
-//   integer->AbsValue(value);
-// }
+  integer->AbsValue(value);
+}
 
 
 // void tciSetIntNumberOfDigits(TciValue inst, unsigned long int dig_num)
@@ -142,6 +153,35 @@ TciType tciGetType(TciValue inst)
   
 //   return record->Field(fieldName);
 // }
+
+
+
+Boolean tciGetBooleanValue(TciValue inst)
+{
+  if (!inst)
+    throw freettcn::ECastFailed();
+  
+  freettcn::TE::CType::CInstance *val = static_cast<freettcn::TE::CType::CInstance *>(inst);
+  freettcn::TE::CBooleanType::CInstance *boolean = dynamic_cast<freettcn::TE::CBooleanType::CInstance *>(val);
+  if (!boolean)
+    throw freettcn::ECastFailed();
+  
+  return boolean->Value();
+}
+
+
+void tciSetBooleanValue(TciValue inst, Boolean value)
+{
+  if (!inst)
+    throw freettcn::ECastFailed();
+  
+  freettcn::TE::CType::CInstance *val = static_cast<freettcn::TE::CType::CInstance *>(inst);
+  freettcn::TE::CBooleanType::CInstance *boolean = dynamic_cast<freettcn::TE::CBooleanType::CInstance *>(val);
+  if (!boolean)
+    throw freettcn::ECastFailed();
+  
+  boolean->Value(static_cast<freettcn::TE::TVerdict>(value));
+}
 
 
 

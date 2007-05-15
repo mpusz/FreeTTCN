@@ -19,6 +19,9 @@
 
 
 #include "cliTestManagement.h"
+extern "C" {
+#include <freettcn/ttcn3/tci_value.h>
+}
 #include <iostream>
 
 
@@ -28,9 +31,28 @@ CCLITestManagement::CCLITestManagement(CMainLoop &mainLoop):
 }
 
 
+void CCLITestManagement::ModuleInfoPrint() const
+{
+  const TModuleParList &modParList = ModuleParameterList();
+  
+  std::cout << "Module Parameters:" << std::endl;
+  
+  for(unsigned int i=0; i<modParList.size(); i++) {
+    TciType type = tciGetType(modParList[i]->DefaultValue());
+    
+    std::cout << " - " << modParList[i]->Name() <<
+      " <" << (tciGetDefiningModule(type).moduleName ? tciGetDefiningModule(type).moduleName : "{freettcn}") << "." << tciGetName(type) << ">" <<
+      std::endl;
+  }
+  
+  std::cout << std::endl << "Test Cases:" << std::endl;
+  TestCasesPrint();
+}
+
+
 void CCLITestManagement::TestCasesPrint() const
 {
-  const freettcn::TM::CTestManagement::TTCList &tcList = TCList();
+  const TTCList &tcList = TCList();
   for(TTCList::const_iterator it=tcList.begin(); it != tcList.end(); ++it) {
     TciTestCaseIdType id = (*it)->Id();
     std::cout << " - " << id.moduleName << "." << id.objectName << std::endl;
@@ -59,6 +81,29 @@ void CCLITestManagement::TestCasesInfoPrint(const std::string &testCaseId) const
       portList.portIdList[i]->portType.moduleName << "." <<
       portList.portIdList[i]->portType.objectName << ">" <<
       std::endl;
+  }
+}
+
+
+void CCLITestManagement::ParametersSet() const
+{
+  const TModuleParList &modParList = ModuleParameterList();
+  
+  for(unsigned int i=0; i<modParList.size(); i++) {
+//     if (modParList[i]->Name() == "long") {
+//       TciType type = tciGetType(modParList[i]->DefaultValue());
+//       TciValue value = tciNewInstance(type);
+      
+//       tciSetBooleanValue(value, true);
+//       modParList[i]->Value(value);
+//     }
+    if (modParList[i]->Name() == "count") {
+      TciType type = tciGetType(modParList[i]->DefaultValue());
+      TciValue value = tciNewInstance(type);
+      
+      tciSetIntAbs(value, "3");
+      modParList[i]->Value(value);
+    }
   }
 }
 

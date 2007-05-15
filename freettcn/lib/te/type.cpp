@@ -44,7 +44,7 @@ freettcn::TE::CType::CType(const CModule   *module,
   if (_module)
     _id.moduleName = _module->Id().moduleName;
   else
-    _id.moduleName = "{freettcn}";
+    _id.moduleName = "_freettcn_";
   _id.objectName = const_cast<char *>(name);
   _id.aux = this;
 }

@@ -33,6 +33,7 @@ extern "C" {
 #include <freettcn/ttcn3/tci_value.h>
 #include <freettcn/ttcn3/tci_tl.h>
 }
+#include <freettcn/tools/tools.h>
 #include <freettcn/tools/timeStamp.h>
 #include <iostream>
 
@@ -110,18 +111,25 @@ std::string freettcn::TM::CTestManagement::CModuleParameter::Name() const
   return _parName;
 }
 
+TciValue freettcn::TM::CTestManagement::CModuleParameter::DefaultValue() const
+{
+  return _defaultValue;
+}
+
+void freettcn::TM::CTestManagement::CModuleParameter::Value(TciValue value)
+{
+  _value = value;
+}
+
 TciValue freettcn::TM::CTestManagement::CModuleParameter::Value() throw(freettcn::EOperationFailed)
 {
   if (!_value) {
-    if (!_defaultValue) {
+    if (tciNotPresent(_defaultValue)) {
       std::cout << "ERROR: Module Parameter value not set" << std::endl;
       throw freettcn::EOperationFailed();
     }
     
-    // copy from default value
-    _value = tciNewInstance(tciGetType(_defaultValue));
-    
-    /// @todo - set from default value
+    return 0;
   }
   
   return _value;
@@ -173,15 +181,8 @@ freettcn::TM::CTestManagement::TStatus freettcn::TM::CTestManagement::Status() c
 
 void freettcn::TM::CTestManagement::Clear()
 {
-  // clear module parameters list
-  for(TModuleParList::iterator it=_modParList.begin(); it != _modParList.end(); ++it)
-    delete *it;
-  _modParList.clear();
-  
-  // clear test cases list
-  for(TTCList::iterator it=_tcList.begin(); it != _tcList.end(); ++it)
-    delete *it;
-  _tcList.clear();
+  Purge(_modParList);
+  Purge(_tcList);
   
   _status = NOT_RUNNING;
 }
@@ -269,7 +270,7 @@ TciValue freettcn::TM::CTestManagement::ModuleParameterGet(const TciModuleParame
 {
   for(TModuleParList::const_iterator it = _modParList.begin(); it != _modParList.end(); ++it) {
     if ((*it)->Name() == parameterId)
-      return (*it);
+      return (*it)->Value();
   }
   
   return 0;

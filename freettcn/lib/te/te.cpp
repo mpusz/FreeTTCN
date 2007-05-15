@@ -215,6 +215,9 @@ void freettcn::TE::CTTCNExecutable::TestCaseStart(const TciTestCaseIdType &testC
   
   freettcn::TE::CTestCase &tc = module.TestCase(testCaseId.objectName);
   
+  // obtain module parameters
+  module.ParametersGet();
+  
   // set as current test case
   module.ActiveTestCase(tc);
   
@@ -233,7 +236,12 @@ void freettcn::TE::CTTCNExecutable::TestCaseStop() const
 
 const TriComponentId &freettcn::TE::CTTCNExecutable::ControlStart() const
 {
-  return RootModule().ControlStart().Id();
+  freettcn::TE::CModule &module = RootModule();
+  
+  // obtain module parameters
+  module.ParametersGet();
+  
+  return module.ControlStart().Id();
 }
 
 

@@ -29,6 +29,7 @@
  */
 
 #include "freettcn/te/integer.h"
+#include <cstdlib>
 
 
 freettcn::TE::CIntegerType::CIntegerType() :
@@ -47,20 +48,25 @@ freettcn::TE::CIntegerType::CInstance::CInstance(const CType &type, bool omit) :
 {
 }
 
-// void freettcn::TE::CIntegerType::CInstance::AbsValue(String value) throw(freettcn::EOperationFailed)
-// {
-//   if (*value == '\0')
-//     throw freettcn::EOperationFailed();
+freettcn::TE::CIntegerType::CInstance *freettcn::TE::CIntegerType::CInstance::Duplicate() const
+{
+  return new CInstance(*this);
+}
+
+void freettcn::TE::CIntegerType::CInstance::AbsValue(const char *value) throw(EOperationFailed)
+{
+  if (*value == '\0')
+    throw freettcn::EOperationFailed();
   
-//   char *endPtr;
-//   //  std::errno = 0;    /* To distinguish success/failure after call */
-//   unsigned long val = strtoul(value, &endPtr, 10);
-//   if (*endPtr != '\0' || value == endPtr) // ||
-// //       (errno == ERANGE && (val == LONG_MAX || val == LONG_MIN)))
-//     throw freettcn::EOperationFailed();
+  char *endPtr;
+  //  std::errno = 0;    /* To distinguish success/failure after call */
+  unsigned long val = strtoul(value, &endPtr, 10);
+  if (*endPtr != '\0' || value == endPtr) // ||
+//       (errno == ERANGE && (val == LONG_MAX || val == LONG_MIN)))
+    throw freettcn::EOperationFailed();
   
-//   _absValue = val;
-// }
+  _value = val;
+}
 
 
 // void freettcn::TE::CIntegerType::CInstance::DigitsNum(unsigned long int dig_num)

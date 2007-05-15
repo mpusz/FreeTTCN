@@ -267,22 +267,6 @@ void freettcn::TE::CModule::Register(CPortType *portType)
 }
 
 
-// void freettcn::TE::CModule::ParametersSet() throw(freettcn::EOperationFailed)
-// {
-//   // obtain and set module parameters values
-//   for(TParameterList::iterator it=_parameterArray.begin(); it != _parameterArray.end(); ++it) {
-//     TciValue val = tciGetModulePar((*it)->Id());
-// //     if (!val && (*it)->DefaultValue())
-// //       val = new((*it)->DefaultValue());
-    
-//     if (!val)
-//       throw freettcn::EOperationFailed();
-    
-//     (*it)->Value(val);
-//   }
-// }
-
-
 TciModuleParameterListType freettcn::TE::CModule::Parameters() const
 {
   TciModuleParameterListType modParList;
@@ -298,6 +282,37 @@ TciModuleParameterListType freettcn::TE::CModule::Parameters() const
   modParList.modParList = __modParList;
   
   return modParList;
+}
+
+
+void freettcn::TE::CModule::ParametersGet() const throw(EOperationFailed)
+{
+  // obtain and set module parameters values
+  for(unsigned int i=0; i<_parameterArray.size(); i++) {
+    TciValue val = tciGetModulePar(_parameterArray[i]->Id());
+    const CType::CInstance *value = static_cast<const CType::CInstance *>(val);
+    
+    if (!val) {
+      if (_parameterArray[i]->DefaultValue().Omit()) {
+        std::cout << "ERROR: Parameter value not given and default not set" << std::endl;
+        throw freettcn::EOperationFailed();
+      }
+      
+      value = _parameterArray[i]->DefaultValue().Duplicate();
+    }
+    
+    _parameterArray[i]->Value(value);
+  }
+}
+
+
+const freettcn::TE::CModule::CParameter &freettcn::TE::CModule::Parameter(unsigned int parameterIdx) const throw(ENotFound)
+{
+  if (parameterIdx < _parameterArray.size())
+    return *_parameterArray[parameterIdx];
+  
+  std::cout << "ERROR: Parameter index: " << parameterIdx << " too big (size: " << _parameterArray.size() << ")" << std::endl;
+  throw ENotFound();
 }
 
 
@@ -385,9 +400,6 @@ freettcn::TE::CTestCase &freettcn::TE::CModule::ActiveTestCase() const throw(ENo
 
 const freettcn::TE::CTriComponentId &freettcn::TE::CModule::ControlStart()
 {
-  // obtain module parameters
-//   ParametersSet();
-
   _ctrlRunning = true;
   
   return TestComponentCreateReq(_ctrlSrcData->Source(), _ctrlSrcData->Line(), ModuleComponentId(), TCI_CTRL_COMP, 0, "CONTROL");

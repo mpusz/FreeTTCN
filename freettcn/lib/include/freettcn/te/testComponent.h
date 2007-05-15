@@ -122,6 +122,8 @@ namespace freettcn {
         const CBehavior *_behavior;
         CScope *_scope;
         int _behaviorOffset;
+
+        virtual CInstance *Duplicate() const;
         
       protected:
         void Register(CPort *port);

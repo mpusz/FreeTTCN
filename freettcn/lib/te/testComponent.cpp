@@ -121,6 +121,12 @@ freettcn::TE::CTestComponentType::CInstance::~CInstance()
 }
 
 
+freettcn::TE::CTestComponentType::CInstance *freettcn::TE::CTestComponentType::CInstance::Duplicate() const
+{
+  return 0;
+}
+
+
 void freettcn::TE::CTestComponentType::CInstance::Register(CPort *port)
 {
   _portArray.push_back(port);

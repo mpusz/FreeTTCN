@@ -42,6 +42,9 @@ namespace freettcn {
         bool _value;
       public:
         CInstance(const CType &type, bool omit);
+        
+        virtual CInstance *Duplicate() const;
+        
         bool Value() const;
         void Value(bool value);
       };
