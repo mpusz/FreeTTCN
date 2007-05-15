@@ -96,18 +96,6 @@ namespace freettcn {
 //       virtual CValue *InstanceCreate(bool omit = false) const;
 //     };
 
-
-
-//     class CIntegerValue : public CValue {
-//       unsigned long _absValue;
-//       bool _sign;
-//     public:
-//       //     Integer Value() const;
-//       //    void Value(Integer value);
-//       void AbsValue(String value) throw(freettcn::EOperationFailed);
-//       void DigitsNum(unsigned long dig_num);
-//       void Sign(bool sign);
-//     };
   
 //     class CFloatValue : public CValue {
 //       float _value;

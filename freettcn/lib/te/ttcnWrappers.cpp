@@ -31,7 +31,7 @@
 #include <cstring>
 
 
-freettcn::TE::CTestComponentId::CTestComponentId(const TriComponentId &id)
+freettcn::TE::CTriComponentId::CTriComponentId(const TriComponentId &id)
 {
   _id = id;
   
@@ -52,7 +52,7 @@ freettcn::TE::CTestComponentId::CTestComponentId(const TriComponentId &id)
   memmove(_id.compType.objectName, id.compType.objectName, size);
 }
 
-freettcn::TE::CTestComponentId::~CTestComponentId()
+freettcn::TE::CTriComponentId::~CTriComponentId()
 {
   delete[] _id.compInst.data;
   delete[] _id.compName;
@@ -60,7 +60,7 @@ freettcn::TE::CTestComponentId::~CTestComponentId()
   delete[] _id.compType.objectName;
 }
 
-const TriComponentId &freettcn::TE::CTestComponentId::Id() const
+const TriComponentId &freettcn::TE::CTriComponentId::Id() const
 {
   return _id;
 }

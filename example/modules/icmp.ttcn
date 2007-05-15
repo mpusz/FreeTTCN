@@ -121,8 +121,12 @@ module icmp {
   
   control {
     if (execute(TC_ICMPPing_1()) == pass and long) {
-      for (var integer i:=0; i<count; i:=i+1)
+      for (var integer i:=0; i<count; i:=i+1) {
         execute(TC_ICMPPing_2(), 3.0);
+/*         timer t1 := 1.0; */
+/*         t1.start; */
+/*         t1.timeout;  // pause before executing the next test case */
+      }
     }
   }
 }

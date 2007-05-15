@@ -114,12 +114,12 @@ TciModuleParameterListType freettcn::TE::CTTCNExecutable::ModuleParametersGet(co
   const freettcn::TE::CModule &module = RootModule();
   
   // check if the same module given
-  if (strcmp(module.Name(), moduleName.moduleName)) {
+  if (strcmp(module.Id().moduleName, moduleName.moduleName)) {
     std::string str;
     str = "Given module: ";
     str += moduleName.moduleName;
     str += " different than root module: ";
-    str += module.Name();
+    str += module.Id().moduleName;
     
     // send an error
     tciError(const_cast<char *>(str.c_str()));
@@ -147,12 +147,12 @@ TciParameterTypeListType freettcn::TE::CTTCNExecutable::TestCaseParametersGet(co
   const freettcn::TE::CModule &module = RootModule();
   
   // check if the same module given
-  if (strcmp(module.Name(), testCaseId.moduleName)) {
+  if (strcmp(module.Id().moduleName, testCaseId.moduleName)) {
     std::string str;
     str = "Given test case module: ";
     str += testCaseId.moduleName;
     str += " different than root module: ";
-    str += module.Name();
+    str += module.Id().moduleName;
     
     // send an error
     tciError(const_cast<char *>(str.c_str()));
@@ -174,12 +174,12 @@ TriPortIdList freettcn::TE::CTTCNExecutable::TestCaseTSIGet(const TciTestCaseIdT
   const freettcn::TE::CModule &module = RootModule();
   
   // check if the same module given
-  if (strcmp(module.Name(), testCaseId.moduleName)) {
+  if (strcmp(module.Id().moduleName, testCaseId.moduleName)) {
     std::string str;
     str = "Given test case module: ";
     str += testCaseId.moduleName;
     str += " different than root module: ";
-    str += module.Name();
+    str += module.Id().moduleName;
     
     // send an error
     tciError(const_cast<char *>(str.c_str()));
@@ -201,12 +201,12 @@ void freettcn::TE::CTTCNExecutable::TestCaseStart(const TciTestCaseIdType &testC
   freettcn::TE::CModule &module = RootModule();
   
   // check if the same module given
-  if (strcmp(module.Name(), testCaseId.moduleName)) {
+  if (strcmp(module.Id().moduleName, testCaseId.moduleName)) {
     std::string str;
     str = "Given test case module: ";
     str += testCaseId.moduleName;
     str += " different than root module: ";
-    str += module.Name();
+    str += module.Id().moduleName;
     
     // send an error
     tciError(const_cast<char *>(str.c_str()));
@@ -216,7 +216,7 @@ void freettcn::TE::CTTCNExecutable::TestCaseStart(const TciTestCaseIdType &testC
   freettcn::TE::CTestCase &tc = module.TestCase(testCaseId.objectName);
   
   // set as current test case
-  module.TestCase(&tc);
+  module.ActiveTestCase(tc);
   
   // start test case
   tc.Start(0, 0, 0, &parameterlist, 0);
@@ -226,10 +226,8 @@ void freettcn::TE::CTTCNExecutable::TestCaseStart(const TciTestCaseIdType &testC
 void freettcn::TE::CTTCNExecutable::TestCaseStop() const
 {
   freettcn::TE::CModule &module = RootModule();
-  if (module.Running()) {
-    if (freettcn::TE::CTestCase *tc = module.TestCase())
-      tc->Stop();
-  }
+  if (module.Running())
+    module.ActiveTestCase().Stop();
 }
 
 
@@ -327,7 +325,7 @@ void freettcn::TE::CTTCNExecutable::TestCaseExecute(const TciTestCaseIdType &tes
   freettcn::TE::CTestCase &tc = RootModule().TestCase(testCaseId.objectName);
   
   // set as current test case
-  RootModule().TestCase(&tc);
+  RootModule().ActiveTestCase(tc);
 
   // prepare test case
   tc.Execute(testCaseId, tsiPortList);

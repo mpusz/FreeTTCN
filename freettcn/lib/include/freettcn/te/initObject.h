@@ -30,6 +30,7 @@
 #ifndef __INITOBJECT_H__
 #define __INITOBJECT_H__
 
+#include <freettcn/tools/exception.h>
 #include <string>
 
 namespace freettcn {
@@ -37,15 +38,19 @@ namespace freettcn {
   namespace TE {
     
     class CInitObject {
-      char const * const _name;
-      bool _inited;
-      
-      virtual void Initialize() = 0;
     public:
-      CInitObject(const char *name);
-      virtual ~CInitObject();
+      class ENotInited : public freettcn::EOperationFailed {};
       
-      const char *Name() const;
+    private:
+      bool _inited;
+      virtual void Initialize() = 0;
+      
+    protected:
+      bool Inited() const;
+      
+    public:
+      CInitObject();
+      virtual ~CInitObject();
       void Init();
     };
     

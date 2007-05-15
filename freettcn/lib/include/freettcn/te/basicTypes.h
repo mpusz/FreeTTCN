@@ -30,6 +30,7 @@
 #ifndef __BASICTYPES_H__
 #define __BASICTYPES_H__
 
+#include <freettcn/te/integer.h>
 #include <freettcn/te/boolean.h>
 #include <freettcn/te/verdict.h>
 #include <freettcn/te/testComponent.h>
@@ -39,10 +40,12 @@ namespace freettcn {
   namespace TE {
     
     class CBasicTypes {
+      static const CIntegerType _integer;
       static const CBooleanType _boolean;
       static const CVerdictType _verdict;
       static const CControlComponentType _control;
     public:
+      static const CIntegerType &Integer();
       static const CBooleanType &Boolean();
       static const CVerdictType &Verdict();
       static const CControlComponentType &ControlComponent();

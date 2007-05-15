@@ -188,6 +188,17 @@ namespace freettcn {
                             const TriTimerId &timer,
                             TimerStatus status) const;
 
+      virtual void SEnter(const char *am, int ts, const char *src, int line,
+                          const TriComponentId &c,
+                          const char *name,
+                          const TciParameterListType &parsValue,
+                          const char *kind) const;
+      virtual void SLeave(const char *am, int ts, const char *src, int line,
+                          const TriComponentId &c,
+                          const char *name,
+                          TciValue returnValue,
+                          const char *kind) const;
+      
       virtual void VerdictSet(const char *am, int ts, const char *src, int line,
                               const TriComponentId &c,
                               TciVerdictValue verdict) const;

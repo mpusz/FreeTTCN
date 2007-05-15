@@ -638,6 +638,44 @@ void freettcn::TL::CTestLogging::TRunning(const char *am, int ts, const char *sr
 
 
 
+void freettcn::TL::CTestLogging::SEnter(const char *am, int ts, const char *src, int line,
+                                        const TriComponentId &c,
+                                        const char *name,
+                                        const TciParameterListType &parsValue,
+                                        const char *kind) const
+{
+  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, freettcn::CEntity::TYPE_TE,
+                                                                        freettcn::CLogMask::CMD_TE_S_ENTER,
+                                                                        "Scope ENTER");
+  
+  char str[256];
+  data->LineAdd("From", TriComponentId2String(c, str));
+  
+  data->LineAdd("Kind", kind);
+  
+  Logger().Push(data);
+}
+
+
+void freettcn::TL::CTestLogging::SLeave(const char *am, int ts, const char *src, int line,
+                                        const TriComponentId &c,
+                                        const char *name,
+                                        TciValue returnValue,
+                                        const char *kind) const
+{
+  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, freettcn::CEntity::TYPE_TE,
+                                                                        freettcn::CLogMask::CMD_TE_S_LEAVE,
+                                                                        "Scope LEAVE");
+  
+  char str[256];
+  data->LineAdd("From", TriComponentId2String(c, str));
+  
+  data->LineAdd("Kind", kind);
+  
+  Logger().Push(data);
+}
+
+
 void freettcn::TL::CTestLogging::VerdictSet(const char *am, int ts, const char *src, int line,
                                             const TriComponentId &c,
                                             TciVerdictValue verdict) const

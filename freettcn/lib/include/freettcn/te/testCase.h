@@ -35,7 +35,6 @@ extern "C" {
 #include <freettcn/ttcn3/tci.h>
 #include <freettcn/ttcn3/tri.h>
 }
-#include <freettcn/te/initObject.h>
 #include <freettcn/te/port.h>
 #include <freettcn/te/verdict.h>
 
@@ -47,10 +46,10 @@ namespace freettcn {
     class CModule;
     class CBehavior;
     class CSourceData;
-    class CTestComponentId;
+    class CTriComponentId;
     
-    class CTestCase : public CInitObject {
-      typedef std::list<CPortType::CInstance *> TPortList;
+    class CTestCase {
+      typedef std::list<CPort *> TPortList;
       
       CModule &_module;
       CSourceData const * const _srcData;
@@ -62,7 +61,7 @@ namespace freettcn {
       
       // test case dynamic state
       TPortList _allPortStates;                   /**< a list of states of different ports */
-      const CTestComponentId *_mtc;               /**< MTC reference */
+      const CTriComponentId *_mtc;                /**< MTC reference */
       CTimer *_guardTimer;                        /**< special timer which is necessary to guard the execution time of test cases */
       CVerdictType::CInstance _verdict;                          /**< actual global test verdict of a test case,
                                                      updated after every test component termination */
@@ -71,6 +70,8 @@ namespace freettcn {
                 const CTestComponentType &mtcType, CBehavior *behavior,
                 const CTestComponentType *systemType = 0);
       virtual ~CTestCase();
+      
+      TciTestCaseIdType Id() const;
       
       void Reset();
       TVerdict Verdict() const;
@@ -86,7 +87,7 @@ namespace freettcn {
       void Execute(TciTestCaseIdType testCaseId, TriPortIdList tsiPortList);
       void Stop();
       
-      void PortAdd(CPortType::CInstance &port);
+      void PortAdd(CPort &port);
     };
     
   } // namespace TE

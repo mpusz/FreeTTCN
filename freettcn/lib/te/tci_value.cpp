@@ -25,6 +25,7 @@ extern "C" {
 #include "freettcn/te/module.h"
 
 
+
 TciModuleIdType tciGetDefiningModule(TciType inst)
 {
   if (!inst)
@@ -74,8 +75,6 @@ TciValue tciNewInstance(TciType inst)
   const freettcn::TE::CType *type = static_cast<const freettcn::TE::CType *>(inst);
   return type->InstanceCreate();
 }
-
-
 
 
 TciType tciGetType(TciValue inst)

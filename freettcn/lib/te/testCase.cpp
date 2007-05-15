@@ -52,11 +52,11 @@ extern "C" {
 freettcn::TE::CTestCase::CTestCase(CModule &module, const char *name, const freettcn::TE::CSourceData *srcData,
                                    const freettcn::TE::CTestComponentType &mtcType, freettcn::TE::CBehavior *behavior,
                                    const freettcn::TE::CTestComponentType *systemType /* 0 */):
-  CInitObject(name), _module(module), _srcData(srcData),
+  _module(module), _srcData(srcData),
   _mtcType(mtcType), _behavior(behavior), _systemType(systemType ? *systemType : mtcType),
   _mtc(0), _guardTimer(0), _verdict(CBasicTypes::Verdict(), false)
 {
-  _id.moduleName = const_cast<char *>(_module.Name());
+  _id.moduleName = _module.Id().moduleName;
   _id.objectName = const_cast<char *>(name);
   _id.aux = 0;
   
@@ -69,6 +69,11 @@ freettcn::TE::CTestCase::~CTestCase()
     delete _srcData;
   
   Reset();
+}
+
+TciTestCaseIdType freettcn::TE::CTestCase::Id() const
+{
+  return _id;
 }
 
 void freettcn::TE::CTestCase::Reset()
@@ -123,7 +128,7 @@ void freettcn::TE::CTestCase::Start(const char *src, int line,
   TriComponentId creatorId;
   
   // set current test case
-  _module.TestCase(this);
+  _module.ActiveTestCase(*this);
   
   if (creator) {
     creatorId = creator->Id();
@@ -186,7 +191,7 @@ void freettcn::TE::CTestCase::Start(const char *src, int line,
 void freettcn::TE::CTestCase::Execute(TciTestCaseIdType testCaseId, TriPortIdList tsiPortList)
 {
   // set current test case
-  _module.TestCase(this);
+  _module.ActiveTestCase(*this);
   
   if (triExecuteTestCase(&testCaseId, &tsiPortList) != TRI_OK) {
     /// @todo do something
@@ -201,7 +206,8 @@ void freettcn::TE::CTestCase::Stop()
     // log
     tliTcStop(0, te.TimeStamp().Get(), 0, 0, _mtc->Id());
   
-  /// @todo set verdict to ERROR
+  // set verdict to ERROR
+  _verdict.Value(VERDICT_ERROR);
   
   // notify TM about test case termination
   TciValue error = 0;
@@ -219,8 +225,7 @@ void freettcn::TE::CTestCase::Stop()
 
 
 
-void freettcn::TE::CTestCase::PortAdd(CPortType::CInstance &port)
+void freettcn::TE::CTestCase::PortAdd(CPort &port)
 {
   _allPortStates.push_back(&port);
-  port.Init();
 }

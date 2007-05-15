@@ -34,7 +34,7 @@
 freettcn::TE::CBehavior::CBehavior(CModule &module, const char *name):
   _module(module)
 {
-  _id.moduleName = const_cast<char *>(_module.Name());
+  _id.moduleName = _module.Id().moduleName;
   _id.objectName = const_cast<char *>(name);
   _id.aux = 0;
   

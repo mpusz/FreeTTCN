@@ -18,56 +18,45 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /**
- * @file   behavior.h
+ * @file   integer.h
  * @author Mateusz Pusz
- * @date   Wed Apr 25 11:01:46 2007
+ * @date   Mon May 14 21:34:08 2007
  * 
  * @brief  
  * 
  * 
  */
 
-#ifndef __BEHAVIOR_H__
-#define __BEHAVIOR_H__
+#ifndef __INTEGER_H__
+#define __INTEGER_H__
 
-#include <freettcn/te/testComponent.h>
-extern "C" {
-#include <freettcn/ttcn3/tci.h>
-}
-#include <string>
-
+#include <freettcn/te/type.h>
 
 namespace freettcn {
-
+  
   namespace TE {
     
-    class CModule;
-    
-    class CBehavior {
+    class CIntegerType : public CType {
     public:
-      enum {
-        ERROR           = 0,
-        END             = 1,
-        WAIT            = 2,
-        OFFSET_AUTO     = 3,
-        OFFSET_START    = 10
+      class CInstance : public CType::CInstance {
+        long _value;
+      public:
+        CInstance(const CType &type, bool omit);
+//         void AbsValue(const char *value) throw(freettcn::EOperationFailed);
+//         void DigitsNum(unsigned long dig_num);
+//         void Sign(bool sign);
+        long Value() const;
+        void Value(long value);
       };
       
-    private:
-      CModule &_module;
-      TciBehaviourIdType _id;
     public:
-      CBehavior(CModule &module, const char *name);
-      virtual ~CBehavior();
-      
-      const TciBehaviourIdType &Id() const;
-      
-      virtual int Run(freettcn::TE::CTestComponentType::CInstance &comp, unsigned int offset) const = 0;
+      CIntegerType();
+      virtual CInstance *InstanceCreate(bool omit = false) const;
     };
-
+    
   } // namespace TE
   
 } // namespace freettcn
 
 
-#endif /* __BEHAVIOR_H__ */
+#endif /* __INTEGER_H__ */

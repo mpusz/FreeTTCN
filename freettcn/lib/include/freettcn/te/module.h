@@ -36,10 +36,8 @@ extern "C" {
 #include <freettcn/ttcn3/tci.h>
 #include <freettcn/ttcn3/tri.h>
 }
-#include <freettcn/te/initObject.h>
 #include <freettcn/te/testComponent.h>
 #include <freettcn/te/ttcnWrappers.h>
-#include <freettcn/tools/exception.h>
 #include <vector>
 #include <list>
 
@@ -47,56 +45,63 @@ extern "C" {
 namespace freettcn {
 
   namespace TE {
-
+    
+    class CType;
     class CBehavior;
     class CTestCase;
     class CSourceData;
     
     class CModule : public CInitObject {
     public:
-      class CParameter : public CInitObject {
-        TciValue _defaultValue;
-        TciValue _value;
+      class CParameter {
+        TciModuleParameterIdType _id;
+        CType::CInstance const * const _defaultValue;
+        const CType::CInstance *_value;
       public:
-        CParameter(const char *name);
-        virtual ~CParameter();
-        
-        TciValue DefaultValue() const;
-        void Value(TciValue value);
+        CParameter(const char *name, const CType::CInstance *defaultValue) throw(EOperationFailed);
+        ~CParameter();
+        const TciModuleParameterIdType &Id() const;
+        const CType::CInstance &DefaultValue() const;
+        void Value(const CType::CInstance *value);
+        const CType::CInstance &Value() const throw(EOperationFailed);
       };
       
     private:
       class CTestComponentData {
-        CTestComponentId _id;
+        CTriComponentId _id;
         TciTestComponentKindType _kind;
       public:
         CTestComponentData(const TriComponentId &id, TciTestComponentKindType kind);
-        const CTestComponentId &Id() const;
+        const CTriComponentId &Id() const;
         TciTestComponentKindType Kind() const;
         bool operator==(const TriComponentId &id) const;
       };
       
       // types
-      typedef std::vector<CParameter *> TParameterList;
+      typedef std::vector<const CType *> TTypeArray;
+      typedef std::vector<CParameter *> TParameterArray;
       typedef std::list<const CBehavior *> TBehaviorList;
-      typedef std::vector<CTestCase *> TTestCaseList;
+      typedef std::vector<CTestCase *> TTestCaseArray;
       typedef std::list<const CTestComponentData *> TTestCompList;
       typedef std::list<CTestComponentType::CInstance *> TLocalTestCompList;
+      typedef std::vector<CPortType *> TPortTypeArray;
       
       // module info
+      TciModuleIdType _id;
+      TTypeArray _typeArray;
+      TParameterArray _parameterArray;
+      TBehaviorList _behaviorList;
+      TTestCaseArray _testCaseArray;
+      TPortTypeArray _portTypeArray;
       const CBehavior * _ctrlBehavior;
       const CSourceData * _ctrlSrcData;
-      TciModuleIdType _id;
-      TParameterList _parameterList;
-      TBehaviorList _behaviorList;
-      TTestCaseList _testCaseList;
       
       // module dynamic state
       bool _ctrlRunning;
       TTestCompList _allEntityStates;             /**< list of all entities that was used in a test case - M-CONTROL (must be the first) */
-      CTestCase *_currTestCase;                   /**< current test case pointer */
-      TTestCompList _done;                         /**< a list of all currently stopped test components during test case execution (filled when TC is stopped or killed, removed when TC is started) */
-      TTestCompList _killed;                       /**< a list of all terminated test components during test case execution (filled when TC is killed) */
+      CTestCase *_activeTestCase;                 /**< current test case pointer */
+      TTestCompList _done;                        /**< a list of all currently stopped test components during test case execution (filled when TC is stopped or killed, removed when TC is started) */
+      TTestCompList _killed;                      /**< a list of all terminated test components during test case execution (filled when TC is killed) */
       
       TLocalTestCompList _localTestComponents;
       
@@ -111,12 +116,13 @@ namespace freettcn {
       const CBehavior &Behavior(const TciBehaviourIdType &behavior) const throw(ENotFound);
       
     protected:
+      void Register(const CType *type);
       void Register(CParameter *parameter);
       void Register(const CBehavior *ctrlBehavior, const CSourceData *ctrlSrcData);
+      void Register(CTestCase *testCase);
+      void Register(CPortType *portType);
       
-      void TestCaseAdd(CTestCase &testCase);
-      
-      void ParametersSet() throw(freettcn::EOperationFailed);
+//       void ParametersSet() throw(freettcn::EOperationFailed);
       
       virtual void Cleanup();
       
@@ -125,25 +131,30 @@ namespace freettcn {
       virtual ~CModule() = 0;
       
       const TciModuleIdType &Id() const;
-      TriComponentId ModuleComponentId() const;
-      
       bool Running() const;
       void Reset();
       
+      TriComponentId ModuleComponentId() const;
       TciModuleParameterListType Parameters() const;
+      
+      const CType &Type(const char *typeName) const throw(ENotFound);
+      const CType &Type(unsigned int typeIdx) const throw(ENotFound);
+      
+      const CPortType &PortType(unsigned int portTypeIdx) const throw(ENotFound);
       
       TciTestCaseIdListType TestCases() const;
       CTestCase &TestCase(const char *tcId) const throw(ENotFound);
-      void TestCase(CTestCase *tc);
-      CTestCase *TestCase() const;
+      CTestCase &TestCase(unsigned int tcIdx) const throw(ENotFound);
+      void ActiveTestCase(CTestCase &tc);
+      CTestCase &ActiveTestCase() const throw(ENotFound);
       
-      const CTestComponentId &ControlStart();
+      const CTriComponentId &ControlStart();
       void ControlStop() throw(EOperationFailed);
       
       const CBehavior &ControlBehavior() const throw(ENotFound);
       void BehaviorAdd(CBehavior *behavior);
       
-      const CTestComponentId &TestComponentCreateReq(const char *src, int line, const TriComponentId &creatorId, TciTestComponentKindType kind, const CTestComponentType *compType, const char *name);
+      const CTriComponentId &TestComponentCreateReq(const char *src, int line, const TriComponentId &creatorId, TciTestComponentKindType kind, const CTestComponentType *compType, const char *name);
       const TriComponentId &TestComponentCreate(TciTestComponentKindType kind, TciType componentType, const char *name);
       void TestComponentStartReq(const char *src, int line, const TriComponentId &creatorId, const TriComponentId &componentId, const TciBehaviourIdType &behaviorId, const TciParameterListType &parameterList);
       void TestComponentStart(const TriComponentId &componentId, const TciBehaviourIdType &behaviorId, const TciParameterListType &parameterList) throw(ENotFound);
@@ -154,7 +165,7 @@ namespace freettcn {
       void TestComponentLocalAdd(CTestComponentType::CInstance &comp);
       void TestComponentLocalRemove(CTestComponentType::CInstance &comp) throw(ENotFound);
     };
-
+    
   } // namespace TE
   
 } // namespace freettcn

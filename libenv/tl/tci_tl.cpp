@@ -2647,6 +2647,8 @@ void tliSEnter(String am,
                TciParameterListType parsValue,
                String kind)
 {
+  freettcn::TL::CTestLogging &tl = freettcn::TL::CTestLogging::Instance();
+  tl.SEnter(am, ts, src, line, c, name, parsValue, kind);
 }
 
 
@@ -2676,6 +2678,8 @@ void tliSLeave(String am,
                TciValue returnValue,
                String kind)
 {
+  freettcn::TL::CTestLogging &tl = freettcn::TL::CTestLogging::Instance();
+  tl.SLeave(am, ts, src, line, c, name, returnValue, kind);
 }
 
 

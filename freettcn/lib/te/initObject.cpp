@@ -31,18 +31,13 @@
 
 
 
-freettcn::TE::CInitObject::CInitObject(const char *name):
-  _name(name), _inited(false)
+freettcn::TE::CInitObject::CInitObject():
+  _inited(false)
 {
 }
 
 freettcn::TE::CInitObject::~CInitObject()
 {
-}
-
-const char *freettcn::TE::CInitObject::Name() const
-{
-  return _name;
 }
 
 void freettcn::TE::CInitObject::Init()
@@ -52,4 +47,9 @@ void freettcn::TE::CInitObject::Init()
     Initialize();
     _inited = true;
   }
+}
+
+bool freettcn::TE::CInitObject::Inited() const
+{
+  return _inited;
 }

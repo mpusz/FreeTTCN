@@ -35,9 +35,9 @@ extern "C" {
 #include <freettcn/ttcn3/tci.h>
 #include <freettcn/ttcn3/tri.h>
 }
-#include <freettcn/te/verdict.h>
 #include <freettcn/te/idObject.h>
-#include <freettcn/tools/exception.h>
+#include <freettcn/te/verdict.h>
+#include <freettcn/te/initObject.h>
 #include <freettcn/tools/tools.h>
 #include <string>
 #include <vector>
@@ -48,15 +48,16 @@ namespace freettcn {
   namespace TE {
     
     class CBehavior;
-    class CPortType;
     class CTimer;
     class CSourceData;
     class CTestCase;
     class CScope;
+    class CPortType;
+    class CPort;
     
     class CTestComponentType : public CType {
     public:
-      class CInstance : public CType::CInstance, public CIdObject {
+      class CInstance : public CType::CInstance, public CIdObject, public CInitObject {
       public:
         enum TStatus {
           NOT_INITED,                             /**< created but Init() not run */
@@ -71,25 +72,36 @@ namespace freettcn {
                                                      started */
         };
         
-        class ENotInited : public freettcn::EOperationFailed {};
         class ENotStarted : public freettcn::EOperationFailed {};
         
         class CScope {
+          typedef std::vector<CType::CInstance *> TValueArray;
+          
+          const char *_kind;
           CScope * const _up;
+          TValueArray _valueArray;
         public:
-          CScope(CTestComponentType::CInstance &comp, CScope *up);
-          CScope *Up() const;
+          CScope(const char *kind, CScope *up);
+          ~CScope();
+          const char *Kind() const;
+          CScope *Up() const;;
+          
+          void Register(CType::CInstance *value);
+          CType::CInstance &Value(unsigned int valueIdx) const throw(ENotFound);
         };
         
       private:
+        typedef std::vector<CPort *> TPortArray;
         typedef std::list<const CTimer *> TTimerList;
         
+        // test componnent info
         CModule *_module;
         TciTestComponentKindType _kind;
         TriComponentId _id;
+        TPortArray _portArray;
         CTimer *_startTimer;
         
-        // test comopnent dynamic state
+        // test component dynamic state
         TStatus _status;                          /**< describes the status of test component */
 //         CCommandQueue _controlStack;              /**< a stack of flow graph node references; the top element is the flow graph node that has to be interpreted next */
 //         TDefaultList _defaultList;                /**< a list of activated defaults; a list of pointers to the start nodes of activated defaults; the list in reverse order of activation */
@@ -111,10 +123,8 @@ namespace freettcn {
         CScope *_scope;
         int _behaviorOffset;
         
-        virtual void Initialize() = 0;
-        
       protected:
-        CModule &Module() const throw(ENotInited);
+        void Register(CPort *port);
         
       public:
         CInstance(const CType &type);
@@ -122,7 +132,8 @@ namespace freettcn {
         
         TStatus Status() const;
         void Status(TStatus status);
-        
+        CModule &Module() const throw(ENotInited);
+
         void Init(CModule &module, TciTestComponentKindType kind, const char *name);
         const TriComponentId &Id() const throw(ENotInited);
         TciTestComponentKindType Kind() const throw(ENotInited);
@@ -138,9 +149,9 @@ namespace freettcn {
         //       void Map(const CPort &fromPort, const CPort &toPort) throw(ENotInited);
         void Verdict(const char *src, int line, TVerdict verdict);
         
-        CScope *Scope() const;
-        void ScopePush(CScope &scope);
-        void ScopePop() throw(EOperationFailed);
+        void ScopeEnter(const char *src, int line, const char *kind);
+        CScope &Scope() const throw(ENotFound);
+        void ScopeLeave(const char *src, int line);
       };
 
       
@@ -155,7 +166,7 @@ namespace freettcn {
       mutable TriPortId **__portIdList;
       
     protected:
-      void Register(const CPortType &portType, const char *name, int portIdx = -1);
+      void PortTypeAdd(const CPortType &portType, const char *name, int portIdx = -1);
       
     public:
       CTestComponentType(const CModule *module, const char *name);

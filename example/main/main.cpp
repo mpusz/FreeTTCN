@@ -198,7 +198,7 @@ int main (int argc, char **argv)
     const freettcn::TE::CModulesContainer::TModuleList &list = modules.List();
     
     for(freettcn::TE::CModulesContainer::TModuleList::const_iterator it=list.begin(); it != list.end(); ++it)
-      std::cout << " - " << (*it)->Name() << std::endl;
+      std::cout << " - " << (*it)->Id().moduleName << std::endl;
     
     exit(0);
   }

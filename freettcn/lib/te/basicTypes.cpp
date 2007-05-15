@@ -32,9 +32,17 @@
 #include "freettcn/te/basicTypes.h"
 
 
+const freettcn::TE::CIntegerType freettcn::TE::CBasicTypes::_integer;
 const freettcn::TE::CBooleanType freettcn::TE::CBasicTypes::_boolean;
 const freettcn::TE::CVerdictType freettcn::TE::CBasicTypes::_verdict;
 const freettcn::TE::CControlComponentType freettcn::TE::CBasicTypes::_control;
+
+
+
+const freettcn::TE::CIntegerType &freettcn::TE::CBasicTypes::Integer()
+{
+  return _integer;
+}
 
 const freettcn::TE::CBooleanType &freettcn::TE::CBasicTypes::Boolean()
 {

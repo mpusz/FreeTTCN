@@ -33,9 +33,13 @@
 
 freettcn::TE::CPortType::CPortType(const freettcn::TE::CModule &module, const char *name)
 {
-  _id.moduleName = const_cast<char *>(module.Name());
+  _id.moduleName = module.Id().moduleName;
   _id.objectName = const_cast<char *>(name);
   _id.aux = 0;
+}
+
+freettcn::TE::CPortType::~CPortType()
+{
 }
 
 const QualifiedName &freettcn::TE::CPortType::Id() const
@@ -47,9 +51,9 @@ const QualifiedName &freettcn::TE::CPortType::Id() const
 
 
 
-freettcn::TE::CPortType::CInstance::CInstance(const freettcn::TE::CPortType &type,
-                                              const freettcn::TE::CTestComponentType::CInstance &component,
-                                              const char *name, int portIdx /* -1 */):
+freettcn::TE::CPort::CPort(const freettcn::TE::CPortType &type,
+                           const freettcn::TE::CTestComponentType::CInstance &component,
+                           const char *name, int portIdx /* -1 */):
   _component(component), _status(STARTED)
 {
   _id.compInst = _component.Id();
@@ -60,18 +64,12 @@ freettcn::TE::CPortType::CInstance::CInstance(const freettcn::TE::CPortType &typ
 }
 
 
-freettcn::TE::CPortType::CInstance::~CInstance()
+freettcn::TE::CPort::~CPort()
 {
 }
 
 
-const TriPortId &freettcn::TE::CPortType::CInstance::Id() const
+const TriPortId &freettcn::TE::CPort::Id() const
 {
   return _id;
-}
-
-
-void freettcn::TE::CPortType::CInstance::Init()
-{
-  Initialize();
 }

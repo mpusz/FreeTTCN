@@ -30,10 +30,10 @@
 #include "freettcn/te/testComponent.h"
 #include "freettcn/te/te.h"
 #include "freettcn/te/module.h"
-#include "freettcn/te/port.h"
 #include "freettcn/te/behavior.h"
 #include "freettcn/te/timer.h"
 #include "freettcn/te/testCase.h"
+#include "freettcn/te/port.h"
 #include "freettcn/te/basicTypes.h"
 #include "freettcn/te/sourceData.h"
 #include "freettcn/tools/logMask.h"
@@ -63,7 +63,7 @@ freettcn::TE::CTestComponentType::~CTestComponentType()
 }
 
 
-void freettcn::TE::CTestComponentType::Register(const CPortType &portType, const char *name, int portIdx /* -1 */)
+void freettcn::TE::CTestComponentType::PortTypeAdd(const CPortType &portType, const char *name, int portIdx /* -1 */)
 {
   TriPortId *portId = new TriPortId;
   
@@ -107,22 +107,33 @@ freettcn::TE::CTestComponentType::CInstance::CInstance(const CType &type):
 
 freettcn::TE::CTestComponentType::CInstance::~CInstance()
 {
+  Purge(_portArray);
+  
   if (_startTimer)
     delete _startTimer;
   
   // purge stack
   while (_scope)
-    ScopePop();
+    ScopeLeave(0, 0);
   
   if (_status != NOT_INITED)
     _module->TestComponentLocalRemove(*this);
 }
 
 
+void freettcn::TE::CTestComponentType::CInstance::Register(CPort *port)
+{
+  _portArray.push_back(port);
+  /// @todo Maybe it should be added after 'Start' operation
+  /// @todo PortRemove should be added
+  _module->ActiveTestCase().PortAdd(*port);
+}
+
+
 freettcn::TE::CModule &freettcn::TE::CTestComponentType::CInstance::Module() const throw(ENotInited)
 {
   if (_status == NOT_INITED)
-    throw CTestComponentType::CInstance::ENotInited();
+    throw ENotInited();
   
   return *_module;
 }
@@ -154,32 +165,32 @@ void freettcn::TE::CTestComponentType::CInstance::Init(CModule &module, TciTestC
   _status = BLOCKED;
   
   // perform component specific initialization
-  Initialize();
+  freettcn::TE::CInitObject::Init();
   
   _module->TestComponentLocalAdd(*this);
 }
 
 
-const TriComponentId &freettcn::TE::CTestComponentType::CInstance::Id() const throw(CTestComponentType::CInstance::ENotInited)
+const TriComponentId &freettcn::TE::CTestComponentType::CInstance::Id() const throw(ENotInited)
 {
   if (_status == NOT_INITED)
-    throw CTestComponentType::CInstance::ENotInited();
+    throw ENotInited();
   return _id;
 }
 
 
-TciTestComponentKindType freettcn::TE::CTestComponentType::CInstance::Kind() const throw(CTestComponentType::CInstance::ENotInited)
+TciTestComponentKindType freettcn::TE::CTestComponentType::CInstance::Kind() const throw(ENotInited)
 {
   if (_status == NOT_INITED)
-    throw CTestComponentType::CInstance::ENotInited();
+    throw ENotInited();
   return _kind;
 }
 
 
-void freettcn::TE::CTestComponentType::CInstance::Start(const CBehavior &behavior, TciParameterListType parameterList) throw(CTestComponentType::CInstance::ENotInited)
+void freettcn::TE::CTestComponentType::CInstance::Start(const CBehavior &behavior, TciParameterListType parameterList) throw(ENotInited)
 {
   if (_status == NOT_INITED)
-    throw CTestComponentType::CInstance::ENotInited();
+    throw ENotInited();
   
   _behavior = &behavior;
   
@@ -311,7 +322,7 @@ void freettcn::TE::CTestComponentType::CInstance::TimerRemove(const CTimer &time
 }
 
 
-// void freettcn::TE::CTestComponentType::CInstance::Map(const freettcn::TE::CPort &fromPort, const freettcn::TE::CPort &toPort) throw(freettcn::TE::CTestComponentType::CInstance::ENotInited)
+// void freettcn::TE::CTestComponentType::CInstance::Map(const freettcn::TE::CPort &fromPort, const freettcn::TE::CPort &toPort) throw(ENotInited)
 // {
 //   if (_status == NOT_INITED)
 //     throwfreettcn::TE::CTestComponentType::CInstance::ENotInited();
@@ -341,29 +352,91 @@ void freettcn::TE::CTestComponentType::CInstance::Verdict(const char *src, int l
 // }
 
 
-freettcn::TE::CTestComponentType::CInstance::CScope *freettcn::TE::CTestComponentType::CInstance::Scope() const
+
+void freettcn::TE::CTestComponentType::CInstance::ScopeEnter(const char *src, int line, const char *kind)
 {
-  return _scope;
+  _scope = new CScope(kind, _scope);
+
+  freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
+  if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_S_ENTER)) {
+    // log
+    TciParameterListType parList;
+    parList.length = 0;
+    parList.parList = 0;
+    tliSEnter(0, te.TimeStamp().Get(), const_cast<char *>(src), line, Id(), "", parList, const_cast<char *>(kind));
+  }
 }
 
-void freettcn::TE::CTestComponentType::CInstance::ScopePush(CScope &scope)
+
+freettcn::TE::CTestComponentType::CInstance::CScope &freettcn::TE::CTestComponentType::CInstance::Scope() const throw(ENotFound)
 {
-  _scope = &scope;
+  if (_scope)
+    return *_scope;
+  
+  std::cout << "ERROR: Scope not found!!!" << std::endl;
+  throw ENotFound();
 }
 
-void freettcn::TE::CTestComponentType::CInstance::ScopePop() throw(EOperationFailed)
+
+void freettcn::TE::CTestComponentType::CInstance::ScopeLeave(const char *src, int line)
 {
-  if (!_scope) {
+  if (_scope) {
+    freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
+    if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_S_ENTER))
+      // log
+      tliSLeave(0, te.TimeStamp().Get(), const_cast<char *>(src), line, Id(), "", 0, const_cast<char *>(_scope->Kind()));
+    
+    CScope *scope = _scope->Up();
+    delete _scope;
+    _scope = scope;
+  }
+  else {
     std::cout << "ERROR: Already on the top scope\n" << std::cout;
     throw EOperationFailed();
   }
-  
-  CScope *scope = _scope->Up();
-  delete _scope;
-  _scope = scope;
 }
 
 
+
+
+freettcn::TE::CTestComponentType::CInstance::CScope::CScope(const char *kind, CScope *up):
+  _kind(kind), _up(up)
+{
+}
+
+
+freettcn::TE::CTestComponentType::CInstance::CScope::~CScope()
+{
+  Purge(_valueArray);
+}
+
+
+const char *freettcn::TE::CTestComponentType::CInstance::CScope::Kind() const
+{
+  return _kind;
+}
+
+
+freettcn::TE::CTestComponentType::CInstance::CScope *freettcn::TE::CTestComponentType::CInstance::CScope::Up() const
+{
+  return _up;
+}
+
+
+void freettcn::TE::CTestComponentType::CInstance::CScope::Register(CType::CInstance *value)
+{
+  _valueArray.push_back(value);
+}
+
+
+freettcn::TE::CType::CInstance &freettcn::TE::CTestComponentType::CInstance::CScope::Value(unsigned int valueIdx) const throw(ENotFound)
+{
+  if (valueIdx < _valueArray.size())
+    return *_valueArray[valueIdx];
+  
+  std::cout << "ERROR: Value index: " << valueIdx << " too big (size: " << _valueArray.size() << ")" << std::endl;
+  throw ENotFound();
+}
 
 
 
@@ -389,17 +462,3 @@ void freettcn::TE::CControlComponentType::CInstance::Initialize()
 }
 
 
-
-
-
-freettcn::TE::CTestComponentType::CInstance::CScope::CScope(CTestComponentType::CInstance &comp, CScope *up):
-  _up(up)
-{
-  comp.ScopePush(*this);
-}
-
-
-freettcn::TE::CTestComponentType::CInstance::CScope *freettcn::TE::CTestComponentType::CInstance::CScope::Up() const
-{
-  return _up;
-}

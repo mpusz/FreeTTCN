@@ -39,11 +39,11 @@ namespace freettcn {
   
   namespace TE {
     
-    class CTestComponentId {
+    class CTriComponentId {
       TriComponentId _id;
     public:
-      CTestComponentId(const TriComponentId &id);
-      ~CTestComponentId();
+      CTriComponentId(const TriComponentId &id);
+      ~CTriComponentId();
       const TriComponentId &Id() const;
     };
         

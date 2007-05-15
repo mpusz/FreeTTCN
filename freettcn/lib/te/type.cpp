@@ -42,7 +42,7 @@ freettcn::TE::CType::CType(const CModule   *module,
   _module(module), _class(typeClass), _encoding(encoding), _encodingVariant(encodingVariant), _extension(extension)
 {
   if (_module)
-    _id.moduleName = const_cast<char *>(_module->Name());
+    _id.moduleName = _module->Id().moduleName;
   else
     _id.moduleName = "{freettcn}";
   _id.objectName = const_cast<char *>(name);
@@ -124,33 +124,3 @@ const char *freettcn::TE::CType::CInstance::Extension() const
 {
   return Type().Extension();
 }
-
-
-
-
-// void freettcn::TE::CIntegerValue::AbsValue(String value) throw(freettcn::EOperationFailed)
-// {
-//   if (*value == '\0')
-//     throw freettcn::EOperationFailed();
-  
-//   char *endPtr;
-//   //  std::errno = 0;    /* To distinguish success/failure after call */
-//   unsigned long val = strtoul(value, &endPtr, 10);
-//   if (*endPtr != '\0' || value == endPtr) // ||
-// //       (errno == ERANGE && (val == LONG_MAX || val == LONG_MIN)))
-//     throw freettcn::EOperationFailed();
-  
-//   _absValue = val;
-// }
-
-
-// void freettcn::TE::CIntegerValue::DigitsNum(unsigned long int dig_num)
-// {
-// }
-
-
-// void freettcn::TE::CIntegerValue::Sign(bool sign)
-// {
-//   _sign = sign;
-// }
-

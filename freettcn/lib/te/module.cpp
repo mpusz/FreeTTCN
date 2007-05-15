@@ -49,49 +49,104 @@ extern "C" {
 #include <iostream>
 
 
-freettcn::TE::CModule::CParameter::CParameter(const char *name):
-  CInitObject(name), _defaultValue(0), _value(0)
+
+
+/* ********************************** P A R A M E T E R ********************************* */
+
+freettcn::TE::CModule::CParameter::CParameter(const char *name, const CType::CInstance *defaultValue) throw(EOperationFailed):
+  _defaultValue(defaultValue), _value(0)
 {
-  
+  if (!_defaultValue)
+    throw EOperationFailed();
+  _id = const_cast<char *>(name);
 }
 
 freettcn::TE::CModule::CParameter::~CParameter()
 {
-//   if (_defaultValue)
-//     delete _defaultValue;
-//   if (_value)
-//     delete value;
+  if (_defaultValue)
+    delete _defaultValue;
+  if (_value)
+    delete _value;
 }
 
-TciValue freettcn::TE::CModule::CParameter::DefaultValue() const
+const TciModuleParameterIdType &freettcn::TE::CModule::CParameter::Id() const
 {
-  return _defaultValue;
+  return _id;
 }
 
-void freettcn::TE::CModule::CParameter::Value(TciValue value)
+const freettcn::TE::CType::CInstance &freettcn::TE::CModule::CParameter::DefaultValue() const
 {
-//   if (_value)
-//     delete value;
+  return *_defaultValue;
+}
+
+void freettcn::TE::CModule::CParameter::Value(const CType::CInstance *value)
+{
+  if (_value)
+    delete _value;
+  
   _value = value;
 }
 
+const freettcn::TE::CType::CInstance &freettcn::TE::CModule::CParameter::Value() const throw(EOperationFailed)
+{
+  if (_value) {
+    if (!_value->Omit())
+      return *_value;
+    
+    std::cout << "ERROR: Value is set to omit!!!" << std::endl;
+    throw EOperationFailed();
+  }
+  else {
+    if (!_defaultValue->Omit())
+      return *_defaultValue;
+    
+    std::cout << "ERROR: Default value is set to omit!!!" << std::endl;
+    throw EOperationFailed();
+  }
+}
 
 
 
 
+/* ********************** T E S T   C O M P O N E N T   D A T A************************** */
+
+freettcn::TE::CModule::CTestComponentData::CTestComponentData(const TriComponentId &id, TciTestComponentKindType kind):
+  _id(id), _kind(kind)
+{
+}
+
+const freettcn::TE::CTriComponentId &freettcn::TE::CModule::CTestComponentData::Id() const
+{
+  return _id;
+}
+
+TciTestComponentKindType freettcn::TE::CModule::CTestComponentData::Kind() const
+{
+  return _kind;
+}
+
+bool freettcn::TE::CModule::CTestComponentData::operator==(const TriComponentId &id) const
+{
+  const TriComponentId &localId = _id.Id();
+  
+  return (id.compInst.bits == localId.compInst.bits) &&
+    !memcmp(id.compInst.data, localId.compInst.data, id.compInst.bits / 8);
+}
 
 
 
+
+/* ************************************* M O D U L E ************************************ */
 
 freettcn::TE::CModule::CModule(const char *name):
-  CInitObject(name), _ctrlBehavior(0), _ctrlSrcData(0),
+  _ctrlBehavior(0), _ctrlSrcData(0),
   //_ctrlCompType(*this), 
-  _ctrlRunning(false), _currTestCase(0), __modParList(0), __testCaseIdList(0)
+  _ctrlRunning(false), _activeTestCase(0), __modParList(0), __testCaseIdList(0)
 {
   freettcn::TE::CModulesContainer &modContainer = freettcn::TE::CModulesContainer::Instance();
   modContainer.Register(*this);
   
-  _id.moduleName = const_cast<char *>(Name());
+  _id.moduleName = const_cast<char *>(name);
   _id.objectName = _id.moduleName;
   _id.aux = this;
 }
@@ -125,9 +180,12 @@ TriComponentId freettcn::TE::CModule::ModuleComponentId() const
 
 void freettcn::TE::CModule::Cleanup()
 {
-  Purge(_parameterList);
+  Purge(_typeArray);
+  Purge(_parameterArray);
   Purge(_allEntityStates);
   Purge(_behaviorList);
+  Purge(_testCaseArray);
+  Purge(_portTypeArray);
   
   if (_ctrlSrcData)
     delete _ctrlSrcData;
@@ -142,16 +200,16 @@ void freettcn::TE::CModule::Cleanup()
 
 bool freettcn::TE::CModule::Running() const
 {
-  return _ctrlRunning || _currTestCase;
+  return _ctrlRunning || _activeTestCase;
 }
 
 
 void freettcn::TE::CModule::Reset()
 {
   if (Running()) {
-    if (_currTestCase) {
-      _currTestCase->Reset();
-      _currTestCase = 0;
+    if (_activeTestCase) {
+      _activeTestCase->Reset();
+      _activeTestCase = 0;
       
       // reset SA only if test case is running
       triSAReset();
@@ -178,44 +236,63 @@ void freettcn::TE::CModule::Reset()
 }
 
 
-void freettcn::TE::CModule::Register(CParameter *parameter)
+void freettcn::TE::CModule::Register(const CType *type)
 {
-  _parameterList.push_back(parameter);
-  parameter->Init();
+  _typeArray.push_back(type);
 }
 
-void freettcn::TE::CModule::Register(const freettcn::TE::CBehavior *ctrlBehavior, const freettcn::TE::CSourceData *ctrlSrcData)
+
+void freettcn::TE::CModule::Register(CParameter *parameter)
+{
+  _parameterArray.push_back(parameter);
+}
+
+
+void freettcn::TE::CModule::Register(const CBehavior *ctrlBehavior, const CSourceData *ctrlSrcData)
 {
   _ctrlBehavior = ctrlBehavior;
   _ctrlSrcData = ctrlSrcData;
 }
 
-void freettcn::TE::CModule::ParametersSet() throw(freettcn::EOperationFailed)
+
+void freettcn::TE::CModule::Register(CTestCase *testCase)
 {
-  // obtain and set module parameters values
-  for(TParameterList::iterator it=_parameterList.begin(); it != _parameterList.end(); ++it) {
-    TciValue val = tciGetModulePar(const_cast<char *>((*it)->Name()));
-//     if (!val && (*it)->DefaultValue())
-//       val = new((*it)->DefaultValue());
-    
-    if (!val)
-      throw freettcn::EOperationFailed();
-    
-    (*it)->Value(val);
-  }
+  _testCaseArray.push_back(testCase);
 }
+
+
+void freettcn::TE::CModule::Register(CPortType *portType)
+{
+  _portTypeArray.push_back(portType);
+}
+
+
+// void freettcn::TE::CModule::ParametersSet() throw(freettcn::EOperationFailed)
+// {
+//   // obtain and set module parameters values
+//   for(TParameterList::iterator it=_parameterArray.begin(); it != _parameterArray.end(); ++it) {
+//     TciValue val = tciGetModulePar((*it)->Id());
+// //     if (!val && (*it)->DefaultValue())
+// //       val = new((*it)->DefaultValue());
+    
+//     if (!val)
+//       throw freettcn::EOperationFailed();
+    
+//     (*it)->Value(val);
+//   }
+// }
+
 
 TciModuleParameterListType freettcn::TE::CModule::Parameters() const
 {
   TciModuleParameterListType modParList;
-  modParList.length = _parameterList.size();
+  modParList.length = _parameterArray.size();
   if (!__modParList) {
     __modParList = new TciModuleParameterType[modParList.length];
     
-    unsigned int i=0;
-    for(TParameterList::const_iterator it=_parameterList.begin(); it != _parameterList.end(); ++it, i++) {
-      __modParList[i].parName = const_cast<char *>((*it)->Name());
-      __modParList[i].defaultValue = ((*it)->DefaultValue());
+    for(unsigned int i=0; i<_parameterArray.size(); i++) {
+      __modParList[i].parName = _parameterArray[i]->Id();
+      __modParList[i].defaultValue = const_cast<void *>(static_cast<const void *>(&_parameterArray[i]->DefaultValue()));
     }
   }
   modParList.modParList = __modParList;
@@ -224,52 +301,89 @@ TciModuleParameterListType freettcn::TE::CModule::Parameters() const
 }
 
 
-void freettcn::TE::CModule::TestCaseAdd(CTestCase &testCase)
+const freettcn::TE::CType &freettcn::TE::CModule::Type(const char *typeName) const throw(ENotFound)
 {
-  _testCaseList.push_back(&testCase);
-  testCase.Init();
+  for(unsigned int i=0; i<_typeArray.size(); i++)
+    if (!strcmp(_typeArray[i]->Name(), typeName))
+      return *_typeArray[i];
+  
+  std::cout << "ERROR: " << __FUNCTION__ << ":" << __LINE__ <<
+    " Requested type: '" << typeName << "'not found" << std::endl;
+  throw ENotFound();
 }
+
+
+const freettcn::TE::CType &freettcn::TE::CModule::Type(unsigned int typeIdx) const throw(ENotFound)
+{
+  if (typeIdx < _typeArray.size())
+    return *_typeArray[typeIdx];
+  
+  std::cout << "ERROR: Type index: " << typeIdx << " too big (size: " << _typeArray.size() << ")" << std::endl;
+  throw ENotFound();
+}
+
+
+const freettcn::TE::CPortType &freettcn::TE::CModule::PortType(unsigned int portTypeIdx) const throw(ENotFound)
+{
+  if (portTypeIdx < _portTypeArray.size())
+    return *_portTypeArray[portTypeIdx];
+  
+  std::cout << "ERROR: Port Type index: " << portTypeIdx << " too big (size: " << _portTypeArray.size() << ")" << std::endl;
+  throw ENotFound();
+}
+
 
 TciTestCaseIdListType freettcn::TE::CModule::TestCases() const
 {
   TciTestCaseIdListType tcList;
-  tcList.length = _testCaseList.size();
+  tcList.length = _testCaseArray.size();
   if (!__testCaseIdList) {
-     __testCaseIdList = new TciTestCaseIdType[tcList.length];
-     
-     unsigned int i=0;
-     for(TTestCaseList::const_iterator it=_testCaseList.begin(); it!=_testCaseList.end(); ++it, i++) {
-       __testCaseIdList[i].moduleName = const_cast<char *>(Name());
-       __testCaseIdList[i].objectName = const_cast<char *>((*it)->Name());
-       __testCaseIdList[i].aux = 0;
-     }
+    __testCaseIdList = new TciTestCaseIdType[tcList.length];
+    for(unsigned int i=0; i<_testCaseArray.size(); i++)
+      __testCaseIdList[i] = _testCaseArray[i]->Id();
   }
   tcList.idList = __testCaseIdList;
   
   return tcList;
 }
 
+
 freettcn::TE::CTestCase &freettcn::TE::CModule::TestCase(const char *tcId) const throw(ENotFound)
 {
-  for(TTestCaseList::const_iterator it=_testCaseList.begin(); it != _testCaseList.end(); ++it)
-    if ((*it)->Name() == tcId)
-      return *(*it);
+  for(unsigned int i=0; i<_testCaseArray.size(); i++)
+    if (!strcmp(_testCaseArray[i]->Id().objectName, tcId))
+      return *_testCaseArray[i];
   std::cout << "ERROR: Test Case not found" << std::endl;
   throw freettcn::ENotFound();
 }
 
-void freettcn::TE::CModule::TestCase(freettcn::TE::CTestCase *tc)
+freettcn::TE::CTestCase &freettcn::TE::CModule::TestCase(unsigned int tcIdx) const throw(ENotFound)
 {
-  _currTestCase = tc;
+  if (tcIdx < _testCaseArray.size())
+    return *_testCaseArray[tcIdx];
+  
+  std::cout << "ERROR: Type index: " << tcIdx << " too big (size: " << _testCaseArray.size() << ")" << std::endl;
+  throw ENotFound();
 }
 
-freettcn::TE::CTestCase *freettcn::TE::CModule::TestCase() const
+
+void freettcn::TE::CModule::ActiveTestCase(freettcn::TE::CTestCase &tc)
 {
-  return _currTestCase;
+  _activeTestCase = &tc;
 }
 
 
-const freettcn::TE::CTestComponentId &freettcn::TE::CModule::ControlStart()
+freettcn::TE::CTestCase &freettcn::TE::CModule::ActiveTestCase() const throw(ENotFound)
+{
+  if (_activeTestCase)
+    return *_activeTestCase;
+  
+  std::cout << "ERROR: Test Case not running!!!" << std::endl;
+  throw ENotFound();
+}
+
+
+const freettcn::TE::CTriComponentId &freettcn::TE::CModule::ControlStart()
 {
   // obtain module parameters
 //   ParametersSet();
@@ -287,8 +401,8 @@ void freettcn::TE::CModule::ControlStop() throw(EOperationFailed)
     // log
     tliCtrlStop(0, te.TimeStamp().Get(), 0, 0, ModuleComponentId());
   
-  if (_currTestCase)
-    _currTestCase->Stop();
+  if (_activeTestCase)
+    _activeTestCase->Stop();
   
   tciResetReq();
   
@@ -329,7 +443,6 @@ const freettcn::TE::CBehavior &freettcn::TE::CModule::Behavior(const TciBehaviou
 }
 
 
-
 freettcn::TE::CTestComponentType::CInstance &freettcn::TE::CModule::TestComponent(const TriComponentId &component) const throw(freettcn::ENotFound)
 {
   freettcn::TE::CIdObject &object = CIdObject::Get(component.compInst);
@@ -346,8 +459,7 @@ freettcn::TE::CTestComponentType::CInstance &freettcn::TE::CModule::TestComponen
 }
 
 
-
-const freettcn::TE::CTestComponentId &freettcn::TE::CModule::TestComponentCreateReq(const char *src, int line,
+const freettcn::TE::CTriComponentId &freettcn::TE::CModule::TestComponentCreateReq(const char *src, int line,
                                                                                     const TriComponentId &creatorId,
                                                                                     TciTestComponentKindType kind,
                                                                                     const CTestComponentType *compType,
@@ -409,6 +521,7 @@ const TriComponentId &freettcn::TE::CModule::TestComponentCreate(TciTestComponen
   return cInstance->Id();
 }
 
+
 void freettcn::TE::CModule::TestComponentStartReq(const char *src, int line,
                                                   const TriComponentId &creatorId,
                                                   const TriComponentId &componentId,
@@ -466,7 +579,7 @@ void freettcn::TE::CModule::TestComponentTerminated(const TriComponentId &compon
   case TCI_MTC_COMP:
     {
       // update testcase verdict
-      _currTestCase->Verdict(static_cast<TVerdict>(tciGetVerdictValue(verdict)));
+      _activeTestCase->Verdict(static_cast<TVerdict>(tciGetVerdictValue(verdict)));
 
       // get SYSTEM component
       for(TTestCompList::iterator it=_allEntityStates.begin(); it!=_allEntityStates.end(); ++it) {
@@ -483,8 +596,8 @@ void freettcn::TE::CModule::TestComponentTerminated(const TriComponentId &compon
       
       // test case terminated
       tciTestCaseTerminated(verdict, parms);
-      _currTestCase->Reset();
-      _currTestCase = 0;
+      _activeTestCase->Reset();
+      _activeTestCase = 0;
       
       // get control component
       if (_localTestComponents.size()) {
@@ -505,7 +618,7 @@ void freettcn::TE::CModule::TestComponentTerminated(const TriComponentId &compon
   case TCI_PTC_COMP:
   case TCI_ALIVE_COMP:
     // update testcase verdict
-    _currTestCase->Verdict(static_cast<TVerdict>(tciGetVerdictValue(verdict)));
+    _activeTestCase->Verdict(static_cast<TVerdict>(tciGetVerdictValue(verdict)));
       
     /// @todo PTC termination
 //     bool terminated = true;
@@ -552,32 +665,4 @@ void freettcn::TE::CModule::TestComponentLocalRemove(CTestComponentType::CInstan
   
   std::cout << "ERROR: Local test component not found" << std::endl;
   throw ENotFound();
-}
-
-
-
-
-
-
-freettcn::TE::CModule::CTestComponentData::CTestComponentData(const TriComponentId &id, TciTestComponentKindType kind):
-  _id(id), _kind(kind)
-{
-}
-
-const freettcn::TE::CTestComponentId &freettcn::TE::CModule::CTestComponentData::Id() const
-{
-  return _id;
-}
-
-TciTestComponentKindType freettcn::TE::CModule::CTestComponentData::Kind() const
-{
-  return _kind;
-}
-
-bool freettcn::TE::CModule::CTestComponentData::operator==(const TriComponentId &id) const
-{
-  const TriComponentId &localId = _id.Id();
-  
-  return (id.compInst.bits == localId.compInst.bits) &&
-    !memcmp(id.compInst.data, localId.compInst.data, id.compInst.bits / 8);
 }

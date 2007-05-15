@@ -40,44 +40,49 @@ namespace freettcn {
   
   namespace TE {
     
-    class CMessage {
-      const TriComponentId &sender;
-      const CType::CInstance &value;
-    };
-
     class CModule;
     
     class CPortType {
-    public:
-      class CInstance {
-      public:
-        enum TStatus {
-          STARTED,
-          STOPPED
-        };
-
-      private:
-        typedef CQueue<CMessage *> CMessageQueue;
-        
-        const CTestComponentType::CInstance &_component;
-        TriPortId _id;
-        
-        // port dynamic state
-        TStatus _status;                          /**< actual status of a port */
-        // CONNECTIONS_LIST - keeps track of connections between the different ports in the test system
-        CMessageQueue _valueQueue;                /**< not yet consumed messages, calls, replies and exceptions */
-        // SNAP_VALUE - when a snapshot is taken the first element from VALUE_QUEUE is copied (NULL if VALUE_QUEUE is empty or STATUS = STOPPED)
+    private:
+      QualifiedName _id;
       
-      protected:
-        virtual void Initialize() = 0;
-        
-      public:
-        CInstance(const CPortType &type, const CTestComponentType::CInstance &component, const char *name, int portIdx = -1);
-        virtual ~CInstance() = 0;
-        
-        const TriPortId &Id() const;
-        void Init();
-        
+    public:
+      CPortType(const CModule &module, const char *name);
+      virtual ~CPortType() = 0;
+      const QualifiedName &Id() const;
+    };
+    
+
+    class CPort {
+    public:
+      enum TStatus {
+        STARTED,
+        STOPPED
+      };
+      
+      class CMessage {
+        const TriComponentId &sender;
+        const CType::CInstance &value;
+      };
+      
+    private:
+      typedef CQueue<CMessage *> CMessageQueue;
+      
+      const CTestComponentType::CInstance &_component;
+      TriPortId _id;
+      
+      // port dynamic state
+      TStatus _status;                          /**< actual status of a port */
+      // CONNECTIONS_LIST - keeps track of connections between the different ports in the test system
+      CMessageQueue _valueQueue;                /**< not yet consumed messages, calls, replies and exceptions */
+      // SNAP_VALUE - when a snapshot is taken the first element from VALUE_QUEUE is copied (NULL if VALUE_QUEUE is empty or STATUS = STOPPED)
+      
+    public:
+      CPort(const CPortType &type, const CTestComponentType::CInstance &component, const char *name, int portIdx = -1);
+      virtual ~CPort() = 0;
+      
+      const TriPortId &Id() const;
+      
         //       void Send();
         
 //         const TriPortId &RemoteId(const CTestComponentType::CInstance &component) const throw(ENotFound);
@@ -85,14 +90,6 @@ namespace freettcn {
 //         void Connect(const TriPortId &remoteId);
 //         void Disconnect(const TriPortId &remoteId);
         
-      };
-      
-    private:
-      QualifiedName _id;
-      
-    public:
-      CPortType(const CModule &module, const char *name);
-      const QualifiedName &Id() const;
     };
     
     
