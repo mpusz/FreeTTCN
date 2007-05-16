@@ -97,11 +97,10 @@ TriPortIdList freettcn::TE::CTestComponentType::Ports() const
 
 
 freettcn::TE::CTestComponentType::CInstance::CInstance(const CType &type):
-  freettcn::TE::CType::CInstance(type, false), _module(0), _startTimer(0),
-  _status(NOT_INITED), _verdict(CBasicTypes::Verdict(), false),
+  freettcn::TE::CType::CInstance(type), _module(0), _startTimer(0),
+  _status(NOT_INITED), _verdict(CBasicTypes::Verdict(), VERDICT_NONE),
   _behavior(0), _scope(0), _behaviorOffset(CBehavior::OFFSET_AUTO)
 {
-  _verdict.Value(VERDICT_NONE);
 }
 
 
@@ -340,9 +339,7 @@ void freettcn::TE::CTestComponentType::CInstance::Verdict(const char *src, int l
   freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
   if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_C_TERMINATED)) {
     // log
-    CVerdictType::CInstance tciVerdict(CBasicTypes::Verdict(), false);
-    tciVerdict.Value(verdict);
-    
+    CVerdictType::CInstance tciVerdict(CBasicTypes::Verdict(), verdict);
     tliSetVerdict(0, te.TimeStamp().Get(), const_cast<char *>(src), line, Id(), &tciVerdict);
   }
   
@@ -451,7 +448,7 @@ freettcn::TE::CControlComponentType::CControlComponentType():
 {
 }
 
-freettcn::TE::CControlComponentType::CInstance *freettcn::TE::CControlComponentType::InstanceCreate(bool omit /* false */) const
+freettcn::TE::CControlComponentType::CInstance *freettcn::TE::CControlComponentType::InstanceCreate() const
 {
   return new freettcn::TE::CControlComponentType::CInstance(*this);
 }

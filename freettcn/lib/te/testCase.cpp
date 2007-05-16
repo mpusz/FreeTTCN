@@ -54,13 +54,11 @@ freettcn::TE::CTestCase::CTestCase(CModule &module, const char *name, const free
                                    const freettcn::TE::CTestComponentType *systemType /* 0 */):
   _module(module), _srcData(srcData),
   _mtcType(mtcType), _behavior(behavior), _systemType(systemType ? *systemType : mtcType),
-  _mtc(0), _guardTimer(0), _verdict(CBasicTypes::Verdict(), false)
+  _mtc(0), _guardTimer(0), _verdict(CBasicTypes::Verdict(), VERDICT_NONE)
 {
   _id.moduleName = _module.Id().moduleName;
   _id.objectName = const_cast<char *>(name);
   _id.aux = 0;
-  
-  _verdict.Value(VERDICT_NONE);
 }
 
 freettcn::TE::CTestCase::~CTestCase()

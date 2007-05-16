@@ -1,7 +1,7 @@
 //
 // Copyright (C) 2007 Mateusz Pusz
 //
-// This file is part of freettcn (Free TTCN) library.
+// This file is part of freettcnenv (Free TTCN Environment) library.
 
 // This library is free software; you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -18,46 +18,38 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /**
- * @file   boolean.h
+ * @file   tl.cpp
  * @author Mateusz Pusz
- * @date   Fri May  4 09:10:30 2007
+ * @date   Fri Apr 20 08:11:42 2007
  * 
  * @brief  
  * 
  * 
  */
 
-#ifndef __BOOLEAN_H__
-#define __BOOLEAN_H__
 
-#include <freettcn/te/type.h>
+#include "freettcn/tools/tciValueDumper.h"
+extern "C" {
+#include "freettcn/ttcn3/tci_value.h"
+}
 
-namespace freettcn {
 
-  namespace TE {
-    
-    class CBooleanType : public CType {
-    public:
-      class CInstance : public CType::CInstance {
-        bool _value;
-      public:
-        CInstance(const CType &type);
-        CInstance(const CType &type, bool value);
-        
-        virtual CInstance *Duplicate() const;
-        
-        bool Value() const throw(EOmitSet);
-        void Value(bool value);
-      };
-      
-    public:
-      CBooleanType();
-      virtual CInstance *InstanceCreate() const;
-    };
-    
-  } // namespace TE
+const char *freettcn::CTciValueDumper::Boolean2String(TciValue value)
+{
+  const char *str[] = { "FALSE",
+                        "TRUE" };
   
-} // namespace freettcn
+  return str[tciGetBooleanValue(value)];
+}
 
 
-#endif /* __BOOLEAN_H__ */
+const char *freettcn::CTciValueDumper::Verdict2String(TciVerdictValue value)
+{
+  const char *str[] = { "NONE",
+                        "PASS",
+                        "INCONC",
+                        "FAIL",
+                        "ERROR" };
+  
+  return str[tciGetVerdictValue(value)];
+}

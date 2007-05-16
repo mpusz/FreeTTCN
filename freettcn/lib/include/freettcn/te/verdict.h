@@ -49,16 +49,17 @@ namespace freettcn {
       class CInstance : public CType::CInstance {
         TVerdict _value;
       public:
-        CInstance(const CType &type, bool omit);
+        CInstance(const CType &type);
+        CInstance(const CType &type, TVerdict value);
         
         virtual CInstance *Duplicate() const;
         
-        TVerdict Value() const;
+        TVerdict Value() const throw(EOmitSet);
         void Value(TVerdict value);
       };
       
       CVerdictType();
-      virtual CInstance *InstanceCreate(bool omit = false) const;
+      virtual CInstance *InstanceCreate() const;
     };
     
   } // namespace TE

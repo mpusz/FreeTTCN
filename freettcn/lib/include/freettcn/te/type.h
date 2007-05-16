@@ -30,6 +30,7 @@
 #ifndef __TYPE_H__
 #define __TYPE_H__
 
+#include <freettcn/tools/exception.h>
 extern "C" {
 #include <freettcn/ttcn3/tci.h>
 }
@@ -43,17 +44,22 @@ namespace freettcn {
     class CType {
     public:
       class CInstance {
+      public:
+        class EOmitSet : public EOperationFailed {};
+        
+      private:
         const CType &_type;
-        const bool _omit;
+        bool _omit;
         
       public:
-        CInstance(const CType &type, bool omit);
+        CInstance(const CType &type);
         virtual ~CInstance();
         
         virtual CInstance *Duplicate() const = 0;
         
         const CType &Type() const;
         bool Omit() const;
+        void Omit(bool omit);
         const char *Encoding() const;
         const char *EncodingVariant() const;
         const char *Extension() const;
@@ -85,7 +91,7 @@ namespace freettcn {
       const char *EncodingVariant() const;
       const char *Extension() const;
       
-      virtual CInstance *InstanceCreate(bool omit = false) const = 0;
+      virtual CInstance *InstanceCreate() const = 0;
     };
     
     
@@ -95,7 +101,7 @@ namespace freettcn {
 //                   String           encoding,
 //                   String           encodingVariant,
 //                   String           extension);
-//       virtual CValue *InstanceCreate(bool omit = false) const;
+//       virtual CValue *InstanceCreate() const;
 //     };
 
   
@@ -205,7 +211,7 @@ namespace freettcn {
 //     class CRecordValue : public CValue {
 //       TciValue _value;
 //     public:
-//       CRecordValue(const CType &type, bool omit);
+//       CRecordValue(const CType &type);
 //       TciValue Field(String fieldName) const;
 //       void Field(String fieldName, TciValue value);
 //       char** FieldNames() const;

@@ -1,7 +1,7 @@
 //
 // Copyright (C) 2007 Mateusz Pusz
 //
-// This file is part of freettcn (Free TTCN) library.
+// This file is part of freettcnenv (Free TTCN Environment) library.
 
 // This library is free software; you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -18,46 +18,31 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /**
- * @file   boolean.h
+ * @file   tciValueDumper.h
  * @author Mateusz Pusz
- * @date   Fri May  4 09:10:30 2007
+ * @date   Wed May 16 09:33:20 2007
  * 
  * @brief  
  * 
  * 
  */
 
-#ifndef __BOOLEAN_H__
-#define __BOOLEAN_H__
+#ifndef __TCIVALUEDUMPER_H__
+#define __TCIVALUEDUMPER_H__
 
-#include <freettcn/te/type.h>
+extern "C" {
+#include <freettcn/ttcn3/tci.h>
+}
+
 
 namespace freettcn {
-
-  namespace TE {
-    
-    class CBooleanType : public CType {
+  
+    class CTciValueDumper {
     public:
-      class CInstance : public CType::CInstance {
-        bool _value;
-      public:
-        CInstance(const CType &type);
-        CInstance(const CType &type, bool value);
-        
-        virtual CInstance *Duplicate() const;
-        
-        bool Value() const throw(EOmitSet);
-        void Value(bool value);
-      };
-      
-    public:
-      CBooleanType();
-      virtual CInstance *InstanceCreate() const;
+      static const char *Boolean2String(TciValue value);
+      static const char *Verdict2String(TciVerdictValue value);
     };
     
-  } // namespace TE
-  
 } // namespace freettcn
 
-
-#endif /* __BOOLEAN_H__ */
+#endif /* __TCIVALUEDUMPER_H__ */

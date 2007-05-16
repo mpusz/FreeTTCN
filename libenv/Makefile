@@ -24,13 +24,14 @@ include ../Makefile.defines
 #
 # directories
 #
+TOOLS_DIR = tools
 PA_DIR = pa
 SA_DIR = sa
 CD_DIR = cd
 CH_DIR = ch
 TM_DIR = tm
 TL_DIR = tl
-BUILD_DIRS = $(TM_DIR) $(PA_DIR) $(SA_DIR) $(CD_DIR) $(CH_DIR) $(TL_DIR)
+BUILD_DIRS = $(TOOLS_DIR) $(TM_DIR) $(PA_DIR) $(SA_DIR) $(CD_DIR) $(CH_DIR) $(TL_DIR)
 
 BIN_DIR = bin
 

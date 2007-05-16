@@ -30,22 +30,28 @@
 
 #include "freettcn/te/integer.h"
 #include <cstdlib>
-
+#include <cstdio>
 
 freettcn::TE::CIntegerType::CIntegerType() :
   CType(0, "integer", TCI_INTEGER_TYPE, "", "", "")
 {
 }
 
-freettcn::TE::CIntegerType::CInstance *freettcn::TE::CIntegerType::InstanceCreate(bool omit /* false */) const
+freettcn::TE::CIntegerType::CInstance *freettcn::TE::CIntegerType::InstanceCreate() const
 {
-  return new freettcn::TE::CIntegerType::CInstance(*this, omit);
+  return new freettcn::TE::CIntegerType::CInstance(*this);
 }
 
 
-freettcn::TE::CIntegerType::CInstance::CInstance(const CType &type, bool omit) :
-  freettcn::TE::CType::CInstance(type, omit)
+freettcn::TE::CIntegerType::CInstance::CInstance(const CType &type) :
+  freettcn::TE::CType::CInstance(type)
 {
+}
+
+freettcn::TE::CIntegerType::CInstance::CInstance(const CType &type, long value) :
+  freettcn::TE::CType::CInstance(type), _value(value)
+{
+  Omit(false);
 }
 
 freettcn::TE::CIntegerType::CInstance *freettcn::TE::CIntegerType::CInstance::Duplicate() const
@@ -65,7 +71,7 @@ void freettcn::TE::CIntegerType::CInstance::AbsValue(const char *value) throw(EO
 //       (errno == ERANGE && (val == LONG_MAX || val == LONG_MIN)))
     throw freettcn::EOperationFailed();
   
-  _value = val;
+  Value(val);
 }
 
 
@@ -80,8 +86,10 @@ void freettcn::TE::CIntegerType::CInstance::AbsValue(const char *value) throw(EO
 // }
 
 
-long freettcn::TE::CIntegerType::CInstance::Value() const
+long freettcn::TE::CIntegerType::CInstance::Value() const throw(EOmitSet)
 {
+  if (Omit())
+    throw EOmitSet();
   return _value;
 }
 
@@ -89,4 +97,5 @@ long freettcn::TE::CIntegerType::CInstance::Value() const
 void freettcn::TE::CIntegerType::CInstance::Value(long value)
 {
   _value = value;
+  Omit(false);
 }

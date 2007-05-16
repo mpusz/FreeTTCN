@@ -36,15 +36,21 @@ freettcn::TE::CBooleanType::CBooleanType() :
 {
 }
 
-freettcn::TE::CBooleanType::CInstance *freettcn::TE::CBooleanType::InstanceCreate(bool omit /* false */) const
+freettcn::TE::CBooleanType::CInstance *freettcn::TE::CBooleanType::InstanceCreate() const
 {
-  return new freettcn::TE::CBooleanType::CInstance(*this, omit);
+  return new freettcn::TE::CBooleanType::CInstance(*this);
 }
 
 
-freettcn::TE::CBooleanType::CInstance::CInstance(const CType &type, bool omit) :
-  freettcn::TE::CType::CInstance(type, omit)
+freettcn::TE::CBooleanType::CInstance::CInstance(const CType &type) :
+  freettcn::TE::CType::CInstance(type)
 {
+}
+
+freettcn::TE::CBooleanType::CInstance::CInstance(const CType &type, bool value) :
+  freettcn::TE::CType::CInstance(type), _value(value)
+{
+  Omit(false);
 }
 
 freettcn::TE::CBooleanType::CInstance *freettcn::TE::CBooleanType::CInstance::Duplicate() const
@@ -52,12 +58,15 @@ freettcn::TE::CBooleanType::CInstance *freettcn::TE::CBooleanType::CInstance::Du
   return new CInstance(*this);
 }
 
-bool freettcn::TE::CBooleanType::CInstance::Value() const
+bool freettcn::TE::CBooleanType::CInstance::Value() const throw(EOmitSet)
 {
+  if (Omit())
+    throw EOmitSet();
   return _value;
 }
 
 void freettcn::TE::CBooleanType::CInstance::Value(bool value)
 {
   _value = value;
+  Omit(false);
 }

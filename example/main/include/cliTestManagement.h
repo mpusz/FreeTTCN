@@ -45,6 +45,9 @@ public:
   
 private:
   CMainLoop &_mainLoop;
+
+protected:
+  void ParameterDump(const CModuleParameter &param) const;
   
 public:
   CCLITestManagement(CMainLoop &mainLoop);

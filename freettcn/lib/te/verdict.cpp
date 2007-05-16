@@ -36,16 +36,21 @@ freettcn::TE::CVerdictType::CVerdictType():
 {
 }
 
-freettcn::TE::CVerdictType::CInstance *freettcn::TE::CVerdictType::InstanceCreate(bool omit /* false */) const
+freettcn::TE::CVerdictType::CInstance *freettcn::TE::CVerdictType::InstanceCreate() const
 {
-  return new freettcn::TE::CVerdictType::CInstance(*this, omit);
+  return new freettcn::TE::CVerdictType::CInstance(*this);
 }
 
 
-freettcn::TE::CVerdictType::CInstance::CInstance(const CType &type, bool omit):
-  freettcn::TE::CType::CInstance(type, omit),
-  _value(VERDICT_NONE)
+freettcn::TE::CVerdictType::CInstance::CInstance(const CType &type):
+  freettcn::TE::CType::CInstance(type)
 {
+}
+
+freettcn::TE::CVerdictType::CInstance::CInstance(const CType &type, TVerdict value):
+  freettcn::TE::CType::CInstance(type), _value(value)
+{
+  Omit(false);
 }
 
 freettcn::TE::CVerdictType::CInstance *freettcn::TE::CVerdictType::CInstance::Duplicate() const
@@ -53,12 +58,15 @@ freettcn::TE::CVerdictType::CInstance *freettcn::TE::CVerdictType::CInstance::Du
   return new CInstance(*this);
 }
 
-freettcn::TE::TVerdict freettcn::TE::CVerdictType::CInstance::Value() const
+freettcn::TE::TVerdict freettcn::TE::CVerdictType::CInstance::Value() const throw(EOmitSet)
 {
+  if (Omit())
+    throw EOmitSet();
   return _value;
 }
 
 void freettcn::TE::CVerdictType::CInstance::Value(TVerdict value)
 {
   _value = value;
+  Omit(false);
 }

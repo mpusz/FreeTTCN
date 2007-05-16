@@ -91,8 +91,8 @@ const char *freettcn::TE::CType::Extension() const
 
 
 
-freettcn::TE::CType::CInstance::CInstance(const CType &type, bool omit) :
-  _type(type), _omit(omit)
+freettcn::TE::CType::CInstance::CInstance(const CType &type) :
+  _type(type), _omit(true)
 {
 }
 
@@ -108,6 +108,11 @@ const freettcn::TE::CType &freettcn::TE::CType::CInstance::Type() const
 bool freettcn::TE::CType::CInstance::Omit() const
 {
   return _omit;
+}
+
+void freettcn::TE::CType::CInstance::Omit(bool omit)
+{
+  _omit = omit;
 }
 
 const char *freettcn::TE::CType::CInstance::Encoding() const

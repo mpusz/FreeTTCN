@@ -127,7 +127,7 @@ namespace freettcn {
       
     public:
       CICMPComponentType(const freettcn::TE::CModule &module);
-      virtual CInstance *InstanceCreate(bool omit = false) const { return new CInstance(*this); }
+      virtual CInstance *InstanceCreate() const { return new CInstance(*this); }
     };
     
     
@@ -145,7 +145,7 @@ namespace freettcn {
       
     public:
       CIPStackType(const freettcn::TE::CModule &module);
-      virtual CInstance *InstanceCreate(bool omit = false) const { return new CInstance(*this); }
+      virtual CInstance *InstanceCreate() const { return new CInstance(*this); }
     };
     
     
@@ -476,12 +476,8 @@ namespace freettcn {
       Register(new CIPStackType(*this));
       
       // register module parameters
-      {
-        freettcn::TE::CBooleanType::CInstance *par = new freettcn::TE::CBooleanType::CInstance(freettcn::TE::CBasicTypes::Boolean(), false);
-        par->Value(true);
-        Register(new CParameter("long", par));
-      }
-      Register(new CParameter("count", new freettcn::TE::CIntegerType::CInstance(freettcn::TE::CBasicTypes::Integer(), true)));
+      Register(new CParameter("long", new freettcn::TE::CBooleanType::CInstance(freettcn::TE::CBasicTypes::Boolean(), true)));
+      Register(new CParameter("count", new freettcn::TE::CIntegerType::CInstance(freettcn::TE::CBasicTypes::Integer())));
       
       // register control behavior
       Register(new CBehavior(*this), new freettcn::TE::CSourceData("icmp.ttcn", 115));
@@ -523,8 +519,7 @@ namespace freettcn {
               MY_CAST<const freettcn::TE::CBooleanType::CInstance &>(comp.Module().Parameter(PAR_long).Value()).Value()) {
             comp.ScopeEnter("icmp.ttcn", 124, "for");
             {
-              freettcn::TE::CIntegerType::CInstance *val = new freettcn::TE::CIntegerType::CInstance(freettcn::TE::CBasicTypes::Integer(), false);
-              val->Value(0);
+              freettcn::TE::CIntegerType::CInstance *val = new freettcn::TE::CIntegerType::CInstance(freettcn::TE::CBasicTypes::Integer(), 0);
               comp.Scope().Register(val);
             }
             
@@ -547,6 +542,8 @@ namespace freettcn {
         {
           {
             freettcn::TE::CIntegerType::CInstance &val = MY_CAST<freettcn::TE::CIntegerType::CInstance &>(comp.Scope().Value(SCOPE1_VALUE_i));
+
+            // timer 
             val.Value(val.Value() + 1);
           }
           return OFFSET_2;

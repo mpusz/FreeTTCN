@@ -19,10 +19,13 @@
 
 
 #include "cliTestManagement.h"
+#include <freettcn/tools/tciValueDumper.h>
 extern "C" {
 #include <freettcn/ttcn3/tci_value.h>
 }
 #include <iostream>
+#include <sstream>
+#include <iomanip>
 
 
 CCLITestManagement::CCLITestManagement(CMainLoop &mainLoop):
@@ -31,18 +34,54 @@ CCLITestManagement::CCLITestManagement(CMainLoop &mainLoop):
 }
 
 
+void CCLITestManagement::ParameterDump(const CModuleParameter &param) const
+{
+  const unsigned short NAME_WIDTH = 15;
+  const unsigned short TYPE_WIDTH = 35;
+  
+  using namespace std;
+  
+  ostringstream ostring;
+  
+  TciValue value = param.DefaultValue();
+  TciType type = tciGetType(value);
+  
+  ostringstream typeString;
+  typeString << " <" << (tciGetDefiningModule(type).moduleName ? tciGetDefiningModule(type).moduleName : "{freettcn}") << "." << tciGetName(type) << ">";
+  
+  ostring.setf(ios::left, ios::adjustfield);
+  ostring << " - " << setw(TYPE_WIDTH) << typeString.str() << setw(NAME_WIDTH) << param.Name();
+  
+  if (!tciNotPresent(value)) {
+    char buffer[64];
+    const char *valueStr = buffer;
+    
+    TciTypeClassType typeClass = tciGetTypeClass(type);
+    switch(typeClass) {
+    case TCI_BOOLEAN_TYPE:
+      valueStr = freettcn::CTciValueDumper::Boolean2String(value);
+      break;
+    case TCI_INTEGER_TYPE:
+      break;
+    default:
+      sprintf(buffer, "<Type class: %u not supported>", typeClass);
+    }
+    
+    ostring << " Default: " << valueStr;
+  }
+  cout << ostring.str();
+}
+
+
 void CCLITestManagement::ModuleInfoPrint() const
 {
   const TModuleParList &modParList = ModuleParameterList();
   
   std::cout << "Module Parameters:" << std::endl;
-  
   for(unsigned int i=0; i<modParList.size(); i++) {
-    TciType type = tciGetType(modParList[i]->DefaultValue());
-    
-    std::cout << " - " << modParList[i]->Name() <<
-      " <" << (tciGetDefiningModule(type).moduleName ? tciGetDefiningModule(type).moduleName : "{freettcn}") << "." << tciGetName(type) << ">" <<
-      std::endl;
+    std::cout << " - ";
+    ParameterDump(*modParList[i]);
+    std::cout << std::endl;
   }
   
   std::cout << std::endl << "Test Cases:" << std::endl;
@@ -87,23 +126,83 @@ void CCLITestManagement::TestCasesInfoPrint(const std::string &testCaseId) const
 
 void CCLITestManagement::ParametersSet() const
 {
+  using namespace std;
+  
   const TModuleParList &modParList = ModuleParameterList();
   
   for(unsigned int i=0; i<modParList.size(); i++) {
-//     if (modParList[i]->Name() == "long") {
-//       TciType type = tciGetType(modParList[i]->DefaultValue());
-//       TciValue value = tciNewInstance(type);
+    cout << "Set value for module parameter:" << endl;
+    ParameterDump(*modParList[i]);
+    cout << endl;
+
+    TciValue defaultValue = modParList[i]->DefaultValue();
+    TciType type = tciGetType(defaultValue);
+    TciTypeClassType typeClass = tciGetTypeClass(type);
+    bool omit = tciNotPresent(defaultValue);
+    if (!omit)
+      cout << "<ENTER> for DEFAULT" << endl;
+    
+    const int SIZE = 64; // Buffer size;
+    char buf[SIZE];
+    bool error;
+    do {
+      error = false;
       
-//       tciSetBooleanValue(value, true);
-//       modParList[i]->Value(value);
-//     }
-    if (modParList[i]->Name() == "count") {
-      TciType type = tciGetType(modParList[i]->DefaultValue());
-      TciValue value = tciNewInstance(type);
+      string str;
+      do {
+        cin.getline(buf, SIZE);
+        str = buf;
+      }
+      while(str.empty() && omit);
       
-      tciSetIntAbs(value, "3");
-      modParList[i]->Value(value);
+      if (!omit && str.empty())
+        break;
+      
+      switch(typeClass) {
+      case TCI_BOOLEAN_TYPE:
+        {
+          bool value;
+          if (str == "TRUE" || str == "true" || str == "1")
+            value = true;
+          else if (str == "FALSE" || str == "false" || str == "0")
+            value = false;
+          else
+            error = true;
+          
+          if (!error) {
+            TciValue newValue = tciNewInstance(type);
+            tciSetBooleanValue(newValue, value);
+            modParList[i]->Value(newValue);
+          }
+        }
+        break;
+        
+      case TCI_INTEGER_TYPE:
+        {
+          long value;
+          
+          const char *start = str.c_str();
+          char *end;
+          value = strtol(start, &end, 0);
+          if (end == start || *end != '\0')
+            error = true;
+          
+          if (!error) {
+            char buffer[32];
+            sprintf(buffer, "%lu", value);
+            
+            TciValue newValue = tciNewInstance(type);
+            tciSetIntAbs(newValue, buffer);
+            modParList[i]->Value(newValue);
+          }
+        }
+        break;
+        
+      default:
+        ;
+      }
     }
+    while(error);
   }
 }
 

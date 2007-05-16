@@ -187,7 +187,7 @@ namespace freettcn {
       
     public:
       CControlComponentType();
-      virtual CInstance *InstanceCreate(bool omit = false) const;
+      virtual CInstance *InstanceCreate() const;
     };
     
   } // namespace TE

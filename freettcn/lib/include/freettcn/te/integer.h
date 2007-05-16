@@ -42,20 +42,21 @@ namespace freettcn {
       class CInstance : public CType::CInstance {
         long _value;
       public:
-        CInstance(const CType &type, bool omit);
+        CInstance(const CType &type);
+        CInstance(const CType &type, long value);
         
         virtual CInstance *Duplicate() const;
         
         void AbsValue(const char *value) throw(EOperationFailed);
 //         void DigitsNum(unsigned long dig_num);
 //         void Sign(bool sign);
-        long Value() const;
+        long Value() const throw(EOmitSet);
         void Value(long value);
       };
       
     public:
       CIntegerType();
-      virtual CInstance *InstanceCreate(bool omit = false) const;
+      virtual CInstance *InstanceCreate() const;
     };
     
   } // namespace TE

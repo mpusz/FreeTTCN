@@ -29,6 +29,7 @@
 
 
 #include "freettcn/tl/tl.h"
+#include <freettcn/tools/tciValueDumper.h>
 #include <freettcn/tools/logMask.h>
 #include <freettcn/tools/timeStamp.h>
 extern "C" {
@@ -234,18 +235,6 @@ const char *freettcn::TL::CTestLogging::TriComponentId2String(const TriComponent
 }
 
 
-const char *freettcn::TL::CTestLogging::TciVerdictValue2String(TciVerdictValue verdict) const
-{
-  const char *verdictStr[] = { "NONE",
-                               "PASS",
-                               "INCONC",
-                               "FAIL",
-                               "ERROR" };
-  
-  return verdictStr[tciGetVerdictValue(verdict)];
-}
-
-
 void freettcn::TL::CTestLogging::TcExecute(const char *am, int ts, const char *src, int line,
                                            const TriComponentId &c,
                                            const TciTestCaseIdType &tcId,
@@ -381,7 +370,7 @@ void freettcn::TL::CTestLogging::TcTerminated(const char *am, int ts, const char
 //   }
 //   data->LineAdd("Parameters", params);
   
-  sprintf(str, "%s", TciVerdictValue2String(outcome));
+  sprintf(str, "%s", CTciValueDumper::Verdict2String(outcome));
   data->LineAdd("Outcome", str);
   
   Logger().Push(data);
@@ -539,7 +528,7 @@ void freettcn::TL::CTestLogging::CTerminated(const char *am, int ts, const char 
   char str[256];
   data->LineAdd("From", TriComponentId2String(c, str));
   
-  sprintf(str, "%s", TciVerdictValue2String(verdict));
+  sprintf(str, "%s", CTciValueDumper::Verdict2String(verdict));
   data->LineAdd("Verdict", str);
   
   Logger().Push(data);
@@ -687,7 +676,7 @@ void freettcn::TL::CTestLogging::VerdictSet(const char *am, int ts, const char *
   char str[256];
   data->LineAdd("From", TriComponentId2String(c, str));
   
-  sprintf(str, "%s", TciVerdictValue2String(verdict));
+  sprintf(str, "%s", CTciValueDumper::Verdict2String(verdict));
   data->LineAdd("Verdict", str);
   
   Logger().Push(data);
