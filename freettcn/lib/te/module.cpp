@@ -292,16 +292,14 @@ void freettcn::TE::CModule::ParametersGet() const throw(EOperationFailed)
     TciValue val = tciGetModulePar(_parameterArray[i]->Id());
     const CType::CInstance *value = static_cast<const CType::CInstance *>(val);
     
-    if (!val) {
+    if (val)
+      _parameterArray[i]->Value(value);
+    else {
       if (_parameterArray[i]->DefaultValue().Omit()) {
         std::cout << "ERROR: Parameter value not given and default not set" << std::endl;
         throw freettcn::EOperationFailed();
       }
-      
-      value = _parameterArray[i]->DefaultValue().Duplicate();
     }
-    
-    _parameterArray[i]->Value(value);
   }
 }
 

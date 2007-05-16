@@ -45,8 +45,6 @@ namespace freettcn {
         CInstance(const CType &type);
         CInstance(const CType &type, long value);
         
-        virtual CInstance *Duplicate() const;
-        
         void AbsValue(const char *value) throw(EOperationFailed);
 //         void DigitsNum(unsigned long dig_num);
 //         void Sign(bool sign);

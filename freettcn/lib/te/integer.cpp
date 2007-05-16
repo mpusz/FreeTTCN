@@ -54,11 +54,6 @@ freettcn::TE::CIntegerType::CInstance::CInstance(const CType &type, long value) 
   Omit(false);
 }
 
-freettcn::TE::CIntegerType::CInstance *freettcn::TE::CIntegerType::CInstance::Duplicate() const
-{
-  return new CInstance(*this);
-}
-
 void freettcn::TE::CIntegerType::CInstance::AbsValue(const char *value) throw(EOperationFailed)
 {
   if (*value == '\0')

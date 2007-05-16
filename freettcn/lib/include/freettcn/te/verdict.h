@@ -52,8 +52,6 @@ namespace freettcn {
         CInstance(const CType &type);
         CInstance(const CType &type, TVerdict value);
         
-        virtual CInstance *Duplicate() const;
-        
         TVerdict Value() const throw(EOmitSet);
         void Value(TVerdict value);
       };

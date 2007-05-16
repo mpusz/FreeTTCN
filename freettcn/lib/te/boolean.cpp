@@ -53,11 +53,6 @@ freettcn::TE::CBooleanType::CInstance::CInstance(const CType &type, bool value) 
   Omit(false);
 }
 
-freettcn::TE::CBooleanType::CInstance *freettcn::TE::CBooleanType::CInstance::Duplicate() const
-{
-  return new CInstance(*this);
-}
-
 bool freettcn::TE::CBooleanType::CInstance::Value() const throw(EOmitSet)
 {
   if (Omit())

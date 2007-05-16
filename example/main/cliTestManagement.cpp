@@ -47,10 +47,10 @@ void CCLITestManagement::ParameterDump(const CModuleParameter &param) const
   TciType type = tciGetType(value);
   
   ostringstream typeString;
-  typeString << " <" << (tciGetDefiningModule(type).moduleName ? tciGetDefiningModule(type).moduleName : "{freettcn}") << "." << tciGetName(type) << ">";
+  typeString << "<" << (tciGetDefiningModule(type).moduleName ? tciGetDefiningModule(type).moduleName : "{freettcn}") << "." << tciGetName(type) << ">";
   
   ostring.setf(ios::left, ios::adjustfield);
-  ostring << " - " << setw(TYPE_WIDTH) << typeString.str() << setw(NAME_WIDTH) << param.Name();
+  ostring << setw(TYPE_WIDTH) << typeString.str() << setw(NAME_WIDTH) << param.Name();
   
   if (!tciNotPresent(value)) {
     char buffer[64];

@@ -44,8 +44,6 @@ namespace freettcn {
         CInstance(const CType &type);
         CInstance(const CType &type, bool value);
         
-        virtual CInstance *Duplicate() const;
-        
         bool Value() const throw(EOmitSet);
         void Value(bool value);
       };

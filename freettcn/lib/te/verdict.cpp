@@ -53,11 +53,6 @@ freettcn::TE::CVerdictType::CInstance::CInstance(const CType &type, TVerdict val
   Omit(false);
 }
 
-freettcn::TE::CVerdictType::CInstance *freettcn::TE::CVerdictType::CInstance::Duplicate() const
-{
-  return new CInstance(*this);
-}
-
 freettcn::TE::TVerdict freettcn::TE::CVerdictType::CInstance::Value() const throw(EOmitSet)
 {
   if (Omit())

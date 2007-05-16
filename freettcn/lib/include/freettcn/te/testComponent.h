@@ -123,8 +123,6 @@ namespace freettcn {
         CScope *_scope;
         int _behaviorOffset;
 
-        virtual CInstance *Duplicate() const;
-        
       protected:
         void Register(CPort *port);
         
