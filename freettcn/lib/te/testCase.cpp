@@ -54,7 +54,7 @@ freettcn::TE::CTestCase::CTestCase(CModule &module, const char *name, const free
                                    const freettcn::TE::CTestComponentType *systemType /* 0 */):
   _module(module), _srcData(srcData),
   _mtcType(mtcType), _behavior(behavior), _systemType(systemType ? *systemType : mtcType),
-  _mtc(0), _guardTimer(0), _verdict(CBasicTypes::Verdict(), VERDICT_NONE)
+  _mtc(0), _system(0), _guardTimer(0), _verdict(CBasicTypes::Verdict(), VERDICT_NONE)
 {
   _id.moduleName = _module.Id().moduleName;
   _id.objectName = const_cast<char *>(name);
@@ -72,6 +72,22 @@ freettcn::TE::CTestCase::~CTestCase()
 TciTestCaseIdType freettcn::TE::CTestCase::Id() const
 {
   return _id;
+}
+
+freettcn::TE::CTestComponentType::CInstanceRemote &freettcn::TE::CTestCase::MTC() const throw(ENotFound)
+{
+  if (_mtc)
+    return *_mtc;
+  std::cout << "ERROR: MTC test component not found!!!" << std::endl;
+  throw ENotFound();
+}
+
+freettcn::TE::CTestComponentType::CInstanceRemote &freettcn::TE::CTestCase::System() const throw(ENotFound)
+{
+  if (_system)
+    return *_system;
+  std::cout << "ERROR: SYSTEM test component not found!!!" << std::endl;
+  throw ENotFound();
 }
 
 void freettcn::TE::CTestCase::Reset()
@@ -148,10 +164,10 @@ void freettcn::TE::CTestCase::Start(const char *src, int line,
   }
   
   // create MTC
-  _mtc = &_module.TestComponentCreateReq(src, line, creatorId, TCI_MTC_COMP, &_mtcType, "MTC");
-
+  _mtc = &_module.TestComponentCreateReq(src, line, creatorId, TCI_MTC_COMP, _mtcType, "MTC");
+  
   // create SYSTEM component
-  _module.TestComponentCreateReq(src, line, _mtc->Id(), TCI_SYS_COMP, &_systemType, "SYSTEM");
+  _system = &_module.TestComponentCreateReq(src, line, _mtc->Id(), TCI_SYS_COMP, _systemType, "SYSTEM");
   
   // give a chance to create static connections and the initialization of TSI ports
   if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_TC_EXECUTE)) {

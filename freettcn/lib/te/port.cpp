@@ -52,7 +52,7 @@ const QualifiedName &freettcn::TE::CPortType::Id() const
 
 
 freettcn::TE::CPort::CPort(const freettcn::TE::CPortType &type,
-                           const freettcn::TE::CTestComponentType::CInstance &component,
+                           const freettcn::TE::CTestComponentType::CInstanceLocal &component,
                            const char *name, int portIdx /* -1 */):
   _component(component), _status(STARTED)
 {

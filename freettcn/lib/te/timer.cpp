@@ -35,14 +35,14 @@ extern "C" {
 #include <iostream>
 
 
-freettcn::TE::CTimer::CTimer(CTestComponentType::CInstance &comp, bool implicit):
+freettcn::TE::CTimer::CTimer(CTestComponentType::CInstanceLocal &comp, bool implicit):
   _component(comp), _implicit(implicit),
   _status(IDLE), _defaultDurationValid(false)
 {
   _component.TimerAdd(*this, _implicit);
 }
 
-freettcn::TE::CTimer::CTimer(CTestComponentType::CInstance &comp, bool implicit, TriTimerDuration defaultDuration) throw(EOperationFailed):
+freettcn::TE::CTimer::CTimer(CTestComponentType::CInstanceLocal &comp, bool implicit, TriTimerDuration defaultDuration) throw(EOperationFailed):
   _component(comp), _implicit(implicit),
   _status(IDLE), _defaultDurationValid(true), _defaultDuration(defaultDuration)
 {
@@ -119,8 +119,29 @@ bool freettcn::TE::CTimer::Running() const throw(freettcn::EOperationFailed)
   return _status == RUNNING;
 }
 
+void freettcn::TE::CTimer::HandlerAdd(unsigned int behavoiorOffset)
+{
+  _offsetList.push_back(behavoiorOffset);
+}
+
+void freettcn::TE::CTimer::HandlerRemove(unsigned int behavoiorOffset)
+{
+  for(TOffsetList::iterator it=_offsetList.begin(); it!=_offsetList.end(); ++it) {
+    if (*it == behavoiorOffset) {
+      _offsetList.erase(it);
+      break;
+    }
+  }
+}
+
 void freettcn::TE::CTimer::Timeout()
 {
   _status = TIMEOUT;
-  _component.Run(freettcn::TE::CBehavior::OFFSET_START);
+  
+  // timer can be deleted during execution
+  TOffsetList list(_offsetList);
+  _offsetList.clear();
+  
+  for(TOffsetList::iterator it=list.begin(); it!=list.end(); ++it)
+    _component.Run(*it);
 }

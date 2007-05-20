@@ -35,6 +35,7 @@ extern "C" {
 #include <freettcn/ttcn3/tci.h>
 #include <freettcn/ttcn3/tri.h>
 }
+#include <freettcn/te/testComponent.h>
 #include <freettcn/te/port.h>
 #include <freettcn/te/verdict.h>
 
@@ -46,7 +47,6 @@ namespace freettcn {
     class CModule;
     class CBehavior;
     class CSourceData;
-    class CTriComponentId;
     
     class CTestCase {
       typedef std::list<CPort *> TPortList;
@@ -61,7 +61,8 @@ namespace freettcn {
       
       // test case dynamic state
       TPortList _allPortStates;                   /**< a list of states of different ports */
-      const CTriComponentId *_mtc;                /**< MTC reference */
+      CTestComponentType::CInstanceRemote *_mtc;  /**< MTC reference */
+      CTestComponentType::CInstanceRemote *_system; /**< SYSTEM reference */
       CTimer *_guardTimer;                        /**< special timer which is necessary to guard the execution time of test cases */
       CVerdictType::CInstance _verdict;                          /**< actual global test verdict of a test case,
                                                      updated after every test component termination */
@@ -72,6 +73,8 @@ namespace freettcn {
       virtual ~CTestCase();
       
       TciTestCaseIdType Id() const;
+      CTestComponentType::CInstanceRemote &MTC() const throw(ENotFound);
+      CTestComponentType::CInstanceRemote &System() const throw(ENotFound);
       
       void Reset();
       TVerdict Verdict() const;

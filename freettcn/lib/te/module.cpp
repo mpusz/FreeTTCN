@@ -108,40 +108,13 @@ const freettcn::TE::CType::CInstance &freettcn::TE::CModule::CParameter::Value()
 
 
 
-/* ********************** T E S T   C O M P O N E N T   D A T A************************** */
-
-freettcn::TE::CModule::CTestComponentData::CTestComponentData(const TriComponentId &id, TciTestComponentKindType kind):
-  _id(id), _kind(kind)
-{
-}
-
-const freettcn::TE::CTriComponentId &freettcn::TE::CModule::CTestComponentData::Id() const
-{
-  return _id;
-}
-
-TciTestComponentKindType freettcn::TE::CModule::CTestComponentData::Kind() const
-{
-  return _kind;
-}
-
-bool freettcn::TE::CModule::CTestComponentData::operator==(const TriComponentId &id) const
-{
-  const TriComponentId &localId = _id.Id();
-  
-  return (id.compInst.bits == localId.compInst.bits) &&
-    !memcmp(id.compInst.data, localId.compInst.data, id.compInst.bits / 8);
-}
-
-
-
 
 /* ************************************* M O D U L E ************************************ */
 
 freettcn::TE::CModule::CModule(const char *name):
   _ctrlBehavior(0), _ctrlSrcData(0),
   //_ctrlCompType(*this), 
-  _ctrlRunning(false), _activeTestCase(0), __modParList(0), __testCaseIdList(0)
+  _ctrlRunning(false), _ctrlComponent(0), _activeTestCase(0), __modParList(0), __testCaseIdList(0)
 {
   freettcn::TE::CModulesContainer &modContainer = freettcn::TE::CModulesContainer::Instance();
   modContainer.Register(*this);
@@ -218,16 +191,12 @@ void freettcn::TE::CModule::Reset()
     _ctrlRunning = false;
     
     // delete all local test components but not Control component
-    while (_localTestComponents.size()) {
-      TLocalTestCompList::reverse_iterator it = _localTestComponents.rbegin();
-      if ((*it)->Kind() == TCI_CTRL_COMP) {
-        // unblock Control component
-        (*it)->Status(CTestComponentType::CInstance::ACTIVE);
-        (*it)->Run(CBehavior::OFFSET_AUTO);
-        break;
-      }
-      else
-        delete *it;
+    /// @todo Kill components
+    
+    if (_ctrlComponent) {
+      // unblock Control component
+      _ctrlComponent->Status(CTestComponentType::CInstanceLocal::ACTIVE);
+      _ctrlComponent->Run(CBehavior::OFFSET_AUTO);
     }
     
     // reset PA
@@ -396,11 +365,12 @@ freettcn::TE::CTestCase &freettcn::TE::CModule::ActiveTestCase() const throw(ENo
 }
 
 
-const freettcn::TE::CTriComponentId &freettcn::TE::CModule::ControlStart()
+const TriComponentId &freettcn::TE::CModule::ControlStart()
 {
   _ctrlRunning = true;
   
-  return TestComponentCreateReq(_ctrlSrcData->Source(), _ctrlSrcData->Line(), ModuleComponentId(), TCI_CTRL_COMP, 0, "CONTROL");
+  return TestComponentCreateReq(_ctrlSrcData->Source(), _ctrlSrcData->Line(), ModuleComponentId(),
+                                TCI_CTRL_COMP, freettcn::TE::CBasicTypes::ControlComponent(), "CONTROL").Id();
 }
 
 
@@ -453,11 +423,11 @@ const freettcn::TE::CBehavior &freettcn::TE::CModule::Behavior(const TciBehaviou
 }
 
 
-freettcn::TE::CTestComponentType::CInstance &freettcn::TE::CModule::TestComponent(const TriComponentId &component) const throw(freettcn::ENotFound)
+freettcn::TE::CTestComponentType::CInstanceLocal &freettcn::TE::CModule::TestComponent(const TriComponentId &component) const throw(freettcn::ENotFound)
 {
   freettcn::TE::CIdObject &object = CIdObject::Get(component.compInst);
   try {
-    return dynamic_cast<freettcn::TE::CTestComponentType::CInstance &>(object);
+    return dynamic_cast<freettcn::TE::CTestComponentType::CInstanceLocal &>(object);
   }
   catch(Exception) {
     throw;
@@ -469,11 +439,11 @@ freettcn::TE::CTestComponentType::CInstance &freettcn::TE::CModule::TestComponen
 }
 
 
-const freettcn::TE::CTriComponentId &freettcn::TE::CModule::TestComponentCreateReq(const char *src, int line,
-                                                                                    const TriComponentId &creatorId,
-                                                                                    TciTestComponentKindType kind,
-                                                                                    const CTestComponentType *compType,
-                                                                                    const char *name)
+freettcn::TE::CTestComponentType::CInstanceRemote &freettcn::TE::CModule::TestComponentCreateReq(const char *src, int line,
+                                                                                                 const TriComponentId &creatorId,
+                                                                                                 TciTestComponentKindType kind,
+                                                                                                 const CTestComponentType &compType,
+                                                                                                 const char *name)
 {
   CTTCNExecutable &te = CTTCNExecutable::Instance();
   if (kind == TCI_CTRL_COMP) {
@@ -482,9 +452,9 @@ const freettcn::TE::CTriComponentId &freettcn::TE::CModule::TestComponentCreateR
       tliCtrlStart(0, te.TimeStamp().Get(), const_cast<char *>(src), line, creatorId);
   }
   
-  TriComponentId compId = tciCreateTestComponentReq(kind, const_cast<void *>(reinterpret_cast<const void*>(compType)), const_cast<char *>(name));
-  const CTestComponentData *data = new CTestComponentData(compId, kind);
-  _allEntityStates.push_back(data);
+  TriComponentId compId = tciCreateTestComponentReq(kind, kind == TCI_CTRL_COMP ? 0 : const_cast<void *>(reinterpret_cast<const void*>(&compType)), const_cast<char *>(name));
+  CTestComponentType::CInstanceRemote *comp = new CTestComponentType::CInstanceRemote(compType, compId, kind);
+  _allEntityStates.push_back(comp);
   
   if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_C_CREATE))
     // log
@@ -501,7 +471,7 @@ const freettcn::TE::CTriComponentId &freettcn::TE::CModule::TestComponentCreateR
     TestComponentStartReq(src, line, creatorId, compId, ControlBehavior().Id(), parameterList);
   }
   
-  return data->Id();
+  return *comp;
 }
 
 
@@ -520,7 +490,7 @@ const TriComponentId &freettcn::TE::CModule::TestComponentCreate(TciTestComponen
   }
   
   freettcn::TE::CType::CInstance *instance = type->InstanceCreate();
-  freettcn::TE::CTestComponentType::CInstance *cInstance = dynamic_cast<freettcn::TE::CTestComponentType::CInstance *>(instance);
+  freettcn::TE::CTestComponentType::CInstanceLocal *cInstance = dynamic_cast<freettcn::TE::CTestComponentType::CInstanceLocal *>(instance);
   if (!cInstance) {
     std::cout << "ERROR!!! TciType does not specify Component type" << std::endl;
     throw EOperationFailed();
@@ -528,6 +498,10 @@ const TriComponentId &freettcn::TE::CModule::TestComponentCreate(TciTestComponen
   
   cInstance->Init(*this, kind, name);
   
+  if (kind == TCI_CTRL_COMP)
+    // store control component
+    _ctrlComponent = cInstance;
+
   return cInstance->Id();
 }
 
@@ -557,18 +531,17 @@ void freettcn::TE::CModule::TestComponentStart(const TriComponentId &componentId
 
 void freettcn::TE::CModule::TestComponentStop(const TriComponentId &componentId) throw(ENotFound)
 {
-  TestComponent(componentId).Stop(0, 0);
+  TestComponent(componentId).Stop();
 }
 
 
 void freettcn::TE::CModule::TestComponentTerminated(const TriComponentId &componentId, TciVerdictValue verdict) throw(ENotFound)
 {
-  const CTestComponentData *comp = 0;
+  CTestComponentType::CInstanceRemote *comp = 0;
   
   for(TTestCompList::iterator it=_allEntityStates.begin(); it!=_allEntityStates.end(); ++it) {
-    if (*(*it) == componentId) {
+    if (!(*it)->Terminated() && *(*it) == componentId) {
       comp = *it;
-      _allEntityStates.erase(it);
       break;
     }
   }
@@ -579,6 +552,7 @@ void freettcn::TE::CModule::TestComponentTerminated(const TriComponentId &compon
   }
   
   _done.push_back(comp);
+  comp->Terminated(true);
   
   switch (comp->Kind()) {
   case TCI_CTRL_COMP:
@@ -590,15 +564,6 @@ void freettcn::TE::CModule::TestComponentTerminated(const TriComponentId &compon
     {
       // update testcase verdict
       _activeTestCase->Verdict(static_cast<TVerdict>(tciGetVerdictValue(verdict)));
-
-      // get SYSTEM component
-      for(TTestCompList::iterator it=_allEntityStates.begin(); it!=_allEntityStates.end(); ++it) {
-        if ((*it)->Kind() == TCI_SYS_COMP) {
-          // stop SYSTEM component
-          tciStopTestComponentReq((*it)->Id().Id());
-          break;
-        }
-      }
       
       TciParameterListType parms;
       parms.length = 0;
@@ -609,14 +574,25 @@ void freettcn::TE::CModule::TestComponentTerminated(const TriComponentId &compon
       _activeTestCase->Reset();
       _activeTestCase = 0;
       
-      // get control component
-      if (_localTestComponents.size()) {
-        CTestComponentType::CInstance *ctrlCmp = *_localTestComponents.begin();
-        if (ctrlCmp->Kind() == TCI_CTRL_COMP) {
-          // unblock Control component
-          ctrlCmp->Status(CTestComponentType::CInstance::ACTIVE);
-          ctrlCmp->Run(CBehavior::OFFSET_AUTO);
+      // remove all test case related test components
+      TTestCompList::iterator it=_allEntityStates.begin();
+      do {
+        for(it=_allEntityStates.begin(); it!=_allEntityStates.end(); ++it) {
+          if ((*it)->Kind() != TCI_CTRL_COMP) {
+            delete *it;
+            _allEntityStates.erase(it);
+            break;
+          }
         }
+      }
+      while(it != _allEntityStates.end());
+      _done.clear();
+      _killed.clear();
+      
+      if (_ctrlComponent) {
+        // unblock Control component
+        _ctrlComponent->Status(CTestComponentType::CInstanceLocal::ACTIVE);
+        _ctrlComponent->Run(CBehavior::OFFSET_AUTO);
       }
     }
     break;
@@ -649,30 +625,49 @@ void freettcn::TE::CModule::TestComponentTerminated(const TriComponentId &compon
 
 void freettcn::TE::CModule::TestComponentKill(const TriComponentId &componentId) throw(ENotFound)
 {
-  delete &TestComponent(componentId);
+  TestComponent(componentId).Kill();
+//   CTestComponentType::CInstance &comp = TestComponent(componentId);
   
-  freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
-  if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_C_KILLED))
-    // log
-    tliCKilled(0, te.TimeStamp().Get(), 0, 0, componentId, 0);
+//   if (&comp == _ctrlComponent)
+//     _ctrlComponent = 0;
+//   delete &comp;
+  
+//   freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
+//   if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_C_KILLED))
+//     // log
+//     tliCKilled(0, te.TimeStamp().Get(), 0, 0, componentId, 0);
 }
 
 
-void freettcn::TE::CModule::TestComponentLocalAdd(CTestComponentType::CInstance &comp)
+void freettcn::TE::CModule::TestComponentAllStop(const char *src, int line, CTestComponentType::CInstanceLocal &comp)
 {
-  _localTestComponents.push_back(&comp);
-}
-
-
-void freettcn::TE::CModule::TestComponentLocalRemove(CTestComponentType::CInstance &comp) throw(ENotFound)
-{
-  for(TLocalTestCompList::iterator it=_localTestComponents.begin(); it!=_localTestComponents.end(); ++it) {
-    if (*it == &comp) {
-      _localTestComponents.erase(it);
-      return;
+  TTestCompList::iterator it = _allEntityStates.begin();
+  do {
+    for(it=_allEntityStates.begin(); it!=_allEntityStates.end(); ++it) {
+      if ((*it)->Kind() == TCI_PTC_COMP) {
+        (*it)->Kill();
+        break;
+      }
+      else if ((*it)->Kind() == TCI_ALIVE_COMP) {
+        (*it)->Stop();
+        break;
+      }
     }
   }
-  
-  std::cout << "ERROR: Local test component not found" << std::endl;
-  throw ENotFound();
+  while(it != _allEntityStates.end());
+}
+
+
+void freettcn::TE::CModule::TestComponentAllKill(const char *src, int line, CTestComponentType::CInstanceLocal &comp)
+{
+  TTestCompList::iterator it = _allEntityStates.begin();
+  do {
+    for(it=_allEntityStates.begin(); it!=_allEntityStates.end(); ++it) {
+      if ((*it)->Kind() == TCI_PTC_COMP || (*it)->Kind() == TCI_ALIVE_COMP) {
+        (*it)->Kill();
+        break;
+      }
+    }
+  }
+  while(it != _allEntityStates.end());
 }

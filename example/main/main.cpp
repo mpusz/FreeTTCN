@@ -71,9 +71,12 @@ void Usage()
 
 void Start(CCLITestManagement &tm, const std::string &testCase)
 {
+  // set module parameters
+  tm.ParametersSet();
+  
   // init timestamping
   freettcn::CTimeStamp ts(4);
-    
+  
   // init logger
   freettcn::TL::CLogger logger(ts);
     
@@ -100,9 +103,6 @@ void Start(CCLITestManagement &tm, const std::string &testCase)
   ch.LogEnable(ts, chLogMask);
   pa.LogEnable(ts, paLogMask);
   sa.LogEnable(ts, saLogMask);
-  
-  // set module parameters
-  tm.ParametersSet();
   
   // run
   if (testCase != "") {

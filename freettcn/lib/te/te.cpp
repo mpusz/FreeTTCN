@@ -241,7 +241,7 @@ const TriComponentId &freettcn::TE::CTTCNExecutable::ControlStart() const
   // obtain module parameters
   module.ParametersGet();
   
-  return module.ControlStart().Id();
+  return module.ControlStart();
 }
 
 

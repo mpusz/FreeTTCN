@@ -50,7 +50,9 @@ namespace freettcn {
       };
 
     private:
-      CTestComponentType::CInstance &_component;
+      typedef std::vector<unsigned int> TOffsetList;
+      
+      CTestComponentType::CInstanceLocal &_component;
       const bool _implicit;
       
       // timer dynamic state
@@ -62,9 +64,11 @@ namespace freettcn {
       // SNAP_VALUE - when taking a snapshot it gets the actual value of ACT_DURATION - TIME_LEFT
       // SNAP_STATUS - when taking a snapshot it gets the same value as STATUS
       
+      TOffsetList _offsetList;
+      
     public:
-      CTimer(CTestComponentType::CInstance &comp, bool implicit);
-      CTimer(CTestComponentType::CInstance &comp, bool implicit, TriTimerDuration defaultDuration) throw(EOperationFailed);
+      CTimer(CTestComponentType::CInstanceLocal &comp, bool implicit);
+      CTimer(CTestComponentType::CInstanceLocal &comp, bool implicit, TriTimerDuration defaultDuration) throw(EOperationFailed);
       ~CTimer();
       
       const TriTimerId &Id() const;
@@ -74,6 +78,9 @@ namespace freettcn {
       void Stop() throw(EOperationFailed);
       TriTimerDuration Read() const throw(EOperationFailed);
       bool Running() const throw(EOperationFailed);
+      
+      void HandlerAdd(unsigned int behavoiorOffset);
+      void HandlerRemove(unsigned int behavoiorOffset);
       
       void Timeout();
     };

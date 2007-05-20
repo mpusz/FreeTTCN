@@ -62,7 +62,7 @@ namespace freettcn {
       
       const TciBehaviourIdType &Id() const;
       
-      virtual int Run(freettcn::TE::CTestComponentType::CInstance &comp, unsigned int offset) const = 0;
+      virtual int Run(freettcn::TE::CTestComponentType::CInstanceLocal &comp, unsigned int offset) const = 0;
     };
 
   } // namespace TE

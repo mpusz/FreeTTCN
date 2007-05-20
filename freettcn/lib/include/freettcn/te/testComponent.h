@@ -38,8 +38,8 @@ extern "C" {
 #include <freettcn/te/idObject.h>
 #include <freettcn/te/verdict.h>
 #include <freettcn/te/initObject.h>
+#include <freettcn/te/ttcnWrappers.h>
 #include <freettcn/tools/tools.h>
-#include <string>
 #include <vector>
 #include <list>
 
@@ -48,38 +48,79 @@ namespace freettcn {
   namespace TE {
     
     class CBehavior;
-    class CTimer;
-    class CSourceData;
-    class CTestCase;
-    class CScope;
     class CPortType;
+    class CTimer;
+    class CTestCase;
     class CPort;
     
     class CTestComponentType : public CType {
     public:
-      class CInstance : public CType::CInstance, public CIdObject, public CInitObject {
+      class CInstance : public CType::CInstance {
+      private:
+        // not allowed
+        bool Omit() const;
+        void Omit(bool omit);
+        const char *Encoding() const;
+        const char *EncodingVariant() const;
+        const char *Extension() const;
+
+      public:
+        CInstance(const CType &type);
+        
+        virtual const TriComponentId &Id() const  = 0;
+        virtual TciTestComponentKindType Kind() const  = 0;
+        
+        virtual void Start(const CBehavior &behavior, TciParameterListType parameterList) = 0;
+        virtual void Stop() = 0;
+        virtual void Kill() = 0;
+      };
+      
+      
+      class CInstanceRemote : public CInstance {
+        const CTriComponentId _id;
+        const TciTestComponentKindType _kind;
+        bool _terminated;
+      public:
+        CInstanceRemote(const CType &type, const TriComponentId &id, TciTestComponentKindType kind);
+        
+        virtual const TriComponentId &Id() const;
+        virtual TciTestComponentKindType Kind() const;
+        
+        virtual void Start(const CBehavior &behavior, TciParameterListType parameterList);
+        virtual void Stop();
+        virtual void Kill();
+        
+        bool operator==(const TriComponentId &id) const;
+        bool Terminated() const;
+        void Terminated(bool terminated);
+      };
+      
+      
+      class CInstanceLocal : public CInstance, public CIdObject, public CInitObject {
       public:
         enum TStatus {
-          NOT_INITED,                             /**< created but Init() not run */
+          NOT_INITED,                               /**< created but Init() not run */
           ACTIVE,
-          SNAPSHOT,                               /**< active but in the evaluation phase of a snapshot */
-          REPEAT,                                 /**< active and in an 'alt' statement that should be
-                                                     reevaluated due to a 'repeat' statement */
-          BLOCKED                                 /**< module control is blocked during the execution of
-                                                     the test case;
-                                                     test components are blocked during the creation of
-                                                     other test components, and when they wait for being
-                                                     started */
+          SNAPSHOT,                                 /**< active but in the evaluation phase of a snapshot */
+          REPEAT,                                   /**< active and in an 'alt' statement that should be
+                                                       reevaluated due to a 'repeat' statement */
+          BLOCKED                                   /**< module control is blocked during the execution of
+                                                       the test case;
+                                                       test components are blocked during the creation of
+                                                       other test components, and when they wait for being
+                                                       started */
         };
         
         class ENotStarted : public freettcn::EOperationFailed {};
         
         class CScope {
           typedef std::vector<CType::CInstance *> TValueArray;
+          typedef std::vector<CTimer *> TTimerArray;
           
           const char *_kind;
           CScope * const _up;
           TValueArray _valueArray;
+          TTimerArray _timerArray;
         public:
           CScope(const char *kind, CScope *up);
           ~CScope();
@@ -87,24 +128,26 @@ namespace freettcn {
           CScope *Up() const;;
           
           void Register(CType::CInstance *value);
+          void Register(CTimer *timer);
           CType::CInstance &Value(unsigned int valueIdx) const throw(ENotFound);
+          CTimer &Timer(unsigned int timerIdx) const throw(ENotFound);
         };
         
       private:
         typedef std::vector<CPort *> TPortArray;
         typedef std::list<const CTimer *> TTimerList;
-        
+      
         // test componnent info
-        CModule *_module;
-        TciTestComponentKindType _kind;
         TriComponentId _id;
+        TciTestComponentKindType _kind;
+        CModule *_module;
         TPortArray _portArray;
         CTimer *_startTimer;
         
         // test component dynamic state
         TStatus _status;                          /**< describes the status of test component */
-//         CCommandQueue _controlStack;              /**< a stack of flow graph node references; the top element is the flow graph node that has to be interpreted next */
-//         TDefaultList _defaultList;                /**< a list of activated defaults; a list of pointers to the start nodes of activated defaults; the list in reverse order of activation */
+        //         CCommandQueue _controlStack;              /**< a stack of flow graph node references; the top element is the flow graph node that has to be interpreted next */
+        //         TDefaultList _defaultList;                /**< a list of activated defaults; a list of pointers to the start nodes of activated defaults; the list in reverse order of activation */
         // DEFAULT_POINTER (next default that has to be evaluated if the actual default terminates unsuccessfully)
         // VALUE_STACK (CStack) (not used)
         CVerdictType::CInstance _verdict;         /**< actual local verdict of a test component;
@@ -122,38 +165,49 @@ namespace freettcn {
         const CBehavior *_behavior;
         CScope *_scope;
         int _behaviorOffset;
-
+      
+        void ScopePush(const char *kind);
+        void ScopePop();
+      
       protected:
         void Register(CPort *port);
         
       public:
-        CInstance(const CType &type);
-        ~CInstance();
+        CInstanceLocal(const CType &type);
+        ~CInstanceLocal();
+        
+        virtual const TriComponentId &Id() const;
+        virtual TciTestComponentKindType Kind() const;
+        
+        virtual void Start(const CBehavior &behavior, TciParameterListType parameterList);
+        virtual void Stop();
+        virtual void Kill();
         
         TStatus Status() const;
         void Status(TStatus status);
         CModule &Module() const throw(ENotInited);
-
-        void Init(CModule &module, TciTestComponentKindType kind, const char *name);
-        const TriComponentId &Id() const throw(ENotInited);
-        TciTestComponentKindType Kind() const throw(ENotInited);
         
-        virtual void Start(const CBehavior &behavior, TciParameterListType parameterList) throw(ENotInited);
-        void Execute(const char *src, int line, CTestCase &testCase, TriTimerDuration duration, int returnOffset);
+        void Init(CModule &module, TciTestComponentKindType kind, const char *name);
+        void Reset();
+        
+        void Verdict(const char *src, int line, TVerdict verdict);
+        
         void Run(int offset) throw(ENotStarted);
-        void Stop(const char *src, int line);
+        void Execute(const char *src, int line, CTestCase &testCase, TriTimerDuration duration, int returnOffset);
         
         void TimerAdd(const CTimer &timer, bool implicit = false);
         void TimerRemove(const CTimer &timer, bool implicit = false) throw(ENotFound);
         
         //       void Map(const CPort &fromPort, const CPort &toPort) throw(ENotInited);
-        void Verdict(const char *src, int line, TVerdict verdict);
         
         void ScopeEnter(const char *src, int line, const char *kind);
         CScope &Scope() const throw(ENotFound);
         void ScopeLeave(const char *src, int line);
+        
+        void StopReq(const char *src, int line, CInstanceRemote *comp = 0);
+        void StopAllReq(const char *src, int line) throw(EOperationFailed);
       };
-
+      
       
     private:
       // types
@@ -176,8 +230,10 @@ namespace freettcn {
     };
     
     
+    
+    
     class CControlComponentType : public CTestComponentType {
-      class CInstance : public CTestComponentType::CInstance {
+      class CInstance : public CTestComponentType::CInstanceLocal {
         virtual void Initialize();
       public:
         CInstance(const CType &type);

@@ -68,7 +68,7 @@ namespace freettcn {
     private:
       typedef CQueue<CMessage *> CMessageQueue;
       
-      const CTestComponentType::CInstance &_component;
+      const CTestComponentType::CInstanceLocal &_component;
       TriPortId _id;
       
       // port dynamic state
@@ -78,7 +78,7 @@ namespace freettcn {
       // SNAP_VALUE - when a snapshot is taken the first element from VALUE_QUEUE is copied (NULL if VALUE_QUEUE is empty or STATUS = STOPPED)
       
     public:
-      CPort(const CPortType &type, const CTestComponentType::CInstance &component, const char *name, int portIdx = -1);
+      CPort(const CPortType &type, const CTestComponentType::CInstanceLocal &component, const char *name, int portIdx = -1);
       virtual ~CPort() = 0;
       
       const TriPortId &Id() const;
