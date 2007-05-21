@@ -583,7 +583,7 @@ void freettcn::TE::CModule::TestComponentTerminated(const TriComponentId &compon
       parms.parList = 0;
       
       // test case terminated
-      tciTestCaseTerminated(verdict, parms);
+      tciTestCaseTerminated(const_cast<void *>(static_cast<const void *>(&_activeTestCase->Verdict())), parms);
       _activeTestCase = 0;
       
       // remove all test case related test components

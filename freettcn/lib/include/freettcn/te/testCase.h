@@ -75,7 +75,7 @@ namespace freettcn {
       CTestComponentType::CInstanceRemote &MTC() const throw(ENotFound);
       CTestComponentType::CInstanceRemote &System() const throw(ENotFound);
       
-      TVerdict Verdict() const;
+      const CVerdictType::CInstance &Verdict() const;
       void Verdict(TVerdict verdict);
       
       TciParameterTypeListType Parameters() const;

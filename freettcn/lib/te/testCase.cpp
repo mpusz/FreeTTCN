@@ -88,9 +88,9 @@ freettcn::TE::CTestComponentType::CInstanceRemote &freettcn::TE::CTestCase::Syst
   throw ENotFound();
 }
 
-freettcn::TE::TVerdict freettcn::TE::CTestCase::Verdict() const
+const freettcn::TE::CVerdictType::CInstance &freettcn::TE::CTestCase::Verdict() const
 {
-  return _verdict.Value();
+  return _verdict;
 }
 
 void freettcn::TE::CTestCase::Verdict(TVerdict verdict)
@@ -132,6 +132,9 @@ void freettcn::TE::CTestCase::Start(const char *src, int line,
   
   // set current test case
   _module.ActiveTestCase(*this);
+  
+  // saet initial verdict value
+  _verdict.Value(VERDICT_NONE);
   
   if (creator) {
     creatorId = creator->Id();
@@ -206,18 +209,13 @@ void freettcn::TE::CTestCase::Stop()
   // set verdict to ERROR
   _verdict.Value(VERDICT_ERROR);
   
-  // notify TM about test case termination
-  TciValue error = 0;
-  TciParameterListType parList;
-  parList.length = 0;
-  parList.parList = 0;
-  tciTestCaseTerminated(error, parList);
+  _mtc->Kill();
   
-  // reset local module
-  _module.Reset();
+//   // reset local module
+//   _module.Reset();
   
-  // reset other modules
-  tciResetReq();
+//   // reset other modules
+//   tciResetReq();
 }
 
 

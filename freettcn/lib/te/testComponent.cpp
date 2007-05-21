@@ -336,7 +336,7 @@ void freettcn::TE::CTestComponentType::CInstanceLocal::Run(unsigned int offset) 
   
   if (offset == CBehavior::GUARD_TIMEOUT) {
     // kill MTC
-    _module->ActiveTestCase().MTC().Kill();
+    _module->ActiveTestCase().Stop();
     return;
   }
   

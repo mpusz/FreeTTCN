@@ -551,7 +551,7 @@ namespace freettcn {
         
       case OFFSET_1: // test case termination
         {
-          if (comp.Module().TestCase(TESTCASE_ICMPPing_1).Verdict() == freettcn::TE::VERDICT_PASS &&
+          if (comp.Module().TestCase(TESTCASE_ICMPPing_1).Verdict().Value() == freettcn::TE::VERDICT_PASS &&
               MY_CAST<const freettcn::TE::CBooleanType::CInstance &>(comp.Module().Parameter(PAR_long).Value()).Value()) {
             comp.ScopeEnter("icmp.ttcn", 124, "for");
             comp.Scope().Register(new freettcn::TE::CIntegerType::CInstance(freettcn::TE::CBasicTypes::Integer(), 0));
