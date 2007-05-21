@@ -47,9 +47,10 @@ namespace freettcn {
     public:
       enum {
         ERROR           = 0,
-        END             = 1,
-        WAIT            = 2,
-        OFFSET_AUTO     = 3,
+        END,
+        WAIT,
+        GUARD_TIMEOUT,
+        OFFSET_AUTO,
         OFFSET_START    = 10
       };
       

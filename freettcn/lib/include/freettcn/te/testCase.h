@@ -84,7 +84,7 @@ namespace freettcn {
       TriPortIdList SystemInterface() const;
       
       void Start(const char *src, int line,
-                 CTestComponentType::CInstance *creator,
+                 CTestComponentType::CInstanceLocal *creator,
                  const TciParameterListType *parameterList,
                  TriTimerDuration dur);
       void Execute(TciTestCaseIdType testCaseId, TriPortIdList tsiPortList);

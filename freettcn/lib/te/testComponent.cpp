@@ -126,8 +126,6 @@ freettcn::TE::CTestComponentType::CInstanceLocal::~CInstanceLocal()
   Purge(_portArray);
 
   // purge stack
-  if (!_scope || _scope->Up())
-    std::cout << "ERROR: Scope handling error!!!" << std::endl;
   while(_scope)
     ScopePop();
   
@@ -177,10 +175,6 @@ void freettcn::TE::CTestComponentType::CInstanceLocal::Stop()
   tciTestComponentTerminatedReq(Id(), &_verdict);
   
   Reset();
-  
-  // check stack
-  if (!_scope || _scope->Up())
-    std::cout << "ERROR: Scope handling error!!!" << std::endl;
   
   _status = BLOCKED;
 }
@@ -307,15 +301,21 @@ void freettcn::TE::CTestComponentType::CInstanceLocal::Execute(const char *src, 
 // }
 
 
-void freettcn::TE::CTestComponentType::CInstanceLocal::Run(int offset) throw(ENotStarted)
+void freettcn::TE::CTestComponentType::CInstanceLocal::Run(unsigned int offset) throw(ENotStarted)
 {
   if (!_behavior)
     throw ENotStarted();
   
+  if (offset == CBehavior::GUARD_TIMEOUT) {
+    // kill MTC
+    _module->ActiveTestCase().MTC().Kill();
+    return;
+  }
+  
   if (offset != CBehavior::OFFSET_AUTO)
     _behaviorOffset = offset;
   
-  int next = CBehavior::ERROR;
+  unsigned int next = CBehavior::ERROR;
   do {
     next = _behavior->Run(*this, _behaviorOffset);
     switch(next) {

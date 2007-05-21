@@ -248,6 +248,14 @@ namespace freettcn {
     public:
       class CBehavior : public freettcn::TE::CBehavior {
       public:
+        enum {
+          SCOPE1_t1
+        };
+        
+        enum {
+          OFFSET_1 = freettcn::TE::CBehavior::OFFSET_START + 1,
+        };
+        
         CBehavior(freettcn::TE::CModule &module);
         int Run(freettcn::TE::CTestComponentType::CInstanceLocal &comp, unsigned int offset) const;
       };
@@ -417,13 +425,25 @@ namespace freettcn {
       
 //       // add automatically if 'self.stop' not included in *.ttcn file
 //       comp.Enqueue(new freettcn::TE::CCmdStopMTC(comp, new freettcn::TE::CSourceData("icmp.ttcn", 115)));
-
-      comp.Verdict("icmp.ttcn", 127, freettcn::TE::VERDICT_PASS);
       
-      comp.StopReq("icmp.ttcn", 113);
-      return freettcn::TE::CBehavior::END;
-    }
+      switch(offset) {
+      case freettcn::TE::CBehavior::OFFSET_START:
+        {
+          comp.ScopeEnter("icmp.ttcn", 83, "behavior");
+          
+          comp.Verdict("icmp.ttcn", 85, freettcn::TE::VERDICT_PASS);
+          
+          comp.ScopeLeave("icmp.ttcn", 113);
+          comp.StopReq("icmp.ttcn", 113);
+          return freettcn::TE::CBehavior::END;
+        }
     
+      default:
+        std::cout << "ERROR: Unknown offset: " << offset << std::endl;
+      }
+      
+      return freettcn::TE::CBehavior::ERROR;
+    }
     
     // ICMP_Ping_2
     
@@ -443,8 +463,31 @@ namespace freettcn {
     
     int CTC_ICMPPing_2::CBehavior::Run(freettcn::TE::CTestComponentType::CInstanceLocal &comp, unsigned int offset) const
     {
-      comp.StopReq("icmp.ttcn", 117);
-      return freettcn::TE::CBehavior::END;
+      switch(offset) {
+      case freettcn::TE::CBehavior::OFFSET_START:
+        {
+          comp.ScopeEnter("icmp.ttcn", 116, "behavior");
+          
+          comp.Verdict("icmp.ttcn", 117, freettcn::TE::VERDICT_PASS);
+          
+          comp.Scope().Register(new freettcn::TE::CTimer(comp, false, 1.0));
+          comp.Scope().Timer(SCOPE1_t1).Start();
+          comp.Scope().Timer(SCOPE1_t1).HandlerAdd(OFFSET_1);
+          return freettcn::TE::CBehavior::WAIT;
+        }
+        
+      case OFFSET_1:
+        {
+          comp.ScopeLeave("icmp.ttcn", 117);
+          comp.StopReq("icmp.ttcn", 117);
+          return freettcn::TE::CBehavior::END;
+        }
+        
+      default:
+        std::cout << "ERROR: Unknown offset: " << offset << std::endl;
+      }
+      
+      return freettcn::TE::CBehavior::ERROR;
     }
     
 

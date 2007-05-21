@@ -164,7 +164,7 @@ namespace freettcn {
         TTimerList _implicitTimers;
         const CBehavior *_behavior;
         CScope *_scope;
-        int _behaviorOffset;
+        unsigned int _behaviorOffset;
       
         void ScopePush(const char *kind);
         void ScopePop();
@@ -192,7 +192,7 @@ namespace freettcn {
         
         void Verdict(const char *src, int line, TVerdict verdict);
         
-        void Run(int offset) throw(ENotStarted);
+        void Run(unsigned int offset) throw(ENotStarted);
         void Execute(const char *src, int line, CTestCase &testCase, TriTimerDuration duration, int returnOffset);
         
         void TimerAdd(const CTimer &timer, bool implicit = false);

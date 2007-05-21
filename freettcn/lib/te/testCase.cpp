@@ -93,9 +93,8 @@ freettcn::TE::CTestComponentType::CInstanceRemote &freettcn::TE::CTestCase::Syst
 void freettcn::TE::CTestCase::Reset()
 {
   if (_guardTimer) {
-    if (_guardTimer->Running())
-      _guardTimer->Stop();
     delete _guardTimer;
+    _guardTimer = 0;
   }
 }
 
@@ -135,7 +134,7 @@ TriPortIdList freettcn::TE::CTestCase::SystemInterface() const
 
 
 void freettcn::TE::CTestCase::Start(const char *src, int line,
-                                    freettcn::TE::CTestComponentType::CInstance *creator,
+                                    freettcn::TE::CTestComponentType::CInstanceLocal *creator,
                                     const TciParameterListType *parameterList,
                                     TriTimerDuration dur)
 {
@@ -192,9 +191,10 @@ void freettcn::TE::CTestCase::Start(const char *src, int line,
   _module.TestComponentStartReq(src, line, creatorId, _mtc->Id(), _behavior->Id(), parList);
   
   if (dur) {
-//     // set test case guard timer
-//     _guardTimer = new freettcn::TE::CTimer(*creator, true, new CTimer::CCmdTestCaseGuard(*this), dur);
-//     _guardTimer->Start();
+    // set test case guard timer
+    _guardTimer = new CTimer(*creator, true, dur);
+    _guardTimer->Start();
+    _guardTimer->HandlerAdd(CBehavior::GUARD_TIMEOUT);
   }
   
   // inform TM about TC execution
@@ -215,8 +215,8 @@ void freettcn::TE::CTestCase::Execute(TciTestCaseIdType testCaseId, TriPortIdLis
 
 void freettcn::TE::CTestCase::Stop()
 {
-  freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
-  if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_TC_STOP))
+  CTTCNExecutable &te = CTTCNExecutable::Instance();
+  if (te.Logging() && te.LogMask().Get(CLogMask::CMD_TE_TC_STOP))
     // log
     tliTcStop(0, te.TimeStamp().Get(), 0, 0, _mtc->Id());
   

@@ -57,6 +57,8 @@ freettcn::TE::CTimer::CTimer(CTestComponentType::CInstanceLocal &comp, bool impl
 freettcn::TE::CTimer::~CTimer()
 {
   _component.TimerRemove(*this, _implicit);
+  if (Running())
+    Stop();
 }
 
 const TriTimerId &freettcn::TE::CTimer::Id() const
