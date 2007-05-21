@@ -116,7 +116,7 @@ freettcn::TE::CTestComponentType::CInstanceRemote::TStatus freettcn::TE::CTestCo
 
 freettcn::TE::CTestComponentType::CInstanceLocal::CInstanceLocal(const CType &type):
   freettcn::TE::CTestComponentType::CInstance(type), _module(0), _startTimer(0),
-  _status(NOT_INITED), _verdict(CBasicTypes::Verdict(), VERDICT_NONE),
+  _status(NOT_INITED), _verdict(CBasicTypes::Verdict(), VERDICT_NONE), _guardTimer(0),
   _behavior(0), _scope(0), _behaviorOffset(CBehavior::OFFSET_AUTO)
 {
 }
@@ -210,8 +210,14 @@ void freettcn::TE::CTestComponentType::CInstanceLocal::Kill()
 
 void freettcn::TE::CTestComponentType::CInstanceLocal::Reset()
 {
-  if (_startTimer)
+  if (_startTimer) {
     delete _startTimer;
+    _startTimer = 0;
+  }
+  if (_guardTimer) {
+    delete _guardTimer;
+    _guardTimer = 0;
+  }
   
   // reset component scope to the first level
   while(_scope->Up())
@@ -244,6 +250,11 @@ freettcn::TE::CTestComponentType::CInstanceLocal::TStatus freettcn::TE::CTestCom
 
 void freettcn::TE::CTestComponentType::CInstanceLocal::Status(TStatus status)
 {
+  if (status == ACTIVE && _guardTimer) {
+    delete _guardTimer;
+    _guardTimer = 0;
+  }
+  
   _status = status;
 }
 
@@ -274,7 +285,17 @@ void freettcn::TE::CTestComponentType::CInstanceLocal::Execute(const char *src, 
   testCase.Start(const_cast<char *>(src), line, this, 0, duration);
   
   // block Control component for the time of testcase execution
-  _status = BLOCKED;
+  if (duration) {
+    _status = SNAPSHOT;
+    
+    // set test case guard timer
+    _guardTimer = new CTimer(*this, true, duration);
+    _guardTimer->Start();
+    _guardTimer->HandlerAdd(CBehavior::GUARD_TIMEOUT);
+  }
+  else {
+    _status = BLOCKED;
+  }
   
   // set offset to be run when component terminates
   _behaviorOffset = returnOffset;

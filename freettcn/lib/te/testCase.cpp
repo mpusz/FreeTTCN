@@ -54,7 +54,7 @@ freettcn::TE::CTestCase::CTestCase(CModule &module, const char *name, const free
                                    const freettcn::TE::CTestComponentType *systemType /* 0 */):
   _module(module), _srcData(srcData),
   _mtcType(mtcType), _behavior(behavior), _systemType(systemType ? *systemType : mtcType),
-  _mtc(0), _system(0), _guardTimer(0), _verdict(CBasicTypes::Verdict(), VERDICT_NONE)
+  _mtc(0), _system(0), _verdict(CBasicTypes::Verdict(), VERDICT_NONE)
 {
   _id.moduleName = _module.Id().moduleName;
   _id.objectName = const_cast<char *>(name);
@@ -65,8 +65,6 @@ freettcn::TE::CTestCase::~CTestCase()
 {
   if (_srcData)
     delete _srcData;
-  
-  Reset();
 }
 
 TciTestCaseIdType freettcn::TE::CTestCase::Id() const
@@ -88,14 +86,6 @@ freettcn::TE::CTestComponentType::CInstanceRemote &freettcn::TE::CTestCase::Syst
     return *_system;
   std::cout << "ERROR: SYSTEM test component not found!!!" << std::endl;
   throw ENotFound();
-}
-
-void freettcn::TE::CTestCase::Reset()
-{
-  if (_guardTimer) {
-    delete _guardTimer;
-    _guardTimer = 0;
-  }
 }
 
 freettcn::TE::TVerdict freettcn::TE::CTestCase::Verdict() const
@@ -136,7 +126,7 @@ TriPortIdList freettcn::TE::CTestCase::SystemInterface() const
 void freettcn::TE::CTestCase::Start(const char *src, int line,
                                     freettcn::TE::CTestComponentType::CInstanceLocal *creator,
                                     const TciParameterListType *parameterList,
-                                    TriTimerDuration dur)
+                                    TriTimerDuration duration)
 {
   TriComponentId creatorId;
   
@@ -159,7 +149,7 @@ void freettcn::TE::CTestCase::Start(const char *src, int line,
     parList.length = 0;
     parList.parList = 0;
     
-    tliTcStart(0, te.TimeStamp().Get(), const_cast<char *>(src), line, creatorId, _id, parList, dur);
+    tliTcStart(0, te.TimeStamp().Get(), const_cast<char *>(src), line, creatorId, _id, parList, duration);
   }
   
   // create MTC
@@ -175,7 +165,7 @@ void freettcn::TE::CTestCase::Start(const char *src, int line,
     parList.length = 0;
     parList.parList = 0;
     
-    tliTcExecute(0, te.TimeStamp().Get(), const_cast<char *>(src), line, _mtc->Id(), _id, parList, dur);
+    tliTcExecute(0, te.TimeStamp().Get(), const_cast<char *>(src), line, _mtc->Id(), _id, parList, duration);
   }
   tciExecuteTestCaseReq(_id, SystemInterface());
   
@@ -190,15 +180,8 @@ void freettcn::TE::CTestCase::Start(const char *src, int line,
   }
   _module.TestComponentStartReq(src, line, creatorId, *_mtc, _behavior, parList);
   
-  if (dur) {
-    // set test case guard timer
-    _guardTimer = new CTimer(*creator, true, dur);
-    _guardTimer->Start();
-    _guardTimer->HandlerAdd(CBehavior::GUARD_TIMEOUT);
-  }
-  
   // inform TM about TC execution
-  tciTestCaseStarted(_id, parList, dur);
+  tciTestCaseStarted(_id, parList, duration);
 }
 
 

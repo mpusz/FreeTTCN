@@ -181,7 +181,6 @@ void freettcn::TE::CModule::Reset()
 {
   if (Running()) {
     if (_activeTestCase) {
-      _activeTestCase->Reset();
       _activeTestCase = 0;
       
       // reset SA only if test case is running
@@ -585,7 +584,6 @@ void freettcn::TE::CModule::TestComponentTerminated(const TriComponentId &compon
       
       // test case terminated
       tciTestCaseTerminated(verdict, parms);
-      _activeTestCase->Reset();
       _activeTestCase = 0;
       
       // remove all test case related test components

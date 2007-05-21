@@ -160,7 +160,7 @@ namespace freettcn {
         // VALUE_STACK (CStack) (not used)
         CVerdictType::CInstance _verdict;         /**< actual local verdict of a test component;
                                                      ignored if an entity state represents the module control */
-        // TIMER_GUARD (special timer which is necessary to guard the execution time of test cases and the duration of call operations; modelled as a timer binding)
+        CTimer *_guardTimer;                      /**< special timer which is necessary to guard the execution time of test cases and the duration of call operations */
         // DATA_STATE (CList) (list of list of variable bindings)
         // TIMER_STATE (wtf ???)
         // PORT_REF (wtf ???)

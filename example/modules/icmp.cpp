@@ -470,7 +470,7 @@ namespace freettcn {
           
           comp.Verdict("icmp.ttcn", 117, freettcn::TE::VERDICT_PASS);
           
-          comp.Scope().Register(new freettcn::TE::CTimer(comp, false, 1.0));
+          comp.Scope().Register(new freettcn::TE::CTimer(comp, false, 5.0));
           comp.Scope().Timer(SCOPE1_t1).Start();
           comp.Scope().Timer(SCOPE1_t1).HandlerAdd(OFFSET_1);
           return freettcn::TE::CBehavior::WAIT;
