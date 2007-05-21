@@ -43,6 +43,8 @@ extern "C" {
 
 namespace freettcn {
   
+  class CTriComponentId;
+  
   namespace TM {
     
     class CLogMask : public freettcn::CLogMask {
@@ -50,7 +52,6 @@ namespace freettcn {
       CLogMask(bool enabled = true);
       ~CLogMask();
     };
-    
     
     
     class CTestManagement : public freettcn::CEntity {
@@ -99,7 +100,7 @@ namespace freettcn {
       static CTestManagement *_instance;
       
       TStatus _status;                            /**< specifies if a test case or control part is running */
-      TriComponentId _ctrlCompId;                 /**< component Id of running Control part */
+      CTriComponentId *_ctrlCompId;               /**< component Id of running Control part */
       CTestCase *_tc;                             /**< currently started test case */
       TModuleParList _modParList;
       TTCList _tcList;

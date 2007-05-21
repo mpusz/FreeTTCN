@@ -54,7 +54,7 @@ namespace freettcn {
       CModule &_module;
       CSourceData const * const _srcData;
       const CTestComponentType &_mtcType;
-      CBehavior * const _behavior;
+      const CBehavior &_behavior;
       const CTestComponentType &_systemType;
       
       TciTestCaseIdType _id;
@@ -68,7 +68,7 @@ namespace freettcn {
                                                      updated after every test component termination */
     public:
       CTestCase(CModule &module, const char *name, const CSourceData *srcData,
-                const CTestComponentType &mtcType, CBehavior *behavior,
+                const CTestComponentType &mtcType, const CBehavior &behavior,
                 const CTestComponentType *systemType = 0);
       virtual ~CTestCase();
       

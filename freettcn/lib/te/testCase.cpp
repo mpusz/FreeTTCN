@@ -33,11 +33,11 @@
 #include "freettcn/te/behavior.h"
 #include "freettcn/te/port.h"
 #include "freettcn/te/timer.h"
-#include "freettcn/te/ttcnWrappers.h"
 #include "freettcn/te/basicTypes.h"
 #include "freettcn/te/sourceData.h"
 #include "freettcn/tools/tools.h"
 #include "freettcn/tools/logMask.h"
+#include "freettcn/tools/ttcnWrappers.h"
 #include "freettcn/tools/timeStamp.h"
 extern "C" {
 #include "freettcn/ttcn3/tci_te_tm.h"
@@ -50,7 +50,7 @@ extern "C" {
 
 
 freettcn::TE::CTestCase::CTestCase(CModule &module, const char *name, const freettcn::TE::CSourceData *srcData,
-                                   const freettcn::TE::CTestComponentType &mtcType, freettcn::TE::CBehavior *behavior,
+                                   const freettcn::TE::CTestComponentType &mtcType, const CBehavior &behavior,
                                    const freettcn::TE::CTestComponentType *systemType /* 0 */):
   _module(module), _srcData(srcData),
   _mtcType(mtcType), _behavior(behavior), _systemType(systemType ? *systemType : mtcType),
@@ -188,7 +188,7 @@ void freettcn::TE::CTestCase::Start(const char *src, int line,
     parList.length = 0;
     parList.parList = 0;
   }
-  _module.TestComponentStartReq(src, line, creatorId, _mtc->Id(), _behavior->Id(), parList);
+  _module.TestComponentStartReq(src, line, creatorId, *_mtc, _behavior, parList);
   
   if (dur) {
     // set test case guard timer

@@ -37,18 +37,13 @@ extern "C" {
 
 namespace freettcn {
   
-  namespace TE {
-    
-    class CTriComponentId {
-      TriComponentId _id;
-    public:
-      CTriComponentId(const TriComponentId &id);
-      ~CTriComponentId();
-      const TriComponentId &Id() const;
-    };
-        
-
-  } // namespace TE
+  class CTriComponentId {
+    TriComponentId _id;
+  public:
+    CTriComponentId(const TriComponentId &id);
+    ~CTriComponentId();
+    const TriComponentId &Id() const;
+  };
   
 } // namespace freettcn
 

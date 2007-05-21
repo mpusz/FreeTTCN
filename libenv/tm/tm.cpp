@@ -34,6 +34,7 @@ extern "C" {
 #include <freettcn/ttcn3/tci_tl.h>
 }
 #include <freettcn/tools/tools.h>
+#include <freettcn/tools/ttcnWrappers.h>
 #include <freettcn/tools/timeStamp.h>
 #include <iostream>
 
@@ -163,7 +164,7 @@ freettcn::TM::CTestManagement &freettcn::TM::CTestManagement::Instance() throw(E
 }
 
 freettcn::TM::CTestManagement::CTestManagement() :
-  _status(NOT_RUNNING), _tc(0)
+  _status(NOT_RUNNING), _ctrlCompId(0), _tc(0)
 {
   _instance = this;
 }
@@ -347,7 +348,7 @@ void freettcn::TM::CTestManagement::TestCaseStop()  throw(EOperationFailed)
 void freettcn::TM::CTestManagement::ControlStart()
 {
   _status = RUNNING_CONTROL;
-  _ctrlCompId = tciStartControl();
+  _ctrlCompId = new CTriComponentId(tciStartControl());
 }
 
 
@@ -367,7 +368,9 @@ void freettcn::TM::CTestManagement::ControlStop() throw(EOperationFailed)
 void freettcn::TM::CTestManagement::ControlTerminated()
 {
   if (Logging() && LogMask().Get(freettcn::CLogMask::CMD_TM_CTRL_TERMINATED))
-    tliCtrlTerminated(0, TimeStamp().Get(), 0, 0, _ctrlCompId);
+    tliCtrlTerminated(0, TimeStamp().Get(), 0, 0, _ctrlCompId->Id());
   
+  delete _ctrlCompId;
+  _ctrlCompId = 0;
   _status = NOT_RUNNING;
 }

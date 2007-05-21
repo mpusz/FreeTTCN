@@ -38,7 +38,7 @@ extern "C" {
 #include <freettcn/te/idObject.h>
 #include <freettcn/te/verdict.h>
 #include <freettcn/te/initObject.h>
-#include <freettcn/te/ttcnWrappers.h>
+#include <freettcn/tools/ttcnWrappers.h>
 #include <freettcn/tools/tools.h>
 #include <vector>
 #include <list>
@@ -77,9 +77,18 @@ namespace freettcn {
       
       
       class CInstanceRemote : public CInstance {
+      public:
+        enum TStatus {
+          IDLE,
+          ACTIVE,
+          TERMINATED,
+          KILLED
+        };
+        
+      private:
         const CTriComponentId _id;
         const TciTestComponentKindType _kind;
-        bool _terminated;
+        TStatus _status;
       public:
         CInstanceRemote(const CType &type, const TriComponentId &id, TciTestComponentKindType kind);
         
@@ -91,8 +100,7 @@ namespace freettcn {
         virtual void Kill();
         
         bool operator==(const TriComponentId &id) const;
-        bool Terminated() const;
-        void Terminated(bool terminated);
+        TStatus Status() const;
       };
       
       

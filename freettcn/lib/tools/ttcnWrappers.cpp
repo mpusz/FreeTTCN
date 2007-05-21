@@ -27,11 +27,11 @@
  * 
  */
 
-#include "freettcn/te/ttcnWrappers.h"
+#include "freettcn/tools/ttcnWrappers.h"
 #include <cstring>
 
 
-freettcn::TE::CTriComponentId::CTriComponentId(const TriComponentId &id)
+freettcn::CTriComponentId::CTriComponentId(const TriComponentId &id)
 {
   _id = id;
   
@@ -52,7 +52,7 @@ freettcn::TE::CTriComponentId::CTriComponentId(const TriComponentId &id)
   memmove(_id.compType.objectName, id.compType.objectName, size);
 }
 
-freettcn::TE::CTriComponentId::~CTriComponentId()
+freettcn::CTriComponentId::~CTriComponentId()
 {
   delete[] _id.compInst.data;
   delete[] _id.compName;
@@ -60,7 +60,7 @@ freettcn::TE::CTriComponentId::~CTriComponentId()
   delete[] _id.compType.objectName;
 }
 
-const TriComponentId &freettcn::TE::CTriComponentId::Id() const
+const TriComponentId &freettcn::CTriComponentId::Id() const
 {
   return _id;
 }

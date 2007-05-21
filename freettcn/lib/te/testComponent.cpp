@@ -62,7 +62,7 @@ freettcn::TE::CTestComponentType::CInstance::CInstance(const CType &type):
 /* *************************** I N S T A N C E   R E M O T E **************************** */
 
 freettcn::TE::CTestComponentType::CInstanceRemote::CInstanceRemote(const CType &type, const TriComponentId &id, TciTestComponentKindType kind):
-  CInstance(type), _id(id), _kind(kind), _terminated(false)
+  CInstance(type), _id(id), _kind(kind), _status(IDLE)
 {
 }
 
@@ -78,16 +78,22 @@ TciTestComponentKindType freettcn::TE::CTestComponentType::CInstanceRemote::Kind
 
 void freettcn::TE::CTestComponentType::CInstanceRemote::Start(const CBehavior &behavior, TciParameterListType parameterList)
 {
+  tciStartTestComponentReq(_id.Id(), behavior.Id(), parameterList);
+  _status = ACTIVE;
 }
 
 void freettcn::TE::CTestComponentType::CInstanceRemote::Stop()
 {
   tciStopTestComponentReq(_id.Id());
+  if (_kind != TCI_ALIVE_COMP)
+    std::cout << "WARNING: Only ALIVE components should be stopped (use 'kill') instead." << std::endl; 
+  _status = TERMINATED;
 }
 
 void freettcn::TE::CTestComponentType::CInstanceRemote::Kill()
 {
   tciKillTestComponentReq(_id.Id());
+  _status = KILLED;
 }
 
 bool freettcn::TE::CTestComponentType::CInstanceRemote::operator==(const TriComponentId &id) const
@@ -98,14 +104,9 @@ bool freettcn::TE::CTestComponentType::CInstanceRemote::operator==(const TriComp
     !memcmp(id.compInst.data, localId.compInst.data, id.compInst.bits / 8);
 }
 
-bool freettcn::TE::CTestComponentType::CInstanceRemote::Terminated() const
+freettcn::TE::CTestComponentType::CInstanceRemote::TStatus freettcn::TE::CTestComponentType::CInstanceRemote::Status() const
 {
-  return _terminated;
-}
-
-void freettcn::TE::CTestComponentType::CInstanceRemote::Terminated(bool terminated)
-{
-  _terminated = terminated;
+  return _status;
 }
 
 
@@ -125,11 +126,10 @@ freettcn::TE::CTestComponentType::CInstanceLocal::~CInstanceLocal()
 {
   Purge(_portArray);
 
-  // purge stack
-  while(_scope)
-    ScopePop();
-  
   Reset();
+  
+  // purge component stack
+  ScopePop();
 }
 
 
@@ -189,13 +189,16 @@ void freettcn::TE::CTestComponentType::CInstanceLocal::Kill()
     // kill SYSTEM component
     _module->ActiveTestCase().System().Kill();
   }
-  
+
   freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
   if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_C_TERMINATED))
     // log
     tliCTerminated(0, te.TimeStamp().Get(), 0, 0, Id(), &_verdict);
   
   tciTestComponentTerminatedReq(Id(), &_verdict);
+  
+  // add to killed list
+  /// @todo add to killed list (only local?)
   
   delete this;
 }
@@ -209,6 +212,10 @@ void freettcn::TE::CTestComponentType::CInstanceLocal::Reset()
 {
   if (_startTimer)
     delete _startTimer;
+  
+  // reset component scope to the first level
+  while(_scope->Up())
+    ScopePop();
 }
 
 
@@ -356,10 +363,12 @@ void freettcn::TE::CTestComponentType::CInstanceLocal::StopReq(const char *src, 
   }
   else {
     // other test component
-    if (!comp->Terminated()) {
-      if (comp->Kind() == TCI_ALIVE_COMP)
+    if (comp->Kind() == TCI_ALIVE_COMP) {
+      if (comp->Status() != CInstanceRemote::TERMINATED)
         comp->Stop();
-      else
+    }
+    else {
+      if (comp->Status() != CInstanceRemote::KILLED)
         comp->Kill();
     }
   }
@@ -373,7 +382,6 @@ void freettcn::TE::CTestComponentType::CInstanceLocal::StopAllReq(const char *sr
     throw EOperationFailed();
   }
   
-  // <stop-all-components>
   _module->TestComponentAllStop(src, line, *this);
 }
 

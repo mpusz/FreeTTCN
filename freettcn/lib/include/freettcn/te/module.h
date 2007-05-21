@@ -105,9 +105,10 @@ namespace freettcn {
     protected:
       void Register(const CType *type);
       void Register(CParameter *parameter);
-      void Register(const CBehavior *ctrlBehavior, const CSourceData *ctrlSrcData);
       void Register(CTestCase *testCase);
       void Register(CPortType *portType);
+      
+      void ControlBehavior(const CBehavior &ctrlBehavior, const CSourceData *ctrlSrcData);
       
       virtual void Cleanup();
       
@@ -144,7 +145,7 @@ namespace freettcn {
       
       CTestComponentType::CInstanceRemote &TestComponentCreateReq(const char *src, int line, const TriComponentId &creatorId, TciTestComponentKindType kind, const CTestComponentType &compType, const char *name);
       const TriComponentId &TestComponentCreate(TciTestComponentKindType kind, TciType componentType, const char *name);
-      void TestComponentStartReq(const char *src, int line, const TriComponentId &creatorId, const TriComponentId &componentId, const TciBehaviourIdType &behaviorId, const TciParameterListType &parameterList);
+      void TestComponentStartReq(const char *src, int line, const TriComponentId &creatorId, CTestComponentType::CInstanceRemote &component, const CBehavior &behavior, const TciParameterListType &parameterList) throw(EOperationFailed);
       void TestComponentStart(const TriComponentId &componentId, const TciBehaviourIdType &behaviorId, const TciParameterListType &parameterList) throw(ENotFound);
       void TestComponentStop(const TriComponentId &componentId) throw(ENotFound);
       void TestComponentTerminated(const TriComponentId &componentId, TciVerdictValue verdict) throw(ENotFound);

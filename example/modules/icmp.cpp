@@ -402,7 +402,7 @@ namespace freettcn {
     CTC_ICMPPing_1::CTC_ICMPPing_1(freettcn::TE::CModule &module):
       freettcn::TE::CTestCase(module, "TC_ICMPPing_1", new freettcn::TE::CSourceData("icmp.ttcn", 76),
                               MY_CAST<const freettcn::TE::CTestComponentType &>(module.Type(CModule::TYPE_ICMPComponentType)),
-                              new CBehavior(module),
+                              *new CBehavior(module),
                               &MY_CAST<const freettcn::TE::CTestComponentType &>(module.Type(CModule::TYPE_IPStackType)))
     {
       // register test case parameters
@@ -450,7 +450,7 @@ namespace freettcn {
     CTC_ICMPPing_2::CTC_ICMPPing_2(freettcn::TE::CModule &module):
       freettcn::TE::CTestCase(module, "TC_ICMPPing_2", new freettcn::TE::CSourceData("icmp.ttcn", 109),
                               MY_CAST<const freettcn::TE::CTestComponentType &>(module.Type(CModule::TYPE_ICMPComponentType)),
-                              new CBehavior(module))
+                              *new CBehavior(module))
     {
       // register test case parameters
     }
@@ -515,12 +515,12 @@ namespace freettcn {
       Register(new CParameter("long", new freettcn::TE::CBooleanType::CInstance(freettcn::TE::CBasicTypes::Boolean(), true)));
       Register(new CParameter("count", new freettcn::TE::CIntegerType::CInstance(freettcn::TE::CBasicTypes::Integer())));
       
-      // register control behavior
-      Register(new CBehavior(*this), new freettcn::TE::CSourceData("icmp.ttcn", 115));
-      
       // register test cases
       Register(new CTC_ICMPPing_1(*this));
       Register(new CTC_ICMPPing_2(*this));
+      
+      // register control behavior
+      ControlBehavior(*new CBehavior(*this), new freettcn::TE::CSourceData("icmp.ttcn", 115));
     }
     
     void CModule::Cleanup()

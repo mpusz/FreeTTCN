@@ -34,7 +34,6 @@
 #include "freettcn/te/behavior.h"
 #include "freettcn/te/testCase.h"
 #include "freettcn/te/timer.h"
-#include "freettcn/te/ttcnWrappers.h"
 #include "freettcn/tools/logMask.h"
 #include "freettcn/tools/timeStamp.h"
 extern "C" {
