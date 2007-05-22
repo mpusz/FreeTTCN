@@ -32,6 +32,7 @@
 #include <freettcn/te/testCase.h>
 #include <freettcn/te/behavior.h>
 #include <freettcn/te/port.h>
+#include <freettcn/te/record.h>
 #include <freettcn/te/timer.h>
 #include <freettcn/te/basicTypes.h>
 #include <freettcn/te/sourceData.h>
@@ -44,52 +45,39 @@ namespace freettcn {
   
   namespace icmp {
 
-//     // ********** TYPES ***********
+    // ************************* T Y P E S *****************************
     
-//     class CICMPPingDataType {
-//     public:
-//       int id;
-//       int seqNumber;
-//       std::string *data;
-//       CICMPPingDataType(): data(0) {};
-//       virtual ~CICMPPingDataType()
-//       {
-//         if (data)
-//           delete data;
-//       }
-//     };
     
-//     class CICMPDataType {
-//     public:
-//       enum Selector {
-//         SELECTOR_ping
-//       };
-//       Selector _selector;
-      
-//       union {
-//         CICMPPingDataType *ping;
-//       };
-//       CICMPDataType(): ping(0) {};
-//       virtual ~CICMPDataType()
-//       {
-//         if (ping)
-//           delete ping;
-//       }
-//     };
+    class CICMPPingDataType : public freettcn::TE::CRecordType {
+    public:
+      enum {
+        FIELD_id,
+        FIELD_seqNumber,
+        FIELD_data
+      };
+      CICMPPingDataType(const freettcn::TE::CModule &module);
+    };
     
-//     class CICMPMsg {
-//     public:
-//       int msgType;
-//       int code;
-//       int *crc;
-//       CICMPDataType data;
-//       CICMPMsg(): crc(0) {};
-//       virtual ~CICMPMsg()
-//       {
-//         if (crc)
-//           delete crc;
-//       }
-//     };
+    /// @todo should be an union
+    class CICMPDataType : public freettcn::TE::CRecordType {
+    public:
+      enum {
+        FIELD_ping
+      };
+      CICMPDataType(const freettcn::TE::CModule &module);
+    };
+    
+    class CICMPMsg : public freettcn::TE::CRecordType {
+    public:
+      enum {
+        FIELD_msgType,
+        FIELD_code,
+        FIELD_crc,
+        FIELD_data
+      };
+      CICMPMsg(const freettcn::TE::CModule &module);
+    };
+    
     
     
     // ************************* P O R T S *****************************
@@ -272,6 +260,9 @@ namespace freettcn {
     class CModule : public freettcn::TE::CModule {
     public:
       enum {
+        TYPE_ICMPPingDataType,
+        TYPE_ICMPDataType,
+        TYPE_ICMPMsg,
         TYPE_ICMPComponentType,
         TYPE_IPStackType
       };
@@ -332,6 +323,38 @@ namespace freettcn {
     
     CModule CModule::_instance;
     
+    
+    
+
+    // ************************* T Y P E S *****************************
+    
+    CICMPPingDataType::CICMPPingDataType(const freettcn::TE::CModule &module):
+      freettcn::TE::CRecordType(module, "ICMPPingDataType", "", "", "")
+    {
+      Register(freettcn::TE::CBasicTypes::Integer(), "id");
+      Register(freettcn::TE::CBasicTypes::Integer(), "seqNumber");
+      /// @todo hexstring
+//       Register(module.Type(CModule::TYPE_ICMPDataType), "data", true);
+      Init();
+    }
+    
+    /// @todo should be of union type
+    CICMPDataType::CICMPDataType(const freettcn::TE::CModule &module):
+      freettcn::TE::CRecordType(module, "ICMPDataType", "", "", "")
+    {
+      Register(module.Type(CModule::TYPE_ICMPPingDataType), "ping");
+      Init();
+    }
+    
+    CICMPMsg::CICMPMsg(const freettcn::TE::CModule &module):
+      freettcn::TE::CRecordType(module, "ICMPMsg", "", "", "")
+    {
+      Register(freettcn::TE::CBasicTypes::Integer(), "msgType");
+      Register(freettcn::TE::CBasicTypes::Integer(), "code");
+      Register(freettcn::TE::CBasicTypes::Integer(), "crc");
+      Register(module.Type(CModule::TYPE_ICMPDataType), "data");
+      Init();
+    }
     
     
     
@@ -504,16 +527,25 @@ namespace freettcn {
     
     void CModule::Initialize()
     {
+      // register module types (without components)
+      Register(new CICMPPingDataType(*this));
+      Register(new CICMPDataType(*this));
+      Register(new CICMPMsg(*this));
+      
       // register port types
       Register(new CICMPPortType(*this));
       
-      // register module types
+      // register module components
       Register(new CICMPComponentType(*this));
       Register(new CIPStackType(*this));
       
       // register module parameters
       Register(new CParameter("long", new freettcn::TE::CBooleanType::CInstance(freettcn::TE::CBasicTypes::Boolean(), true)));
-      Register(new CParameter("count", new freettcn::TE::CIntegerType::CInstance(freettcn::TE::CBasicTypes::Integer())));
+      {
+        freettcn::TE::CIntegerType::CInstance *value = new freettcn::TE::CIntegerType::CInstance(freettcn::TE::CBasicTypes::Integer());
+        value->Omit(true);
+        Register(new CParameter("count", value));
+      }
       
       // register test cases
       Register(new CTC_ICMPPing_1(*this));

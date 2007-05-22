@@ -50,7 +50,6 @@ freettcn::TE::CVerdictType::CInstance::CInstance(const CType &type):
 freettcn::TE::CVerdictType::CInstance::CInstance(const CType &type, TVerdict value):
   freettcn::TE::CType::CInstance(type), _value(value)
 {
-  Omit(false);
 }
 
 freettcn::TE::TVerdict freettcn::TE::CVerdictType::CInstance::Value() const throw(EOmitSet)
@@ -63,5 +62,4 @@ freettcn::TE::TVerdict freettcn::TE::CVerdictType::CInstance::Value() const thro
 void freettcn::TE::CVerdictType::CInstance::Value(TVerdict value)
 {
   _value = value;
-  Omit(false);
 }

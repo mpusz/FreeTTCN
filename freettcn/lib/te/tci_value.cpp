@@ -23,6 +23,7 @@ extern "C" {
 }
 #include "freettcn/te/type.h"
 #include "freettcn/te/basicTypes.h"
+#include "freettcn/te/record.h"
 #include "freettcn/te/module.h"
 
 
@@ -141,18 +142,54 @@ void tciSetIntAbs(TciValue inst, String value)
 // }
 
 
-// TciValue tciGetRecFieldValue(TciValue inst, String fieldName)
+
+
+TciValue tciGetRecFieldValue(TciValue inst, String fieldName)
+{
+  if (!inst)
+    throw freettcn::ECastFailed();
+  
+  const freettcn::TE::CType::CInstance *val = static_cast<const freettcn::TE::CType::CInstance *>(inst);
+  const freettcn::TE::CRecordType::CInstance *record = dynamic_cast<const freettcn::TE::CRecordType::CInstance *>(val);
+  if (!record)
+    throw freettcn::ECastFailed();
+  
+  return &record->Field(fieldName);
+}
+
+
+// void tciSetRecFieldValue(TciValue inst, String fieldName, TciValue value)
 // {
-//   if (!inst)
-//     throw freettcn::ECastFailed();
-  
-//   const freettcn::TE::CType::CInstance *val = static_cast<const freettcn::TE::CType::CInstance *>(inst);
-//   const freettcn::TE::CRecordValue *record = dynamic_cast<const freettcn::TE::CRecordValue *>(val);
-//   if (!record)
-//     throw freettcn::ECastFailed();
-  
-//   return record->Field(fieldName);
 // }
+
+
+char** tciGetRecFieldNames(TciValue inst)
+{
+  if (!inst)
+    throw freettcn::ECastFailed();
+  
+  const freettcn::TE::CType::CInstance *val = static_cast<const freettcn::TE::CType::CInstance *>(inst);
+  const freettcn::TE::CRecordType::CInstance *record = dynamic_cast<const freettcn::TE::CRecordType::CInstance *>(val);
+  if (!record)
+    throw freettcn::ECastFailed();
+  
+  return const_cast<char **>(record->FieldNames());
+}
+
+
+void tciSetFieldOmitted(TciValue inst, String fieldName)
+{
+  if (!inst)
+    throw freettcn::ECastFailed();
+  
+  const freettcn::TE::CType::CInstance *val = static_cast<const freettcn::TE::CType::CInstance *>(inst);
+  const freettcn::TE::CRecordType::CInstance *record = dynamic_cast<const freettcn::TE::CRecordType::CInstance *>(val);
+  if (!record)
+    throw freettcn::ECastFailed();
+  
+  record->Field(fieldName).Omit(true);
+}
+
 
 
 

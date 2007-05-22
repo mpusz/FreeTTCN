@@ -50,7 +50,6 @@ freettcn::TE::CBooleanType::CInstance::CInstance(const CType &type) :
 freettcn::TE::CBooleanType::CInstance::CInstance(const CType &type, bool value) :
   freettcn::TE::CType::CInstance(type), _value(value)
 {
-  Omit(false);
 }
 
 bool freettcn::TE::CBooleanType::CInstance::Value() const throw(EOmitSet)
@@ -63,5 +62,4 @@ bool freettcn::TE::CBooleanType::CInstance::Value() const throw(EOmitSet)
 void freettcn::TE::CBooleanType::CInstance::Value(bool value)
 {
   _value = value;
-  Omit(false);
 }

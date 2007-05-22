@@ -51,7 +51,6 @@ freettcn::TE::CIntegerType::CInstance::CInstance(const CType &type) :
 freettcn::TE::CIntegerType::CInstance::CInstance(const CType &type, long value) :
   freettcn::TE::CType::CInstance(type), _value(value)
 {
-  Omit(false);
 }
 
 void freettcn::TE::CIntegerType::CInstance::AbsValue(const char *value) throw(EOperationFailed)
@@ -92,5 +91,4 @@ long freettcn::TE::CIntegerType::CInstance::Value() const throw(EOmitSet)
 void freettcn::TE::CIntegerType::CInstance::Value(long value)
 {
   _value = value;
-  Omit(false);
 }

@@ -41,15 +41,15 @@ freettcn::CTriComponentId::CTriComponentId(const TriComponentId &id)
   
   unsigned int size = strlen(id.compName) + 1;
   _id.compName = new char[size];
-  memmove(_id.compName, id.compName, size);
+  strcpy(_id.compName, id.compName);
   
   size = strlen(id.compType.moduleName) + 1;
   _id.compType.moduleName = new char[size];
-  memmove(_id.compType.moduleName, id.compType.moduleName, size);
+  strcpy(_id.compType.moduleName, id.compType.moduleName);
   
   size = strlen(id.compType.objectName) + 1;
   _id.compType.objectName = new char[size];
-  memmove(_id.compType.objectName, id.compType.objectName, size);
+  strcpy(_id.compType.objectName, id.compType.objectName);
 }
 
 freettcn::CTriComponentId::~CTriComponentId()

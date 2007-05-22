@@ -93,16 +93,6 @@ namespace freettcn {
     };
     
     
-//     class CRecordType : public CType {
-//     public:
-//       CRecordType(const CModule    &module,
-//                   String           encoding,
-//                   String           encodingVariant,
-//                   String           extension);
-//       virtual CValue *InstanceCreate() const;
-//     };
-
-  
 //     class CFloatValue : public CValue {
 //       float _value;
 //     public:
@@ -206,15 +196,6 @@ namespace freettcn {
 //       char** VariantNames() const;
 //     };
   
-//     class CRecordValue : public CValue {
-//       TciValue _value;
-//     public:
-//       CRecordValue(const CType &type);
-//       TciValue Field(String fieldName) const;
-//       void Field(String fieldName, TciValue value);
-//       char** FieldNames() const;
-//     };
-    
 //     class CRecordOfValue : public CValue {
 //       TciValue _value;
 //     public:

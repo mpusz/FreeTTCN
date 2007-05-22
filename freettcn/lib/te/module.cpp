@@ -337,7 +337,7 @@ freettcn::TE::CTestCase &freettcn::TE::CModule::TestCase(unsigned int tcIdx) con
   if (tcIdx < _testCaseArray.size())
     return *_testCaseArray[tcIdx];
   
-  std::cout << "ERROR: Type index: " << tcIdx << " too big (size: " << _testCaseArray.size() << ")" << std::endl;
+  std::cout << "ERROR: Test Case index: " << tcIdx << " too big (size: " << _testCaseArray.size() << ")" << std::endl;
   throw ENotFound();
 }
 

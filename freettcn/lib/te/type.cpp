@@ -92,7 +92,7 @@ const char *freettcn::TE::CType::Extension() const
 
 
 freettcn::TE::CType::CInstance::CInstance(const CType &type) :
-  _type(type), _omit(true)
+  _type(type), _omit(false)
 {
 }
 
