@@ -91,4 +91,5 @@ classes:
 	$(Q)$(EBROWSE) -s freettcn/lib/include/freettcn/*/*.h freettcn/lib/*/*.cpp libenv/include/freettcn/*/*.h example/*/*.cpp #libenv/*/*.cpp
 
 doc:
+	$(Q)$(SED) -i -e 's/\(PROJECT_NUMBER.*=\).*/\1 $(VERSION)/' doc/Doxyfile
 	$(Q)$(DOXYGEN) $(DOC_DIR)/Doxyfile

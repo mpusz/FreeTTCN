@@ -18,7 +18,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /**
- * @file   ip.cpp
+ * @file   icmp.cpp
  * @author Mateusz Pusz
  * @date   Sun Apr  8 19:33:57 2007
  * 

@@ -34,7 +34,9 @@
 #define __TYPES_H__
 
 /**
- * @mainpage Abbreviations
+ * @mainpage The FreeTTCN API documentation
+ *
+ * Abbreviations:
  *
  * @b MTC   - Main Test Component @n
  * @b PA    - Platform Adapter @n

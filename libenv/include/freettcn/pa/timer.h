@@ -19,7 +19,7 @@
 
 
 /**
- * @file   timer.h
+ * @file   pa/timer.h
  * @author Mateusz Pusz
  * @date   Mon May  7 13:19:21 2007
  * 

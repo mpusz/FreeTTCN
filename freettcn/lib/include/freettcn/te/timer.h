@@ -18,7 +18,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /**
- * @file   timer.h
+ * @file   te/timer.h
  * @author Mateusz Pusz
  * @date   Wed Apr 25 10:59:31 2007
  * 
