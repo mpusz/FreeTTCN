@@ -69,7 +69,7 @@ void Usage()
 }
 
 
-void Start(CCLITestManagement &tm, const std::string &testCase)
+void Start(freettcn::example::CCLITestManagement &tm, const std::string &testCase)
 {
   // set module parameters
   tm.ParametersSet();
@@ -86,7 +86,7 @@ void Start(CCLITestManagement &tm, const std::string &testCase)
   // initiate all entities
   freettcn::CH::CComponentHandler ch;
   //     freettcn::CD::CComponentHandler cd;
-  CGlibPlatformAdaptor pa;
+  freettcn::example::CGlibPlatformAdaptor pa;
   freettcn::SA::CSUTAdaptor sa;
   freettcn::TL::CTestLogging tl(logger);
     
@@ -213,8 +213,8 @@ int main (int argc, char **argv)
   }
   
   // init test management
-  CGlibMainLoop mainLoop;
-  CCLITestManagement tm(mainLoop);
+  freettcn::example::CGlibMainLoop mainLoop;
+  freettcn::example::CCLITestManagement tm(mainLoop);
   
   try {
     // init module
