@@ -36,33 +36,40 @@
 #include <glib.h>
 
 
-class CGlibPlatformAdaptor : public freettcn::PA::CPlatformAdaptor {
-  class CTimer : public freettcn::PA::CTimer {
-    enum TState {
-      STOPPED,
-      STARTED
-    };
-    
-    guint _id;
-    TState _state;
-    
-    static gboolean CallbackFunc(gpointer data);
-    
-    TState State() const;
-    void State(TState state);
-    
-  public:
-    CTimer(const TriTimerId &timerId);
-    ~CTimer();
-    
-    virtual void Start(TriTimerDuration duration) throw(freettcn::EOperationFailed);
-    virtual void Stop() throw(freettcn::EOperationFailed);
-    virtual TriTimerDuration Read() const throw(freettcn::EOperationFailed);
-    virtual bool Running() const throw(freettcn::EOperationFailed);
-  };
+namespace freettcn {
   
-  virtual CTimer *TimerCreate(const TriTimerId &timerId) const;
-};
+  namespace example {
+    
+    class CGlibPlatformAdaptor : public freettcn::PA::CPlatformAdaptor {
+      class CTimer : public freettcn::PA::CTimer {
+        enum TState {
+          STOPPED,
+          STARTED
+        };
+    
+        guint _id;
+        TState _state;
+    
+        static gboolean CallbackFunc(gpointer data);
+    
+        TState State() const;
+        void State(TState state);
+    
+      public:
+        CTimer(const TriTimerId &timerId);
+        ~CTimer();
+    
+        virtual void Start(TriTimerDuration duration) throw(freettcn::EOperationFailed);
+        virtual void Stop() throw(freettcn::EOperationFailed);
+        virtual TriTimerDuration Read() const throw(freettcn::EOperationFailed);
+        virtual bool Running() const throw(freettcn::EOperationFailed);
+      };
+  
+      virtual CTimer *TimerCreate(const TriTimerId &timerId) const;
+    };
 
+  } // namespace example
+  
+} // namespace freettcn
 
 #endif /* __GLIBPLATFORMADAPTOR_H__ */

@@ -21,25 +21,25 @@
 #include "glibMainLoop.h"
 
 
-CGlibMainLoop::CGlibMainLoop():
+freettcn::example::CGlibMainLoop::CGlibMainLoop():
   _loop(0)
 {
 }
 
-CGlibMainLoop::~CGlibMainLoop()
+freettcn::example::CGlibMainLoop::~CGlibMainLoop()
 {
   if (_loop)
     g_main_loop_quit(_loop);
 }
 
-void CGlibMainLoop::Start()
+void freettcn::example::CGlibMainLoop::Start()
 {
   // create main event loop
   _loop = g_main_loop_new(0, FALSE);
   g_main_loop_run(_loop);
 }
 
-void CGlibMainLoop::Stop()
+void freettcn::example::CGlibMainLoop::Stop()
 {
   g_main_loop_quit(_loop);
   _loop = 0;

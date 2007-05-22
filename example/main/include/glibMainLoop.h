@@ -34,15 +34,21 @@
 #include "cliTestManagement.h"
 #include <glib.h>
 
+namespace freettcn {
+  
+  namespace example {
+    
+    class CGlibMainLoop : public CCLITestManagement::CMainLoop {
+      GMainLoop *_loop;
+    public:
+      CGlibMainLoop();
+      ~CGlibMainLoop();
+      virtual void Start();
+      virtual void Stop();
+    };
 
-class CGlibMainLoop : public CCLITestManagement::CMainLoop {
-  GMainLoop *_loop;
-public:
-  CGlibMainLoop();
-  ~CGlibMainLoop();
-  virtual void Start();
-  virtual void Stop();
-};
-
+  } // namespace example
+  
+} // namespace freettcn
 
 #endif /* __GLIBMAINLOOP_H__ */

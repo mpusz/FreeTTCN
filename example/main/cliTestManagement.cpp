@@ -28,13 +28,13 @@ extern "C" {
 #include <iomanip>
 
 
-CCLITestManagement::CCLITestManagement(CMainLoop &mainLoop):
+freettcn::example::CCLITestManagement::CCLITestManagement(CMainLoop &mainLoop):
   _mainLoop(mainLoop)
 {
 }
 
 
-void CCLITestManagement::ParameterDump(const CModuleParameter &param) const
+void freettcn::example::CCLITestManagement::ParameterDump(const CModuleParameter &param) const
 {
   const unsigned short NAME_WIDTH = 15;
   const unsigned short TYPE_WIDTH = 35;
@@ -73,7 +73,7 @@ void CCLITestManagement::ParameterDump(const CModuleParameter &param) const
 }
 
 
-void CCLITestManagement::ModuleInfoPrint() const
+void freettcn::example::CCLITestManagement::ModuleInfoPrint() const
 {
   const TModuleParList &modParList = ModuleParameterList();
   
@@ -89,7 +89,7 @@ void CCLITestManagement::ModuleInfoPrint() const
 }
 
 
-void CCLITestManagement::TestCasesPrint() const
+void freettcn::example::CCLITestManagement::TestCasesPrint() const
 {
   const TTCList &tcList = TCList();
   for(TTCList::const_iterator it=tcList.begin(); it != tcList.end(); ++it) {
@@ -99,7 +99,7 @@ void CCLITestManagement::TestCasesPrint() const
 }
 
 
-void CCLITestManagement::TestCasesInfoPrint(const std::string &testCaseId) const throw(freettcn::ENotFound)
+void freettcn::example::CCLITestManagement::TestCasesInfoPrint(const std::string &testCaseId) const throw(freettcn::ENotFound)
 {
   CTestCase &tc = TestCaseGet(testCaseId);
   
@@ -124,7 +124,7 @@ void CCLITestManagement::TestCasesInfoPrint(const std::string &testCaseId) const
 }
 
 
-void CCLITestManagement::ParametersSet() const
+void freettcn::example::CCLITestManagement::ParametersSet() const
 {
   using namespace std;
   
@@ -207,14 +207,14 @@ void CCLITestManagement::ParametersSet() const
 }
 
 
-void CCLITestManagement::TestCaseStart(const std::string &testCaseId, const TciParameterListType &parameterlist) throw(freettcn::ENotFound)
+void freettcn::example::CCLITestManagement::TestCaseStart(const std::string &testCaseId, const TciParameterListType &parameterlist) throw(freettcn::ENotFound)
 {
   freettcn::TM::CTestManagement::TestCaseStart(testCaseId, parameterlist);
   _mainLoop.Start();
 }
 
 
-void CCLITestManagement::TestCaseTerminated(TciVerdictValue verdict, const TciParameterListType &parameterlist)
+void freettcn::example::CCLITestManagement::TestCaseTerminated(TciVerdictValue verdict, const TciParameterListType &parameterlist)
 {
   TStatus status = Status();
   freettcn::TM::CTestManagement::TestCaseTerminated(verdict, parameterlist);
@@ -223,7 +223,7 @@ void CCLITestManagement::TestCaseTerminated(TciVerdictValue verdict, const TciPa
 }
 
 
-void CCLITestManagement::TestCaseStop() throw(freettcn::EOperationFailed)
+void freettcn::example::CCLITestManagement::TestCaseStop() throw(freettcn::EOperationFailed)
 {
   TStatus status = Status();
   freettcn::TM::CTestManagement::TestCaseStop();
@@ -234,21 +234,21 @@ void CCLITestManagement::TestCaseStop() throw(freettcn::EOperationFailed)
 
 
 
-void CCLITestManagement::ControlStart()
+void freettcn::example::CCLITestManagement::ControlStart()
 {
   freettcn::TM::CTestManagement::ControlStart();
   _mainLoop.Start();
 }
 
 
-void CCLITestManagement::ControlStop() throw(freettcn::EOperationFailed)
+void freettcn::example::CCLITestManagement::ControlStop() throw(freettcn::EOperationFailed)
 {
   freettcn::TM::CTestManagement::ControlStop();
   _mainLoop.Stop();
 }
 
 
-void CCLITestManagement::ControlTerminated()
+void freettcn::example::CCLITestManagement::ControlTerminated()
 {
   freettcn::TM::CTestManagement::ControlTerminated();
   _mainLoop.Stop();
@@ -258,6 +258,6 @@ void CCLITestManagement::ControlTerminated()
 
 
 
-CCLITestManagement::CMainLoop::~CMainLoop()
+freettcn::example::CCLITestManagement::CMainLoop::~CMainLoop()
 {
 }

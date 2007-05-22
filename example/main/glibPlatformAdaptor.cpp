@@ -23,20 +23,20 @@
 #include <cmath>
 
 
-CGlibPlatformAdaptor::CTimer::CTimer(const TriTimerId &timerId):
+freettcn::example::CGlibPlatformAdaptor::CTimer::CTimer(const TriTimerId &timerId):
   freettcn::PA::CTimer(timerId), _state(STOPPED)
 {
 }
 
 
-CGlibPlatformAdaptor::CTimer::~CTimer()
+freettcn::example::CGlibPlatformAdaptor::CTimer::~CTimer()
 {
 //   if (gSource)
 //     ;
 }
 
 
-gboolean CGlibPlatformAdaptor::CTimer::CallbackFunc(gpointer data)
+gboolean freettcn::example::CGlibPlatformAdaptor::CTimer::CallbackFunc(gpointer data)
 {
   CTimer *timer = static_cast<CTimer *>(data);
   timer->Timeout();
@@ -46,19 +46,19 @@ gboolean CGlibPlatformAdaptor::CTimer::CallbackFunc(gpointer data)
 }
 
 
-CGlibPlatformAdaptor::CTimer::TState CGlibPlatformAdaptor::CTimer::State() const
+freettcn::example::CGlibPlatformAdaptor::CTimer::TState freettcn::example::CGlibPlatformAdaptor::CTimer::State() const
 {
   return _state;
 }
 
 
-void CGlibPlatformAdaptor::CTimer::State(TState state)
+void freettcn::example::CGlibPlatformAdaptor::CTimer::State(TState state)
 {
   _state = state;
 }
 
 
-void CGlibPlatformAdaptor::CTimer::Start(TriTimerDuration duration) throw(freettcn::EOperationFailed)
+void freettcn::example::CGlibPlatformAdaptor::CTimer::Start(TriTimerDuration duration) throw(freettcn::EOperationFailed)
 {
   _id = g_timeout_add_full(G_PRIORITY_HIGH, static_cast<guint>(round(duration * 1000)),
                            CallbackFunc, this, 0);
@@ -66,7 +66,7 @@ void CGlibPlatformAdaptor::CTimer::Start(TriTimerDuration duration) throw(freett
 }
 
 
-void CGlibPlatformAdaptor::CTimer::Stop() throw(freettcn::EOperationFailed)
+void freettcn::example::CGlibPlatformAdaptor::CTimer::Stop() throw(freettcn::EOperationFailed)
 {
   if (!g_source_remove(_id))
     throw freettcn::EOperationFailed();
@@ -74,13 +74,13 @@ void CGlibPlatformAdaptor::CTimer::Stop() throw(freettcn::EOperationFailed)
 }
 
 
-TriTimerDuration CGlibPlatformAdaptor::CTimer::Read() const throw(freettcn::EOperationFailed)
+TriTimerDuration freettcn::example::CGlibPlatformAdaptor::CTimer::Read() const throw(freettcn::EOperationFailed)
 {
   return 0;
 }
 
 
-bool CGlibPlatformAdaptor::CTimer::Running() const throw(freettcn::EOperationFailed)
+bool freettcn::example::CGlibPlatformAdaptor::CTimer::Running() const throw(freettcn::EOperationFailed)
 {
   return _state == STARTED;
 }
@@ -88,7 +88,7 @@ bool CGlibPlatformAdaptor::CTimer::Running() const throw(freettcn::EOperationFai
 
 
 
-CGlibPlatformAdaptor::CTimer *CGlibPlatformAdaptor::TimerCreate(const TriTimerId &timerId) const
+freettcn::example::CGlibPlatformAdaptor::CTimer *freettcn::example::CGlibPlatformAdaptor::TimerCreate(const TriTimerId &timerId) const
 {
   return new CTimer(timerId);
 }

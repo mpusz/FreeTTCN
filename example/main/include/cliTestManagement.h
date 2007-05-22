@@ -33,39 +33,46 @@
 
 #include <freettcn/tm/tm.h>
 
+namespace freettcn {
+  
+  namespace example {
+    
+    class CCLITestManagement : public freettcn::TM::CTestManagement {
+    public:
+      class CMainLoop {
+      public:
+        virtual ~CMainLoop() = 0;
+        virtual void Start() = 0;
+        virtual void Stop() = 0;
+      };
+  
+    private:
+      CMainLoop &_mainLoop;
 
-class CCLITestManagement : public freettcn::TM::CTestManagement {
-public:
-  class CMainLoop {
-  public:
-    virtual ~CMainLoop() = 0;
-    virtual void Start() = 0;
-    virtual void Stop() = 0;
-  };
+    protected:
+      void ParameterDump(const CModuleParameter &param) const;
   
-private:
-  CMainLoop &_mainLoop;
+    public:
+      CCLITestManagement(CMainLoop &mainLoop);
+  
+      void ModuleInfoPrint() const;
+  
+      void TestCasesPrint() const;
+      void TestCasesInfoPrint(const std::string &testCaseId) const throw(freettcn::ENotFound);
+  
+      virtual void ParametersSet() const;
+  
+      virtual void TestCaseStart(const std::string &testCaseId, const TciParameterListType &parameterlist) throw(freettcn::ENotFound);
+      virtual void TestCaseTerminated(TciVerdictValue verdict, const TciParameterListType &parameterlist);
+      virtual void TestCaseStop() throw(freettcn::EOperationFailed);
+  
+      virtual void ControlStart();
+      virtual void ControlStop() throw(freettcn::EOperationFailed);
+      virtual void ControlTerminated();
+    };
 
-protected:
-  void ParameterDump(const CModuleParameter &param) const;
+  } // namespace example
   
-public:
-  CCLITestManagement(CMainLoop &mainLoop);
-  
-  void ModuleInfoPrint() const;
-  
-  void TestCasesPrint() const;
-  void TestCasesInfoPrint(const std::string &testCaseId) const throw(freettcn::ENotFound);
-  
-  virtual void ParametersSet() const;
-  
-  virtual void TestCaseStart(const std::string &testCaseId, const TciParameterListType &parameterlist) throw(freettcn::ENotFound);
-  virtual void TestCaseTerminated(TciVerdictValue verdict, const TciParameterListType &parameterlist);
-  virtual void TestCaseStop() throw(freettcn::EOperationFailed);
-  
-  virtual void ControlStart();
-  virtual void ControlStop() throw(freettcn::EOperationFailed);
-  virtual void ControlTerminated();
-};
+} // namespace freettcn
 
 #endif /* __CLITESTMANAGEMENT_H__ */
