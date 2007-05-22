@@ -25,6 +25,10 @@
  * @brief  TTCN-3 Executable TE => CH operation interface (TCI-CH provided)
  * 
  * This header specifies the operations the CH shall provide to the TE.
+ *
+ * @remarks This file implements interfaces specified in the ETSI standards:
+ *  - ES 201 873-6: "Methods for Testing and Specification (MTS); The Testing and Test Control Notation version 3; Part 6: TTCN-3 Control Interface (TCI)"
+ *
  */
 
 #ifndef __TCI_TE_CH_H__
@@ -60,9 +64,9 @@
  * 
  * Sends an asynchronous transmission only to the given receiver component. CH transmits the
  * message to the remote TE on which receiver is being executed and enqueues the data in the
- * remote TE. @n
- * @n
- * This operation shall be called by the TE when it executes a TTCN-3 unicast send operation on a
+ * remote TE.
+ * 
+ * @remarks This operation shall be called by the TE when it executes a TTCN-3 unicast send operation on a
  * component port, which has been connected to another component port.
  * 
  * @param sender Port identifier at the sending component via which the message is sent.
@@ -79,9 +83,9 @@ void tciSendConnected(TriPortId sender,
  * 
  * Sends an asynchronous transmission to all components being connected to this port. CH transmits
  * the message to all remote TEs on which receivers are being executed and enqueues the data in
- * the remote TEs. @n
- * @n
- * This operation shall be called by the TE when it executes a TTCN-3 broadcast send operation on a
+ * the remote TEs.
+ * 
+ * @remarks This operation shall be called by the TE when it executes a TTCN-3 broadcast send operation on a
  * component port, which has been connected to other component ports.
  * 
  * @param sender Port identifier at the sending component via which the message is sent.
@@ -95,9 +99,9 @@ void tciSendConnectedBC(TriPortId sender,
  * @brief Sends an asynchronous transmission to all given receiver components.
  * 
  * Sends an asynchronous transmission to all given receiver components. CH transmits the message
- * to all remote TEs on which receivers are being executed and enqueues the data in the remote TEs. @n
- * @n
- * This operation shall be called by the TE when it executes a TTCN-3 multicast send operation on a
+ * to all remote TEs on which receivers are being executed and enqueues the data in the remote TEs.
+ * 
+ * @remarks This operation shall be called by the TE when it executes a TTCN-3 multicast send operation on a
  * component port, which has been connected to other component ports.
  * 
  * @param sender Port identifier at the sending component via which the message is sent.
@@ -119,9 +123,9 @@ void tciSendConnectedMC(TriPortId sender,
  * tciCallConnected() operation signature. The TE is responsible to address this issue by starting
  * a timer for the TTCN-3 call operation in the PA with a separate TRI operation call, i.e.
  * triStartTimer(). CH transmits the call to the remote TE on which @p receiver is being executed
- * and enqueues the call in the remote TE. @n
- * @n
- * This operation shall be called by the TE when it executes a TTCN-3 unicast call operation on a
+ * and enqueues the call in the remote TE.
+ * 
+ * @remarks This operation shall be called by the TE when it executes a TTCN-3 unicast call operation on a
  * component port, which has been connected to another component port. All @e in and @e inout procedure
  * parameters contain values. All @e out procedure parameters shall contain the distinct value of @c null
  * because they are only of relevance in a reply to the procedure call but not in the procedure call
@@ -150,9 +154,9 @@ void tciCallConnected(TriPortId sender,
  * tciCallConnectedBC() operation signature. The TE is responsible to address this issue by starting a
  * timer for the TTCN-3 call operation in the PA with a separate TRI operation call, i.e.
  * triStartTimer(). CH transmits the call to all remote TEs on which @p receiver is being executed
- * and enqueues the call in the remote TEs. @n
- * @n
- * This operation shall be called by the TE when it executes a TTCN-3 broadcast call operation on a
+ * and enqueues the call in the remote TEs.
+ * 
+ * @remarks This operation shall be called by the TE when it executes a TTCN-3 broadcast call operation on a
  * component port, which has been connected to other component ports. All @e in and @e inout procedure
  * parameters contain values. All @e out procedure parameters shall contain the distinct value of @c null
  * because they are only of relevance in a reply to the procedure call but not in the procedure call itself.
@@ -179,9 +183,9 @@ void tciCallConnectedBC(TriPortId sender,
  * tciCallConnectedMC() operation signature. The TE is responsible to address this issue by starting a
  * timer for the TTCN-3 call operation in the PA with a separate TRI operation call, i.e.
  * triStartTimer(). CH transmits the call to all remote TEs on which @p receiver is being executed
- * and enqueues the call in the remote TEs. @n
- * @n
- * This operation shall be called by the TE when it executes a TTCN-3 multicast call operation on a
+ * and enqueues the call in the remote TEs.
+ * 
+ * @remarks This operation shall be called by the TE when it executes a TTCN-3 multicast call operation on a
  * component port, which has been connected to other component ports. All @e in and @e inout procedure
  * parameters contain values. All @e out procedure parameters shall contain the distinct value of @c null
  * because they are only of relevance in a reply to the procedure call but not in the procedure call itself.
@@ -205,9 +209,9 @@ void tciCallConnectedMC(TriPortId sender,
  * 
  * On invocation of this operation the CH can issue the reply to a procedure call corresponding to the
  * signature identifier @p signature and component identifier @p receiver. CH transmits the reply to the
- * remote TE on which @p receiver is being executed and enqueues the reply in the remote TE. @n
- * @n
- * This operation shall be called by the TE when it executes a TTCN-3 unicast reply operation on a
+ * remote TE on which @p receiver is being executed and enqueues the reply in the remote TE.
+ * 
+ * @remarks This operation shall be called by the TE when it executes a TTCN-3 unicast reply operation on a
  * component port which has been connected to another component port.
  * All @e out and @e inout procedure parameters and the return value contain values. All @e in procedure
  * parameters shall contain the distinct value of @c null since they are only of relevance to the procedure
@@ -239,9 +243,9 @@ void tciReplyConnected(TriPortId sender,
  * On invocation of this operation the CH can issue the reply to a procedure call corresponding to the
  * signature identifier @p signature and all components connected to @p sender. CH transmits the
  * exception to all remote TEs on which receivers are being executed and enqueues the exception in
- * the remote TEs. @n
- * @n
- * This operation shall be called by the TE when it executes a TTCN-3 broadcast reply operation on a
+ * the remote TEs.
+ * 
+ * @remarks This operation shall be called by the TE when it executes a TTCN-3 broadcast reply operation on a
  * component port which has been connected to other component ports.
  * All @e out and @e inout procedure parameters and the return value contain values. All @e in procedure
  * parameters shall contain the distinct value of @c null since they are only of relevance to the
@@ -271,9 +275,9 @@ void tciReplyConnectedBC(TriPortId sender,
  * On invocation of this operation the CH can issue the reply to a procedure call corresponding to the
  * signature identifier @p signature and one of the component identifier in @p receivers. CH transmits
  * the reply to the remote TEs on which receivers are being executed and enqueues the reply in
- * the remote TEs. @n
- * @n
- * This operation shall be called by the TE when it executes a TTCN-3 multicast reply operation on a
+ * the remote TEs.
+ * 
+ * @remarks This operation shall be called by the TE when it executes a TTCN-3 multicast reply operation on a
  * component port which has been connected to other component ports.
  * All @e out and @e inout procedure parameters and the return value contain values. All @e in procedure
  * parameters shall contain the distinct value of @c null since they are only of relevance to the
@@ -305,9 +309,9 @@ void tciReplyConnectedMC(TriPortId sender,
  * On invocation of this operation the CH can raise an exception to a procedure call corresponding to
  * the signature identifier @p signature and component identifier @p receiver.
  * CH transmits the exception to the remote TE on which @p receiver is being executed and enqueues
- * the exception in the remote TE. @n
- * @n
- * This operation shall be called by the TE when it executes a TTCN-3 unicast raise operation on a
+ * the exception in the remote TE.
+ * 
+ * @remarks This operation shall be called by the TE when it executes a TTCN-3 unicast raise operation on a
  * component port which has been connected to another component port.
  * 
  * @param sender Identifier of the port sending the reply.
@@ -327,9 +331,9 @@ void tciRaiseConnected(TriPortId sender,
  * On invocation of this operation the CH can raise an exception to a procedure call corresponding
  * to the signature identifier @p signature and all components connected to @p sender. CH
  * transmits the exception to all remote TEs on which receivers are being executed and enqueues
- * the exception in the remote TEs. @n
- * @n
- * This operation shall be called by the TE when it executes a TTCN-3 broadcast raise operation
+ * the exception in the remote TEs.
+ * 
+ * @remarks This operation shall be called by the TE when it executes a TTCN-3 broadcast raise operation
  * on a component port which has been connected to other component ports.
  * 
  * @param sender Identifier of the port sending the reply.
@@ -347,9 +351,9 @@ void tciRaiseConnectedBC(TriPortId sender,
  * On invocation of this operation the CH can raise an exception to a procedure call corresponding to
  * the signature identifier @p signature and one of the component identifier @p receivers. CH transmits
  * the exception to all remote TEs on which @p receivers are being executed and enqueues the
- * exception in the remote TEs. @n
- * @n
- * This operation shall be called by the TE when it executes a TTCN-3 multicast raise operation on a
+ * exception in the remote TEs.
+ * 
+ * @remarks This operation shall be called by the TE when it executes a TTCN-3 multicast raise operation on a
  * component port which has been connected to another component port.
  * 
  * @param sender Identifier of the port sending the reply.
@@ -367,9 +371,9 @@ void tciRaiseConnectedMC(TriPortId sender,
  * @brief CH transmits the component creation request to the remote TE.
  * 
  * CH transmits the component creation request to the remote TE and calls there the
- * tciCreateTestComponent() operation to obtain a component identifier for this component. @n
- * @n
- * This operation shall be called from the TE when a component has to be created, either explicitly
+ * tciCreateTestComponent() operation to obtain a component identifier for this component.
+ * 
+ * @remarks This operation shall be called from the TE when a component has to be created, either explicitly
  * when the TTCN-3 create operation is called or implicitly when the master test component (MTC)
  * or a control component has to be created. @p name shall be set to the distinct value @c null if no name
  * is given in the TTCN-3 create statement.
@@ -389,9 +393,9 @@ TriComponentId tciCreateTestComponentReq(TciTestComponentKindType kind,
  * @brief CH transmits the start component request to the remote TE
  * 
  * CH transmits the start component request to the remote TE and calls there the
- * tciStartTestComponent() operation. @n
- * @n
- * This operation shall be called by the TE when it executes the TTCN-3 start operation. Since only @e in
+ * tciStartTestComponent() operation.
+ * 
+ * @remarks This operation shall be called by the TE when it executes the TTCN-3 start operation. Since only @e in
  * parameters are allowed for functions being started (ES 201 873-1 [2]), @p parameterList contains
  * only @e in parameters.
  * 
@@ -415,9 +419,9 @@ void tciStartTestComponentReq(TriComponentId component,
  * @brief CH transmits the stop component request to the remote TE.
  * 
  * CH transmits the stop component request to the remote TE and calls there the
- * tciStopTestComponent() operation. @n
- * @n
- * This operation shall be called by the TE when it executes the TTCN-3 stop operation.
+ * tciStopTestComponent() operation.
+ * 
+ * @remarks This operation shall be called by the TE when it executes the TTCN-3 stop operation.
  * 
  * @param component Identifier of the component to be stopped.
  */
@@ -430,9 +434,9 @@ void tciStopTestComponentReq(TriComponentId component);
  * CH transmits the connection request to the remote TE where it calls the tciConnect() operation to
  * establish a logical connection between the two indicated ports. Note that both ports can be on
  * remote TEs. In this case, the operation returns only after calling the tciConnect() operation on both
- * remote TEs. @n
- * @n
- * This operation shall be called by the TE when it executes a TTCN-3 connect operation.
+ * remote TEs.
+ * 
+ * @remarks This operation shall be called by the TE when it executes a TTCN-3 connect operation.
  * 
  * @param fromPort Identifier of the test component port to be connected from.
  * @param toPort Identifier of the test component port to be connected to.
@@ -447,9 +451,9 @@ void tciConnectReq(TriPortId fromPort,
  * CH transmits the disconnect request to the remote TE where it calls the tciDisconnect()
  * operation to tear down the logical connection between the two indicated ports. Note that both
  * ports can be on remote TEs. In this case, the operation returns only after calling the
- * tciDisconnect() operation on both remote TEs. @n
- * @n
- * This operation shall be called by the TE when it executes a TTCN-3 disconnect operation.
+ * tciDisconnect() operation on both remote TEs.
+ * 
+ * @remarks This operation shall be called by the TE when it executes a TTCN-3 disconnect operation.
  * 
  * @param fromPort Identifier of the test component port to be disconnected.
  * @param toPort Identifier of the test component port to be disconnected.
@@ -462,9 +466,9 @@ void tciDisconnectReq(TriPortId fromPort,
  * @brief CH transmits the map request to the remote TE.
  * 
  * CH transmits the map request to the remote TE where it calls the tciMap() operation to
- * establish a logical connection between the two indicated ports. @n
- * @n
- * This operation shall be called by the TE when it executes a TTCN-3 map operation.
+ * establish a logical connection between the two indicated ports.
+ * 
+ * @remarks This operation shall be called by the TE when it executes a TTCN-3 map operation.
  * 
  * @param fromPort Identifier of the test component port to be mapped from.
  * @param toPort Identifier of the test component port to be mapped to.
@@ -477,9 +481,9 @@ void tciMapReq(TriPortId fromPort,
  * @brief CH transmits the unmap request to the remote TE.
  * 
  * CH transmits the unmap request to the remote TE where it calls the tciUnmap() operation to
- * tear down the logical connection between the two indicated ports. @n
- * @n
- * This operation shall be called by the TE when it executes a TTCN-3 unmap operation.
+ * tear down the logical connection between the two indicated ports.
+ * 
+ * @remarks This operation shall be called by the TE when it executes a TTCN-3 unmap operation.
  * 
  * @param fromPort Identifier of the test component port to be unmapped.
  * @param toPort Identifier of the test component port to be unmapped.
@@ -495,9 +499,9 @@ void tciUnmapReq(TriPortId fromPort,
  * executed on a test component can only have @e in parameters (ES 201 873-1 [2]), the
  * tciTestComponentTerminateReq() operation does not have a @p parameterList parameter.
  * CH communicates the termination of the indicated component to all participating TEs and to the
- * special TE*, which keeps track of the overall verdict. @n
- * @n
- * This operation shall be called by the TE when a test component terminates execution, either
+ * special TE*, which keeps track of the overall verdict.
+ * 
+ * @remarks This operation shall be called by the TE when a test component terminates execution, either
  * explicitly with the TTCN-3 stop operation or implicitly, if it has reached the last statement.
  * 
  * @param component Identifier of the component that has terminated.
@@ -512,9 +516,9 @@ void tciTestComponentTerminatedReq(TriComponentId component,
  * 
  * CH transmits the running request to the remote TE having the test component to be checked,
  * where it calls the tciTestComponentRunning() operation to check the execution status of the
- * indicated test component. @n
- * @n
- * This operation shall be called by the TE when it executes a TTCN-3 running operation.
+ * indicated test component.
+ * 
+ * @remarks This operation shall be called by the TE when it executes a TTCN-3 running operation.
  * 
  * @param component Identifier of the component to be checked for running.
  * 
@@ -530,9 +534,9 @@ Boolean tciTestComponentRunningReq(TriComponentId component);
  * 
  * CH transmits the done request to the remote TE having the test component to be checked, where
  * it calls the tciTestComponentDone() operation to check the status of the indicated test
- * component. @n
- * @n
- * This operation shall be called by the TE when it executes a TTCN-3 done operation.
+ * component.
+ * 
+ * @remarks This operation shall be called by the TE when it executes a TTCN-3 done operation.
  * 
  * @param component Identifier of the component to be checked for done.
  * 
@@ -546,9 +550,9 @@ Boolean tciTestComponentDoneReq(TriComponentId component);
 /** 
  * @brief The CH determines the component id of the MTC.
  * 
- * The CH determines the component id of the MTC. @n
- * @n
- * This operation shall be called by the TE when it executes a TTCN-3 mtc operation.
+ * The CH determines the component id of the MTC.
+ * 
+ * @remarks This operation shall be called by the TE when it executes a TTCN-3 mtc operation.
  * 
  * @return A TriComponentIdType value of the MTC.
  */
@@ -560,9 +564,9 @@ TriComponentId tciGetMTCReq();
  * 
  * CH transmits the execute test case request to the remote TEs having system ports of the indicated
  * test case. Static connections to the SUT and the initialization of communication means for TSI ports
- * can be set up. @n
- * @n
- * This operation can be called by the TE immediately before it starts the test case behaviour on the
+ * can be set up.
+ * 
+ * @remarks This operation can be called by the TE immediately before it starts the test case behaviour on the
  * MTC (in course of a TTCN-3 execute operation).
  * 
  * @param testCaseId A test case identifier as defined in the TTCN-3 module.
@@ -582,9 +586,9 @@ void tciExecuteTestCaseReq(TciTestCaseIdType testCaseId,
 /** 
  * @brief CH transmits the reset request to all involved TEs.
  * 
- * CH transmits the reset request to all involved TEs. @n
- * @n
- * This operation can be called by the TE at any time to reset the test system.
+ * CH transmits the reset request to all involved TEs.
+ * 
+ * @remarks This operation can be called by the TE at any time to reset the test system.
  * 
  */
 void tciResetReq();
@@ -594,9 +598,9 @@ void tciResetReq();
  * @brief CH transmits the kill component request to the remote TE.
  * 
  * CH transmits the kill component request to the remote TE and calls there the
- * tciKillTestComponent() operation. @n
- * @n
- * This operation shall be called by the TE when it executes the TTCN-3 kill operation.
+ * tciKillTestComponent() operation.
+ * 
+ * @remarks This operation shall be called by the TE when it executes the TTCN-3 kill operation.
  * 
  * @param component Identifier of the component to be killed.
  */
@@ -608,9 +612,9 @@ void tciKillTestComponentReq(TriComponentId component);
  * 
  * CH transmits the request to the remote TE that created the test component in question, where it
  * calls the tciTestComponentAlive() operation to check the status of the indicated test
- * component. @n
- * @n
- * This operation shall be called by the TE when it executes the TTCN-3 alive operation.
+ * component.
+ * 
+ * @remarks This operation shall be called by the TE when it executes the TTCN-3 alive operation.
  * 
  * @param component Identifier of the component to be checked for being alive.
  * 
@@ -625,9 +629,9 @@ Boolean tciTestComponentAliveReq(TriComponentId component);
  * @brief CH transmits the request to the remote TE.
  * 
  * CH transmits the request to the remote TE that created the test component in question, where it calls
- * the tciTestComponentKilled() operation to check the status of the indicated test component. @n
- * @n
- * This operation shall be called by the TE when it executes the TTCN-3 killed operation.
+ * the tciTestComponentKilled() operation to check the status of the indicated test component.
+ * 
+ * @remarks This operation shall be called by the TE when it executes the TTCN-3 killed operation.
  * 
  * @param component Identifier of the component to be checked for being killed.
  * 

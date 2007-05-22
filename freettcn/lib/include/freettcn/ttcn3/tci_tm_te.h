@@ -27,6 +27,10 @@
  * This header specifies the operations the TM requires from the TE. In addition to the
  * operations specified in this file, a test management requires the operations as required
  * at the TCI-CD interface.
+ *
+ * @remarks This file implements interfaces specified in the ETSI standards:
+ *  - ES 201 873-6: "Methods for Testing and Specification (MTS); The Testing and Test Control Notation version 3; Part 6: TTCN-3 Control Interface (TCI)"
+ *
  */
 
 #ifndef __TCI_TM_TE_H__
@@ -62,9 +66,9 @@
  * 
  * tciRootModule() selects the indicated module for execution through a subsequent call using
  * tciStartTestCase() or tciStartControl(). A tciError() will be issued by the TE if no such
- * module exists. @n
- * @n
- * Shall be used only if neither the control part nor a test case is currently being executed.
+ * module exists.
+ * 
+ * @remarks Shall be used only if neither the control part nor a test case is currently being executed.
  * 
  * @param moduleId The moduleName denotes the module identifiers as defined in TTCN-3.
  */
@@ -89,9 +93,9 @@ void tciRootModule(String moduleId);
  * 
  * The TE provides to the management a list of module parameters of the identified module. If no
  * module parameters exist, an empty module parameter list is returned. If the TE cannot provide a list,
- * the distinct @c null value shall be returned. @n
- * @n
- * Shall be used only if a root module has been set before.
+ * the distinct @c null value shall be returned.
+ * 
+ * @remarks Shall be used only if a root module has been set before.
  * 
  * @param moduleName The moduleName denotes the module identifiers for which the module parameters should be retrieved.
  * 
@@ -107,9 +111,9 @@ TciModuleParameterListType tciGetModuleParameters(TciModuleIdType moduleName);
  * @brief The TE provides a list of test cases.
  * 
  * The TE provides to the management a list of test cases. If no test cases exist, an empty test
- * case list is returned. If the TE cannot provide a list, the distinct @c null value shall be returned. @n
- * @n
- * Shall be used only if a root module has been set before.
+ * case list is returned. If the TE cannot provide a list, the distinct @c null value shall be returned.
+ * 
+ * @remarks Shall be used only if a root module has been set before.
  * 
  * @return A list of all test cases that are either defined in or imported into the root module.
  */
@@ -121,9 +125,9 @@ TciTestCaseIdListType tciGetTestCases();
  * 
  * The TE provides to the management a list of parameter types of the given test case. If no test case
  * parameters exist, an empty parameter type list is returned. If the TE cannot provide a list, the distinct
- * @c null value shall be returned. @n
- * @n
- * Shall be used only if a root module has been set before.
+ * @c null value shall be returned.
+ * 
+ * @remarks Shall be used only if a root module has been set before.
  * 
  * @param testCaseId A test case identifier as defined in the TTCN-3 module.
  * 
@@ -139,8 +143,9 @@ TciParameterTypeListType tciGetTestCaseParameters(TciTestCaseIdType testCaseId);
  * 
  * The TE provides to the management a list of system ports of the given test case. If no system ports
  * exist, an empty port list is returned. If the TE cannot provide a list, the distinct @c null value shall be
- * returned. @n
- * @n Shall be used only if a root module has been set before.
+ * returned.
+ * 
+ * @remarks Shall be used only if a root module has been set before.
  * 
  * @param testCaseId A test case identifier as defined in the TTCN-3 module.
  * 
@@ -160,9 +165,9 @@ TriPortIdList tciGetTestCaseTSI(TciTestCaseIdType testCaseId);
  * A tciError() will be issued by the TE if no such test case exists.
  * All @e in and @e inout test case parameters in @p parameterList contain Value. All @e out test case
  * parameters in @p parameterList shall contain the distinct value of @c null since they are only of
- * relevance when the test case terminates. @n
- * @n
- * Shall be called only if a module has been selected before. Only @p testCaseIds for test cases that
+ * relevance when the test case terminates.
+ * 
+ * @remarks Shall be called only if a module has been selected before. Only @p testCaseIds for test cases that
  * are declared in the currently selected TTCN-3 module shall be passed. Test cases that are
  * imported in a referenced module can not be started. To start imported test cases the referenced
  * (imported) module must be selected first using the tciRootModule() operation.
@@ -185,9 +190,9 @@ void tciStartTestCase(TciTestCaseIdType testCaseId, TciParameterListType paramet
  * execution of the currently executed test case, i.e. the execution of the test case that has recently
  * been indicated using the @e provided operation tciTestCaseStarted(). A possible executing control
  * part will continue execution as if the test case has stopped normally and returned with verdict
- * @c ERROR. @n
- * @n
- * Shall be called only if a module has been selected before.
+ * @c ERROR.
+ * 
+ * @remarks Shall be called only if a module has been selected before.
  */
 void tciStopTestCase();
 
@@ -199,9 +204,9 @@ void tciStopTestCase();
  * described in TTCN-3. While executing the control part the TE will call the @e provided operation
  * tciTestCaseStarted() and tciTestCaseTerminated() for every test case that has been
  * started and that has terminated. After termination of the control part the TE will call the @e provided
- * operation tciControlPartTerminated(). @n
- * @n
- * Shall be called only if a module has been selected before.
+ * operation tciControlPartTerminated().
+ * 
+ * @remarks Shall be called only if a module has been selected before.
  * 
  * @return A @c TriComponentId that represents the test component the module control part is executed on. If
  *         the TE cannot start control part of the selected module the distinct value @c null will be returned.
@@ -214,9 +219,9 @@ TriComponentId tciStartControl();
  * 
  * tciStopControl() stops execution of the control part. If no control part is currently being executed
  * the operation will be ignored. If a test case has been started directly this will stop execution of the
- * current test case as if tciStopTestCase() has been called. @n
- * @n
- * Shall only be called if a module has been selected before.
+ * current test case as if tciStopTestCase() has been called.
+ * 
+ * @remarks Shall only be called if a module has been selected before.
  */
 void tciStopControl();
 

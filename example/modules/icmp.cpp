@@ -47,7 +47,6 @@ namespace freettcn {
 
     // ************************* T Y P E S *****************************
     
-    
     class CICMPPingDataType : public freettcn::TE::CRecordType {
     public:
       enum {
@@ -421,7 +420,6 @@ namespace freettcn {
     // ******************** T E S T   C A S E S ************************
     
     // ICMP_Ping_1
-    
     CTC_ICMPPing_1::CTC_ICMPPing_1(freettcn::TE::CModule &module):
       freettcn::TE::CTestCase(module, "TC_ICMPPing_1", new freettcn::TE::CSourceData("icmp.ttcn", 76),
                               MY_CAST<const freettcn::TE::CTestComponentType &>(module.Type(CModule::TYPE_ICMPComponentType)),
@@ -440,15 +438,6 @@ namespace freettcn {
     
     int CTC_ICMPPing_1::CBehavior::Run(freettcn::TE::CTestComponentType::CInstanceLocal &comp, unsigned int offset) const
     {
-// //       comp.CmdQueue().Enqueue(new CCmdInitScopeWithRunsOn(comp));
-      
-//       // <parameter-handling>
-      
-//       // <statement-block>
-      
-//       // add automatically if 'self.stop' not included in *.ttcn file
-//       comp.Enqueue(new freettcn::TE::CCmdStopMTC(comp, new freettcn::TE::CSourceData("icmp.ttcn", 115)));
-      
       switch(offset) {
       case freettcn::TE::CBehavior::OFFSET_START:
         {
@@ -469,7 +458,6 @@ namespace freettcn {
     }
     
     // ICMP_Ping_2
-    
     CTC_ICMPPing_2::CTC_ICMPPing_2(freettcn::TE::CModule &module):
       freettcn::TE::CTestCase(module, "TC_ICMPPing_2", new freettcn::TE::CSourceData("icmp.ttcn", 109),
                               MY_CAST<const freettcn::TE::CTestComponentType &>(module.Type(CModule::TYPE_ICMPComponentType)),

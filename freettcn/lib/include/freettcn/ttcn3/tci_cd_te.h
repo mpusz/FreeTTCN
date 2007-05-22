@@ -26,6 +26,10 @@
  * 
  * This header specifies the operations the CD requires from the TE. All operations specified in this file are also
  * required at the TCI-TM and TCI-CH interfaces.
+ *
+ * @remarks This file implements interfaces specified in the ETSI standards:
+ *  - ES 201 873-6: "Methods for Testing and Specification (MTS); The Testing and Test Control Notation version 3; Part 6: TTCN-3 Control Interface (TCI)"
+ *
  */
 
 #ifndef __TCI_CD_TE_H__
@@ -67,17 +71,17 @@
  * predefined type, or a user-defined type in a module. Other predefined types can not be redefined.
  * 
  * @param typeName The TTCN-3 name of the type as defined in the TTCN-3 module. The following
- *                 are reserved type names and will return a predefined type: @n
- *                 "integer"                    @n
- *                 "float"                      @n
- *                 "bitstring"                  @n
- *                 "hexstring"                  @n
- *                 "octetstring"                @n
- *                 "charstring"                 @n
- *                 "universal charstring"       @n
- *                 "boolean"                    @n
- *                 "verdicttype"                @n
- *                 "objid"                      @n
+ *                 are reserved type names and will return a predefined type:
+ *                 - "integer"
+ *                 - "float"
+ *                 - "bitstring"
+ *                 - "hexstring"
+ *                 - "octetstring"
+ *                 - "charstring"
+ *                 - "universal charstring"
+ *                 - "boolean"
+ *                 - "verdicttype"
+ *                 - "objid" @n
  *                 @p typeName has to be the fully qualified type name, i.e. @c module.typeName
  * 
  * @return A type representing the requested TTCN-3 type.
@@ -201,9 +205,9 @@ TciType tciGetVerdictType();
  * @brief The TE will be notified about an unrecoverable error situation.
  * 
  * The TE will be notified about an unrecoverable error situation within the CD and forward the
- * error indication to the test management. @n
- * @n
- * Shall be called whenever an error situation has occurred.
+ * error indication to the test management.
+ * 
+ * @remarks Shall be called whenever an error situation has occurred.
  * 
  * @param message A string value, i.e. the error phrase describing the problem.
  */

@@ -23,7 +23,11 @@
  * @date   Mon Jan 29 08:54:53 2007
  * 
  * @brief  TTCN-3 Executable basic types
- * 
+ *
+ * @remarks This file implements interfaces specified in the ETSI standards:
+ *  - ES 201 873-5: "Methods for Testing and Specification (MTS); The Testing and Test Control Notation version 3; Part 5: TTCN-3 Runtime Interface (TRI)"
+ *  - ES 201 873-6: "Methods for Testing and Specification (MTS); The Testing and Test Control Notation version 3; Part 6: TTCN-3 Control Interface (TCI)"
+ *
  */
 
 #ifndef __TYPES_H__

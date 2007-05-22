@@ -24,6 +24,9 @@
  * 
  * @brief  TTCN-3 Executable Value interface
  *
+ * @remarks This file implements interfaces specified in the ETSI standards:
+ *  - ES 201 873-6: "Methods for Testing and Specification (MTS); The Testing and Test Control Notation version 3; Part 6: TTCN-3 Control Interface (TCI)"
+ *
  */
 
 #ifndef __TCI_VALUE_H__
@@ -61,9 +64,9 @@ TciModuleIdType tciGetDefiningModule(TciType inst);
 
 
 /**
- * Returns the name of the type as defined in the TTCN-3 module. @n
- * @n
- * String type reused from IDL (OMG recommendation)
+ * Returns the name of the type as defined in the TTCN-3 module.
+ * 
+ * @note String type reused from IDL (OMG recommendation)
  */
 String tciGetName(TciType inst);
 

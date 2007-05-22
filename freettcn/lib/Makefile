@@ -30,8 +30,6 @@ BUILD_DIRS = $(TOOLS_DIR) $(TE_DIR)
 
 BIN_DIR = bin
 
-#DOC_DIR = doc
-
 
 # libraries
 LIB_FILE_NAME = $(LIB_NAME)
@@ -61,23 +59,6 @@ distclean:
 	$(Q)$(RM) -f $(BIN_DIR)/*~
 	$(Q)$(RM) -f $(BIN_DIR)/$(LIB_FULL_NAME)
 
-# 	$(Q)$(MAKE) -C $(SRC_DIR) TOP_DIR=$(TOP_DIR)/.. clobber;
-# 	$(Q)$(RM) -f *~ TAGS BROWSE
-# 	$(Q)$(RM) -rf $(DOC_DIR)/tags.xml $(DOC_DIR)/html
-#	$(RM) -f $(DIR_NAME).tar.gz
-
 tags:
 	@$(call cmd,cmd_tags_h)
 	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_tags,$(dir)))
-
-# doc:
-# 	$(DOXYGEN) $(DOC_DIR)/Doxyfile
-
-
-
-#classes:
-#	ebrowse -s include/ttcn3/*.h *.h *.cpp
-#
-#lines:
-#	wc -l *.cpp
-

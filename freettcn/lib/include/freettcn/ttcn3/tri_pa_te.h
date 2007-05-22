@@ -23,6 +23,9 @@
  * @date   Mon Jan 29 15:47:07 2007
  * 
  * @brief  TTCN-3 Executable TRI platform interface operations PA=>TE
+ *
+ * @remarks This file implements interfaces specified in the ETSI standards:
+ *  - ES 201 873-5: "Methods for Testing and Specification (MTS); The Testing and Test Control Notation version 3; Part 5: TTCN-3 Runtime Interface (TRI)"
  * 
  */
 
@@ -62,9 +65,9 @@
  * 
  * The timeout with the @p timerId can be added to the timeout list in the TE. The implementation of this
  * operation in the TE has to be done in such a manner that it addresses the different TTCN-3
- * semantics for timers defined in ES 201 873-4 [4] (see also clause 5.3.1). @n
- * @n
- * This operation is called by the PA after a timer, which has previously been started using the
+ * semantics for timers defined in ES 201 873-4 [4] (see also clause 5.3.1).
+ * 
+ * @remarks This operation is called by the PA after a timer, which has previously been started using the
  * triStartTimer() operation, has expired, i.e. it has reached its maximum duration value.
  * 
  * @param timerId identifier of the timer instance

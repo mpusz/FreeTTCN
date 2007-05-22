@@ -48,7 +48,7 @@ freettcn::TE::CVerdictType::CInstance::CInstance(const CType &type):
 }
 
 freettcn::TE::CVerdictType::CInstance::CInstance(const CType &type, TVerdict value):
-  freettcn::TE::CType::CInstance(type), _value(value)
+  CType::CInstance(type), _value(value)
 {
 }
 

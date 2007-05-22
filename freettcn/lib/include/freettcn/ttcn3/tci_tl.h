@@ -25,6 +25,10 @@
  * @brief  TTCN-3 Executable TE => TL operation interface (TCI-TL provided)
  * 
  * This header specifies the operations the TL shall provide to the TE.
+ *
+ * @remarks This file implements interfaces specified in the ETSI standards:
+ *  - ES 201 873-6: "Methods for Testing and Specification (MTS); The Testing and Test Control Notation version 3; Part 6: TTCN-3 Control Interface (TCI)"
+ *
  */
 
 #ifndef __TCI_TL_H__

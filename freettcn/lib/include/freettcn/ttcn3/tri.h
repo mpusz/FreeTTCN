@@ -23,6 +23,9 @@
  * @date   Mon Jan 29 08:55:41 2007
  * 
  * @brief  TTCN-3 Executable TRI types
+ *
+ * @remarks This file implements interfaces specified in the ETSI standards:
+ *  - ES 201 873-5: "Methods for Testing and Specification (MTS); The Testing and Test Control Notation version 3; Part 5: TTCN-3 Runtime Interface (TRI)"
  * 
  */
 

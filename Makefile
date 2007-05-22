@@ -26,10 +26,11 @@ FREETTCN_DIR = freettcn
 ENV_DIR = libenv
 EXAMPLE_DIR = example
 BUILD_DIRS = $(FREETTCN_DIR) $(ENV_DIR) $(EXAMPLE_DIR)
+DOC_DIR = doc
 
 
 # targets
-.PHONY: help freettcn freettcn_install env env_install example clean distclean dist all tags classes
+.PHONY: help freettcn freettcn_install env env_install example clean distclean dist all tags classes doc
 
 
 help:
@@ -75,6 +76,7 @@ clean:
 distclean:
 	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_distclean,$(dir)))
 	$(Q)$(RM) -f TAGS BROWSE $(PROJECT_NAME)-$(VERSION).tar.gz *~
+	$(Q)$(RM) -rf $(DOC_DIR)/html # $(DOC_DIR)/tags.xml 
 
 dist: distclean
 	@$(call cmd,cmd_dist)
@@ -87,3 +89,6 @@ tags:
 
 classes:
 	$(Q)$(EBROWSE) -s freettcn/lib/include/freettcn/*/*.h freettcn/lib/*/*.cpp libenv/include/freettcn/*/*.h example/*/*.cpp #libenv/*/*.cpp
+
+doc:
+	$(Q)$(DOXYGEN) $(DOC_DIR)/Doxyfile

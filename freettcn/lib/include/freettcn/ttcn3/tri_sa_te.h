@@ -23,6 +23,9 @@
  * @date   Mon Jan 29 12:55:34 2007
  * 
  * @brief  TTCN-3 Executable TRI communication interface operations SA=>TE
+ *
+ * @remarks This file implements interfaces specified in the ETSI standards:
+ *  - ES 201 873-5: "Methods for Testing and Specification (MTS); The Testing and Test Control Notation version 3; Part 5: TTCN-3 Runtime Interface (TRI)"
  * 
  */
 
@@ -62,13 +65,14 @@
  * @brief This operation shall pass the message to the TE
  * 
  * This operation shall pass the message to the TE indicating the component @p componentId to which the
- * TSI port @p tsiPortId is mapped. @n
- * @n
- * This operation is called by the SA after it has received a message from the SUT. It can only be used
+ * TSI port @p tsiPortId is mapped.
+ * 
+ * @remarks This operation is called by the SA after it has received a message from the SUT. It can only be used
  * when @p tsiPortId has been either previously mapped to a port of componentId or has been referenced in
  * the previous triExecuteTestCase() statement.
- * In the invocation of a triEnqueueMsg() operation @p receivedMessage shall contain an encoded value. @n
- * The decoding of @p receivedMessage has to be done in the TE.
+ * In the invocation of a triEnqueueMsg() operation @p receivedMessage shall contain an encoded value.
+ *
+ * @note The decoding of @p receivedMessage has to be done in the TE.
  * 
  * @param tsiPortId identifier of the test system interface port via which the message is enqueued
  *                  by the SUT Adapter
@@ -102,9 +106,9 @@ void triEnqueueMsg(const TriPortId* tsiPortId,
  * 
  * The TE can enqueue this procedure call with the signature identifier @p signatureId at the port of the
  * component @p componentId to which the TSI port @p tsiPortId is mapped. The decoding of procedure
- * parameters has to be done in the TE. @n
- * @n
- * This operation can be called by the SA after it has received a procedure call from the SUT. It can
+ * parameters has to be done in the TE.
+ * 
+ * @remarks This operation can be called by the SA after it has received a procedure call from the SUT. It can
  * only be used when @p tsiPortId has been either previously mapped to a port of @p componentId or
  * referenced in the previous triExecuteTestCase() statement.
  * In the invocation of a triEnqueueCall() operation all in and inout procedure parameters contain
@@ -133,9 +137,9 @@ void triEnqueueCall(const TriPortId* tsiPortId,
  * 
  * The TE can enqueue this reply to the procedure call with the signature identifier @p signatureId at
  * the port of the component @p componentId to which the TSI port @p tsiPortId is mapped. The
- * decoding of the procedure parameters has to be done within the TE. @n
- * @n
- * This operation can be called by the SA after it has received a reply from the SUT. It can only be used
+ * decoding of the procedure parameters has to be done within the TE.
+ * 
+ * @remarks This operation can be called by the SA after it has received a reply from the SUT. It can only be used
  * when @p tsiPortId has been either previously mapped to a port of @p componentId or referenced in the
  * previous triExecuteTestCase() statement.
  * In the invocation of a triEnqueueReply() operation all out and inout procedure parameters and the
@@ -168,9 +172,9 @@ void triEnqueueReply(const TriPortId* tsiPortId,
  * 
  * The TE can enqueue this exception for the procedure call with the signature identifier @p signatureId
  * at the port of the component @p componentId to which the TSI port @p tsiPortId is mapped.
- * The decoding of the exception has to be done within the TE. @n
- * @n
- * This operation can be called by the SA after it has received a reply from the SUT. It can only be
+ * The decoding of the exception has to be done within the TE.
+ * 
+ * @remarks This operation can be called by the SA after it has received a reply from the SUT. It can only be
  * used when @p tsiPortId has been either previously mapped to a port of @p componentId or referenced in
  * the previous triExecuteTestCase() statement.
  * In the invocation of a triEnqueueException() operation exception shall contain an encoded value.

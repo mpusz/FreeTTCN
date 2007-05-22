@@ -23,6 +23,9 @@
  * @date   Fri Feb  2 08:50:45 2007
  * 
  * @brief  TTCN-3 Executable TCI types
+ *
+ * @remarks This file implements interfaces specified in the ETSI standards:
+ *  - ES 201 873-6: "Methods for Testing and Specification (MTS); The Testing and Test Control Notation version 3; Part 6: TTCN-3 Control Interface (TCI)"
  * 
  */
 

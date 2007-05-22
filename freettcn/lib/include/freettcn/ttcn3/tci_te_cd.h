@@ -25,6 +25,10 @@
  * @brief  TTCN-3 Executable TE => CD operation interface (TCI-CD provided)
  * 
  * This header specifies the operations the CD shall provide to the TE.
+ *
+ * @remarks This file implements interfaces specified in the ETSI standards:
+ *  - ES 201 873-6: "Methods for Testing and Specification (MTS); The Testing and Test Control Notation version 3; Part 6: TTCN-3 Control Interface (TCI)"
+ *
  */
 
 #ifndef __TCI_TE_CD_H__
@@ -62,9 +66,9 @@
  * decoded. If an encoding rule is not self-sufficient, i.e. if the encoded message does not inherently
  * contain its type @p decodingHypothesis shall be used. If the encoded value can be decoded
  * without the decoding hypothesis, the distinct @c null value shall be returned if the type determined
- * from the encoded message is not compatible with the decoding hypothesis. @n
- * @n
- * This operation shall be called whenever the TE has to decode an encoded value. The TE might
+ * from the encoded message is not compatible with the decoding hypothesis.
+ * 
+ * @remarks This operation shall be called whenever the TE has to decode an encoded value. The TE might
  * decode immediately after reception of a encoded value, or might for performance considerations
  * postpone the decoding until the actual access of the encoded value.
  *
@@ -83,9 +87,9 @@ TciValue tciDecode(BinaryString message,
 /** 
  * @brief Returns an encoded TriMessage according to the encoding rules.
  * 
- * Returns an encoded TriMessage according to the encoding rules. @n
- * @n
- * This operation shall be called whenever the TE has to encode a Value.
+ * Returns an encoded TriMessage according to the encoding rules.
+ * 
+ * @remarks This operation shall be called whenever the TE has to encode a Value.
  *
  * @note BinaryString type reused from TRI
  * 
