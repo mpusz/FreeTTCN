@@ -27,13 +27,30 @@ extern "C" {
 #include "freettcn/te/module.h"
 
 
+static const freettcn::TE::CType *TypeGet(TciType inst);
+static freettcn::TE::CType::CInstance *ValueGet(TciValue inst);
 
-TciModuleIdType tciGetDefiningModule(TciType inst)
+static freettcn::TE::CIntegerType::CInstance *IntegerGet(TciValue inst);
+static freettcn::TE::COctetstringType::CInstance *OctetstringGet(TciValue inst);
+static freettcn::TE::CRecordType::CInstance *RecordGet(TciValue inst);
+static freettcn::TE::CBooleanType::CInstance *BooleanGet(TciValue inst);
+static freettcn::TE::CVerdictType::CInstance *VerdictGet(TciValue inst);
+
+
+
+/* *********************************** T Y P E *********************************** */
+
+const freettcn::TE::CType *TypeGet(TciType inst)
 {
   if (!inst)
     throw freettcn::ECastFailed();
   
-  const freettcn::TE::CType *type = static_cast<const freettcn::TE::CType *>(inst);
+  return static_cast<const freettcn::TE::CType *>(inst);
+}
+
+TciModuleIdType tciGetDefiningModule(TciType inst)
+{
+  const freettcn::TE::CType *type = TypeGet(inst);
   if (const freettcn::TE::CModule *module = type->DefiningModule())
     // user defined type
     return module->Id();
@@ -48,68 +65,65 @@ TciModuleIdType tciGetDefiningModule(TciType inst)
   }
 }
 
-
 String tciGetName(TciType inst)
 {
-  if (!inst)
-    throw freettcn::ECastFailed();
-  
-  const freettcn::TE::CType *type = static_cast<const freettcn::TE::CType *>(inst);
+  const freettcn::TE::CType *type = TypeGet(inst);
   return const_cast<char *>(type->Name());
 }
 
-
 TciTypeClassType tciGetTypeClass(TciType inst)
 {
-  if (!inst)
-    throw freettcn::ECastFailed();
-  
-  const freettcn::TE::CType *type = static_cast<const freettcn::TE::CType *>(inst);
+  const freettcn::TE::CType *type = TypeGet(inst);
   return type->Class();
 }
 
-
 TciValue tciNewInstance(TciType inst)
 {
-  if (!inst)
-    throw freettcn::ECastFailed();
-  
-  const freettcn::TE::CType *type = static_cast<const freettcn::TE::CType *>(inst);
+  const freettcn::TE::CType *type = TypeGet(inst);
   return type->InstanceCreate();
 }
 
 
-TciType tciGetType(TciValue inst)
+
+
+/* ********************************** V A L U E ********************************** */
+
+freettcn::TE::CType::CInstance *ValueGet(TciValue inst)
 {
   if (!inst)
     throw freettcn::ECastFailed();
-  
-  freettcn::TE::CType::CInstance *val = static_cast<freettcn::TE::CType::CInstance *>(inst);
+  return static_cast<freettcn::TE::CType::CInstance *>(inst);
+}
+
+TciType tciGetType(TciValue inst)
+{
+  freettcn::TE::CType::CInstance *val = ValueGet(inst);
   return &const_cast<freettcn::TE::CType &>(val->Type());
 }
 
-
 Boolean tciNotPresent(TciValue inst)
 {
-  if (!inst)
-    throw freettcn::ECastFailed();
-  
-  freettcn::TE::CType::CInstance *val = static_cast<freettcn::TE::CType::CInstance *>(inst);
+  freettcn::TE::CType::CInstance *val = ValueGet(inst);
   return val->Omit();
 }
 
 
 
-void tciSetIntAbs(TciValue inst, String value)
+
+/* ******************************** I N T E G E R  ******************************* */
+
+freettcn::TE::CIntegerType::CInstance *IntegerGet(TciValue inst)
 {
-  if (!inst)
-    throw freettcn::ECastFailed();
-  
-  freettcn::TE::CType::CInstance *val = static_cast<freettcn::TE::CType::CInstance *>(inst);
+  freettcn::TE::CType::CInstance *val = ValueGet(inst);
   freettcn::TE::CIntegerType::CInstance *integer = dynamic_cast<freettcn::TE::CIntegerType::CInstance *>(val);
   if (!integer)
     throw freettcn::ECastFailed();
-  
+  return integer;
+}
+
+void tciSetIntAbs(TciValue inst, String value)
+{
+  freettcn::TE::CIntegerType::CInstance *integer = IntegerGet(inst);
   integer->AbsValue(value);
 }
 
@@ -144,107 +158,137 @@ void tciSetIntAbs(TciValue inst, String value)
 
 
 
-TciValue tciGetRecFieldValue(TciValue inst, String fieldName)
+
+/* *************************** O C T E T S T R I N G ***************************** */
+
+freettcn::TE::COctetstringType::CInstance *OctetstringGet(TciValue inst)
 {
-  if (!inst)
+  freettcn::TE::CType::CInstance *val = ValueGet(inst);
+  freettcn::TE::COctetstringType::CInstance *string = dynamic_cast<freettcn::TE::COctetstringType::CInstance *>(val);
+  if (!string)
     throw freettcn::ECastFailed();
-  
-  const freettcn::TE::CType::CInstance *val = static_cast<const freettcn::TE::CType::CInstance *>(inst);
-  const freettcn::TE::CRecordType::CInstance *record = dynamic_cast<const freettcn::TE::CRecordType::CInstance *>(val);
-  if (!record)
-    throw freettcn::ECastFailed();
-  
-  return &record->Field(fieldName);
+  return string;
 }
 
+String tciGetOStringValue(TciValue inst)
+{
+  const freettcn::TE::COctetstringType::CInstance *string = OctetstringGet(inst);
+  return const_cast<char *>(string->Value());
+}
+
+void tciSetOStringValue(TciValue inst, String value)
+{
+  freettcn::TE::COctetstringType::CInstance *string = OctetstringGet(inst);
+  string->Value(value);
+}
+
+int tciGetOStringOctetValue(TciValue inst, unsigned long int position)
+{
+  const freettcn::TE::COctetstringType::CInstance *string = OctetstringGet(inst);
+  return string->Element(position);
+}
+
+void tciSetOStringOctetValue(TciValue inst, unsigned long int position, int value)
+{
+  freettcn::TE::COctetstringType::CInstance *string = OctetstringGet(inst);
+  string->Element(position, value);
+}
+
+unsigned long int tciGetOStringLength(TciValue inst)
+{
+  const freettcn::TE::COctetstringType::CInstance *string = OctetstringGet(inst);
+  return string->Length();
+}
+
+void tciSetOStringLength(TciValue inst, unsigned long int len)
+{
+  freettcn::TE::COctetstringType::CInstance *string = OctetstringGet(inst);
+  string->Length(len);
+}
+
+
+
+
+/* ******************************** R E C O R D ********************************** */
+
+freettcn::TE::CRecordType::CInstance *RecordGet(TciValue inst)
+{
+  freettcn::TE::CType::CInstance *val = ValueGet(inst);
+  freettcn::TE::CRecordType::CInstance *record = dynamic_cast<freettcn::TE::CRecordType::CInstance *>(val);
+  if (!record)
+    throw freettcn::ECastFailed();
+  return record;
+}
+
+TciValue tciGetRecFieldValue(TciValue inst, String fieldName)
+{
+  const freettcn::TE::CRecordType::CInstance *record = RecordGet(inst);
+  return &record->Field(fieldName);
+}
 
 // void tciSetRecFieldValue(TciValue inst, String fieldName, TciValue value)
 // {
 // }
 
-
 char** tciGetRecFieldNames(TciValue inst)
 {
-  if (!inst)
-    throw freettcn::ECastFailed();
-  
-  const freettcn::TE::CType::CInstance *val = static_cast<const freettcn::TE::CType::CInstance *>(inst);
-  const freettcn::TE::CRecordType::CInstance *record = dynamic_cast<const freettcn::TE::CRecordType::CInstance *>(val);
-  if (!record)
-    throw freettcn::ECastFailed();
-  
+  const freettcn::TE::CRecordType::CInstance *record = RecordGet(inst);
   return const_cast<char **>(record->FieldNames());
 }
 
-
 void tciSetFieldOmitted(TciValue inst, String fieldName)
 {
-  if (!inst)
-    throw freettcn::ECastFailed();
-  
-  const freettcn::TE::CType::CInstance *val = static_cast<const freettcn::TE::CType::CInstance *>(inst);
-  const freettcn::TE::CRecordType::CInstance *record = dynamic_cast<const freettcn::TE::CRecordType::CInstance *>(val);
-  if (!record)
-    throw freettcn::ECastFailed();
-  
+  const freettcn::TE::CRecordType::CInstance *record = RecordGet(inst);
   record->Field(fieldName).Omit(true);
 }
 
 
 
 
-Boolean tciGetBooleanValue(TciValue inst)
+/* ******************************* B O O L E A N ********************************* */
+
+freettcn::TE::CBooleanType::CInstance *BooleanGet(TciValue inst)
 {
-  if (!inst)
-    throw freettcn::ECastFailed();
-  
-  freettcn::TE::CType::CInstance *val = static_cast<freettcn::TE::CType::CInstance *>(inst);
+  freettcn::TE::CType::CInstance *val = ValueGet(inst);
   freettcn::TE::CBooleanType::CInstance *boolean = dynamic_cast<freettcn::TE::CBooleanType::CInstance *>(val);
   if (!boolean)
     throw freettcn::ECastFailed();
-  
+  return boolean;
+}
+
+Boolean tciGetBooleanValue(TciValue inst)
+{
+  const freettcn::TE::CBooleanType::CInstance *boolean = BooleanGet(inst);
   return boolean->Value();
 }
 
-
 void tciSetBooleanValue(TciValue inst, Boolean value)
 {
-  if (!inst)
-    throw freettcn::ECastFailed();
-  
-  freettcn::TE::CType::CInstance *val = static_cast<freettcn::TE::CType::CInstance *>(inst);
-  freettcn::TE::CBooleanType::CInstance *boolean = dynamic_cast<freettcn::TE::CBooleanType::CInstance *>(val);
-  if (!boolean)
-    throw freettcn::ECastFailed();
-  
+  freettcn::TE::CBooleanType::CInstance *boolean = BooleanGet(inst);
   boolean->Value(static_cast<freettcn::TE::TVerdict>(value));
 }
 
 
 
-int tciGetVerdictValue(TciValue inst)
+/* ******************************* V E R D I C T ********************************* */
+
+freettcn::TE::CVerdictType::CInstance *VerdictGet(TciValue inst)
 {
-  if (!inst)
-    throw freettcn::ECastFailed();
-  
-  freettcn::TE::CType::CInstance *val = static_cast<freettcn::TE::CType::CInstance *>(inst);
+  freettcn::TE::CType::CInstance *val = ValueGet(inst);
   freettcn::TE::CVerdictType::CInstance *verdict = dynamic_cast<freettcn::TE::CVerdictType::CInstance *>(val);
   if (!verdict)
     throw freettcn::ECastFailed();
-  
+  return verdict;
+}
+
+int tciGetVerdictValue(TciValue inst)
+{
+  const freettcn::TE::CVerdictType::CInstance *verdict = VerdictGet(inst);
   return verdict->Value();
 }
 
-
 void tciSetVerdictValue(TciValue inst, int verdict)
 {
-  if (!inst)
-    throw freettcn::ECastFailed();
-  
-  freettcn::TE::CType::CInstance *val = static_cast<freettcn::TE::CType::CInstance *>(inst);
-  freettcn::TE::CVerdictType::CInstance *verdictVal = dynamic_cast<freettcn::TE::CVerdictType::CInstance *>(val);
-  if (!verdictVal)
-    throw freettcn::ECastFailed();
-  
+  freettcn::TE::CVerdictType::CInstance *verdictVal = VerdictGet(inst);
   verdictVal->Value(static_cast<freettcn::TE::TVerdict>(verdict));
 }

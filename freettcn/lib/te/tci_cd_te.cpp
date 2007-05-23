@@ -53,8 +53,8 @@ TciType tciGetTypeForName(String typeName)
 //       return ;
 //     if (!strcmp(typeName, "hexstring"))
 //       return ;
-//     if (!strcmp(typeName, "octetstring"))
-//       return ;
+    if (!strcmp(typeName, "octetstring"))
+      return const_cast<void *>(static_cast<const void *>(&freettcn::TE::CBasicTypes::Octetstring()));
 //     if (!strcmp(typeName, "charstring"))
 //       return ;
 //     if (!strcmp(typeName, "universal charstring"))
@@ -149,9 +149,10 @@ TciType tciGetBooleanType()
 // }
 
 
-// TciType tciGetOctetstringType()
-// {
-// }
+TciType tciGetOctetstringType()
+{
+  return const_cast<void *>(static_cast<const void *>(&freettcn::TE::CBasicTypes::Octetstring()));
+}
 
 
 TciType tciGetVerdictType()

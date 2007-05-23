@@ -18,45 +18,52 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /**
- * @file   basicTypes.h
+ * @file   octetstring.h
  * @author Mateusz Pusz
- * @date   Fri May  4 09:19:29 2007
+ * @date   Tue May 22 22:16:17 2007
  * 
  * @brief  
  * 
  * 
  */
 
-#ifndef __BASICTYPES_H__
-#define __BASICTYPES_H__
+#ifndef __OCTETSTRING_H__
+#define __OCTETSTRING_H__
 
-#include <freettcn/te/integer.h>
-#include <freettcn/te/boolean.h>
-#include <freettcn/te/octetstring.h>
-#include <freettcn/te/verdict.h>
-#include <freettcn/te/testComponent.h>
+#include <freettcn/te/type.h>
+#include <string>
+
 
 namespace freettcn {
 
   namespace TE {
     
-    class CBasicTypes {
-      static const CIntegerType _integer;
-      static const CBooleanType _boolean;
-      static const COctetstringType _octetstring;
-      static const CVerdictType _verdict;
-      static const CControlComponentType _control;
+    class COctetstringType : public CType {
     public:
-      static const CIntegerType &Integer();
-      static const CBooleanType &Boolean();
-      static const COctetstringType &Octetstring();
-      static const CVerdictType &Verdict();
-      static const CControlComponentType &ControlComponent();
+      class CInstance : public CType::CInstance {
+        std::string _value;
+      public:
+        CInstance(const CType &type);
+        
+        const char *Value() const throw(EOmitSet);
+        void Value(const char *value) throw(EOperationFailed);
+        
+        int Element(unsigned int position) const throw(EOperationFailed, EOmitSet);
+        void Element(unsigned int position, int value) throw(EOperationFailed);
+        
+        unsigned int Length() const;
+        void Length(unsigned int length);
+      };
+      
+    public:
+      friend class CInstance;
+      
+      COctetstringType();
+      virtual CInstance *InstanceCreate() const;
     };
     
   } // namespace TE
   
 } // namespace freettcn
 
-
-#endif /* __BASICTYPES_H__ */
+#endif /* __OCTETSTRING_H__ */

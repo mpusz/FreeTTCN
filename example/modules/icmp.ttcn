@@ -12,7 +12,7 @@ module icmp {
   {
     integer id,
     integer seqNumber,
-    hexstring data optional
+    octetstring data optional
   }
   
   type union ICMPDataType

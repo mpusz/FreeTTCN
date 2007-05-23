@@ -332,8 +332,7 @@ namespace freettcn {
     {
       Register(freettcn::TE::CBasicTypes::Integer(), "id");
       Register(freettcn::TE::CBasicTypes::Integer(), "seqNumber");
-      /// @todo hexstring
-//       Register(module.Type(CModule::TYPE_ICMPDataType), "data", true);
+      Register(freettcn::TE::CBasicTypes::Octetstring(), "data", true);
       Init();
     }
     
