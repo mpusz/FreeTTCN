@@ -290,34 +290,30 @@ void freettcn::TE::CTTCNExecutable::TestComponentStop(const TriComponentId &comp
 }
 
 
-void freettcn::TE::CTTCNExecutable::TestComponentKill(const TriComponentId &componentId)
+void freettcn::TE::CTTCNExecutable::TestComponentKill(const TriComponentId &componentId) const
 {
   RootModule().TestComponentKill(componentId);
 }
 
 
-void freettcn::TE::CTTCNExecutable::Connect(const TriPortId &fromPort, const TriPortId &toPort)
+void freettcn::TE::CTTCNExecutable::Connect(const TriPortId &fromPort, const TriPortId &toPort) const
 {
-
+  RootModule().Connect(fromPort, toPort);
 }
 
-void freettcn::TE::CTTCNExecutable::Disconnect(const TriPortId &fromPort, const TriPortId &toPort)
+void freettcn::TE::CTTCNExecutable::Disconnect(const TriPortId &fromPort, const TriPortId &toPort) const
 {
-
+  RootModule().Disconnect(fromPort, toPort);
 }
 
-void freettcn::TE::CTTCNExecutable::Map(const TriPortId &fromPort, const TriPortId &toPort)
+void freettcn::TE::CTTCNExecutable::Map(const TriPortId &fromPort, const TriPortId &toPort) const
 {
-  if (triMap(&fromPort, &toPort) != TRI_OK) {
-    /// @todo do something
-  }
+  RootModule().Map(fromPort, toPort);
 }
 
-void freettcn::TE::CTTCNExecutable::Unmap(const TriPortId &fromPort, const TriPortId &toPort)
+void freettcn::TE::CTTCNExecutable::Unmap(const TriPortId &fromPort, const TriPortId &toPort) const
 {
-  if (triUnmap(&fromPort, &toPort) != TRI_OK) {
-    /// @todo do something
-  }
+  RootModule().Unmap(fromPort, toPort);
 }
 
 void freettcn::TE::CTTCNExecutable::TestComponentTerminated(const TriComponentId &componentId,

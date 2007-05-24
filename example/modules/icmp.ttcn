@@ -85,8 +85,6 @@ module icmp {
     map(mtc:icmpPort, system:icmpPort);
     
     // the test case behaviour
-    setverdict(fail);
-    
     timer t := 1.0;
     var integer count := 0;
     icmpPort.send(t_EchoRequest(count));
@@ -96,6 +94,7 @@ module icmp {
         setverdict(pass);
       }
       [] icmpPort.receive {
+        setverdict(fail);
       }
       [count < 5] t.timeout {
         count := count + 1;
@@ -103,6 +102,7 @@ module icmp {
         repeat;
       }
       [count == 5] t.timeout {
+        setverdict(fail);
       }
     }
     

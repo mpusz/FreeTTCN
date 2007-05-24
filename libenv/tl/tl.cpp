@@ -235,6 +235,16 @@ const char *freettcn::TL::CTestLogging::TriComponentId2String(const TriComponent
 }
 
 
+const char *freettcn::TL::CTestLogging::TriPortId2String(const TriPortId &port, char *str) const
+{
+  char str1[256];
+  sprintf(str, "[%s]:%s", TriComponentId2String(port.compInst, str1), port.portName);
+  if (port.portIndex)
+    sprintf(str, "%s[%li]", str, port.portIndex);
+  return str;
+}
+
+
 void freettcn::TL::CTestLogging::TcExecute(const char *am, int ts, const char *src, int line,
                                            const TriComponentId &c,
                                            const TciTestCaseIdType &tcId,
@@ -536,6 +546,77 @@ void freettcn::TL::CTestLogging::CTerminated(const char *am, int ts, const char 
 
 
 
+
+void freettcn::TL::CTestLogging::PConnect(const char *am, int ts, const char *src, int line,
+                                          const TriComponentId &c,
+                                          const TriComponentId &c1,
+                                          const TriPortId &port1,
+                                          const TriComponentId &c2,
+                                          const TriPortId &port2) const
+{
+  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, freettcn::CEntity::TYPE_CH,
+                                                                        freettcn::CLogMask::CMD_CH_P_CONNECT,
+                                                                        "Port CONNECT");
+  
+  char str[256];
+  data->LineAdd("From", TriPortId2String(port1, str));
+  data->LineAdd("To", TriPortId2String(port2, str));
+  Logger().Push(data);
+}
+
+
+void freettcn::TL::CTestLogging::PDisconnect(const char *am, int ts, const char *src, int line,
+                                             const TriComponentId &c,
+                                             const TriComponentId &c1,
+                                             const TriPortId &port1,
+                                             const TriComponentId &c2,
+                                             const TriPortId &port2) const
+{
+  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, freettcn::CEntity::TYPE_CH,
+                                                                        freettcn::CLogMask::CMD_CH_P_DISCONNECT,
+                                                                        "Port DISCONNECT");
+  
+  char str[256];
+  data->LineAdd("From", TriPortId2String(port1, str));
+  data->LineAdd("To", TriPortId2String(port2, str));
+  Logger().Push(data);
+}
+
+
+void freettcn::TL::CTestLogging::PMap(const char *am, int ts, const char *src, int line,
+                                      const TriComponentId &c,
+                                      const TriComponentId &c1,
+                                      const TriPortId &port1,
+                                      const TriComponentId &c2,
+                                      const TriPortId &port2) const
+{
+  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, freettcn::CEntity::TYPE_SA,
+                                                                        freettcn::CLogMask::CMD_SA_P_MAP,
+                                                                        "Port MAP");
+  
+  char str[256];
+  data->LineAdd("From", TriPortId2String(port1, str));
+  data->LineAdd("To", TriPortId2String(port2, str));
+  Logger().Push(data);
+}
+
+
+void freettcn::TL::CTestLogging::PUnmap(const char *am, int ts, const char *src, int line,
+                                        const TriComponentId &c,
+                                        const TriComponentId &c1,
+                                        const TriPortId &port1,
+                                        const TriComponentId &c2,
+                                        const TriPortId &port2) const
+{
+  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, freettcn::CEntity::TYPE_SA,
+                                                                        freettcn::CLogMask::CMD_SA_P_UNMAP,
+                                                                        "Port UNMAP");
+  
+  char str[256];
+  data->LineAdd("From", TriPortId2String(port1, str));
+  data->LineAdd("To", TriPortId2String(port2, str));
+  Logger().Push(data);
+}
 
 
 

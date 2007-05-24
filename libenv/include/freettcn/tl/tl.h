@@ -114,6 +114,7 @@ namespace freettcn {
       
       virtual const char *Buffer2String(const BinaryString &binStr, char *str) const;
       virtual const char *InstanceId2String(const BinaryString &inst, char *str) const;
+      virtual const char *TriPortId2String(const TriPortId &port, char *str) const;
       virtual const char *TriComponentId2String(const TriComponentId &comp, char *str) const;
 
       virtual void TcExecute(const char *am, int ts, const char *src, int line,
@@ -167,6 +168,31 @@ namespace freettcn {
       virtual void CTerminated(const char *am, int ts, const char *src, int line,
                                const TriComponentId &c,
                                TciVerdictValue verdict) const;
+
+      virtual void PConnect(const char *am, int ts, const char *src, int line,
+                            const TriComponentId &c,
+                            const TriComponentId &c1,
+                            const TriPortId &port1,
+                            const TriComponentId &c2,
+                            const TriPortId &port2) const;
+      virtual void PDisconnect(const char *am, int ts, const char *src, int line,
+                               const TriComponentId &c,
+                               const TriComponentId &c1,
+                               const TriPortId &port1,
+                               const TriComponentId &c2,
+                               const TriPortId &port2) const;
+      virtual void PMap(const char *am, int ts, const char *src, int line,
+                        const TriComponentId &c,
+                        const TriComponentId &c1,
+                        const TriPortId &port1,
+                        const TriComponentId &c2,
+                        const TriPortId &port2) const;
+      virtual void PUnmap(const char *am, int ts, const char *src, int line,
+                          const TriComponentId &c,
+                          const TriComponentId &c1,
+                          const TriPortId &port1,
+                          const TriComponentId &c2,
+                          const TriPortId &port2) const;
 
       virtual void TTimeoutDetected(const char *am, int ts, const char *src, int line,
                                     const TriComponentId &c,

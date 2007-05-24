@@ -83,18 +83,8 @@ namespace freettcn {
     
     class CICMPPortType : public freettcn::TE::CPortType {
     public:
-      class CInstance : public freettcn::TE::CPort {
-      public:
-        CInstance(const freettcn::TE::CTestComponentType::CInstanceLocal &component,
-                  const char *name);
-      };
-
-    public:
-      CICMPPortType(const freettcn::TE::CModule &module) :
-        freettcn::TE::CPortType(module, "ICMPPort") {};
+      CICMPPortType(const freettcn::TE::CModule &module);
     };
-    
-    
     
     
     
@@ -104,7 +94,7 @@ namespace freettcn {
     class CICMPComponentType : public freettcn::TE::CTestComponentType {
     public:
       enum {
-        PORT_ICMPPort
+        PORT_icmpPort_0
       };
       
       class CInstance : public freettcn::TE::CTestComponentType::CInstanceLocal {
@@ -122,7 +112,7 @@ namespace freettcn {
     class CIPStackType : public freettcn::TE::CTestComponentType {
     public:
       enum {
-        PORT_ICMPPort
+        PORT_icmpPort_0
       };
       
       class CInstance : public freettcn::TE::CTestComponentType::CInstanceLocal {
@@ -222,6 +212,10 @@ namespace freettcn {
     class CTC_ICMPPing_1 : public freettcn::TE::CTestCase {
     public:
       class CBehavior : public freettcn::TE::CBehavior {
+        enum {
+          SCOPE1_t
+        };
+        
       public:
         CBehavior(freettcn::TE::CModule &module);
         int Run(freettcn::TE::CTestComponentType::CInstanceLocal &comp, unsigned int offset) const;
@@ -234,15 +228,14 @@ namespace freettcn {
     class CTC_ICMPPing_2 : public freettcn::TE::CTestCase {
     public:
       class CBehavior : public freettcn::TE::CBehavior {
-      public:
         enum {
           SCOPE1_t1
         };
-        
         enum {
           OFFSET_1 = freettcn::TE::CBehavior::OFFSET_START + 1,
         };
         
+      public:
         CBehavior(freettcn::TE::CModule &module);
         int Run(freettcn::TE::CTestComponentType::CInstanceLocal &comp, unsigned int offset) const;
       };
@@ -358,12 +351,12 @@ namespace freettcn {
     
     // ************************* P O R T S *****************************
     
-    CICMPPortType::CInstance::CInstance(const freettcn::TE::CTestComponentType::CInstanceLocal &component,
-                                        const char *name):
-      freettcn::TE::CPort(component.Module().PortType(CModule::PORT_TYPE_ICMPPortType), component, name)
+    CICMPPortType::CICMPPortType(const freettcn::TE::CModule &module):
+      freettcn::TE::CPortType(module, "ICMPPort", freettcn::TE::CPortType::MESSAGE)
     {
+      TypeAdd(module.Type(CModule::TYPE_ICMPMsg), freettcn::TE::CPortType::INOUT);
     }
-    
+
     
     
     // ******************** C O M P O N E N T S ************************
@@ -372,7 +365,7 @@ namespace freettcn {
     CICMPComponentType::CICMPComponentType(const freettcn::TE::CModule &module):
       freettcn::TE::CTestComponentType(&module, "ICMPComponent")
     {
-      PortTypeAdd(module.PortType(CModule::PORT_TYPE_ICMPPortType), "icmpPort");
+      PortInfoAdd(module.PortType(CModule::PORT_TYPE_ICMPPortType), "icmpPort", 0);
     }
     
     CICMPComponentType::CInstance::CInstance(const freettcn::TE::CType &type):
@@ -382,9 +375,6 @@ namespace freettcn {
     
     void CICMPComponentType::CInstance::Initialize()
     {
-      // ports declaration
-      Register(new CICMPPortType::CInstance(*this, "icmpPort"));
-      
       // constant definition
       
       // variable declaration
@@ -398,7 +388,7 @@ namespace freettcn {
     CIPStackType::CIPStackType(const freettcn::TE::CModule &module):
       freettcn::TE::CTestComponentType(&module, "IPStack")
     {
-      PortTypeAdd(module.PortType(CModule::PORT_TYPE_ICMPPortType), "icmpPort");
+      PortInfoAdd(module.PortType(CModule::PORT_TYPE_ICMPPortType), "icmpPort", 0);
     }
     
     CIPStackType::CInstance::CInstance(const freettcn::TE::CType &type):
@@ -408,7 +398,6 @@ namespace freettcn {
     
     void CIPStackType::CInstance::Initialize()
     {
-      Register(new CICMPPortType::CInstance(*this, "icmpPort"));
     }
     
     
@@ -442,7 +431,21 @@ namespace freettcn {
         {
           comp.ScopeEnter("icmp.ttcn", 83, "behavior");
           
-          comp.Verdict("icmp.ttcn", 85, freettcn::TE::VERDICT_PASS);
+          comp.MapReq(comp.Module().ActiveTestCase().MTC().Port("icmpPort", 0), comp.Module().ActiveTestCase().System().Port("icmpPort", 0));
+          
+          comp.Scope().Register(new freettcn::TE::CTimer(comp, false, 1.0));
+          comp.Scope().Register(new freettcn::TE::CIntegerType::CInstance(freettcn::TE::CBasicTypes::Integer(), 0));
+          /// @todo send operation
+          comp.Scope().Timer(SCOPE1_t).Start();
+          
+          /// @todo alt
+          
+          /// @todo log
+          
+          /// @todo temporary solution
+          comp.Verdict("icmp.ttcn", 94, freettcn::TE::VERDICT_PASS);
+          
+          comp.UnmapReq(comp.Module().ActiveTestCase().MTC().Port("icmpPort", 0), comp.Module().ActiveTestCase().System().Port("icmpPort", 0));
           
           comp.ScopeLeave("icmp.ttcn", 113);
           comp.StopReq("icmp.ttcn", 113);

@@ -64,5 +64,3 @@ const TriComponentId &freettcn::CTriComponentId::Id() const
 {
   return _id;
 }
-
-

@@ -52,20 +52,28 @@ namespace freettcn {
     class CTimer;
     class CTestCase;
     class CPort;
+    class CPortInfo;
     
     class CTestComponentType : public CType {
     public:
       class CInstance : public CType::CInstance {
-      private:
+        typedef std::vector<TriPortId *> TPortIdArray;
+        
+        TPortIdArray _portIdArray;
+        
         // not allowed
         bool Omit() const;
         void Omit(bool omit);
         const char *Encoding() const;
         const char *EncodingVariant() const;
         const char *Extension() const;
-
+        
+      protected:
+        void PortIdArrayCreate();
+        
       public:
         CInstance(const CType &type);
+        ~CInstance();
         
         virtual const TriComponentId &Id() const  = 0;
         virtual TciTestComponentKindType Kind() const  = 0;
@@ -73,6 +81,8 @@ namespace freettcn {
         virtual void Start(const CBehavior &behavior, TciParameterListType parameterList) = 0;
         virtual void Stop() = 0;
         virtual void Kill() = 0;
+        
+        const TriPortId &Port(const char *name, int idx) throw(ENotFound);
       };
       
       
@@ -144,7 +154,7 @@ namespace freettcn {
       private:
         typedef std::vector<CPort *> TPortArray;
         typedef std::list<const CTimer *> TTimerList;
-      
+        
         // test componnent info
         TriComponentId _id;
         TciTestComponentKindType _kind;
@@ -173,12 +183,9 @@ namespace freettcn {
         const CBehavior *_behavior;
         CScope *_scope;
         unsigned int _behaviorOffset;
-      
+        
         void ScopePush(const char *kind);
         void ScopePop();
-      
-      protected:
-        void Register(CPort *port);
         
       public:
         CInstanceLocal(const CType &type);
@@ -214,27 +221,33 @@ namespace freettcn {
         
         void StopReq(const char *src, int line, CInstanceRemote *comp = 0);
         void StopAllReq(const char *src, int line) throw(EOperationFailed);
+        
+        void ConnectReq(const TriPortId &port1, const TriPortId &port2) throw(EOperationFailed);
+        void DisconnectReq(const TriPortId &port1, const TriPortId &port2) throw(ENotFound);
+        void MapReq(const TriPortId &port1, const TriPortId &port2) throw(EOperationFailed);
+        void UnmapReq(const TriPortId &port1, const TriPortId &port2) throw(ENotFound);
       };
       
       
     private:
       // types
-      typedef std::vector<const TriPortId *> TPortIdList;
+      typedef std::vector<const CPortInfo *> TPortInfoArray;
       
       // info
-      TPortIdList _portIdList;
-      
-      // temporary variables
-      mutable TriPortId **__portIdList;
+      TPortInfoArray _portInfoArray;
+      TriPortIdList _portList;
       
     protected:
-      void PortTypeAdd(const CPortType &portType, const char *name, int portIdx = -1);
+      void PortInfoAdd(const CPortType &portType, const char *name, int portIdx);
+      void Init();
       
     public:
       CTestComponentType(const CModule *module, const char *name);
       ~CTestComponentType();
       
       TriPortIdList Ports() const;
+      unsigned int PortInfoNum() const;
+      const CPortInfo &PortInfo(unsigned int idx) const throw(ENotFound);
     };
     
     

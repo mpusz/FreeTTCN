@@ -530,13 +530,13 @@ void freettcn::TE::CModule::TestComponentStartReq(const char *src, int line,
 
 void freettcn::TE::CModule::TestComponentStart(const TriComponentId &componentId,
                                                const TciBehaviourIdType &behaviorId,
-                                               const TciParameterListType &parameterList) throw(ENotFound)
+                                               const TciParameterListType &parameterList) const throw(ENotFound)
 {
   TestComponent(componentId).Start(Behavior(behaviorId), parameterList);
 }
 
 
-void freettcn::TE::CModule::TestComponentStop(const TriComponentId &componentId) throw(ENotFound)
+void freettcn::TE::CModule::TestComponentStop(const TriComponentId &componentId) const throw(ENotFound)
 {
   TestComponent(componentId).Stop();
 }
@@ -628,7 +628,7 @@ void freettcn::TE::CModule::TestComponentTerminated(const TriComponentId &compon
 }
 
 
-void freettcn::TE::CModule::TestComponentKill(const TriComponentId &componentId) throw(ENotFound)
+void freettcn::TE::CModule::TestComponentKill(const TriComponentId &componentId) const throw(ENotFound)
 {
   TestComponent(componentId).Kill();
 //   CTestComponentType::CInstance &comp = TestComponent(componentId);
@@ -644,9 +644,9 @@ void freettcn::TE::CModule::TestComponentKill(const TriComponentId &componentId)
 }
 
 
-void freettcn::TE::CModule::TestComponentAllStop(const char *src, int line, CTestComponentType::CInstanceLocal &comp)
+void freettcn::TE::CModule::TestComponentAllStop(const char *src, int line, CTestComponentType::CInstanceLocal &comp) const
 {
-  for(TTestCompList::iterator it=_allEntityStates.begin(); it!=_allEntityStates.end(); ++it) {
+  for(TTestCompList::const_iterator it=_allEntityStates.begin(); it!=_allEntityStates.end(); ++it) {
     if ((*it)->Status() != CTestComponentType::CInstanceRemote::TERMINATED &&
         (*it)->Status() != CTestComponentType::CInstanceRemote::KILLED) {
       if ((*it)->Kind() == TCI_PTC_COMP)
@@ -669,5 +669,30 @@ void freettcn::TE::CModule::TestComponentAllKill(const char *src, int line, CTes
         _killed.push_back(*it);
       }
     }
+  }
+}
+
+
+void freettcn::TE::CModule::Connect(const TriPortId &fromPort, const TriPortId &toPort) const throw(ENotFound)
+{
+}
+
+void freettcn::TE::CModule::Disconnect(const TriPortId &fromPort, const TriPortId &toPort) const throw(ENotFound)
+{
+}
+
+void freettcn::TE::CModule::Map(const TriPortId &fromPort, const TriPortId &toPort) const throw(ENotFound)
+{
+  
+  if (triMap(&fromPort, &toPort) != TRI_OK) {
+    /// @todo do something
+  }
+}
+
+void freettcn::TE::CModule::Unmap(const TriPortId &fromPort, const TriPortId &toPort) const throw(ENotFound)
+{
+  
+  if (triUnmap(&fromPort, &toPort) != TRI_OK) {
+    /// @todo do something
   }
 }

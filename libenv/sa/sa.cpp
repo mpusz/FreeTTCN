@@ -24,6 +24,8 @@ extern "C" {
 #include <freettcn/ttcn3/tri_sa_te.h>
 #include <freettcn/ttcn3/tci_tl.h>
 }
+#include <freettcn/tools/timeStamp.h>
+
 
 
 freettcn::SA::CLogMask::CLogMask(bool enabled /* true */):
@@ -73,6 +75,12 @@ TriStatus freettcn::SA::CSUTAdaptor::TestCaseExecute(const TriTestCaseId &testCa
 
 TriStatus freettcn::SA::CSUTAdaptor::Map(const TriPortId &compPortId, const TriPortId &tsiPortId)
 {
+  if (Logging() && LogMask().Get(freettcn::CLogMask::CMD_SA_P_MAP)) {
+    TriComponentId comp = { { 0 } };
+    // log
+    tliPMap(0, TimeStamp().Get(), 0, 0, comp, compPortId.compInst, compPortId, tsiPortId.compInst, tsiPortId);
+  }
+  
   /// @todo mapping on SA
   return TRI_OK;
 }
@@ -80,6 +88,12 @@ TriStatus freettcn::SA::CSUTAdaptor::Map(const TriPortId &compPortId, const TriP
 
 TriStatus freettcn::SA::CSUTAdaptor::Unmap(const TriPortId &compPortId, const TriPortId &tsiPortId)
 {
+  if (Logging() && LogMask().Get(freettcn::CLogMask::CMD_SA_P_UNMAP)) {
+    TriComponentId comp = { { 0 } };
+    // log
+    tliPUnmap(0, TimeStamp().Get(), 0, 0, comp, compPortId.compInst, compPortId, tsiPortId.compInst, tsiPortId);
+  }
+  
   /// @todo unmapping on SA
   return TRI_OK;
 }

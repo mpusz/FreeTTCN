@@ -146,13 +146,18 @@ namespace freettcn {
       CTestComponentType::CInstanceRemote &TestComponentCreateReq(const char *src, int line, const TriComponentId &creatorId, TciTestComponentKindType kind, const CTestComponentType &compType, const char *name);
       const TriComponentId &TestComponentCreate(TciTestComponentKindType kind, TciType componentType, const char *name);
       void TestComponentStartReq(const char *src, int line, const TriComponentId &creatorId, CTestComponentType::CInstanceRemote &component, const CBehavior &behavior, const TciParameterListType &parameterList) throw(EOperationFailed);
-      void TestComponentStart(const TriComponentId &componentId, const TciBehaviourIdType &behaviorId, const TciParameterListType &parameterList) throw(ENotFound);
-      void TestComponentStop(const TriComponentId &componentId) throw(ENotFound);
+      void TestComponentStart(const TriComponentId &componentId, const TciBehaviourIdType &behaviorId, const TciParameterListType &parameterList) const throw(ENotFound);
+      void TestComponentStop(const TriComponentId &componentId) const throw(ENotFound);
       void TestComponentTerminated(const TriComponentId &componentId, TciVerdictValue verdict) throw(ENotFound);
-      void TestComponentKill(const TriComponentId &componentId) throw(ENotFound);
+      void TestComponentKill(const TriComponentId &componentId) const throw(ENotFound);
       
-      void TestComponentAllStop(const char *src, int line, CTestComponentType::CInstanceLocal &comp);
+      void TestComponentAllStop(const char *src, int line, CTestComponentType::CInstanceLocal &comp) const;
       void TestComponentAllKill(const char *src, int line, CTestComponentType::CInstanceLocal &comp);
+      
+      void Connect(const TriPortId &fromPort, const TriPortId &toPort) const throw(ENotFound);
+      void Disconnect(const TriPortId &fromPort, const TriPortId &toPort) const throw(ENotFound);
+      void Map(const TriPortId &fromPort, const TriPortId &toPort) const throw(ENotFound);
+      void Unmap(const TriPortId &fromPort, const TriPortId &toPort) const throw(ENotFound);
     };
     
   } // namespace TE

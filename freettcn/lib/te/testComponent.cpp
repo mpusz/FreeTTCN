@@ -55,7 +55,52 @@ freettcn::TE::CTestComponentType::CInstance::CInstance(const CType &type):
 {
 }
 
+freettcn::TE::CTestComponentType::CInstance::~CInstance()
+{
+  Purge(_portIdArray);
+}
 
+void freettcn::TE::CTestComponentType::CInstance::PortIdArrayCreate()
+{
+  // create port Ids
+  const CTestComponentType &type = static_cast<const CTestComponentType &>(Type());
+  for(unsigned int i=0; i<type.PortInfoNum(); i++) {
+    TriPortId *portId = new TriPortId;
+    const CPortInfo &portInfo = type.PortInfo(i);
+    
+    portId->compInst = Id();
+    portId->portName = const_cast<char *>(portInfo.Name());
+    portId->portIndex = portInfo.PortIdx();
+    portId->portType = portInfo.Type().Id();
+    portId->aux = this;
+    
+    _portIdArray.push_back(portId);
+  }
+}
+
+const TriPortId &freettcn::TE::CTestComponentType::CInstance::Port(const char *name, int idx) throw(ENotFound)
+{
+  for(unsigned int i=0; i<_portIdArray.size(); i++) {
+    if (!strcmp(name, _portIdArray[i]->portName)) {
+      if (!idx && idx == _portIdArray[i]->portIndex)
+        return *_portIdArray[i];
+      else {
+        // skip to correct port index
+        if (i + idx < _portIdArray.size()) {
+          /// @todo may be removed in optimizations
+          // check if correct name and index
+          if (!strcmp(name, _portIdArray[i + idx]->portName) &&
+              idx == _portIdArray[i + idx]->portIndex)
+            return *_portIdArray[i + idx];
+        }
+      }
+      break;
+    }
+  }
+  
+  std::cout << "ERROR: Port not found!!!" << std::endl;
+  throw ENotFound();
+}
 
 
 
@@ -64,6 +109,8 @@ freettcn::TE::CTestComponentType::CInstance::CInstance(const CType &type):
 freettcn::TE::CTestComponentType::CInstanceRemote::CInstanceRemote(const CType &type, const TriComponentId &id, TciTestComponentKindType kind):
   CInstance(type), _id(id), _kind(kind), _status(IDLE)
 {
+  // create port IDs array
+  PortIdArrayCreate();
 }
 
 const TriComponentId &freettcn::TE::CTestComponentType::CInstanceRemote::Id() const
@@ -119,6 +166,7 @@ freettcn::TE::CTestComponentType::CInstanceLocal::CInstanceLocal(const CType &ty
   _status(NOT_INITED), _verdict(CBasicTypes::Verdict(), VERDICT_NONE), _guardTimer(0),
   _behavior(0), _scope(0), _behaviorOffset(CBehavior::OFFSET_AUTO)
 {
+  
 }
 
 
@@ -225,15 +273,6 @@ void freettcn::TE::CTestComponentType::CInstanceLocal::Reset()
 }
 
 
-void freettcn::TE::CTestComponentType::CInstanceLocal::Register(CPort *port)
-{
-  _portArray.push_back(port);
-  /// @todo Maybe it should be added after 'Start' operation
-  /// @todo PortRemove should be added
-  _module->ActiveTestCase().PortAdd(*port);
-}
-
-
 freettcn::TE::CModule &freettcn::TE::CTestComponentType::CInstanceLocal::Module() const throw(ENotInited)
 {
   if (_status == NOT_INITED)
@@ -268,6 +307,20 @@ void freettcn::TE::CTestComponentType::CInstanceLocal::Init(CModule &module, Tci
   _id.compType = Type().Id();
   
   _status = BLOCKED;
+  
+  // create port IDs array
+  PortIdArrayCreate();
+  
+  // create ports
+  const CTestComponentType &type = static_cast<const CTestComponentType &>(Type());
+  for(unsigned int i=0; i<type.PortInfoNum(); i++) {
+    CPort *port = new CPort(type.PortInfo(i), *this);
+    _portArray.push_back(port);
+    
+    /// @todo Maybe it should be added after 'Start' operation
+    /// @todo PortRemove should be added
+    _module->ActiveTestCase().PortAdd(*port);
+  }
   
   // perform component specific initialization
   freettcn::TE::CInitObject::Init();
@@ -516,6 +569,33 @@ void freettcn::TE::CTestComponentType::CInstanceLocal::ScopeLeave(const char *sr
 
 
 
+void freettcn::TE::CTestComponentType::CInstanceLocal::ConnectReq(const TriPortId &port1, const TriPortId &port2) throw(EOperationFailed)
+{
+  tciConnectReq(port1, port2);
+}
+
+void freettcn::TE::CTestComponentType::CInstanceLocal::DisconnectReq(const TriPortId &port1, const TriPortId &port2) throw(ENotFound)
+{
+  tciDisconnectReq(port1, port2);
+}
+
+void freettcn::TE::CTestComponentType::CInstanceLocal::MapReq(const TriPortId &port1, const TriPortId &port2) throw(EOperationFailed)
+{
+  tciMapReq(port1, port2);
+}
+
+void freettcn::TE::CTestComponentType::CInstanceLocal::UnmapReq(const TriPortId &port1, const TriPortId &port2) throw(ENotFound)
+{
+  tciUnmapReq(port1, port2);
+}
+
+
+
+
+
+
+
+
 
 freettcn::TE::CTestComponentType::CInstanceLocal::CScope::CScope(const char *kind, CScope *up):
   _kind(kind), _up(up)
@@ -579,51 +659,72 @@ freettcn::TE::CTimer &freettcn::TE::CTestComponentType::CInstanceLocal::CScope::
 /* ************************* T E S T   C O M P O N E N T   T Y P E ********************** */
 
 freettcn::TE::CTestComponentType::CTestComponentType(const freettcn::TE::CModule *module, const char *name) :
-  freettcn::TE::CType(module, name, TCI_COMPONENT_TYPE, "", "", ""),
-  __portIdList(0)
+  freettcn::TE::CType(module, name, TCI_COMPONENT_TYPE, "", "", "")
 {
+  _portList.length = 0;
+  _portList.portIdList = 0;
 }
 
 
 freettcn::TE::CTestComponentType::~CTestComponentType()
 {
-  Purge(_portIdList);
+  Purge(_portInfoArray);
   
-  if (__portIdList)
-    delete[] __portIdList;
+  for(int i=0; i<_portList.length; i++)
+    delete _portList.portIdList[i];
+  delete[] _portList.portIdList;
 }
 
 
-void freettcn::TE::CTestComponentType::PortTypeAdd(const CPortType &portType, const char *name, int portIdx /* -1 */)
+void freettcn::TE::CTestComponentType::PortInfoAdd(const CPortType &portType, const char *name, int portIdx)
 {
-  TriPortId *portId = new TriPortId;
+  CPortInfo *portInfo = new CPortInfo(portType, name, portIdx);
+  _portInfoArray.push_back(portInfo);
   
-  memset(&portId->compInst, 0, sizeof(TriComponentId));
-  portId->portName = const_cast<char *>(name);
-  portId->portIndex = portIdx;
-  portId->portType = portType.Id();
-  portId->aux = 0;
   
-  _portIdList.push_back(portId);
+//   _portIdList.push_back(portId);
+}
+
+
+void freettcn::TE::CTestComponentType::Init()
+{
+  _portList.length = _portInfoArray.size();
+  if (_portList.length) {
+    _portList.portIdList = new TriPortId *[_portList.length];
+
+    for(unsigned int i=0; i<_portInfoArray.size(); i++) {
+      _portList.portIdList[i] = new TriPortId;
+      
+      memset(&_portList.portIdList[i]->compInst, 0, sizeof(TriComponentId)); /**< component not known for now */
+      _portList.portIdList[i]->portName = const_cast<char *>(_portInfoArray[i]->Name());
+      _portList.portIdList[i]->portIndex = _portInfoArray[i]->PortIdx();
+      _portList.portIdList[i]->portType = _portInfoArray[i]->Type().Id();
+      _portList.portIdList[i]->aux = 0;
+    }
+  }
 }
 
 
 TriPortIdList freettcn::TE::CTestComponentType::Ports() const
 {
-  TriPortIdList portList;
-  portList.length = _portIdList.size();
-  if (!__portIdList) {
-    __portIdList = new TriPortId *[portList.length];
-    
-    unsigned int i=0;
-    for(TPortIdList::const_iterator it=_portIdList.begin(); it!=_portIdList.end(); ++it, i++)
-      __portIdList[i] = const_cast<TriPortId*>(*it);
-  }
-  portList.portIdList = __portIdList;
-  
-  return portList;
+  return _portList;
 }
 
+
+unsigned int freettcn::TE::CTestComponentType::PortInfoNum() const
+{
+  return _portInfoArray.size();
+}
+
+
+const freettcn::TE::CPortInfo &freettcn::TE::CTestComponentType::PortInfo(unsigned int idx) const throw(ENotFound)
+{
+  if (idx < _portInfoArray.size())
+    return *_portInfoArray[idx];
+  
+  std::cout << "ERROR: Port info index: " << idx << " too big (size: " << _portInfoArray.size() << ")" << std::endl;
+  throw ENotFound();
+}
 
 
 

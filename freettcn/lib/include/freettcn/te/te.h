@@ -75,11 +75,11 @@ namespace freettcn {
       const TriComponentId &TestComponentCreate(TciTestComponentKindType kind, TciType componentType, String name) const;
       void TestComponentStart(const TriComponentId &componentId, const TciBehaviourIdType &behaviorId, const TciParameterListType &parameterList) const;
       void TestComponentStop(const TriComponentId &componentId) const;
-      void TestComponentKill(const TriComponentId &component);
-      void Connect(const TriPortId &fromPort, const TriPortId &toPort);
-      void Disconnect(const TriPortId &fromPort, const TriPortId &toPort);
-      void Map(const TriPortId &fromPort, const TriPortId &toPort);
-      void Unmap(const TriPortId &fromPort, const TriPortId &toPort);
+      void TestComponentKill(const TriComponentId &component) const;
+      void Connect(const TriPortId &fromPort, const TriPortId &toPort) const;
+      void Disconnect(const TriPortId &fromPort, const TriPortId &toPort) const;
+      void Map(const TriPortId &fromPort, const TriPortId &toPort) const;
+      void Unmap(const TriPortId &fromPort, const TriPortId &toPort) const;
       void TestComponentTerminated(const TriComponentId &componentId, TciVerdictValue verdict) const;
       void TestCaseExecute(const TciTestCaseIdType &testCaseId, const TriPortIdList &tsiPortList) const;
       void Reset() const;

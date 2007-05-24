@@ -43,16 +43,51 @@ namespace freettcn {
     class CModule;
     
     class CPortType {
+    public:
+      enum TType {
+        MESSAGE,
+        PROCEDURE,
+        MIXED
+      };
+      enum TDirection {
+        IN,
+        OUT,
+        INOUT
+      };
+      
     private:
+      typedef std::list<const CType *> TTypeList;
+      
+      const TType _type;
       QualifiedName _id;
+      bool _inAll;
+      TTypeList _inList;
+      bool _outAll;
+      TTypeList _outList;
+      
+    protected:
+      void TypeAdd(const CType &type, TDirection dir) throw(EOperationFailed);
+      void TypeAddAll(TDirection dir) throw(EOperationFailed);
       
     public:
-      CPortType(const CModule &module, const char *name);
+      CPortType(const CModule &module, const char *name, TType type);
       virtual ~CPortType() = 0;
       const QualifiedName &Id() const;
     };
     
-
+    
+    class CPortInfo {
+      const CPortType &_type;
+      const char *_name;
+      const int _portIdx;
+    public:
+      CPortInfo(const CPortType &type, const char *name, int portIdx);
+      const CPortType &Type() const;
+      const char *Name() const;
+      int PortIdx() const;
+    };
+    
+    
     class CPort {
     public:
       enum TStatus {
@@ -66,20 +101,26 @@ namespace freettcn {
       };
       
     private:
-      typedef CQueue<CMessage *> CMessageQueue;
+      typedef std::list<const TriPortId *> TConnectionList;
+//       typedef CQueue<CMessage *> CMessageQueue;
       
+      const CPortInfo &_portInfo;
       const CTestComponentType::CInstanceLocal &_component;
       TriPortId _id;
       
       // port dynamic state
-      TStatus _status;                          /**< actual status of a port */
-      // CONNECTIONS_LIST - keeps track of connections between the different ports in the test system
-      CMessageQueue _valueQueue;                /**< not yet consumed messages, calls, replies and exceptions */
+      TStatus _status;                            /**< actual status of a port */
+      TConnectionList _connectList;               /**< keeps track of connections between the different ports in the test system */
+      TConnectionList _mapList;                   /**< keeps track of connections between the different ports in the test system */
+//       CMessageQueue _valueQueue;                /**< not yet consumed messages, calls, replies and exceptions */
       // SNAP_VALUE - when a snapshot is taken the first element from VALUE_QUEUE is copied (NULL if VALUE_QUEUE is empty or STATUS = STOPPED)
       
+      void Connect(TConnectionList &list, const TriPortId &remoteId) throw(EOperationFailed);
+      void Disconnect(TConnectionList &list, const TriPortId &remoteId) throw(ENotFound);
+      
     public:
-      CPort(const CPortType &type, const CTestComponentType::CInstanceLocal &component, const char *name, int portIdx = -1);
-      virtual ~CPort() = 0;
+      CPort(const CPortInfo &portInfo, const CTestComponentType::CInstanceLocal &component);
+      ~CPort();
       
       const TriPortId &Id() const;
       
@@ -87,9 +128,11 @@ namespace freettcn {
         
 //         const TriPortId &RemoteId(const CTestComponentType::CInstance &component) const throw(ENotFound);
 //         TStatus Status() const;
-//         void Connect(const TriPortId &remoteId);
-//         void Disconnect(const TriPortId &remoteId);
-        
+      void Connect(const TriPortId &remoteId) throw(EOperationFailed);
+      void Disconnect(const TriPortId &remoteId) throw(ENotFound);
+      
+      void Map(const TriPortId &remoteId) throw(EOperationFailed);
+      void Unmap(const TriPortId &remoteId) throw(ENotFound);
     };
     
     

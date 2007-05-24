@@ -30,7 +30,9 @@
 #include "freettcn/ch/ch.h"
 extern "C" {
 #include <freettcn/ttcn3/tci_ch_te.h>
+#include <freettcn/ttcn3/tci_tl.h>
 }
+#include <freettcn/tools/timeStamp.h>
 
 #include <iostream>
 
@@ -163,6 +165,12 @@ void freettcn::CH::CComponentHandler::TestCaseExecute(const TciTestCaseIdType &t
 
 void freettcn::CH::CComponentHandler::ConnectReq(const TriPortId &fromPort, const TriPortId &toPort)
 {
+  if (Logging() && LogMask().Get(freettcn::CLogMask::CMD_CH_P_CONNECT)) {
+    TriComponentId comp = { { 0 } };
+    // log
+    tliPConnect(0, TimeStamp().Get(), 0, 0, comp, fromPort.compInst, fromPort, toPort.compInst, toPort);
+  }
+  
   Connect(fromPort, toPort);
   
 //   fromPort.cmp.te.Connect(TriPortId fromPort, TriPortId toPort);
@@ -178,6 +186,12 @@ void freettcn::CH::CComponentHandler::Connect(const TriPortId &fromPort, const T
 
 void freettcn::CH::CComponentHandler::DisconnectReq(const TriPortId &fromPort, const TriPortId &toPort)
 {
+  if (Logging() && LogMask().Get(freettcn::CLogMask::CMD_CH_P_DISCONNECT)) {
+    TriComponentId comp = { { 0 } };
+    // log
+    tliPDisconnect(0, TimeStamp().Get(), 0, 0, comp, fromPort.compInst, fromPort, toPort.compInst, toPort);
+  }
+  
   Disconnect(fromPort, toPort);
   
 //   fromPort.cmp.te.Disconnect(TriPortId fromPort, TriPortId toPort);
