@@ -675,24 +675,94 @@ void freettcn::TE::CModule::TestComponentAllKill(const char *src, int line, CTes
 
 void freettcn::TE::CModule::Connect(const TriPortId &fromPort, const TriPortId &toPort) const throw(ENotFound)
 {
+  unsigned int count = 0;
+  try {
+    TestComponent(fromPort.compInst).Port(fromPort.portName, fromPort.portIndex).Connect(toPort);
+    count++;
+  }
+  catch(ENotFound) {
+  }
+  try {
+    TestComponent(toPort.compInst).Port(toPort.portName, toPort.portIndex).Connect(fromPort);
+    count++;
+  }
+  catch(ENotFound) {
+  }
+  if (count < 1) {
+    std::cout << "ERROR: Ports to connect not found!!!" << std::endl;
+    throw ENotFound();
+  }
 }
 
 void freettcn::TE::CModule::Disconnect(const TriPortId &fromPort, const TriPortId &toPort) const throw(ENotFound)
 {
-}
-
-void freettcn::TE::CModule::Map(const TriPortId &fromPort, const TriPortId &toPort) const throw(ENotFound)
-{
-  
-  if (triMap(&fromPort, &toPort) != TRI_OK) {
-    /// @todo do something
+  unsigned int count = 0;
+  try {
+    TestComponent(fromPort.compInst).Port(fromPort.portName, fromPort.portIndex).Disconnect(toPort);
+    count++;
+  }
+  catch(ENotFound) {
+  }
+  try {
+    TestComponent(toPort.compInst).Port(toPort.portName, toPort.portIndex).Disconnect(fromPort);
+    count++;
+  }
+  catch(ENotFound) {
+  }
+  if (count < 1) {
+    std::cout << "ERROR: Ports to disconnect not found!!!" << std::endl;
+    throw ENotFound();
   }
 }
 
-void freettcn::TE::CModule::Unmap(const TriPortId &fromPort, const TriPortId &toPort) const throw(ENotFound)
+void freettcn::TE::CModule::Map(const TriPortId &fromPort, const TriPortId &toPort) const throw(ENotFound, EOperationFailed)
 {
+  unsigned int count = 0;
+  try {
+    TestComponent(fromPort.compInst).Port(fromPort.portName, fromPort.portIndex).Map(toPort);
+    count++;
+  }
+  catch(ENotFound) {
+  }
+  try {
+    TestComponent(toPort.compInst).Port(toPort.portName, toPort.portIndex).Map(fromPort);
+    count++;
+  }
+  catch(ENotFound) {
+  }
+  if (count < 1) {
+    std::cout << "ERROR: Ports to map not found!!!" << std::endl;
+    throw ENotFound();
+  }
+  
+  if (triMap(&fromPort, &toPort) != TRI_OK) {
+    std::cout << "ERROR: Mapping of ports failed!!!" << std::endl;
+    throw EOperationFailed();
+  }
+}
+
+void freettcn::TE::CModule::Unmap(const TriPortId &fromPort, const TriPortId &toPort) const throw(ENotFound, EOperationFailed)
+{
+  unsigned int count = 0;
+  try {
+    TestComponent(fromPort.compInst).Port(fromPort.portName, fromPort.portIndex).Unmap(toPort);
+    count++;
+  }
+  catch(ENotFound) {
+  }
+  try {
+    TestComponent(toPort.compInst).Port(toPort.portName, toPort.portIndex).Unmap(fromPort);
+    count++;
+  }
+  catch(ENotFound) {
+  }
+  if (count < 1) {
+    std::cout << "ERROR: Ports to unmap not found!!!" << std::endl;
+    throw ENotFound();
+  }
   
   if (triUnmap(&fromPort, &toPort) != TRI_OK) {
-    /// @todo do something
+    std::cout << "ERROR: Unmapping of ports failed!!!" << std::endl;
+    throw EOperationFailed();
   }
 }

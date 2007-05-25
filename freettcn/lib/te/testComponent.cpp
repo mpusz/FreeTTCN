@@ -78,7 +78,7 @@ void freettcn::TE::CTestComponentType::CInstance::PortIdArrayCreate()
   }
 }
 
-const TriPortId &freettcn::TE::CTestComponentType::CInstance::Port(const char *name, int idx) throw(ENotFound)
+const TriPortId &freettcn::TE::CTestComponentType::CInstance::PortId(const char *name, int idx) const throw(ENotFound)
 {
   for(unsigned int i=0; i<_portIdArray.size(); i++) {
     if (!strcmp(name, _portIdArray[i]->portName)) {
@@ -98,7 +98,7 @@ const TriPortId &freettcn::TE::CTestComponentType::CInstance::Port(const char *n
     }
   }
   
-  std::cout << "ERROR: Port not found!!!" << std::endl;
+  std::cout << "ERROR: Port ID not found!!!" << std::endl;
   throw ENotFound();
 }
 
@@ -381,6 +381,33 @@ void freettcn::TE::CTestComponentType::CInstanceLocal::Execute(const char *src, 
 //     delete this;
 // }
 
+
+freettcn::TE::CPort &freettcn::TE::CTestComponentType::CInstanceLocal::Port(const char *name, int idx) const throw(ENotFound)
+{
+  for(unsigned int i=0; i<_portArray.size(); i++) {
+    const TriPortId *portId = &_portArray[i]->Id();
+    if (!strcmp(name, portId->portName)) {
+      if (!idx && idx == portId->portIndex)
+        return *_portArray[i];
+      else {
+        // skip to correct port index
+        if (i + idx < _portArray.size()) {
+          /// @todo may be removed in optimizations
+          // check if correct name and index
+          portId = &_portArray[i + idx]->Id();
+          if (!strcmp(name, portId->portName) &&
+              idx == portId->portIndex)
+            return *_portArray[i + idx];
+        }
+      }
+      break;
+    }
+  }
+  
+  std::cout << "ERROR: Port not found!!!" << std::endl;
+  throw ENotFound();
+}
+        
 
 void freettcn::TE::CTestComponentType::CInstanceLocal::Run(unsigned int offset) throw(ENotStarted)
 {

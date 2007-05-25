@@ -156,8 +156,8 @@ namespace freettcn {
       
       void Connect(const TriPortId &fromPort, const TriPortId &toPort) const throw(ENotFound);
       void Disconnect(const TriPortId &fromPort, const TriPortId &toPort) const throw(ENotFound);
-      void Map(const TriPortId &fromPort, const TriPortId &toPort) const throw(ENotFound);
-      void Unmap(const TriPortId &fromPort, const TriPortId &toPort) const throw(ENotFound);
+      void Map(const TriPortId &fromPort, const TriPortId &toPort) const throw(ENotFound, EOperationFailed);
+      void Unmap(const TriPortId &fromPort, const TriPortId &toPort) const throw(ENotFound, EOperationFailed);
     };
     
   } // namespace TE

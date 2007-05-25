@@ -82,7 +82,7 @@ namespace freettcn {
         virtual void Stop() = 0;
         virtual void Kill() = 0;
         
-        const TriPortId &Port(const char *name, int idx) throw(ENotFound);
+        const TriPortId &PortId(const char *name, int idx) const throw(ENotFound);
       };
       
       
@@ -206,6 +206,8 @@ namespace freettcn {
         void Reset();
         
         void Verdict(const char *src, int line, TVerdict verdict);
+        
+        CPort &Port(const char *name, int idx) const throw(ENotFound);
         
         void Run(unsigned int offset) throw(ENotStarted);
         void Execute(const char *src, int line, CTestCase &testCase, TriTimerDuration duration, int returnOffset);

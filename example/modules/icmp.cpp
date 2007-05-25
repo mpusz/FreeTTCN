@@ -431,7 +431,7 @@ namespace freettcn {
         {
           comp.ScopeEnter("icmp.ttcn", 83, "behavior");
           
-          comp.MapReq(comp.Module().ActiveTestCase().MTC().Port("icmpPort", 0), comp.Module().ActiveTestCase().System().Port("icmpPort", 0));
+          comp.MapReq(comp.Module().ActiveTestCase().MTC().PortId("icmpPort", 0), comp.Module().ActiveTestCase().System().PortId("icmpPort", 0));
           
           comp.Scope().Register(new freettcn::TE::CTimer(comp, false, 1.0));
           comp.Scope().Register(new freettcn::TE::CIntegerType::CInstance(freettcn::TE::CBasicTypes::Integer(), 0));
@@ -445,7 +445,7 @@ namespace freettcn {
           /// @todo temporary solution
           comp.Verdict("icmp.ttcn", 94, freettcn::TE::VERDICT_PASS);
           
-          comp.UnmapReq(comp.Module().ActiveTestCase().MTC().Port("icmpPort", 0), comp.Module().ActiveTestCase().System().Port("icmpPort", 0));
+          comp.UnmapReq(comp.Module().ActiveTestCase().MTC().PortId("icmpPort", 0), comp.Module().ActiveTestCase().System().PortId("icmpPort", 0));
           
           comp.ScopeLeave("icmp.ttcn", 113);
           comp.StopReq("icmp.ttcn", 113);
