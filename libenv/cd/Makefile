@@ -25,6 +25,6 @@ BIN_DIR = ../bin
 CPPFLAGS += -fPIC
 
 # files
-CPP_FILES = decoder.cpp tci_te_cd.cpp
+CPP_FILES = tci_te_cd.cpp cd.cpp codec.cpp internalCodec.cpp # decoder.cpp
 
 include ../../Makefile.rules

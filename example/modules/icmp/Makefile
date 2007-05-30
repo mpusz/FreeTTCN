@@ -17,41 +17,45 @@
 # along with this example; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-include ../Makefile.defines
+include ../../../Makefile.defines
 
 
-#
-# directories
-#
-MODULES_DIR = modules
-MAIN_DIR = main
-BUILD_DIRS = $(MODULES_DIR) $(MAIN_DIR)
+BIN_DIR = ../../bin
 
-BIN_DIR = bin
+
+# files
+CPP_FILES = icmp.cpp icmp_cd.cpp
+
+
+# macros
+O_FILES = $(addprefix $(BIN_DIR)/, $(patsubst %.cpp,%.o,$(CPP_FILES)))
+DEPEND_FILES = $(patsubst %.cpp,%.d,$(CPP_FILES))
+
+INCLUDE_DIRS = -Iinclude
 
 
 # targets
-.PHONY: all main modules clean distclean tags
+.PHONY: all clean distclean tags
 
-all: $(BIN_DIR)/$(EXAMPLE_NAME)
-
-main:
-	@$(call cmd,cmd_make,$(MAIN_DIR))
-
-modules:
-	@$(call cmd,cmd_make,$(MODULES_DIR))
+all: $(O_FILES)
 
 clean:
-	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_clean,$(dir)))
+	$(Q)$(RM) -f $(O_FILES) $(DEPEND_FILES)
 
-distclean:
-	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_distclean,$(dir)))
-	$(Q)$(RM) -f $(BIN_DIR)/*~
+distclean: clean
+	$(Q)$(RM) -f *~ include/*~
 
 tags:
-	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_tags,$(dir)))
-
+	@$(call cmd,cmd_tags_cpp)
 
 
 # rules
-$(BIN_DIR)/$(EXAMPLE_NAME): modules main
+$(BIN_DIR)/%.o: %.cpp
+	@$(call cmd,cmd_cc_d_o)
+
+%.cpp: %.ttcn
+	@$(call cmd,cmd_ttcn_cc)
+
+
+# include depends files
+-include $(CPP_FILES:.cpp=.d)

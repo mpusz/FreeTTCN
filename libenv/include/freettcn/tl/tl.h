@@ -193,7 +193,14 @@ namespace freettcn {
                           const TriPortId &port1,
                           const TriComponentId &c2,
                           const TriPortId &port2) const;
-
+      
+      virtual void Encode(const char *am, int ts, const char *src, int line,
+                          const TriComponentId &c,
+                          TciValue val,
+                          TriStatus encoderFailure,
+                          const TriMessage &msg,
+                          String codec) const;
+      
       virtual void TTimeoutDetected(const char *am, int ts, const char *src, int line,
                                     const TriComponentId &c,
                                     const TriTimerId &timer) const;

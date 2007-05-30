@@ -55,6 +55,8 @@ namespace freettcn {
         CInstance(const CType &type);
         virtual ~CInstance();
         
+        CInstance &operator=(const CInstance &value) throw(EOperationFailed);
+        
         const CType &Type() const;
         bool Omit() const;
         void Omit(bool omit);

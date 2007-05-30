@@ -124,8 +124,6 @@ namespace freettcn {
       
       const TriPortId &Id() const;
       
-        //       void Send();
-        
 //         const TriPortId &RemoteId(const CTestComponentType::CInstance &component) const throw(ENotFound);
 //         TStatus Status() const;
       void Connect(const TriPortId &remoteId) throw(EOperationFailed);
@@ -133,6 +131,8 @@ namespace freettcn {
       
       void Map(const TriPortId &remoteId) throw(EOperationFailed);
       void Unmap(const TriPortId &remoteId) throw(ENotFound);
+      
+      void Send(const freettcn::TE::CType::CInstance &value) const throw(EOperationFailed);
     };
     
     

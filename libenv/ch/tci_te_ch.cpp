@@ -34,6 +34,16 @@ extern "C" {
 #include "freettcn/ch/ch.h"
 
 
+void tciSendConnected(TriPortId sender,
+                      TriComponentId receiver,
+                      TciValue sendMessage)
+{
+  freettcn::CH::CComponentHandler &ch = freettcn::CH::CComponentHandler::Instance();
+  ch.ConnectedSend(sender, receiver, sendMessage);
+}
+
+
+
 TriComponentId tciCreateTestComponentReq(TciTestComponentKindType kind,
                                          TciType componentType,
                                          String name)

@@ -144,7 +144,14 @@ namespace freettcn {
 
       CMD_CH_NUM                                    /**< should be the last one on the list */
     };
-  
+    
+    enum TCDCommands {
+      CMD_CD_ENCODE,
+      CMD_CD_DECODE,
+      
+      CMD_CD_NUM                                    /**< should be the last one on the list */
+    };
+    
     enum TSACommands {
       CMD_SA_M_SEND_M,
       CMD_SA_M_SEND_M_BC,

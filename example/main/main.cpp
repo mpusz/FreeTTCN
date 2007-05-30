@@ -20,9 +20,11 @@
 
 #include "glibMainLoop.h"
 #include "glibPlatformAdaptor.h"
+#include "../modules/icmp/include/icmp_cd.h"
 
 #include <freettcn/tl/tl.h>
 #include <freettcn/ch/ch.h>
+#include <freettcn/cd/cd.h>
 #include <freettcn/pa/paLogMask.h>
 #include <freettcn/sa/sa.h>
 #include <freettcn/te/te.h>
@@ -85,7 +87,7 @@ void Start(freettcn::example::CCLITestManagement &tm, const std::string &testCas
     
   // initiate all entities
   freettcn::CH::CComponentHandler ch;
-  //     freettcn::CD::CComponentHandler cd;
+  freettcn::CD::CCodingDecoding cd;
   freettcn::example::CGlibPlatformAdaptor pa;
   freettcn::SA::CSUTAdaptor sa;
   freettcn::TL::CTestLogging tl(logger);
@@ -94,6 +96,7 @@ void Start(freettcn::example::CCLITestManagement &tm, const std::string &testCas
   freettcn::TE::CLogMask teLogMask(true);
   freettcn::TM::CLogMask tmLogMask(true);
   freettcn::CH::CLogMask chLogMask(true);
+  freettcn::CD::CLogMask cdLogMask(true);
   freettcn::PA::CLogMask paLogMask(true);
   freettcn::SA::CLogMask saLogMask(true);
     
@@ -101,8 +104,13 @@ void Start(freettcn::example::CCLITestManagement &tm, const std::string &testCas
   te.LogEnable(ts, teLogMask);
   tm.LogEnable(ts, tmLogMask);
   ch.LogEnable(ts, chLogMask);
+  cd.LogEnable(ts, cdLogMask);
   pa.LogEnable(ts, paLogMask);
   sa.LogEnable(ts, saLogMask);
+  
+  // register module specific codecs
+  freettcn::icmp::CCodec *icmpCodec = new freettcn::icmp::CCodec;
+  cd.Register(icmpCodec);
   
   // run
   if (testCase != "") {

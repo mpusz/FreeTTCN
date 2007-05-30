@@ -17,64 +17,68 @@
 // along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-
 /**
- * @file   sa.h
+ * @file   cd.h
  * @author Mateusz Pusz
- * @date   Thu Mar 29 19:16:34 2007
+ * @date   Wed May 30 08:03:44 2007
  * 
  * @brief  
  * 
  * 
  */
 
-#ifndef __SA_H__
-#define __SA_H__
+#ifndef __CD_H__
+#define __CD_H__
 
 extern "C" {
-#include <freettcn/ttcn3/tri.h>
+// #include <freettcn/ttcn3/tri.h>
+#include <freettcn/ttcn3/tci.h>
 }
 #include <freettcn/tools/logMask.h>
 #include <freettcn/tools/entity.h>
+#include <list>
+
 
 namespace freettcn {
   
-  namespace SA {
+  namespace CD {
     
     class CLogMask : public freettcn::CLogMask {
     public:
       CLogMask(bool enabled = true);
       ~CLogMask();
     };
+    
 
-
-    class CSUTAdaptor : public freettcn::CEntity {
-      static CSUTAdaptor *_instance;
+    class CCodec;
+    
+    class CCodingDecoding : public freettcn::CEntity {
+      static CCodingDecoding *_instance;
       
-      CSUTAdaptor& operator=(CSUTAdaptor&);  // Disallowed
-      CSUTAdaptor(const CSUTAdaptor&);       // Disallowed
+      typedef std::list<const CCodec *> TCodecList;
+      
+      TCodecList _codecList;
+      
+      CCodingDecoding& operator=(CCodingDecoding&);  // Disallowed
+      CCodingDecoding(const CCodingDecoding&);       // Disallowed
+      
+      virtual const CCodec &Codec(TciValue value, unsigned int &valueId) const throw(ENotFound);
+      
     public:
-      static CSUTAdaptor &Instance() throw(ENotFound);
+      static CCodingDecoding &Instance() throw(ENotFound);
       
-      CSUTAdaptor();
-      virtual ~CSUTAdaptor();
+      CCodingDecoding();
+      virtual ~CCodingDecoding();
       
-      TriStatus Reset();
+      void Register(const CCodec *codec);
       
-      TriStatus TestCaseExecute(const TriTestCaseId &testCaseId, const TriPortIdList &tsiPortList);
-
-      TriStatus Map(const TriPortId &compPortId, const TriPortId &tsiPortId);
-      TriStatus Unmap(const TriPortId &compPortId, const TriPortId &tsiPortId);
-      
-      TriStatus Send(const TriComponentId &componentId, const TriPortId &tsiPortId, const TriAddress *sutAddress, const TriMessage &sendMessage);
+      TciValue Decode(const BinaryString &message, TciType decHypothesis) const;
+      BinaryString Encode(TciValue value) const;
     };
     
-  } // namespace SA
+  } // namespace CD
   
 } // namespace freettcn
 
 
-// void MessageReceived();
-
-#endif /* __SA_H__ */
-
+#endif /* __CD_H__ */

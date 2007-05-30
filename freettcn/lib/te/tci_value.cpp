@@ -83,6 +83,17 @@ TciValue tciNewInstance(TciType inst)
   return type->InstanceCreate();
 }
 
+String tciGetTypeEncoding(TciType inst)
+{
+  const freettcn::TE::CType *type = TypeGet(inst);
+  return const_cast<char *>(type->Encoding());
+}
+
+String tciGetTypeEncodingVariant(TciType inst)
+{
+  const freettcn::TE::CType *type = TypeGet(inst);
+  return const_cast<char *>(type->EncodingVariant());
+}
 
 
 

@@ -31,6 +31,7 @@
 
 #include "freettcn/te/type.h"
 #include "freettcn/te/module.h"
+#include <iostream>
 
 
 freettcn::TE::CType::CType(const CModule   *module,
@@ -98,6 +99,18 @@ freettcn::TE::CType::CInstance::CInstance(const CType &type) :
 
 freettcn::TE::CType::CInstance::~CInstance()
 {
+}
+
+freettcn::TE::CType::CInstance &freettcn::TE::CType::CInstance::operator=(const CInstance &value) throw(EOperationFailed)
+{
+  if (&_type == &value._type) {
+    _omit = value._omit;
+    
+    return *this;
+  }
+  
+  std::cout << "ERROR: Cannot assign values of different types" << std::endl;
+  throw EOperationFailed();
 }
 
 const freettcn::TE::CType &freettcn::TE::CType::CInstance::Type() const

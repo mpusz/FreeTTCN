@@ -1084,6 +1084,8 @@ void tliEncode(String am,
                TriMessage msg,
                String codec)
 {
+  freettcn::TL::CTestLogging &tl = freettcn::TL::CTestLogging::Instance();
+  tl.Encode(am, ts, src, line, c, val, encoderFailure, msg, codec);
 }
 
 

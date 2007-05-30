@@ -252,6 +252,12 @@ void freettcn::TE::CTTCNExecutable::ControlStop() const
 }
 
 
+void freettcn::TE::CTTCNExecutable::ConnectedMsgEnqueue(const TriPortId &sender, const TriComponentId &receiver, TciValue rcvdMessage) const
+{
+  /// @todo enqueue new message
+}
+
+
 const TriComponentId &freettcn::TE::CTTCNExecutable::TestComponentCreate(TciTestComponentKindType kind,
                                                                          TciType componentType,
                                                                          String name) const

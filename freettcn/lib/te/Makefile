@@ -30,7 +30,7 @@ CPP_FILES = teLogMask.cpp sourceData.cpp modulesContainer.cpp \
 	record.cpp \
 	tci_value.cpp tci_tm_te.cpp tci_ch_te.cpp tci_cd_te.cpp \
 	tri_pa_te.cpp tri_sa_te.cpp \
-	te.cpp idObject.cpp initObject.cpp module.cpp testCase.cpp testComponent.cpp behavior.cpp timer.cpp port.cpp
+	te.cpp idObject.cpp initObject.cpp module.cpp testCase.cpp testComponent.cpp behavior.cpp timer.cpp port.cpp template.cpp
 
 
 include ../../../Makefile.rules

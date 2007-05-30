@@ -34,6 +34,15 @@ extern "C" {
 #include <iostream>
 
 
+void tciEnqueueMsgConnected(TriPortId sender,
+                            TriComponentId receiver,
+                            TciValue rcvdMessage)
+{
+  freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
+  return te.ConnectedMsgEnqueue(sender, receiver, rcvdMessage);
+}
+
+
 TriComponentId tciCreateTestComponent(TciTestComponentKindType kind,
                                       TciType componentType,
                                       String name)

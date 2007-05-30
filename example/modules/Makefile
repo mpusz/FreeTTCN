@@ -20,38 +20,23 @@
 include ../../Makefile.defines
 
 
-BIN_DIR = ../bin
-
-# files
-MODULE_CPP_FILE = $(patsubst %.ttcn,%.cpp,$(MODULE))
-MODULE_DEPEND_FILE = $(patsubst %.ttcn,%.d,$(MODULE))
-MODULE_O_FILE = $(BIN_DIR)/$(patsubst %.ttcn,%.o,$(MODULE))
-
-CPP_FILES = $(patsubst %.ttcn,%.cpp,$(MOD_FILES))
+#
+# directories
+#
+BUILD_DIRS = $(MODULES)
 
 
 # targets
-.PHONY: mod tags distclean clean
+.PHONY: all clean distclean tags
 
-mod: $(MODULE_O_FILE)
+all:
+	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make,$(dir)))
 
 clean:
-	$(Q)$(RM) -f $(BIN_DIR)/$(patsubst %.ttcn,%.o,$(MOD_FILES)) $(patsubst %.ttcn,%.d,$(MOD_FILES))
+	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_clean,$(dir)))
 
-distclean: clean
-	$(Q)$(RM) -f *~ include/*~
+distclean:
+	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_distclean,$(dir)))
 
 tags:
-	@$(call cmd,cmd_tags_cpp)
-
-
-# rules
-$(BIN_DIR)/%.o: %.cpp
-	@$(call cmd,cmd_cc_d_o)
-
-%.cpp: %.ttcn
-	@$(call cmd,cmd_ttcn_cc)
-
-
-# include depends files
--include $(MODULE_CPP_FILE:.cpp=.d)
+	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_tags,$(dir)))

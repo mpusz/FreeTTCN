@@ -32,7 +32,7 @@ O_FILES = $(addprefix $(BIN_DIR)/, $(patsubst %.cpp,%.o,$(CPP_FILES)))
 DEPEND_FILES = $(patsubst %.cpp,%.d,$(CPP_FILES))
 
 # modules
-MODULES_O_FILES = $(addprefix $(BIN_DIR)/, $(patsubst %.ttcn,%.o,$(MOD_FILES)))
+MODULES_O_FILES = $(addprefix $(BIN_DIR)/, $(foreach mod,$(MODULES),$(mod).o $(mod)_cd.o))
 
 
 
@@ -44,7 +44,7 @@ all: $(O_FILES)
 
 clean:
 	$(Q)$(RM) -f $(LIB_PATH) $(O_FILES) $(DEPEND_FILES)
-	$(Q)$(RM) -f $(BIN_DIR)/$(PROG_NAME)
+	$(Q)$(RM) -f $(BIN_DIR)/$(EXAMPLE_NAME)
 
 distclean: clean
 	$(Q)$(RM) -f *~ include/*~

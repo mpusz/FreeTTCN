@@ -55,6 +55,8 @@ namespace freettcn {
       CComponentHandler(const CComponentHandler&);       // Disallowed
       
     protected:
+      virtual void ConnectedMsgEnqueue(const TriPortId &sender, const TriComponentId &receiver, TciValue rcvdMessage);
+      
       virtual TriComponentId TestComponentCreate(TciTestComponentKindType kind, TciType componentType, String name);
       virtual void TestComponentStart(const TriComponentId &component, const TciBehaviourIdType &behavior, const TciParameterListType &parameterList);
       virtual void TestComponentStop(const TriComponentId &component);
@@ -74,6 +76,8 @@ namespace freettcn {
       virtual ~CComponentHandler();
       
       void ResetReq();
+      
+      void ConnectedSend(const TriPortId &sender, const TriComponentId &receiver, TciValue sendMessage);
       
       TriComponentId TestComponentCreateReq(TciTestComponentKindType kind, TciType componentType, String name);
       void TestComponentStartReq(const TriComponentId &component, const TciBehaviourIdType &behavior, const TciParameterListType &parameterList); 

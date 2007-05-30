@@ -72,6 +72,7 @@ namespace freettcn {
       void ControlStop() const;
       
       // CH requests
+      void ConnectedMsgEnqueue(const TriPortId &sender, const TriComponentId &receiver, TciValue rcvdMessage) const;
       const TriComponentId &TestComponentCreate(TciTestComponentKindType kind, TciType componentType, String name) const;
       void TestComponentStart(const TriComponentId &componentId, const TciBehaviourIdType &behaviorId, const TciParameterListType &parameterList) const;
       void TestComponentStop(const TriComponentId &componentId) const;

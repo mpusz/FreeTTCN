@@ -21,14 +21,19 @@
 # project name
 PROJECT_NAME = freettcn
 
+# part names
+LIB_NAME = lib$(PROJECT_NAME)
+LIB_ENV_NAME = lib$(PROJECT_NAME)env
+EXAMPLE_NAME = ttcn_example
+
 # software version
 VERSION_1 = 0
 VERSION_2 = 0
 VERSION_3 = 1
 VERSION = $(VERSION_1).$(VERSION_2).$(VERSION_3)
 
-LIB_NAME = lib$(PROJECT_NAME)
-LIB_ENV_NAME = lib$(PROJECT_NAME)env
+# example modules
+MODULES = icmp
 
 
 #
@@ -117,10 +122,6 @@ quiet_cmd_make = MAKE $(LONG_DIR_NAME)/$(2)
 quiet_cmd_make_install = MAKE_INSTALL $(LONG_DIR_NAME)/$(2)
       cmd_make_install = $(MAKE) -C $(2) DIR_NAME=$(2) LONG_DIR_NAME=$(LONG_DIR_NAME)/$(2) install
 
-# start module compilation
-quiet_cmd_make_mod = MAKE_MOD $(BIN_DIR)/$(patsubst %.ttcn,%.o,$(2))
-      cmd_make_mod = $(MAKE) -C $(MODULES_DIR) MODULE=$(2) mod
-
 # make clean
 quiet_cmd_make_clean = MAKE_CLEAN $(LONG_DIR_NAME)/$(2)
       cmd_make_clean = $(MAKE) -C $(2) DIR_NAME=$(2) LONG_DIR_NAME=$(LONG_DIR_NAME)/$(2) clean
@@ -161,8 +162,8 @@ quiet_cmd_lib_link = LINK $(BIN_DIR)/$(LIB_FULL_NAME)
 		     $(RM) -f *.o
 
 # link example
-quiet_cmd_example_link = LINK       $(BIN_DIR)/$(PROG_NAME)
-      cmd_example_link = $(CPP) $(O_FILES) $(MODULES_O_FILES) -l$(PROJECT_NAME) -l$(PROJECT_NAME)env `pkg-config --libs glib-2.0` -o $(BIN_DIR)/$(PROG_NAME)
+quiet_cmd_example_link = LINK       $(BIN_DIR)/$(EXAMPLE_NAME)
+      cmd_example_link = $(CPP) $(O_FILES) $(MODULES_O_FILES) -l$(PROJECT_NAME) -l$(PROJECT_NAME)env `pkg-config --libs glib-2.0` -o $(BIN_DIR)/$(EXAMPLE_NAME)
 
 # install library
 quiet_cmd_lib_install = INSTALL $(LIB_FULL_NAME)

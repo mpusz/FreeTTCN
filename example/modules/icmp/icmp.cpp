@@ -33,6 +33,7 @@
 #include <freettcn/te/behavior.h>
 #include <freettcn/te/port.h>
 #include <freettcn/te/record.h>
+#include <freettcn/te/template.h>
 #include <freettcn/te/timer.h>
 #include <freettcn/te/basicTypes.h>
 #include <freettcn/te/sourceData.h>
@@ -129,89 +130,28 @@ namespace freettcn {
     
     
     
-//     // ********** TEMPLATES ***********
+    // ********************* T E M P L A T E S *************************
+
+    class Ct_EchoRequest : public freettcn::TE::CTemplate {
+    public:
+      Ct_EchoRequest(const freettcn::TE::CModule &module, freettcn::TE::CIntegerType::CInstance &seqNum);
+    };
     
-//     class Ct_EchoRequest : public CICMPMsg {
-//     public:
-//       Ct_EchoRequest()
-//       {
-//         msgType = 8;
-//         code = 0;
-//         crc = new int(0);
-//         data._selector = CICMPDataType::SELECTOR_ping;
-//         data.ping = new CICMPPingDataType;
-//         data.ping->id = 1234;
-//       }
-      
-//       const Ct_EchoRequest &Template(const int &seqNum)
-//       {
-//         data.ping->seqNumber = seqNum;
-//         return *this;
-//       }
-//     };
-    
-//     Ct_EchoRequest t_EchoRequest;
-    
-//     class Ct_EchoReply : public CICMPMsg {
-//     public:
-//       Ct_EchoReply()
-//       {
-//         msgType = 0;
-//         code = 0;
-//       }
-      
-//       const Ct_EchoReply &Template(const Ct_EchoRequest &echoReq)
-//       {
-//         data = echoReq.data;
-//         return *this;
-//       }
-//     };
-    
-//     Ct_EchoReply t_EchoReply;
-    
+    class Ct_EchoReply : public freettcn::TE::CTemplate {
+    public:
+      Ct_EchoReply(const freettcn::TE::CModule &module, CICMPMsg::CInstance &echoReq);
+    };
     
 
-//     class CTestCase_ICMP_Ping_1_Scope_1 {
-//     public:
-//       CIPStack system;
-//       CICMPComponent mtc;
-//       freettcn::TE::CTimer *t;
-//       int count;
-      
-//       CTestCase_ICMP_Ping_1_Scope_1() : t(0), count(0) {};
-//       ~CTestCase_ICMP_Ping_1_Scope_1()
-//       {
-//         if (t)
-//           delete t;
-//       }
-//     };
-    
-//     class CTestCase_ICMP_Ping_1_Command_1 : public freettcn::TE::CCommand {
-//       freettcn::TE::CTestComponent &_comp;
-//       CTestCase_ICMP_Ping_1_Scope_1 &_scope;
-      
-//     public:
-//       void Run()
-//       {
-//         _comp.Map(_scope.mtc.icmpPort, _scope.system.icmpPort);
-        
-//         _comp.Verdict(freettcn::TE::VERDICT_FAIL);
-        
-//         _scope.t = new freettcn::TE::CTimer(1.0);
-        
-//         _scope.mtc.icmpPort.Send(t_EchoRequest.Template(_scope.count));
-//       }
-//     };
-    
-    
-    
-    
     
     // ******************** T E S T   C A S E S ************************
     
     class CTC_ICMPPing_1 : public freettcn::TE::CTestCase {
     public:
       class CBehavior : public freettcn::TE::CBehavior {
+        enum{
+          SCOPE1_count
+        };
         enum {
           SCOPE1_t
         };
@@ -401,7 +341,38 @@ namespace freettcn {
     }
     
     
-
+    
+    
+    // ********************* T E M P L A T E S *************************
+    
+    Ct_EchoRequest::Ct_EchoRequest(const freettcn::TE::CModule &module, freettcn::TE::CIntegerType::CInstance &seqNum):
+      freettcn::TE::CTemplate(module.Type(CModule::TYPE_ICMPMsg))
+    {
+      CICMPMsg::CInstance &value = MY_CAST<CICMPMsg::CInstance &>(Value());
+      
+      MY_CAST<freettcn::TE::CIntegerType::CInstance &>(value.Field(CICMPMsg::FIELD_msgType)).Value(8);
+      MY_CAST<freettcn::TE::CIntegerType::CInstance &>(value.Field(CICMPMsg::FIELD_code)).Value(0);
+      MY_CAST<freettcn::TE::CIntegerType::CInstance &>(value.Field(CICMPMsg::FIELD_crc)).Value(0);
+      CICMPDataType::CInstance &data = MY_CAST<CICMPDataType::CInstance &>(value.Field(CICMPMsg::FIELD_data));
+      //         data._selector = CICMPDataType::SELECTOR_ping;
+      CICMPPingDataType::CInstance &ping = MY_CAST<CICMPPingDataType::CInstance &>(data.Field(CICMPDataType::FIELD_ping));
+      MY_CAST<freettcn::TE::CIntegerType::CInstance &>(ping.Field(CICMPPingDataType::FIELD_id)).Value(1234);
+      MY_CAST<freettcn::TE::CIntegerType::CInstance &>(ping.Field(CICMPPingDataType::FIELD_seqNumber)) = seqNum;
+      ping.Field(CICMPPingDataType::FIELD_data).Omit(true);
+    }
+    
+    
+    Ct_EchoReply::Ct_EchoReply(const freettcn::TE::CModule &module, CICMPMsg::CInstance &echoReq):
+      freettcn::TE::CTemplate(module.Type(CModule::TYPE_ICMPMsg))
+    {
+      CICMPMsg::CInstance &value = MY_CAST<CICMPMsg::CInstance &>(Value());
+      
+      MY_CAST<freettcn::TE::CIntegerType::CInstance &>(value.Field(CICMPMsg::FIELD_msgType)).Value(0);
+      MY_CAST<freettcn::TE::CIntegerType::CInstance &>(value.Field(CICMPMsg::FIELD_code)).Value(0);
+      MY_CAST<freettcn::TE::CIntegerType::CInstance &>(value.Field(CICMPMsg::FIELD_crc)).Omit(true);
+      MY_CAST<CICMPDataType::CInstance &>(value.Field(CICMPMsg::FIELD_data)) = MY_CAST<CICMPDataType::CInstance &>(echoReq.Field(CICMPMsg::FIELD_data));
+    }
+    
     
     
     
@@ -435,7 +406,9 @@ namespace freettcn {
           
           comp.Scope().Register(new freettcn::TE::CTimer(comp, false, 1.0));
           comp.Scope().Register(new freettcn::TE::CIntegerType::CInstance(freettcn::TE::CBasicTypes::Integer(), 0));
-          /// @todo send operation
+          
+          freettcn::TE::CIntegerType::CInstance &count = MY_CAST<freettcn::TE::CIntegerType::CInstance &>(comp.Scope().Value(SCOPE1_count));
+          comp.Port("icmpPort", 0).Send(Ct_EchoRequest(comp.Module(), count).Value());
           comp.Scope().Timer(SCOPE1_t).Start();
           
           /// @todo alt

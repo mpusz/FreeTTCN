@@ -619,6 +619,29 @@ void freettcn::TL::CTestLogging::PUnmap(const char *am, int ts, const char *src,
 }
 
 
+void freettcn::TL::CTestLogging::Encode(const char *am, int ts, const char *src, int line,
+                                        const TriComponentId &c,
+                                        TciValue val,
+                                        TriStatus encoderFailure,
+                                        const TriMessage &msg,
+                                        String codec) const
+{
+  freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, freettcn::CEntity::TYPE_CD,
+                                                                        freettcn::CLogMask::CMD_CD_ENCODE,
+                                                                        "ENCODE");
+  
+  char str[256];
+  sprintf(str, "%p", val);
+  data->LineAdd("Value", str);
+
+  sprintf(str, "%p", static_cast<const void *>(&msg));
+  data->LineAdd("Message", str);
+
+  data->LineAdd("Codec", codec);
+  
+  Logger().Push(data);
+}
+
 
 void freettcn::TL::CTestLogging::TTimeoutDetected(const char *am, int ts, const char *src, int line,
                                                   const TriComponentId &c,

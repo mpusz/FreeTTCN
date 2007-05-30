@@ -99,6 +99,16 @@ TriStatus freettcn::SA::CSUTAdaptor::Unmap(const TriPortId &compPortId, const Tr
 }
 
 
+TriStatus freettcn::SA::CSUTAdaptor::Send(const TriComponentId &componentId,
+                                          const TriPortId &tsiPortId,
+                                          const TriAddress *sutAddress,
+                                          const TriMessage &sendMessage)
+{
+  /// @todo sending on SA
+  return TRI_OK;
+}
+
+
 // void MessageReceived()
 // {
 //   TriPortId portId;

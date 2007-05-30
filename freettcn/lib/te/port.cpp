@@ -29,6 +29,11 @@
 
 #include "freettcn/te/port.h"
 #include "freettcn/te/module.h"
+extern "C" {
+#include <freettcn/ttcn3/tci_te_ch.h>
+#include <freettcn/ttcn3/tci_te_cd.h>
+#include <freettcn/ttcn3/tri_te_sa.h>
+}
 #include <cmath>
 #include <iostream>
 
@@ -219,4 +224,21 @@ void freettcn::TE::CPort::Map(const TriPortId &remoteId) throw(EOperationFailed)
 void freettcn::TE::CPort::Unmap(const TriPortId &remoteId) throw(ENotFound)
 {
   Disconnect(_mapList, remoteId);
+}
+
+
+void freettcn::TE::CPort::Send(const CType::CInstance &value) const throw(EOperationFailed)
+{
+  // check if value type is allowed
+  
+  // send message to connected components
+  for(TConnectionList::const_iterator it=_connectList.begin(); it!=_connectList.end(); ++it) {
+    tciSendConnected(Id(), (*it)->compInst, const_cast<void *>(static_cast<const void *>(&value)));
+  }
+  
+  // send message to mapped components
+  for(TConnectionList::const_iterator it=_mapList.begin(); it!=_mapList.end(); ++it) {
+    const BinaryString str = tciEncode(const_cast<void *>(static_cast<const void *>(&value)));
+    triSend(&_id.compInst, (*it), 0, &str);
+  }
 }

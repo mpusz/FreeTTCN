@@ -58,6 +58,19 @@ TriStatus triUnmap(const TriPortId *compPortId,
 }
 
 
+TriStatus triSend(const TriComponentId *componentId,
+                  const TriPortId *tsiPortId,
+                  const TriAddress *sutAddress,
+                  const TriMessage *sendMessage)
+{
+  if (!componentId || !tsiPortId || !sendMessage)
+    return TRI_ERROR;
+  
+  freettcn::SA::CSUTAdaptor &sa = freettcn::SA::CSUTAdaptor::Instance();
+  return sa.Send(*componentId, *tsiPortId, sutAddress, *sendMessage);
+}
+
+
 TriStatus triSAReset()
 {
   freettcn::SA::CSUTAdaptor &sa = freettcn::SA::CSUTAdaptor::Instance();

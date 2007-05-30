@@ -80,6 +80,19 @@ void freettcn::CH::CComponentHandler::ResetReq()
 }
 
 
+
+void freettcn::CH::CComponentHandler::ConnectedSend(const TriPortId &sender, const TriComponentId &receiver, TciValue sendMessage)
+{
+  ConnectedMsgEnqueue(sender, receiver, sendMessage);
+}
+
+void freettcn::CH::CComponentHandler::ConnectedMsgEnqueue(const TriPortId &sender, const TriComponentId &receiver, TciValue rcvdMessage)
+{
+  tciEnqueueMsgConnected(sender, receiver, rcvdMessage);
+}
+
+
+
 TriComponentId freettcn::CH::CComponentHandler::TestComponentCreateReq(TciTestComponentKindType kind, TciType componentType, String name)
 {
   return TestComponentCreate(kind, componentType, name);
