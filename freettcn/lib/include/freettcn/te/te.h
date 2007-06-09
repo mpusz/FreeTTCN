@@ -45,7 +45,6 @@ namespace freettcn {
     class CModule;
     
     class CTTCNExecutable : public freettcn::CEntity {
-    private:
       static CTTCNExecutable _instance;
       
       CModule *_rootModule;

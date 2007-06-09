@@ -34,6 +34,7 @@ extern "C" {
 // #include <freettcn/ttcn3/tri.h>
 #include <freettcn/ttcn3/tci.h>
 }
+#include <freettcn/cd/buffer.h>
 #include <freettcn/tools/logMask.h>
 #include <freettcn/tools/entity.h>
 #include <list>

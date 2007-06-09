@@ -132,6 +132,14 @@ freettcn::TE::CIntegerType::CInstance *IntegerGet(TciValue inst)
   return integer;
 }
 
+
+String tciGetIntAbs(TciValue inst)
+{
+  freettcn::TE::CIntegerType::CInstance *integer = IntegerGet(inst);
+  return const_cast<char *>(integer->AbsValue());
+}
+
+
 void tciSetIntAbs(TciValue inst, String value)
 {
   freettcn::TE::CIntegerType::CInstance *integer = IntegerGet(inst);

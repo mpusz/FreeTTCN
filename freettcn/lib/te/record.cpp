@@ -49,8 +49,8 @@ freettcn::TE::CRecordType::~CRecordType()
   Purge(_fieldDataArray);
   if (_fieldNames) {
     for (unsigned int i=0; _fieldNames[i]; i++)
-      delete _fieldNames[i];
-    delete _fieldNames;
+      delete[] _fieldNames[i];
+    delete[] _fieldNames;
   }
 }
 

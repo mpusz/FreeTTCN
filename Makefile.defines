@@ -139,12 +139,13 @@ quiet_cmd_cc_d_a = CC_D_A     $<
       cmd_cc_d_a = $(CPP) $(CPPFLAGS) -MD -MF $*.d_ $(INCLUDE_DIRS) -c $< -o $(@D)/$% && \
 	           $(AR) -rs $@ $(@D)/$% && \
                    $(RM) -f $(@D)/$% && \
-                   $(SED) -i 's,^.*/\(.*\.o\):,$(LIB_PATH)(\1):,' $*.d_ && \
+                   $(SED) -i 's,^\(.*\.o\):,$(LIB_PATH)(\1):,' $*.d_ && \
                    $(tmp_cmd_d)
 
 # compile source file, create depend file *.d
 quiet_cmd_cc_d_o = CC_D_O     $<
       cmd_cc_d_o = $(CPP) -MD -MF $*.d_ $(INCLUDE_DIRS) -c $< -o $@ && \
+                   $(SED) -i 's,^\(.*\.o\):,$(BIN_DIR)/\1:,' $*.d_ && \
                    $(tmp_cmd_d)
 
 # translate source TTCN module file to *.cpp

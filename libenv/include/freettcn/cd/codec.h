@@ -41,6 +41,8 @@ namespace freettcn {
   
   namespace CD {
     
+    class CBuffer;
+    
     class CCodec {
       const char *_name;
     public:
@@ -50,7 +52,7 @@ namespace freettcn {
       const char *Name() const;
 
       virtual bool CapabilityCheck(TciValue value, unsigned int &valueId) const = 0;
-      virtual void Encode(unsigned int valueId, TciValue value, BinaryString &buffer) const = 0;
+      virtual void Encode(unsigned int valueId, TciValue value, CBuffer &buffer) const = 0;
     };
     
   } // namespace CD

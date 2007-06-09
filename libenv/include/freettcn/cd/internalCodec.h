@@ -44,7 +44,7 @@ namespace freettcn {
     public:
       CInternalCodec();
       bool CapabilityCheck(TciValue value, unsigned int &valueId) const;
-      void Encode(unsigned int valueId, TciValue value, BinaryString &buffer) const;
+      void Encode(unsigned int valueId, TciValue value, CBuffer &buffer) const;
     };
     
   } // namespace CD

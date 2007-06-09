@@ -79,7 +79,7 @@ unsigned int freettcn::TE::CIdObject::CIdManager::Id2Index(const BinaryString &i
 {
   unsigned int idx = 0;
   
-  for(unsigned short i=0; i<ceil(id.bits / 8); i++) {
+  for(unsigned short i=0; i<ceil(id.bits / 8.0); i++) {
     if (i)
       idx <<= 8;
     idx |= id.data[i];

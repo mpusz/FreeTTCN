@@ -356,9 +356,10 @@ namespace freettcn {
       CICMPDataType::CInstance &data = MY_CAST<CICMPDataType::CInstance &>(value.Field(CICMPMsg::FIELD_data));
       //         data._selector = CICMPDataType::SELECTOR_ping;
       CICMPPingDataType::CInstance &ping = MY_CAST<CICMPPingDataType::CInstance &>(data.Field(CICMPDataType::FIELD_ping));
-      MY_CAST<freettcn::TE::CIntegerType::CInstance &>(ping.Field(CICMPPingDataType::FIELD_id)).Value(1234);
+      MY_CAST<freettcn::TE::CIntegerType::CInstance &>(ping.Field(CICMPPingDataType::FIELD_id)).Value(0x1234);
       MY_CAST<freettcn::TE::CIntegerType::CInstance &>(ping.Field(CICMPPingDataType::FIELD_seqNumber)) = seqNum;
       ping.Field(CICMPPingDataType::FIELD_data).Omit(true);
+      //      MY_CAST<freettcn::TE::COctetstringType::CInstance &>(ping.Field(CICMPPingDataType::FIELD_data)).Value("\'1234567890abcdef\'O");
     }
     
     

@@ -32,6 +32,7 @@
 
 #include <freettcn/te/type.h>
 #include <freettcn/tools/exception.h>
+#include <sstream>
 
 namespace freettcn {
   
@@ -41,11 +42,15 @@ namespace freettcn {
     public:
       class CInstance : public CType::CInstance {
         long _value;
+        mutable std::stringstream __absValue;
       public:
         CInstance(const CType &type);
         CInstance(const CType &type, long value);
         
+        CInstance &operator=(const CInstance &value) throw(EOperationFailed);
+        
         void AbsValue(const char *value) throw(EOperationFailed);
+        const char *AbsValue() const;
 //         void DigitsNum(unsigned long dig_num);
 //         void Sign(bool sign);
         long Value() const throw(EOmitSet);

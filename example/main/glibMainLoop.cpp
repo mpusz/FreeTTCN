@@ -42,5 +42,6 @@ void freettcn::example::CGlibMainLoop::Start()
 void freettcn::example::CGlibMainLoop::Stop()
 {
   g_main_loop_quit(_loop);
+  g_main_loop_unref(_loop);
   _loop = 0;
 }

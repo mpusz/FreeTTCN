@@ -30,7 +30,6 @@
 #ifndef __TL_H__
 #define __TL_H__
 
-
 extern "C" {
 #include <freettcn/ttcn3/tci.h>
 #include <freettcn/ttcn3/tri.h>

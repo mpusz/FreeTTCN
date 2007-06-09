@@ -152,7 +152,7 @@ void freettcn::TE::CPort::Connect(TConnectionList &list, const TriPortId &remote
     // check if remote port component is on the list already
     if ((*it)->compInst.compInst.bits == remoteId.compInst.compInst.bits &&
         !memcmp((*it)->compInst.compInst.data, remoteId.compInst.compInst.data,
-                static_cast<int>(ceil((*it)->compInst.compInst.bits / 8)))) {
+                static_cast<int>(ceil((*it)->compInst.compInst.bits / 8.0)))) {
       std::cout << "ERROR: Cannot connect port with more than one port on the other component!!!" << std::endl;
       throw EOperationFailed();
     }
@@ -207,7 +207,7 @@ void freettcn::TE::CPort::Map(const TriPortId &remoteId) throw(EOperationFailed)
   if (_component.Kind() == TCI_SYS_COMP &&
       _component.Id().compInst.bits == remoteId.compInst.compInst.bits &&
       !memcmp(_component.Id().compInst.data, remoteId.compInst.compInst.data,
-              static_cast<int>(ceil(_component.Id().compInst.bits / 8)))) {
+              static_cast<int>(ceil(_component.Id().compInst.bits / 8.0)))) {
     std::cout << "ERROR: Cannot map 2 ports of SYSTEM component with each other!!!" << std::endl;
     throw EOperationFailed();
   }

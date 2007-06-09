@@ -38,6 +38,7 @@ extern "C" {
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <cmath>
 
 
 using namespace std;
@@ -194,7 +195,7 @@ const char *freettcn::TL::CTestLogging::Buffer2String(const BinaryString &binStr
 {
   str[0] = 0;
   
-  for(int i=0; i<binStr.bits / 8; i++) {
+  for(int i=0; i<ceil(binStr.bits / 8.0); i++) {
     if (!(i % 8)) {
       if (!(i % 16))
         sprintf(str, "%s\n", str);
@@ -225,11 +226,15 @@ const char *freettcn::TL::CTestLogging::InstanceId2String(const BinaryString &in
 const char *freettcn::TL::CTestLogging::TriComponentId2String(const TriComponentId &comp, char *str) const
 {
   char str1[256];
-  sprintf(str, "<%s.%s> %s", comp.compType.moduleName, comp.compType.objectName,
-          InstanceId2String(comp.compInst, str1));
+  char str2[256];
   
   if (strcmp(comp.compName, ""))
-    sprintf(str, "%s '%s'", str, comp.compName);
+    sprintf(str2, " '%s'", comp.compName);
+  else
+    str2[0] = 0;
+  
+  sprintf(str, "<%s.%s> %s%s", comp.compType.moduleName, comp.compType.objectName,
+          InstanceId2String(comp.compInst, str1), str2);
   
   return str;
 }
@@ -634,9 +639,11 @@ void freettcn::TL::CTestLogging::Encode(const char *am, int ts, const char *src,
   sprintf(str, "%p", val);
   data->LineAdd("Value", str);
 
-  sprintf(str, "%p", static_cast<const void *>(&msg));
-  data->LineAdd("Message", str);
-
+  char long_str1[1024];
+  char long_str2[1024];
+  sprintf(long_str1, "bits: %li%s", msg.bits, Buffer2String(msg, long_str2));
+  data->LineAdd("Message", long_str1);
+  
   data->LineAdd("Codec", codec);
   
   Logger().Push(data);

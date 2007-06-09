@@ -47,6 +47,7 @@ distclean: clean
 
 tags:
 	@$(call cmd,cmd_tags_cpp)
+	@$(TAGS) --append --output=$(TAG_DIR)/TAGS include/*.h
 
 
 # rules

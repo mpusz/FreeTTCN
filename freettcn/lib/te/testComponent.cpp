@@ -139,8 +139,8 @@ void freettcn::TE::CTestComponentType::CInstanceRemote::Stop()
 
 void freettcn::TE::CTestComponentType::CInstanceRemote::Kill()
 {
-  tciKillTestComponentReq(_id.Id());
   _status = KILLED;
+  tciKillTestComponentReq(_id.Id());
 }
 
 bool freettcn::TE::CTestComponentType::CInstanceRemote::operator==(const TriComponentId &id) const

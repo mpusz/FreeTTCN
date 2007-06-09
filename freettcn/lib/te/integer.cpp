@@ -53,6 +53,13 @@ freettcn::TE::CIntegerType::CInstance::CInstance(const CType &type, long value) 
 {
 }
 
+freettcn::TE::CIntegerType::CInstance &freettcn::TE::CIntegerType::CInstance::operator=(const CInstance &value) throw(EOperationFailed)
+{
+  CType::CInstance::operator=(value);
+  _value = value._value;
+  return *this;
+}
+
 void freettcn::TE::CIntegerType::CInstance::AbsValue(const char *value) throw(EOperationFailed)
 {
   if (*value == '\0')
@@ -66,6 +73,14 @@ void freettcn::TE::CIntegerType::CInstance::AbsValue(const char *value) throw(EO
     throw freettcn::EOperationFailed();
   
   Value(val);
+}
+
+
+const char *freettcn::TE::CIntegerType::CInstance::AbsValue() const
+{
+  __absValue.clear();
+  __absValue << _value;
+  return __absValue.str().c_str();
 }
 
 

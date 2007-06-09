@@ -62,7 +62,7 @@ bool freettcn::CD::CInternalCodec::CapabilityCheck(TciValue value, unsigned int 
 }
 
 
-void freettcn::CD::CInternalCodec::Encode(unsigned int valueId, TciValue value, BinaryString &buffer) const
+void freettcn::CD::CInternalCodec::Encode(unsigned int valueId, TciValue value, CBuffer &buffer) const
 {
   switch(valueId) {
   case ID_INTEGER:

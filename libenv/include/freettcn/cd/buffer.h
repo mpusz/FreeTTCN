@@ -18,22 +18,24 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /**
- * @file   decoder.h
+ * @file   buffer.h
  * @author Mateusz Pusz
- * @date   Fri Apr  6 17:52:20 2007
+ * @date   Wed May 30 18:03:27 2007
  * 
  * @brief  
  * 
+ * 
  */
 
-#ifndef __DECODER_H__
-#define __DECODER_H__
+#ifndef __BUFFER_H__
+#define __BUFFER_H__
 
 extern "C" {
 #include <freettcn/ttcn3/types.h>
 }
 
 #include <freettcn/tools/exception.h>
+#include <deque>
 
 namespace freettcn {
   
@@ -48,33 +50,38 @@ namespace freettcn {
       };
       class EBufferTooShort : public EOperationFailed {};
       
-    protected:
-      unsigned char const * const _data;
-      const unsigned long _dataBitLength;
+    private:
+      typedef std::deque<unsigned char> TBuffer;
+      
+      const TByteOrder _hostByteOrder;
       const TByteOrder _byteOrder;
       
-    public:  
-      CBuffer(const BinaryString message, TByteOrder byteOrder = BYTE_ORDER_BIG_ENDIAN);
-      //  CBuffer(const unsigned char *data, unsigned long dataLen, TByteOrder byteOrder = BYTE_ORDER_BIG_ENDIAN);
-      virtual ~CBuffer();
+      TBuffer _buffer;
+      unsigned short _lastOctetBits;
       
-      const BinaryString Message() const;
+      mutable BinaryString *__message;
       
-      unsigned long UIntGet(unsigned short bitLength, TByteOrder byteOrder = BYTE_ORDER_HOST);
-      long IntGet(unsigned short bitLength, TByteOrder byteOrder = BYTE_ORDER_HOST);
+      void BytePack(unsigned char byte, unsigned short bitLength = 8);
+      unsigned char ByteUnpack(unsigned short bitLength = 8);
       
-      virtual unsigned long BitLength() const = 0;
-      virtual const unsigned char *Get(unsigned long bitLength) throw(EOperationFailed, EBufferTooShort) = 0;
-    };
-    
-    
-    class CHexBuffer : public CBuffer {
-      unsigned char const * _currPtr;
     public:
-      CHexBuffer(const BinaryString message, TByteOrder byteOrder = BYTE_ORDER_BIG_ENDIAN);
+      CBuffer(const BinaryString message, TByteOrder byteOrder = BYTE_ORDER_BIG_ENDIAN);
+      CBuffer(TByteOrder byteOrder = BYTE_ORDER_BIG_ENDIAN);
+      ~CBuffer();
       
-      virtual unsigned long BitLength() const;
-      virtual const unsigned char *Get(unsigned long bitLength) throw(EOperationFailed, EBufferTooShort);
+      unsigned long BitLength() const;
+      const BinaryString &Message() const;
+      
+      void UIntPack(unsigned long value, unsigned short bitLength) throw(EOperationFailed);
+      unsigned long UIntUnpack(unsigned short bitLength) throw(EOperationFailed);
+      
+      void IntPack(long value, unsigned short bitLength) throw(EOperationFailed);
+      long IntUnpack(unsigned short bitLength) throw(EOperationFailed);
+      
+      void RawDataPack(const unsigned char buffer[], unsigned int bitLength, TByteOrder byteOrder = BYTE_ORDER_BIG_ENDIAN);
+      void RawDataPack(const CBuffer &buffer);
+      
+//       const unsigned char *Get(unsigned long bitLength) throw(EOperationFailed, EBufferTooShort) = 0;
     };
     
     
@@ -97,8 +104,8 @@ namespace freettcn {
 //       CInteger Integer(unsigned short len, bool signedValue = false) const throw(CBuffer::EBufferTooShort);
 //     };
     
-    class EDecodeFailure : public EOperationFailed {};
-    class EEncodeFailure : public EOperationFailed {};
+//     class EDecodeFailure : public EOperationFailed {};
+//     class EEncodeFailure : public EOperationFailed {};
     
 //     class CType {
 //       TciValue value;
@@ -154,4 +161,4 @@ namespace freettcn {
 // };
 
 
-#endif /* __DECODER_H__ */
+#endif /* __BUFFER_H__ */

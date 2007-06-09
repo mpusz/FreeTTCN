@@ -28,6 +28,7 @@
  */
 
 #include "freettcn/cd/cd.h"
+#include "freettcn/cd/buffer.h"
 #include "freettcn/cd/internalCodec.h"
 #include "freettcn/tools/tools.h"
 extern "C" {
@@ -199,14 +200,15 @@ BinaryString freettcn::CD::CCodingDecoding::Encode(TciValue value) const
   const CCodec &codec = Codec(value, valueId);
   
   // encode
-  TriMessage buffer = { 0 };
+  CBuffer buffer;
   codec.Encode(valueId, value, buffer);
+  TriMessage msg = buffer.Message();
   
+  // log
   if (Logging() && LogMask().Get(freettcn::CLogMask::CMD_CD_ENCODE)) {
     TriComponentId comp = { { 0 } };
-    
-    tliEncode(0, TimeStamp().Get(), 0, 0, comp, value, TRI_OK, buffer, const_cast<char *>(codec.Name()));
+    tliEncode(0, TimeStamp().Get(), 0, 0, comp, value, TRI_OK, msg, const_cast<char *>(codec.Name()));
   }
   
-  return buffer;
+  return msg;
 }

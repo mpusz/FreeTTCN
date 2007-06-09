@@ -31,7 +31,9 @@
 extern "C" {
 #include <freettcn/ttcn3/tci_value.h>
 }
+#include <freettcn/cd/buffer.h>
 #include <cstring>
+#include <cstdlib>
 
 
 freettcn::icmp::CCodec::CCodec():
@@ -58,13 +60,38 @@ bool freettcn::icmp::CCodec::CapabilityCheck(TciValue value, unsigned int &value
 }
 
 
-void freettcn::icmp::CCodec::Encode(unsigned int valueId, TciValue value, BinaryString &buffer) const
+void freettcn::icmp::CCodec::Encode(unsigned int valueId, TciValue value, CD::CBuffer &buffer) const
 {
   switch(valueId) {
   case ID_ICMPMSG:
-    
+    {
+      TciValue msgTypeVal = tciGetRecFieldValue(value, "msgType");
+      buffer.UIntPack(atoi(tciGetIntAbs(msgTypeVal)), 8);
+      TciValue codeVal = tciGetRecFieldValue(value, "code");
+      buffer.UIntPack(atoi(tciGetIntAbs(codeVal)), 8);
+      TciValue crcVal = tciGetRecFieldValue(value, "crc");
+      buffer.UIntPack(atoi(tciGetIntAbs(crcVal)), 16);
+      TciValue dataVal = tciGetRecFieldValue(value, "data");
+      TciValue pingVal = tciGetRecFieldValue(dataVal, "ping");
+      TciValue idVal = tciGetRecFieldValue(pingVal, "id");
+      buffer.UIntPack(atoi(tciGetIntAbs(idVal)), 16);
+      TciValue seqVal = tciGetRecFieldValue(pingVal, "seqNumber");
+      buffer.UIntPack(atoi(tciGetIntAbs(seqVal)), 16);
+      TciValue optDataVal = tciGetRecFieldValue(pingVal, "data");
+      if (!tciNotPresent(optDataVal)) {
+        const char *octetstringValue = tciGetOStringValue(optDataVal);
+        // strip octetstring prefix and postfix
+        unsigned int length = (strlen(++octetstringValue) - 2) / 2;
+        char tmpBuff[] = "00";
+        for(unsigned int i=0; i<length; i++) {
+          tmpBuff[2] = *(octetstringValue++);
+          tmpBuff[3] = *(octetstringValue++);
+          buffer.UIntPack(strtol(tmpBuff, 0, 16), 8);
+        }
+      }
+    }
     break;
-
+    
   default:
     ;
   }
