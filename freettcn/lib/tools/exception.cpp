@@ -68,15 +68,15 @@ const char* freettcn::Exception::what() const throw()
   if (!namePtr && status) {
     // some error encountered during demangling
     fprintf(stderr, "Symbol demangling failed (%u)\n", status);
-    sprintf(msg, "%s", typeid(*this).name());
+    sprintf(_msg, "%s", typeid(*this).name());
   }
   else {
     // copy demagled name to buffer
-    sprintf(msg, "%s", namePtr);
+    sprintf(_msg, "%s", namePtr);
     
     // free pointer allocated by demangler
     free(namePtr);
   }
   
-  return msg;
+  return _msg;
 }

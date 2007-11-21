@@ -62,7 +62,8 @@ namespace freettcn {
         unsigned short _logIdx;
         std::string _title;
         
-        std::vector<TLineData> lines;
+        typedef std::vector<TLineData> CLineArray;
+        CLineArray lines;
       public:
         CData(int ts, const char *src, int line, const char *am, CEntity::TType entity, unsigned short logIdx, const char *title);
         

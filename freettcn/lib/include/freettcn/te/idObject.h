@@ -50,9 +50,9 @@ namespace freettcn {
           bool valid;
           CIdObject *ptr;
         };
-        typedef std::vector<TData> TIdArray;
+        typedef std::vector<TData> CIdArray;
         
-        TIdArray _idArray;
+        CIdArray _idArray;
         
         CIdManager &operator=(CIdManager &);  // Disallowed
         CIdManager(const CIdManager &);       // Disallowed

@@ -69,6 +69,7 @@ namespace freettcn {
       virtual void Disconnect(const TriPortId &fromPort, const TriPortId &toPort);
       virtual void Map(const TriPortId &fromPort, const TriPortId &toPort);
       virtual void Unmap(const TriPortId &fromPort, const TriPortId &toPort);
+
     public:
       static CComponentHandler &Instance() throw(ENotFound);
       

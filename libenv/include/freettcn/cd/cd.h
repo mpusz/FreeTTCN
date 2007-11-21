@@ -56,9 +56,9 @@ namespace freettcn {
     class CCodingDecoding : public freettcn::CEntity {
       static CCodingDecoding *_instance;
       
-      typedef std::list<const CCodec *> TCodecList;
+      typedef std::list<const CCodec *> CCodecList;
       
-      TCodecList _codecList;
+      CCodecList _codecList;
       
       CCodingDecoding& operator=(CCodingDecoding&);  // Disallowed
       CCodingDecoding(const CCodingDecoding&);       // Disallowed

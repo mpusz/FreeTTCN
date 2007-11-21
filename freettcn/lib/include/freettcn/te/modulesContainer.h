@@ -46,10 +46,10 @@ namespace freettcn {
      */
     class CModulesContainer {
     public:
-      typedef std::vector<CModule *> TModuleList;
+      typedef std::vector<CModule *> CModuleList;
       
     private:
-      TModuleList _modList;
+      CModuleList _modList;
       
       CModulesContainer();
       CModulesContainer &operator=(CModulesContainer &);  // Disallowed
@@ -59,7 +59,7 @@ namespace freettcn {
       
       void Register(CModule &module);
       CModule &Get(const std::string &moduleId) const throw(ENotFound);
-      const TModuleList &List() const;
+      const CModuleList &List() const;
     };
 
   } // namespace TE

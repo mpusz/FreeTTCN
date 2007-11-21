@@ -85,7 +85,7 @@ void freettcn::CD::CCodingDecoding::Register(const CCodec *codec)
 
 const freettcn::CD::CCodec &freettcn::CD::CCodingDecoding::Codec(TciValue value, unsigned int &valueId) const throw(ENotFound)
 {
-  for(TCodecList::const_iterator it=_codecList.begin(); it!=_codecList.end(); ++it)
+  for(CCodecList::const_iterator it=_codecList.begin(); it!=_codecList.end(); ++it)
     if ((*it)->CapabilityCheck(value, valueId))
       return *(*it);
   

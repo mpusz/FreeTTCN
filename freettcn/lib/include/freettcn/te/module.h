@@ -67,30 +67,40 @@ namespace freettcn {
       
     private:
       // types
-      typedef std::vector<const CType *> TTypeArray;
-      typedef std::vector<CParameter *> TParameterArray;
-      typedef std::list<const CBehavior *> TBehaviorList;
-      typedef std::vector<CTestCase *> TTestCaseArray;
-      typedef std::list<CTestComponentType::CInstanceRemote *> TTestCompList;
-      typedef std::vector<CPortType *> TPortTypeArray;
+      typedef std::vector<const CType *> CTypeArray;
+      typedef std::vector<CParameter *> CParameterArray;
+      typedef std::list<const CBehavior *> CBehaviorList;
+      typedef std::vector<CTestCase *> CTestCaseArray;
+      typedef std::list<CTestComponentType::CInstanceRemote *> CTestCompList;
+      typedef std::vector<CPortType *> CPortTypeArray;
       
       // module info
       TciModuleIdType _id;
-      TTypeArray _typeArray;
-      TParameterArray _parameterArray;
-      TBehaviorList _behaviorList;
-      TTestCaseArray _testCaseArray;
-      TPortTypeArray _portTypeArray;
-      const CBehavior * _ctrlBehavior;
-      const CSourceData * _ctrlSrcData;
+      CTypeArray _typeArray;
+      CParameterArray _parameterArray;
+      CBehaviorList _behaviorList;
+      CTestCaseArray _testCaseArray;
+      CPortTypeArray _portTypeArray;
+      const CBehavior *_ctrlBehavior;
+      const CSourceData *_ctrlSrcData;
       
       // module dynamic state
       bool _ctrlRunning;
       CTestComponentType::CInstanceLocal *_ctrlComponent;
       CTestCase *_activeTestCase;                 /**< current test case pointer */
-      TTestCompList _allEntityStates;             /**< list of all entities that was used in a test case - M-CONTROL (must be the first) */
-      TTestCompList _done;                        /**< a list of all currently stopped test components during test case execution (filled when TC is stopped or killed, removed when TC is started) */
-      TTestCompList _killed;                      /**< a list of all terminated test components during test case execution (filled when TC is killed) */
+      CTestCompList _allEntityStates;             /**< list of all entities that
+                                                     was used in a test case
+                                                     - M-CONTROL (must be the
+                                                     first) */
+      CTestCompList _done;                        /**< a list of all currently
+                                                     stopped test components during
+                                                     test case execution (filled when
+                                                     TC is stopped or killed, removed
+                                                     when TC is started) */
+      CTestCompList _killed;                      /**< a list of all terminated test
+                                                     components during test case
+                                                     execution (filled when TC is
+                                                     killed) */
       
       // temporary variables
       mutable TciModuleParameterType *__modParList;

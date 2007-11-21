@@ -45,18 +45,19 @@ namespace freettcn {
     class CTimer;
     
     class CPlatformAdaptor : public freettcn::CEntity {
-      typedef std::list<CTimer *> TTimerList;
+      typedef std::list<CTimer *> CTimerList;
       
       static CPlatformAdaptor *_instance;
       
+      CTimerList _timerList;
+      
       CTimer &TimerGet(const TriTimerId &timerId) const throw(ENotFound);
       virtual CTimer *TimerCreate(const TriTimerId &timerId) const = 0;
-
-    protected:
-      TTimerList _timerList;
       
+    protected:
       CPlatformAdaptor& operator=(CPlatformAdaptor&);  // Disallowed
       CPlatformAdaptor(const CPlatformAdaptor&);       // Disallowed
+      
     public:
       static CPlatformAdaptor &Instance() throw(ENotFound);
       

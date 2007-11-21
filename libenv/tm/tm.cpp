@@ -190,7 +190,7 @@ void freettcn::TM::CTestManagement::Clear()
 
 freettcn::TM::CTestManagement::CTestCase &freettcn::TM::CTestManagement::TestCaseGet(const std::string &testCaseId) const throw(freettcn::ENotFound)
 {
-  for(TTCList::const_iterator it = _tcList.begin(); it != _tcList.end(); ++it) {
+  for(CTCList::const_iterator it = _tcList.begin(); it != _tcList.end(); ++it) {
     if ((*it)->Name() == testCaseId)
       return *(*it);
   }
@@ -200,12 +200,12 @@ freettcn::TM::CTestManagement::CTestCase &freettcn::TM::CTestManagement::TestCas
 }
 
 
-const freettcn::TM::CTestManagement::TTCList &freettcn::TM::CTestManagement::TCList() const
+const freettcn::TM::CTestManagement::CTCList &freettcn::TM::CTestManagement::TCList() const
 {
   return _tcList;
 }
 
-const freettcn::TM::CTestManagement::TModuleParList &freettcn::TM::CTestManagement::ModuleParameterList() const
+const freettcn::TM::CTestManagement::CModuleParList &freettcn::TM::CTestManagement::ModuleParameterList() const
 {
   return _modParList;
 }
@@ -269,7 +269,7 @@ void freettcn::TM::CTestManagement::Abort()
 
 TciValue freettcn::TM::CTestManagement::ModuleParameterGet(const TciModuleParameterIdType &parameterId) const
 {
-  for(TModuleParList::const_iterator it = _modParList.begin(); it != _modParList.end(); ++it) {
+  for(CModuleParList::const_iterator it = _modParList.begin(); it != _modParList.end(); ++it) {
     if ((*it)->Name() == parameterId)
       return (*it)->Value();
   }

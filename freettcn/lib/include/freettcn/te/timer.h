@@ -50,7 +50,7 @@ namespace freettcn {
       };
 
     private:
-      typedef std::vector<unsigned int> TOffsetList;
+      typedef std::vector<unsigned int> COffsetList;
       
       CTestComponentType::CInstanceLocal &_component;
       const bool _implicit;
@@ -64,7 +64,7 @@ namespace freettcn {
       // SNAP_VALUE - when taking a snapshot it gets the actual value of ACT_DURATION - TIME_LEFT
       // SNAP_STATUS - when taking a snapshot it gets the same value as STATUS
       
-      TOffsetList _offsetList;
+      COffsetList _offsetList;
       
     public:
       CTimer(CTestComponentType::CInstanceLocal &comp, bool implicit);

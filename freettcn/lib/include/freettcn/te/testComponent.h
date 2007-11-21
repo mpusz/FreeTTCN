@@ -57,9 +57,9 @@ namespace freettcn {
     class CTestComponentType : public CType {
     public:
       class CInstance : public CType::CInstance {
-        typedef std::vector<TriPortId *> TPortIdArray;
+        typedef std::vector<TriPortId *> CPortIdArray;
         
-        TPortIdArray _portIdArray;
+        CPortIdArray _portIdArray;
         
         // not allowed
         bool Omit() const;
@@ -132,13 +132,13 @@ namespace freettcn {
         class ENotStarted : public freettcn::EOperationFailed {};
         
         class CScope {
-          typedef std::vector<CType::CInstance *> TValueArray;
-          typedef std::vector<CTimer *> TTimerArray;
+          typedef std::vector<CType::CInstance *> CValueArray;
+          typedef std::vector<CTimer *> CTimerArray;
           
           const char *_kind;
           CScope * const _up;
-          TValueArray _valueArray;
-          TTimerArray _timerArray;
+          CValueArray _valueArray;
+          CTimerArray _timerArray;
         public:
           CScope(const char *kind, CScope *up);
           ~CScope();
@@ -152,14 +152,14 @@ namespace freettcn {
         };
         
       private:
-        typedef std::vector<CPort *> TPortArray;
-        typedef std::list<const CTimer *> TTimerList;
+        typedef std::vector<CPort *> CPortArray;
+        typedef std::list<const CTimer *> CTimerList;
         
         // test componnent info
         TriComponentId _id;
         TciTestComponentKindType _kind;
         CModule *_module;
-        TPortArray _portArray;
+        CPortArray _portArray;
         CTimer *_startTimer;
         
         // test component dynamic state
@@ -178,8 +178,8 @@ namespace freettcn {
         // SNAP_DONE (supports snapshot semantics of test component; when a snapshot is taken, a copy of the DONE list of module state will be assigned)
         // SNAP_KILLED (supports snapshot semantics of test component; when a snapshot is taken, a copy of the KILLED list of module state will be assigned)
         // KEEP_ALIVE (indicated wheter the entity can be restarted after its termination or not; 'true' if the entity can be restarted)
-        TTimerList _explicitTimers;
-        TTimerList _implicitTimers;
+        CTimerList _explicitTimers;
+        CTimerList _implicitTimers;
         const CBehavior *_behavior;
         CScope *_scope;
         unsigned int _behaviorOffset;
@@ -233,10 +233,10 @@ namespace freettcn {
       
     private:
       // types
-      typedef std::vector<const CPortInfo *> TPortInfoArray;
+      typedef std::vector<const CPortInfo *> CPortInfoArray;
       
       // info
-      TPortInfoArray _portInfoArray;
+      CPortInfoArray _portInfoArray;
       TriPortIdList _portList;
       
     protected:

@@ -489,16 +489,16 @@ void freettcn::TE::CTestComponentType::CInstanceLocal::StopAllReq(const char *sr
 
 void freettcn::TE::CTestComponentType::CInstanceLocal::TimerAdd(const CTimer &timer, bool implicit /* false */)
 {
-  TTimerList &list = implicit ? _implicitTimers : _explicitTimers;
+  CTimerList &list = implicit ? _implicitTimers : _explicitTimers;
   list.push_back(&timer);
 }
 
 
 void freettcn::TE::CTestComponentType::CInstanceLocal::TimerRemove(const CTimer &timer, bool implicit /* false */) throw(ENotFound)
 {
-  TTimerList &list = implicit ? _implicitTimers : _explicitTimers;
+  CTimerList &list = implicit ? _implicitTimers : _explicitTimers;
   
-  for(TTimerList::iterator it=list.begin(); it!=list.end(); ++it) {
+  for(CTimerList::iterator it=list.begin(); it!=list.end(); ++it) {
     if (*it == &timer) {
       list.erase(it);
       return;

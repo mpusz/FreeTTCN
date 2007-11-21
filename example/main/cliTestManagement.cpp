@@ -75,7 +75,7 @@ void freettcn::example::CCLITestManagement::ParameterDump(const CModuleParameter
 
 void freettcn::example::CCLITestManagement::ModuleInfoPrint() const
 {
-  const TModuleParList &modParList = ModuleParameterList();
+  const CModuleParList &modParList = ModuleParameterList();
   
   std::cout << "Module Parameters:" << std::endl;
   for(unsigned int i=0; i<modParList.size(); i++) {
@@ -91,8 +91,8 @@ void freettcn::example::CCLITestManagement::ModuleInfoPrint() const
 
 void freettcn::example::CCLITestManagement::TestCasesPrint() const
 {
-  const TTCList &tcList = TCList();
-  for(TTCList::const_iterator it=tcList.begin(); it != tcList.end(); ++it) {
+  const CTCList &tcList = TCList();
+  for(CTCList::const_iterator it=tcList.begin(); it != tcList.end(); ++it) {
     TciTestCaseIdType id = (*it)->Id();
     std::cout << " - " << id.moduleName << "." << id.objectName << std::endl;
   }
@@ -128,7 +128,7 @@ void freettcn::example::CCLITestManagement::ParametersSet() const
 {
   using namespace std;
   
-  const TModuleParList &modParList = ModuleParameterList();
+  const CModuleParList &modParList = ModuleParameterList();
   
   for(unsigned int i=0; i<modParList.size(); i++) {
     cout << "Set value for module parameter:" << endl;

@@ -41,7 +41,7 @@ namespace freettcn {
    */
   class Exception : public std::exception
   {
-    mutable char msg[255];
+    mutable char _msg[255];
   
   public:
     Exception() throw();

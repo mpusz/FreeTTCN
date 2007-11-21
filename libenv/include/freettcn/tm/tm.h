@@ -93,8 +93,8 @@ namespace freettcn {
         TciValue Value() throw(EOperationFailed);
       };
       
-      typedef std::vector<CTestCase *> TTCList;
-      typedef std::vector<CModuleParameter *> TModuleParList;
+      typedef std::vector<CTestCase *> CTCList;
+      typedef std::vector<CModuleParameter *> CModuleParList;
       
     private:
       static CTestManagement *_instance;
@@ -102,8 +102,8 @@ namespace freettcn {
       TStatus _status;                            /**< specifies if a test case or control part is running */
       CTriComponentId *_ctrlCompId;               /**< component Id of running Control part */
       CTestCase *_tc;                             /**< currently started test case */
-      TModuleParList _modParList;
-      TTCList _tcList;
+      CModuleParList _modParList;
+      CTCList _tcList;
       
       CTestManagement& operator=(CTestManagement&);  // Disallowed
       CTestManagement(const CTestManagement&);       // Disallowed
@@ -112,9 +112,9 @@ namespace freettcn {
       
     protected:
       TStatus Status() const;
-      const TTCList &TCList() const;
+      const CTCList &TCList() const;
       CTestCase &TestCaseGet(const std::string &testCaseId) const throw(ENotFound);
-      const TModuleParList &ModuleParameterList() const;
+      const CModuleParList &ModuleParameterList() const;
       
     public:
       static CTestManagement &Instance() throw(ENotFound);

@@ -88,11 +88,22 @@ void freettcn::TE::CPortType::TypeAddAll(TDirection dir) throw(EOperationFailed)
   }
 }
 
+
 const QualifiedName &freettcn::TE::CPortType::Id() const
 {
   return _id;
 }
 
+
+bool freettcn::TE::CPortType::Check(const CType &type, TDirection dir) const
+{
+  const CTypeList &list = (dir == IN) ? _inList : _outList;
+  for(CTypeList::const_iterator it=list.begin(); it!=list.end(); ++it)
+    if (*it == &type)
+      return true;
+  
+  return false;
+}
 
 
 
@@ -146,9 +157,9 @@ const TriPortId &freettcn::TE::CPort::Id() const
 }
 
 
-void freettcn::TE::CPort::Connect(TConnectionList &list, const TriPortId &remoteId) throw(EOperationFailed)
+void freettcn::TE::CPort::Connect(CConnectionList &list, const TriPortId &remoteId) throw(EOperationFailed)
 {
-  for(TConnectionList::iterator it=list.begin(); it!=list.end(); ++it) {
+  for(CConnectionList::iterator it=list.begin(); it!=list.end(); ++it) {
     // check if remote port component is on the list already
     if ((*it)->compInst.compInst.bits == remoteId.compInst.compInst.bits &&
         !memcmp((*it)->compInst.compInst.data, remoteId.compInst.compInst.data,
@@ -163,9 +174,9 @@ void freettcn::TE::CPort::Connect(TConnectionList &list, const TriPortId &remote
 }
 
 
-void freettcn::TE::CPort::Disconnect(TConnectionList &list, const TriPortId &remoteId) throw(ENotFound)
+void freettcn::TE::CPort::Disconnect(CConnectionList &list, const TriPortId &remoteId) throw(ENotFound)
 {
-  for(TConnectionList::iterator it=list.begin(); it!=list.end(); ++it) {
+  for(CConnectionList::iterator it=list.begin(); it!=list.end(); ++it) {
     if (*it == &remoteId) {
       list.erase(it);
       return;
@@ -230,14 +241,20 @@ void freettcn::TE::CPort::Unmap(const TriPortId &remoteId) throw(ENotFound)
 void freettcn::TE::CPort::Send(const CType::CInstance &value) const throw(EOperationFailed)
 {
   // check if value type is allowed
+  if (!_portInfo.Type().Check(value.Type(), CPortType::OUT)) {
+    std::cout << "ERROR: Message type not supported for port type!!!" << std::endl;
+    throw EOperationFailed();
+  }
+  
+  /// @todo check for IN on system component
   
   // send message to connected components
-  for(TConnectionList::const_iterator it=_connectList.begin(); it!=_connectList.end(); ++it) {
+  for(CConnectionList::const_iterator it=_connectList.begin(); it!=_connectList.end(); ++it) {
     tciSendConnected(Id(), (*it)->compInst, const_cast<void *>(static_cast<const void *>(&value)));
   }
   
   // send message to mapped components
-  for(TConnectionList::const_iterator it=_mapList.begin(); it!=_mapList.end(); ++it) {
+  for(CConnectionList::const_iterator it=_mapList.begin(); it!=_mapList.end(); ++it) {
     const BinaryString str = tciEncode(const_cast<void *>(static_cast<const void *>(&value)));
     triSend(&_id.compInst, (*it), 0, &str);
   }

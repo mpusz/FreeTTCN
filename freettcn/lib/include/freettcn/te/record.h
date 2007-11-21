@@ -41,8 +41,8 @@ namespace freettcn {
     class CRecordType : public CType {
     public:
       class CInstance : public CType::CInstance {
-        typedef std::vector<CType::CInstance *> TFieldArray;
-        TFieldArray _fieldArray;
+        typedef std::vector<CType::CInstance *> CFieldArray;
+        CFieldArray _fieldArray;
         
       public:
         CInstance(const CType &type);
@@ -67,8 +67,8 @@ namespace freettcn {
         const char *Name() const;
         bool Optional() const;
       };
-      typedef std::vector<CFieldData *> TFieldDataArray;
-      TFieldDataArray _fieldDataArray;
+      typedef std::vector<CFieldData *> CFieldDataArray;
+      CFieldDataArray _fieldDataArray;
       char **_fieldNames;
       
       unsigned int FieldIdx(const char *fieldName) const throw(ENotFound);

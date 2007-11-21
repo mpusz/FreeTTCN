@@ -49,7 +49,7 @@ namespace freettcn {
     class CSourceData;
     
     class CTestCase {
-      typedef std::list<CPort *> TPortList;
+      typedef std::list<CPort *> CPortList;
       
       CModule &_module;
       CSourceData const * const _srcData;
@@ -60,7 +60,7 @@ namespace freettcn {
       TciTestCaseIdType _id;
       
       // test case dynamic state
-      TPortList _allPortStates;                   /**< a list of states of different ports */
+      CPortList _allPortStates;                   /**< a list of states of different ports */
       CTestComponentType::CInstanceRemote *_mtc;  /**< MTC reference */
       CTestComponentType::CInstanceRemote *_system; /**< SYSTEM reference */
       CVerdictType::CInstance _verdict;           /**< actual global test verdict of a test case,

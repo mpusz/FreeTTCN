@@ -207,9 +207,9 @@ int main (int argc, char **argv)
   if (list && module == "") {
     // list modules
     freettcn::TE::CModulesContainer &modules = freettcn::TE::CModulesContainer::Instance();
-    const freettcn::TE::CModulesContainer::TModuleList &list = modules.List();
+    const freettcn::TE::CModulesContainer::CModuleList &list = modules.List();
     
-    for(freettcn::TE::CModulesContainer::TModuleList::const_iterator it=list.begin(); it != list.end(); ++it)
+    for(freettcn::TE::CModulesContainer::CModuleList::const_iterator it=list.begin(); it != list.end(); ++it)
       std::cout << " - " << (*it)->Id().moduleName << std::endl;
     
     exit(0);

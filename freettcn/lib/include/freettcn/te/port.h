@@ -56,14 +56,14 @@ namespace freettcn {
       };
       
     private:
-      typedef std::list<const CType *> TTypeList;
+      typedef std::list<const CType *> CTypeList;
       
       const TType _type;
       QualifiedName _id;
       bool _inAll;
-      TTypeList _inList;
+      CTypeList _inList;
       bool _outAll;
-      TTypeList _outList;
+      CTypeList _outList;
       
     protected:
       void TypeAdd(const CType &type, TDirection dir) throw(EOperationFailed);
@@ -73,6 +73,7 @@ namespace freettcn {
       CPortType(const CModule &module, const char *name, TType type);
       virtual ~CPortType() = 0;
       const QualifiedName &Id() const;
+      bool Check(const CType &type, TDirection dir) const;
     };
     
     
@@ -101,7 +102,7 @@ namespace freettcn {
       };
       
     private:
-      typedef std::list<const TriPortId *> TConnectionList;
+      typedef std::list<const TriPortId *> CConnectionList;
 //       typedef CQueue<CMessage *> CMessageQueue;
       
       const CPortInfo &_portInfo;
@@ -110,13 +111,17 @@ namespace freettcn {
       
       // port dynamic state
       TStatus _status;                            /**< actual status of a port */
-      TConnectionList _connectList;               /**< keeps track of connections between the different ports in the test system */
-      TConnectionList _mapList;                   /**< keeps track of connections between the different ports in the test system */
-//       CMessageQueue _valueQueue;                /**< not yet consumed messages, calls, replies and exceptions */
+      CConnectionList _connectList;               /**< keeps track of connections
+                                                     between the different ports
+                                                     in the test system */
+      CConnectionList _mapList;                   /**< keeps track of connections
+                                                     between the different ports
+                                                     in the test system */
+//       CMessageQueue _valueQueue;                /**< not yet consumed messages,calls, replies and exceptions */
       // SNAP_VALUE - when a snapshot is taken the first element from VALUE_QUEUE is copied (NULL if VALUE_QUEUE is empty or STATUS = STOPPED)
       
-      void Connect(TConnectionList &list, const TriPortId &remoteId) throw(EOperationFailed);
-      void Disconnect(TConnectionList &list, const TriPortId &remoteId) throw(ENotFound);
+      void Connect(CConnectionList &list, const TriPortId &remoteId) throw(EOperationFailed);
+      void Disconnect(CConnectionList &list, const TriPortId &remoteId) throw(ENotFound);
       
     public:
       CPort(const CPortInfo &portInfo, const CTestComponentType::CInstanceLocal &component);

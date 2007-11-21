@@ -65,7 +65,7 @@ freettcn::PA::CPlatformAdaptor::~CPlatformAdaptor()
 TriStatus freettcn::PA::CPlatformAdaptor::Reset()
 {
   // stop all timers
-  for(TTimerList::const_iterator it=_timerList.begin(); it!=_timerList.end(); ++it)
+  for(CTimerList::const_iterator it=_timerList.begin(); it!=_timerList.end(); ++it)
     if ((*it)->Running())
       (*it)->Stop();
   
@@ -79,7 +79,7 @@ TriStatus freettcn::PA::CPlatformAdaptor::Reset()
 
 freettcn::PA::CTimer &freettcn::PA::CPlatformAdaptor::TimerGet(const TriTimerId &timerId) const throw(freettcn::ENotFound)
 {
-  for(TTimerList::const_iterator it=_timerList.begin(); it!=_timerList.end(); ++it)
+  for(CTimerList::const_iterator it=_timerList.begin(); it!=_timerList.end(); ++it)
     if (&timerId == &(*it)->Id())
       return *(*it);
   
@@ -96,7 +96,7 @@ TriStatus freettcn::PA::CPlatformAdaptor::TimerStart(const TriTimerId *timerId, 
   freettcn::PA::CTimer *timer = 0;
   
   // check if timer running already
-  for(TTimerList::const_iterator it=_timerList.begin(); it!=_timerList.end(); ++it) {
+  for(CTimerList::const_iterator it=_timerList.begin(); it!=_timerList.end(); ++it) {
     if (timerId == &(*it)->Id()) {
       timer = *it;
       break;

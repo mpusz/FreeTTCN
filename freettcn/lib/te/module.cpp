@@ -405,7 +405,7 @@ void freettcn::TE::CModule::BehaviorAdd(freettcn::TE::CBehavior *behavior)
 
 const freettcn::TE::CBehavior &freettcn::TE::CModule::Behavior(const TciBehaviourIdType &behavior) const throw(freettcn::ENotFound)
 {
-  for(TBehaviorList::const_iterator it=_behaviorList.begin(); it!=_behaviorList.end(); ++it) {
+  for(CBehaviorList::const_iterator it=_behaviorList.begin(); it!=_behaviorList.end(); ++it) {
     TciBehaviourIdType id = (*it)->Id();
     if (!strcmp(behavior.objectName, id.objectName))
       return *(*it);
@@ -512,7 +512,7 @@ void freettcn::TE::CModule::TestComponentStartReq(const char *src, int line,
   
   component.Start(behavior, parameterList);
   
-  for(TTestCompList::iterator it=_done.begin(); it!=_done.end(); ++it) {
+  for(CTestCompList::iterator it=_done.begin(); it!=_done.end(); ++it) {
     if ((*it) == &component) {
       if ((*it)->Status() == CTestComponentType::CInstanceRemote::TERMINATED) {
         // remove component from done list
@@ -546,7 +546,7 @@ void freettcn::TE::CModule::TestComponentTerminated(const TriComponentId &compon
 {
   CTestComponentType::CInstanceRemote *comp = 0;
   
-  for(TTestCompList::iterator it=_allEntityStates.begin(); it!=_allEntityStates.end(); ++it) {
+  for(CTestCompList::iterator it=_allEntityStates.begin(); it!=_allEntityStates.end(); ++it) {
     if (*(*it) == componentId) {
       comp = *it;
       break;
@@ -587,7 +587,7 @@ void freettcn::TE::CModule::TestComponentTerminated(const TriComponentId &compon
       _activeTestCase = 0;
       
       // remove all test case related test components
-      TTestCompList::iterator it=_allEntityStates.begin();
+      CTestCompList::iterator it=_allEntityStates.begin();
       do {
         for(it=_allEntityStates.begin(); it!=_allEntityStates.end(); ++it) {
           if ((*it)->Kind() != TCI_CTRL_COMP) {
@@ -646,7 +646,7 @@ void freettcn::TE::CModule::TestComponentKill(const TriComponentId &componentId)
 
 void freettcn::TE::CModule::TestComponentAllStop(const char *src, int line, CTestComponentType::CInstanceLocal &comp) const
 {
-  for(TTestCompList::const_iterator it=_allEntityStates.begin(); it!=_allEntityStates.end(); ++it) {
+  for(CTestCompList::const_iterator it=_allEntityStates.begin(); it!=_allEntityStates.end(); ++it) {
     if ((*it)->Status() != CTestComponentType::CInstanceRemote::TERMINATED &&
         (*it)->Status() != CTestComponentType::CInstanceRemote::KILLED) {
       if ((*it)->Kind() == TCI_PTC_COMP)
@@ -660,7 +660,7 @@ void freettcn::TE::CModule::TestComponentAllStop(const char *src, int line, CTes
 
 void freettcn::TE::CModule::TestComponentAllKill(const char *src, int line, CTestComponentType::CInstanceLocal &comp)
 {
-  for(TTestCompList::iterator it=_allEntityStates.begin(); it!=_allEntityStates.end(); ++it) {
+  for(CTestCompList::iterator it=_allEntityStates.begin(); it!=_allEntityStates.end(); ++it) {
     if ((*it)->Status() != CTestComponentType::CInstanceRemote::KILLED) {
       if ((*it)->Kind() == TCI_PTC_COMP || (*it)->Kind() == TCI_ALIVE_COMP) {
         (*it)->Kill();

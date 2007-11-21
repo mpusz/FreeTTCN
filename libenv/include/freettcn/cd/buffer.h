@@ -51,12 +51,12 @@ namespace freettcn {
       class EBufferTooShort : public EOperationFailed {};
       
     private:
-      typedef std::deque<unsigned char> TBuffer;
+      typedef std::deque<unsigned char> CBufferArray;
       
       const TByteOrder _hostByteOrder;
       const TByteOrder _byteOrder;
       
-      TBuffer _buffer;
+      CBufferArray _buffer;
       unsigned short _lastOctetBits;
       
       mutable BinaryString *__message;

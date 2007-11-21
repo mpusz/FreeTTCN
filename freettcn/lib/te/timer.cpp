@@ -128,7 +128,7 @@ void freettcn::TE::CTimer::HandlerAdd(unsigned int behavoiorOffset)
 
 void freettcn::TE::CTimer::HandlerRemove(unsigned int behavoiorOffset)
 {
-  for(TOffsetList::iterator it=_offsetList.begin(); it!=_offsetList.end(); ++it) {
+  for(COffsetList::iterator it=_offsetList.begin(); it!=_offsetList.end(); ++it) {
     if (*it == behavoiorOffset) {
       _offsetList.erase(it);
       break;
@@ -141,9 +141,9 @@ void freettcn::TE::CTimer::Timeout()
   _status = TIMEOUT;
   
   // timer can be deleted during execution
-  TOffsetList list(_offsetList);
+  COffsetList list(_offsetList);
   _offsetList.clear();
   
-  for(TOffsetList::iterator it=list.begin(); it!=list.end(); ++it)
+  for(COffsetList::iterator it=list.begin(); it!=list.end(); ++it)
     _component.Run(*it);
 }
