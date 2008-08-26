@@ -39,8 +39,8 @@ namespace freettcn {
   
     class CTciValueDumper {
     public:
-      static const char *Boolean2String(TciValue value);
-      static const char *Verdict2String(TciVerdictValue value);
+      static const char *Boolean2String(Value value);
+      static const char *Verdict2String(VerdictValue value);
     };
     
 } // namespace freettcn

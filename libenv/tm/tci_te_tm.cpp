@@ -32,7 +32,6 @@ extern "C" {
 #include <freettcn/ttcn3/tci_te_tm.h>
 }
 #include "freettcn/tm/tm.h"
-#include <iostream>
 #include <assert.h>
 
 
@@ -45,7 +44,7 @@ void tciTestCaseStarted(TciTestCaseIdType testCaseId,
 }
 
 
-void tciTestCaseTerminated(TciVerdictValue verdict,
+void tciTestCaseTerminated(VerdictValue verdict,
                            TciParameterListType parameterlist)
 {
   freettcn::TM::CTestManagement &tm = freettcn::TM::CTestManagement::Instance();
@@ -60,7 +59,7 @@ void tciControlTerminated()
 }
 
 
-TciValue tciGetModulePar(TciModuleParameterIdType parameterId)
+Value tciGetModulePar(TciModuleParameterIdType parameterId)
 {
   freettcn::TM::CTestManagement &tm = freettcn::TM::CTestManagement::Instance();
   return tm.ModuleParameterGet(parameterId);

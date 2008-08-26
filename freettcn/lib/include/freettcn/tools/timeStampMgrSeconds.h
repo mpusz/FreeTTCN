@@ -18,58 +18,51 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /**
- * @file   timeStamp.h
+ * @file   timeStampMgrSeconds.h
  * @author Mateusz Pusz
  * @date   Mon Apr 30 20:28:52 2007
  * 
- * @brief  
- * 
+ * @brief  TTCN-3 seconds timestamp manager class declaration.
  * 
  */
 
-#ifndef __TIMESTAMP_H__
-#define __TIMESTAMP_H__
+#ifndef __TIMESTAMPMGRSECONDS_H__
+#define __TIMESTAMPMGRSECONDS_H__
 
-#include <string>
+#include "timeStampMgr.h"
 
 namespace freettcn {
 
-  class CTimeStamp {
-  public:
-    enum TMode {
-      MODE_ABSOLUTE,
-      MODE_RELATIVE
-    };
-    
+  class CTimeStampMgrSeconds : public CTimeStampMgr {
+  protected:
     struct TTime {
       int sec;
       int usec;
     };
+
   private:
     const unsigned short _precision;
-    TMode _mode;
     TTime _absTimeOffset;
     
   protected:
     virtual void Set(TTime &ts) const;
+    virtual int Convert(const TTime &value) const;
+    virtual void Convert(int ts, TTime &value) const;
+
     void Sub(TTime &value, const TTime &delta) const;
     void Add(TTime &value, const TTime &delta) const;
-    virtual int Convert(TTime &value) const;
-    virtual void Convert(int ts, TTime &ts) const;
     
   public:
-    CTimeStamp(unsigned short precision = 4, TMode initMode = MODE_RELATIVE);
-    virtual ~CTimeStamp();
+    CTimeStampMgrSeconds(unsigned short precision = 4, TMode initMode = MODE_RELATIVE);
+    virtual ~CTimeStampMgrSeconds();
     
-    void Mode(TMode mode);
-    TMode Mode() const;
-    void Reset();
-    
-    int Get() const;
+    virtual void Reset();
+    virtual int Get() const;
     virtual std::string String(int ts) const;
   };
+
 
 } // namespace freettcn
 
 
-#endif /* __TIMESTAMP_H__ */
+#endif /* __TIMESTAMPMGRSECONDS_H__ */

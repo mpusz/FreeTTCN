@@ -54,7 +54,7 @@ namespace freettcn {
       CTTCNExecutable& operator=(CTTCNExecutable&);  // Disallowed
       CTTCNExecutable(const CTTCNExecutable&);       // Disallowed
     protected:
-      CModule &RootModule() const throw(ENotFound);
+      CModule &RootModule() const;
       
     public:
       static CTTCNExecutable &Instance();
@@ -71,8 +71,8 @@ namespace freettcn {
       void ControlStop() const;
       
       // CH requests
-      void ConnectedMsgEnqueue(const TriPortId &sender, const TriComponentId &receiver, TciValue rcvdMessage) const;
-      const TriComponentId &TestComponentCreate(TciTestComponentKindType kind, TciType componentType, String name) const;
+      void ConnectedMsgEnqueue(const TriPortId &sender, const TriComponentId &receiver, const Value &rcvdMessage) const;
+      const TriComponentId &TestComponentCreate(TciTestComponentKindType kind, const Type &componentType, String name) const;
       void TestComponentStart(const TriComponentId &componentId, const TciBehaviourIdType &behaviorId, const TciParameterListType &parameterList) const;
       void TestComponentStop(const TriComponentId &componentId) const;
       void TestComponentKill(const TriComponentId &component) const;
@@ -80,12 +80,12 @@ namespace freettcn {
       void Disconnect(const TriPortId &fromPort, const TriPortId &toPort) const;
       void Map(const TriPortId &fromPort, const TriPortId &toPort) const;
       void Unmap(const TriPortId &fromPort, const TriPortId &toPort) const;
-      void TestComponentTerminated(const TriComponentId &componentId, TciVerdictValue verdict) const;
+      void TestComponentTerminated(const TriComponentId &componentId, const VerdictValue &verdict) const;
       void TestCaseExecute(const TciTestCaseIdType &testCaseId, const TriPortIdList &tsiPortList) const;
       void Reset() const;
       
       // PA requests
-      void Timeout(const TriTimerId* timerId) throw(ENotFound);
+      void Timeout(const TriTimerId* timerId);
     };
     
   } // namespace TE

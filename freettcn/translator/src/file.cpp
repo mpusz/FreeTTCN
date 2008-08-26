@@ -30,7 +30,7 @@ TTCN3::CFile::~CFile()
  * 
  * @return Reference to TTCN-3 Module node.
  */
-CModule &TTCN3::CFile::Module() const throw(ENotFound)
+CModule &TTCN3::CFile::Module() const
 {
   if(!module)
     throw ENotFound();

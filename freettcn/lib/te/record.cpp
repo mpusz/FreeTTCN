@@ -30,8 +30,9 @@
 
 #include "freettcn/te/record.h"
 #include "freettcn/tools/tools.h"
+#include "freettcn/tools/exception.h"
+#include <sstream>
 #include <cstring>
-#include <iostream>
 
 
 freettcn::TE::CRecordType::CRecordType(const CModule    &module,
@@ -76,13 +77,13 @@ void freettcn::TE::CRecordType::Init()
 }
 
 
-unsigned int freettcn::TE::CRecordType::FieldIdx(const char *fieldName) const throw(ENotFound)
+unsigned int freettcn::TE::CRecordType::FieldIdx(const char *fieldName) const
 {
   for(unsigned int i=0; i<_fieldDataArray.size(); i++)
     if (!strcmp(_fieldDataArray[i]->Name(), fieldName))
       return i;
-  std::cout << "ERROR: Record Field not found" << std::endl;
-  throw freettcn::ENotFound();
+
+  throw ENotFound(E_DATA, "Record Field '" + std::string(fieldName) + "' not found!!!");
 }
 
 
@@ -145,25 +146,26 @@ void freettcn::TE::CRecordType::CInstance::Register(CType::CInstance *field)
 // }
 
 
-freettcn::TE::CType::CInstance &freettcn::TE::CRecordType::CInstance::Field(const char *fieldName) const throw(ENotFound, EOmitSet)
+freettcn::TE::CType::CInstance &freettcn::TE::CRecordType::CInstance::Field(const char *fieldName) const
 {
   if (Omit())
-    throw EOmitSet();
+    throw EOperationFailed(E_DATA, "Cannot get a field of record with Omit set!!!");
   
   return *_fieldArray[static_cast<const CRecordType &>(Type()).FieldIdx(fieldName)];
 }
 
 
-freettcn::TE::CType::CInstance &freettcn::TE::CRecordType::CInstance::Field(unsigned int fieldIdx) const throw(ENotFound, EOmitSet)
+freettcn::TE::CType::CInstance &freettcn::TE::CRecordType::CInstance::Field(unsigned int fieldIdx) const
 {
   if (Omit())
-    throw EOmitSet();
+    throw EOperationFailed(E_DATA, "Cannot get a field of record with Omit set!!!");
   
   if (fieldIdx < _fieldArray.size())
     return *_fieldArray[fieldIdx];
   
-  std::cout << "ERROR: Record field index: " << fieldIdx << " too big (size: " << _fieldArray.size() << ")" << std::endl;
-  throw ENotFound();
+  std::stringstream stream;
+  stream << "Record field index: " << fieldIdx << " too big (size: " << _fieldArray.size() << ")";
+  throw EOutOfRange(E_DATA, stream.str());
 }
 
 

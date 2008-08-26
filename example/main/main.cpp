@@ -31,8 +31,7 @@
 #include <freettcn/te/teLogMask.h>
 #include <freettcn/te/module.h>
 #include <freettcn/te/modulesContainer.h>
-#include <freettcn/tools/timeStamp.h>
-
+#include <freettcn/tools/timeStampMgrSeconds.h>
 #include <iostream>
 #include <getopt.h>
 
@@ -77,7 +76,7 @@ void Start(freettcn::example::CCLITestManagement &tm, const std::string &testCas
   tm.ParametersSet();
   
   // init timestamping
-  freettcn::CTimeStamp ts(4);
+  freettcn::CTimeStampMgrSeconds ts(4);
   
   // init logger
   freettcn::TL::CLogger logger(ts);

@@ -38,14 +38,13 @@
 #include "freettcn/tools/tools.h"
 #include "freettcn/tools/logMask.h"
 #include "freettcn/tools/ttcnWrappers.h"
-#include "freettcn/tools/timeStamp.h"
+#include "freettcn/tools/timeStampMgr.h"
 extern "C" {
 #include "freettcn/ttcn3/tci_te_tm.h"
 #include "freettcn/ttcn3/tci_te_ch.h"
 #include "freettcn/ttcn3/tri_te_sa.h"
 #include "freettcn/ttcn3/tci_tl.h"
 }
-#include <iostream>
 
 
 
@@ -72,20 +71,18 @@ TciTestCaseIdType freettcn::TE::CTestCase::Id() const
   return _id;
 }
 
-freettcn::TE::CTestComponentType::CInstanceRemote &freettcn::TE::CTestCase::MTC() const throw(ENotFound)
+freettcn::TE::CTestComponentType::CInstanceRemote &freettcn::TE::CTestCase::MTC() const
 {
   if (_mtc)
     return *_mtc;
-  std::cout << "ERROR: MTC test component not found!!!" << std::endl;
-  throw ENotFound();
+  throw ENotFound(E_DATA, "MTC test component not found!!!");
 }
 
-freettcn::TE::CTestComponentType::CInstanceRemote &freettcn::TE::CTestCase::System() const throw(ENotFound)
+freettcn::TE::CTestComponentType::CInstanceRemote &freettcn::TE::CTestCase::System() const
 {
   if (_system)
     return *_system;
-  std::cout << "ERROR: SYSTEM test component not found!!!" << std::endl;
-  throw ENotFound();
+  throw ENotFound(E_DATA, "SYSTEM test component not found!!!");
 }
 
 const freettcn::TE::CVerdictType::CInstance &freettcn::TE::CTestCase::Verdict() const
@@ -145,34 +142,6 @@ void freettcn::TE::CTestCase::Start(const char *src, int line,
     creatorId = _module.ModuleComponentId();
   }
   
-  freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
-  if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_TC_START)) {
-    // log
-    TriParameterList parList;                     /**< @todo Paramters list should be translated */
-    parList.length = 0;
-    parList.parList = 0;
-    
-    tliTcStart(0, te.TimeStamp().Get(), const_cast<char *>(src), line, creatorId, _id, parList, duration);
-  }
-  
-  // create MTC
-  _mtc = &_module.TestComponentCreateReq(src, line, creatorId, TCI_MTC_COMP, _mtcType, "MTC");
-  
-  // create SYSTEM component
-  _system = &_module.TestComponentCreateReq(src, line, _mtc->Id(), TCI_SYS_COMP, _systemType, "SYSTEM");
-  
-  // give a chance to create static connections and the initialization of TSI ports
-  if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_TC_EXECUTE)) {
-    // log
-    TriParameterList parList;                     /**< @todo Paramters list should be translated */
-    parList.length = 0;
-    parList.parList = 0;
-    
-    tliTcExecute(0, te.TimeStamp().Get(), const_cast<char *>(src), line, _mtc->Id(), _id, parList, duration);
-  }
-  tciExecuteTestCaseReq(_id, SystemInterface());
-  
-  // start MTC
   TciParameterListType parList;
   if (parameterList) {
     parList = *parameterList;
@@ -181,6 +150,24 @@ void freettcn::TE::CTestCase::Start(const char *src, int line,
     parList.length = 0;
     parList.parList = 0;
   }
+  
+  freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
+  if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_TC_START))
+    tliTcStart(0, te.TimeStampMgr().Get(), const_cast<char *>(src), line, creatorId, _id, parList, duration);
+  
+  // create MTC
+  _mtc = &_module.TestComponentCreateReq(src, line, creatorId, TCI_MTC_COMP, _mtcType, "MTC");
+  
+  // create SYSTEM component
+  _system = &_module.TestComponentCreateReq(src, line, _mtc->Id(), TCI_SYS_COMP, _systemType, "SYSTEM");
+  
+  // give a chance to create static connections and the initialization of TSI ports
+  if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_TC_EXECUTE))
+    tliTcExecute(0, te.TimeStampMgr().Get(), const_cast<char *>(src), line, _mtc->Id(), _id, parList, duration);
+  
+  tciExecuteTestCaseReq(_id, SystemInterface());
+  
+  // start MTC
   _module.TestComponentStartReq(src, line, creatorId, *_mtc, _behavior, parList);
   
   // inform TM about TC execution
@@ -204,7 +191,7 @@ void freettcn::TE::CTestCase::Stop()
   CTTCNExecutable &te = CTTCNExecutable::Instance();
   if (te.Logging() && te.LogMask().Get(CLogMask::CMD_TE_TC_STOP))
     // log
-    tliTcStop(0, te.TimeStamp().Get(), 0, 0, _mtc->Id());
+    tliTcStop(0, te.TimeStampMgr().Get(), 0, 0, _mtc->Id());
   
   // set verdict to ERROR
   _verdict.Value(VERDICT_ERROR);

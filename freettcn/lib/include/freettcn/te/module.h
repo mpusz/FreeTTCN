@@ -57,12 +57,12 @@ namespace freettcn {
         CType::CInstance const * const _defaultValue;
         const CType::CInstance *_value;
       public:
-        CParameter(const char *name, const CType::CInstance *defaultValue) throw(EOperationFailed);
+        CParameter(const char *name, const CType::CInstance *defaultValue);
         ~CParameter();
         const TciModuleParameterIdType &Id() const;
         const CType::CInstance &DefaultValue() const;
         void Value(const CType::CInstance *value);
-        const CType::CInstance &Value() const throw(EOperationFailed);
+        const CType::CInstance &Value() const;
       };
       
     private:
@@ -109,8 +109,8 @@ namespace freettcn {
       CModule& operator=(CModule&);  // Disallowed
       CModule(const CModule&);       // Disallowed
       
-      CTestComponentType::CInstanceLocal &TestComponent(const TriComponentId &component) const throw(ENotFound);
-      const CBehavior &Behavior(const TciBehaviourIdType &behavior) const throw(ENotFound);
+      CTestComponentType::CInstanceLocal &TestComponent(const TriComponentId &component) const;
+      const CBehavior &Behavior(const TciBehaviourIdType &behavior) const;
       
     protected:
       void Register(const CType *type);
@@ -133,41 +133,41 @@ namespace freettcn {
       TriComponentId ModuleComponentId() const;
 
       TciModuleParameterListType Parameters() const;
-      void ParametersGet() const throw(EOperationFailed);
-      const CParameter &Parameter(unsigned int parameterIdx) const throw(ENotFound);
+      void ParametersGet() const;
+      const CParameter &Parameter(unsigned int parameterIdx) const;
       
-      const CType &Type(const char *typeName) const throw(ENotFound);
-      const CType &Type(unsigned int typeIdx) const throw(ENotFound);
+      const CType &TypeGet(const char *typeName) const;
+      const CType &TypeGet(unsigned int typeIdx) const;
       
-      const CPortType &PortType(unsigned int portTypeIdx) const throw(ENotFound);
+      const CPortType &PortType(unsigned int portTypeIdx) const;
       
       TciTestCaseIdListType TestCases() const;
-      CTestCase &TestCase(const char *tcId) const throw(ENotFound);
-      CTestCase &TestCase(unsigned int tcIdx) const throw(ENotFound);
+      CTestCase &TestCase(const char *tcId) const;
+      CTestCase &TestCase(unsigned int tcIdx) const;
       void ActiveTestCase(CTestCase &tc);
-      CTestCase &ActiveTestCase() const throw(ENotFound);
+      CTestCase &ActiveTestCase() const;
       
       const TriComponentId &ControlStart();
-      void ControlStop() throw(EOperationFailed);
+      void ControlStop();
       
-      const CBehavior &ControlBehavior() const throw(ENotFound);
+      const CBehavior &ControlBehavior() const;
       void BehaviorAdd(CBehavior *behavior);
       
       CTestComponentType::CInstanceRemote &TestComponentCreateReq(const char *src, int line, const TriComponentId &creatorId, TciTestComponentKindType kind, const CTestComponentType &compType, const char *name);
-      const TriComponentId &TestComponentCreate(TciTestComponentKindType kind, TciType componentType, const char *name);
-      void TestComponentStartReq(const char *src, int line, const TriComponentId &creatorId, CTestComponentType::CInstanceRemote &component, const CBehavior &behavior, const TciParameterListType &parameterList) throw(EOperationFailed);
-      void TestComponentStart(const TriComponentId &componentId, const TciBehaviourIdType &behaviorId, const TciParameterListType &parameterList) const throw(ENotFound);
-      void TestComponentStop(const TriComponentId &componentId) const throw(ENotFound);
-      void TestComponentTerminated(const TriComponentId &componentId, TciVerdictValue verdict) throw(ENotFound);
-      void TestComponentKill(const TriComponentId &componentId) const throw(ENotFound);
+      const TriComponentId &TestComponentCreate(TciTestComponentKindType kind, const Type &componentType, const char *name);
+      void TestComponentStartReq(const char *src, int line, const TriComponentId &creatorId, CTestComponentType::CInstanceRemote &component, const CBehavior &behavior, const TciParameterListType &parameterList);
+      void TestComponentStart(const TriComponentId &componentId, const TciBehaviourIdType &behaviorId, const TciParameterListType &parameterList) const;
+      void TestComponentStop(const TriComponentId &componentId) const;
+      void TestComponentTerminated(const TriComponentId &componentId, const VerdictValue &verdict);
+      void TestComponentKill(const TriComponentId &componentId) const;
       
       void TestComponentAllStop(const char *src, int line, CTestComponentType::CInstanceLocal &comp) const;
       void TestComponentAllKill(const char *src, int line, CTestComponentType::CInstanceLocal &comp);
       
-      void Connect(const TriPortId &fromPort, const TriPortId &toPort) const throw(ENotFound);
-      void Disconnect(const TriPortId &fromPort, const TriPortId &toPort) const throw(ENotFound);
-      void Map(const TriPortId &fromPort, const TriPortId &toPort) const throw(ENotFound, EOperationFailed);
-      void Unmap(const TriPortId &fromPort, const TriPortId &toPort) const throw(ENotFound, EOperationFailed);
+      void Connect(const TriPortId &fromPort, const TriPortId &toPort) const;
+      void Disconnect(const TriPortId &fromPort, const TriPortId &toPort) const;
+      void Map(const TriPortId &fromPort, const TriPortId &toPort) const;
+      void Unmap(const TriPortId &fromPort, const TriPortId &toPort) const;
     };
     
   } // namespace TE

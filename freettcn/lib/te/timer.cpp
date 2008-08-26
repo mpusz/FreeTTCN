@@ -32,7 +32,6 @@
 extern "C" {
 #include <freettcn/ttcn3/tri_te_pa.h>
 }
-#include <iostream>
 
 
 freettcn::TE::CTimer::CTimer(CTestComponentType::CInstanceLocal &comp, bool implicit):
@@ -42,14 +41,12 @@ freettcn::TE::CTimer::CTimer(CTestComponentType::CInstanceLocal &comp, bool impl
   _component.TimerAdd(*this, _implicit);
 }
 
-freettcn::TE::CTimer::CTimer(CTestComponentType::CInstanceLocal &comp, bool implicit, TriTimerDuration defaultDuration) throw(EOperationFailed):
+freettcn::TE::CTimer::CTimer(CTestComponentType::CInstanceLocal &comp, bool implicit, TriTimerDuration defaultDuration):
   _component(comp), _implicit(implicit),
   _status(IDLE), _defaultDurationValid(true), _defaultDuration(defaultDuration)
 {
-  if (_defaultDuration < 0) {
-    std::cout << "ERROR: Timer default duration < 0!!!" << std::endl;
-    throw freettcn::EOperationFailed();
-  }
+  if (_defaultDuration < 0)
+    throw EOperationFailed(E_DATA, "Timer default duration < 0!!!");
   
   _component.TimerAdd(*this, _implicit);
 }
@@ -66,57 +63,53 @@ const TriTimerId &freettcn::TE::CTimer::Id() const
   return InstanceId();
 }
 
-void freettcn::TE::CTimer::Start() throw(freettcn::EOperationFailed)
+void freettcn::TE::CTimer::Start()
 {
-  if (!_defaultDurationValid) {
-    std::cout << "ERROR: Default duration not set!!!" << std::endl;
-    throw freettcn::EOperationFailed();
-  }
+  if (!_defaultDurationValid)
+    throw EOperationFailed(E_DATA, "Default duration not set!!!");
   
   _activeDuration = _defaultDuration;
   if (triStartTimer(&InstanceId(), _activeDuration) == TRI_ERROR)
-    throw freettcn::EOperationFailed();
+    throw EOperationFailed(E_DATA, "triStartTimer() failed!!!");
   
   _status = RUNNING;
 }
 
-void freettcn::TE::CTimer::Start(TriTimerDuration duration) throw(freettcn::EOperationFailed)
+void freettcn::TE::CTimer::Start(TriTimerDuration duration)
 {
-  if (duration < 0) {
-    std::cout << "ERROR: Timer duration < 0!!!" << std::endl;
-    throw freettcn::EOperationFailed();
-  }
+  if (duration < 0)
+    throw EOperationFailed(E_DATA, "Timer duration < 0!!!");
   
   _activeDuration = duration;
   if (triStartTimer(&InstanceId(), _activeDuration) == TRI_ERROR)
-    throw freettcn::EOperationFailed();
+    throw EOperationFailed(E_DATA, "triStartTimer() failed!!!");
   
   _status = RUNNING;
 }
 
-void freettcn::TE::CTimer::Stop() throw(freettcn::EOperationFailed)
+void freettcn::TE::CTimer::Stop()
 {
   if (triStopTimer(&InstanceId()) == TRI_ERROR)
-    throw freettcn::EOperationFailed();
+    throw EOperationFailed(E_DATA, "triStopTimer() failed!!!");
 }
 
-TriTimerDuration freettcn::TE::CTimer::Read() const throw(freettcn::EOperationFailed)
+TriTimerDuration freettcn::TE::CTimer::Read() const
 {
   if (_status == RUNNING) {
     TriTimerDuration dur;
     if (triReadTimer(&InstanceId(), &dur) == TRI_ERROR)
-      throw freettcn::EOperationFailed();
+      throw EOperationFailed(E_DATA, "triReadTimer() failed !!!");
     return dur;
   }
   else
     return 0;
 }
 
-bool freettcn::TE::CTimer::Running() const throw(freettcn::EOperationFailed)
+bool freettcn::TE::CTimer::Running() const
 {
 //   unsigned char running;
 //   if (triTimerRunning(&InstanceId(), &running) == TRI_ERROR)
-//     throw freettcn::EOperationFailed();
+//     throw EOperationFailed();
 //   return running;
   return _status == RUNNING;
 }

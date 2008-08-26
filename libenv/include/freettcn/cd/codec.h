@@ -34,8 +34,6 @@ extern "C" {
 #include <freettcn/ttcn3/tci.h>
 }
 
-// #include <freettcn/tools/exception.h>
-
 
 namespace freettcn {
   
@@ -51,8 +49,8 @@ namespace freettcn {
       
       const char *Name() const;
 
-      virtual bool CapabilityCheck(TciValue value, unsigned int &valueId) const = 0;
-      virtual void Encode(unsigned int valueId, TciValue value, CBuffer &buffer) const = 0;
+      virtual bool CapabilityCheck(const Value &value, unsigned int &valueId) const = 0;
+      virtual void Encode(unsigned int valueId, const Value &value, CBuffer &buffer) const = 0;
     };
     
   } // namespace CD

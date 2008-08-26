@@ -80,7 +80,7 @@
  * @retval TRI_OK success
  * @retval TRI_Error failure
  */
-TriStatus triStartTimer(const TriTimerId* timerId,
+TriStatus triStartTimer(const TriTimerId *timerId,
                         TriTimerDuration timerDuration);
 
 
@@ -103,7 +103,7 @@ TriStatus triStartTimer(const TriTimerId* timerId,
  * @retval TRI_OK success
  * @retval TRI_Error failure
  */
-TriStatus triStopTimer(const TriTimerId* timerId);
+TriStatus triStopTimer(const TriTimerId *timerId);
 
 
 
@@ -127,8 +127,8 @@ TriStatus triStopTimer(const TriTimerId* timerId);
  * @retval TRI_OK success
  * @retval TRI_Error failure
  */
-TriStatus triReadTimer(const TriTimerId* timerId,
-                       TriTimerDuration* elapsedTime);
+TriStatus triReadTimer(const TriTimerId *timerId,
+                       TriTimerDuration *elapsedTime);
 
 
 /** 
@@ -149,8 +149,8 @@ TriStatus triReadTimer(const TriTimerId* timerId,
  * @retval TRI_OK success
  * @retval TRI_Error failure
  */
-TriStatus triTimerRunning(const TriTimerId* timerId,
-                          unsigned char* running);
+TriStatus triTimerRunning(const TriTimerId *timerId,
+                          unsigned char *running);
 
 
 /// @} TriIfacePlatformTimer_TE_PA
@@ -219,9 +219,9 @@ TriStatus triPAReset();
  * @retval TRI_OK success
  * @retval TRI_Error failure
  */
-TriStatus triExternalFunction(const TriFunctionId* functionId,
-                              TriParameterList* parameterList,
-                              TriParameter* returnValue);
+TriStatus triExternalFunction(const TriFunctionId *functionId,
+                              TriParameterList *parameterList,
+                              TriParameter *returnValue);
 
 /// @} TriIfacePlatformMisc_TE_SA
 

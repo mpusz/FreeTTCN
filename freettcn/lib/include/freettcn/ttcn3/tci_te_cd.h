@@ -80,8 +80,8 @@
  * @return Returns the decoded value, if the value is of a compatible type as the @p decodingHypothesis, else
  *         the distinct value @c null.
  */
-TciValue tciDecode(BinaryString message,
-                   TciType decHypothesis);
+Value tciDecode(BinaryString message,
+                Type         decHypothesis);
 
 
 /** 
@@ -97,7 +97,7 @@ TciValue tciDecode(BinaryString message,
  * 
  * @return Returns an encoded TriMessage for the specified encoding rule.
  */
-BinaryString tciEncode(TciValue value);
+BinaryString tciEncode(Value value);
 
 
 /// @} TciInterfaceCDProvided

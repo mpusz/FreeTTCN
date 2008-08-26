@@ -37,7 +37,6 @@
 #include <freettcn/te/timer.h>
 #include <freettcn/te/basicTypes.h>
 #include <freettcn/te/sourceData.h>
-#include <iostream>
 
 
 #define MY_CAST         dynamic_cast
@@ -273,7 +272,7 @@ namespace freettcn {
     CICMPDataType::CICMPDataType(const freettcn::TE::CModule &module):
       freettcn::TE::CRecordType(module, "ICMPDataType", "", "", "")
     {
-      Register(module.Type(CModule::TYPE_ICMPPingDataType), "ping");
+      Register(module.TypeGet(CModule::TYPE_ICMPPingDataType), "ping");
       Init();
     }
     
@@ -283,7 +282,7 @@ namespace freettcn {
       Register(freettcn::TE::CBasicTypes::Integer(), "msgType");
       Register(freettcn::TE::CBasicTypes::Integer(), "code");
       Register(freettcn::TE::CBasicTypes::Integer(), "crc");
-      Register(module.Type(CModule::TYPE_ICMPDataType), "data");
+      Register(module.TypeGet(CModule::TYPE_ICMPDataType), "data");
       Init();
     }
     
@@ -294,7 +293,7 @@ namespace freettcn {
     CICMPPortType::CICMPPortType(const freettcn::TE::CModule &module):
       freettcn::TE::CPortType(module, "ICMPPort", freettcn::TE::CPortType::MESSAGE)
     {
-      TypeAdd(module.Type(CModule::TYPE_ICMPMsg), freettcn::TE::CPortType::INOUT);
+      TypeAdd(module.TypeGet(CModule::TYPE_ICMPMsg), freettcn::TE::CPortType::INOUT);
     }
 
     
@@ -346,7 +345,7 @@ namespace freettcn {
     // ********************* T E M P L A T E S *************************
     
     Ct_EchoRequest::Ct_EchoRequest(const freettcn::TE::CModule &module, freettcn::TE::CIntegerType::CInstance &seqNum):
-      freettcn::TE::CTemplate(module.Type(CModule::TYPE_ICMPMsg))
+      freettcn::TE::CTemplate(module.TypeGet(CModule::TYPE_ICMPMsg))
     {
       CICMPMsg::CInstance &value = MY_CAST<CICMPMsg::CInstance &>(Value());
       
@@ -364,7 +363,7 @@ namespace freettcn {
     
     
     Ct_EchoReply::Ct_EchoReply(const freettcn::TE::CModule &module, CICMPMsg::CInstance &echoReq):
-      freettcn::TE::CTemplate(module.Type(CModule::TYPE_ICMPMsg))
+      freettcn::TE::CTemplate(module.TypeGet(CModule::TYPE_ICMPMsg))
     {
       CICMPMsg::CInstance &value = MY_CAST<CICMPMsg::CInstance &>(Value());
       
@@ -382,9 +381,9 @@ namespace freettcn {
     // ICMP_Ping_1
     CTC_ICMPPing_1::CTC_ICMPPing_1(freettcn::TE::CModule &module):
       freettcn::TE::CTestCase(module, "TC_ICMPPing_1", new freettcn::TE::CSourceData("icmp.ttcn", 76),
-                              MY_CAST<const freettcn::TE::CTestComponentType &>(module.Type(CModule::TYPE_ICMPComponentType)),
+                              MY_CAST<const freettcn::TE::CTestComponentType &>(module.TypeGet(CModule::TYPE_ICMPComponentType)),
                               *new CBehavior(module),
-                              &MY_CAST<const freettcn::TE::CTestComponentType &>(module.Type(CModule::TYPE_IPStackType)))
+                              &MY_CAST<const freettcn::TE::CTestComponentType &>(module.TypeGet(CModule::TYPE_IPStackType)))
     {
       // register test case parameters
     }
@@ -427,7 +426,11 @@ namespace freettcn {
         }
     
       default:
-        std::cout << "ERROR: Unknown offset: " << offset << std::endl;
+        {
+          std::stringstream stream;
+          stream << "Unknown offset: " << offset;
+          throw EOperationFailed(E_DATA, stream.str());
+        }
       }
       
       return freettcn::TE::CBehavior::ERROR;
@@ -436,7 +439,7 @@ namespace freettcn {
     // ICMP_Ping_2
     CTC_ICMPPing_2::CTC_ICMPPing_2(freettcn::TE::CModule &module):
       freettcn::TE::CTestCase(module, "TC_ICMPPing_2", new freettcn::TE::CSourceData("icmp.ttcn", 109),
-                              MY_CAST<const freettcn::TE::CTestComponentType &>(module.Type(CModule::TYPE_ICMPComponentType)),
+                              MY_CAST<const freettcn::TE::CTestComponentType &>(module.TypeGet(CModule::TYPE_ICMPComponentType)),
                               *new CBehavior(module))
     {
       // register test case parameters
@@ -471,7 +474,11 @@ namespace freettcn {
         }
         
       default:
-        std::cout << "ERROR: Unknown offset: " << offset << std::endl;
+        {
+          std::stringstream stream;
+          stream << "Unknown offset: " << offset;
+          throw EOperationFailed(E_DATA, stream.str());
+        }
       }
       
       return freettcn::TE::CBehavior::ERROR;
@@ -598,7 +605,11 @@ namespace freettcn {
         }
         
       default:
-        std::cout << "ERROR: Unknown offset: " << offset << std::endl;
+        {
+          std::stringstream stream;
+          stream << "Unknown offset: " << offset;
+          throw EOperationFailed(E_DATA, stream.str());
+        }
       }
       
       return freettcn::TE::CBehavior::ERROR;

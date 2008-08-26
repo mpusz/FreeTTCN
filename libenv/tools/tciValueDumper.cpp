@@ -34,7 +34,7 @@ extern "C" {
 }
 
 
-const char *freettcn::CTciValueDumper::Boolean2String(TciValue value)
+const char *freettcn::CTciValueDumper::Boolean2String(Value value)
 {
   const char *str[] = { "FALSE",
                         "TRUE" };
@@ -43,7 +43,7 @@ const char *freettcn::CTciValueDumper::Boolean2String(TciValue value)
 }
 
 
-const char *freettcn::CTciValueDumper::Verdict2String(TciVerdictValue value)
+const char *freettcn::CTciValueDumper::Verdict2String(VerdictValue value)
 {
   const char *str[] = { "NONE",
                         "PASS",

@@ -29,6 +29,7 @@
  */
 
 #include "freettcn/te/verdict.h"
+#include "freettcn/tools/exception.h"
 
 
 freettcn::TE::CVerdictType::CVerdictType():
@@ -52,10 +53,10 @@ freettcn::TE::CVerdictType::CInstance::CInstance(const CType &type, TVerdict val
 {
 }
 
-freettcn::TE::TVerdict freettcn::TE::CVerdictType::CInstance::Value() const throw(EOmitSet)
+freettcn::TE::TVerdict freettcn::TE::CVerdictType::CInstance::Value() const
 {
   if (Omit())
-    throw EOmitSet();
+    throw EOperationFailed(E_DATA, "Cannot get value for a field with Ommit set!!!");
   return _value;
 }
 

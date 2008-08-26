@@ -34,7 +34,6 @@
 extern "C" {
 #include <freettcn/ttcn3/tri.h>
 }
-#include <freettcn/tools/exception.h>
 
 
 namespace freettcn {
@@ -68,16 +67,16 @@ namespace freettcn {
       
     public:
       CTimer(CTestComponentType::CInstanceLocal &comp, bool implicit);
-      CTimer(CTestComponentType::CInstanceLocal &comp, bool implicit, TriTimerDuration defaultDuration) throw(EOperationFailed);
+      CTimer(CTestComponentType::CInstanceLocal &comp, bool implicit, TriTimerDuration defaultDuration);
       ~CTimer();
       
       const TriTimerId &Id() const;
       
-      void Start() throw(EOperationFailed);
-      void Start(TriTimerDuration duration) throw(EOperationFailed);
-      void Stop() throw(EOperationFailed);
-      TriTimerDuration Read() const throw(EOperationFailed);
-      bool Running() const throw(EOperationFailed);
+      void Start();
+      void Start(TriTimerDuration duration);
+      void Stop();
+      TriTimerDuration Read() const;
+      bool Running() const;
       
       void HandlerAdd(unsigned int behavoiorOffset);
       void HandlerRemove(unsigned int behavoiorOffset);

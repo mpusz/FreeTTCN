@@ -55,12 +55,12 @@ namespace freettcn {
       CComponentHandler(const CComponentHandler&);       // Disallowed
       
     protected:
-      virtual void ConnectedMsgEnqueue(const TriPortId &sender, const TriComponentId &receiver, TciValue rcvdMessage);
+      virtual void ConnectedMsgEnqueue(const TriPortId &sender, const TriComponentId &receiver, const Value &rcvdMessage);
       
-      virtual TriComponentId TestComponentCreate(TciTestComponentKindType kind, TciType componentType, String name);
+      virtual TriComponentId TestComponentCreate(TciTestComponentKindType kind, const Type &componentType, String name);
       virtual void TestComponentStart(const TriComponentId &component, const TciBehaviourIdType &behavior, const TciParameterListType &parameterList);
       virtual void TestComponentStop(const TriComponentId &component);
-      virtual void TestComponentTerminated(const TriComponentId &component, TciVerdictValue verdict);
+      virtual void TestComponentTerminated(const TriComponentId &component, const VerdictValue &verdict);
       virtual void TestComponentKill(const TriComponentId &component);
 
       virtual void TestCaseExecute(const TciTestCaseIdType &testCaseId, const TriPortIdList &tsiPortList);
@@ -71,19 +71,19 @@ namespace freettcn {
       virtual void Unmap(const TriPortId &fromPort, const TriPortId &toPort);
 
     public:
-      static CComponentHandler &Instance() throw(ENotFound);
+      static CComponentHandler &Instance();
       
       CComponentHandler();
       virtual ~CComponentHandler();
       
       void ResetReq();
       
-      void ConnectedSend(const TriPortId &sender, const TriComponentId &receiver, TciValue sendMessage);
+      void ConnectedSend(const TriPortId &sender, const TriComponentId &receiver, const Value &sendMessage);
       
-      TriComponentId TestComponentCreateReq(TciTestComponentKindType kind, TciType componentType, String name);
+      TriComponentId TestComponentCreateReq(TciTestComponentKindType kind, const Type &componentType, String name);
       void TestComponentStartReq(const TriComponentId &component, const TciBehaviourIdType &behavior, const TciParameterListType &parameterList); 
       void TestComponentStopReq(const TriComponentId &component); 
-      void TestComponentTerminatedReq(const TriComponentId &component, TciVerdictValue verdict);
+      void TestComponentTerminatedReq(const TriComponentId &component, const VerdictValue &verdict);
       void TestComponentKillReq(const TriComponentId &component); 
       
       void TestCaseExecuteReq(const TciTestCaseIdType &testCaseId, const TriPortIdList &tsiPortList);

@@ -34,7 +34,6 @@ extern "C" {
 #include <freettcn/ttcn3/types.h>
 }
 
-#include <freettcn/tools/exception.h>
 #include <deque>
 
 namespace freettcn {
@@ -48,7 +47,6 @@ namespace freettcn {
         BYTE_ORDER_LITTLE_ENDIAN,
         BYTE_ORDER_HOST                               /**< byte order of current host */
       };
-      class EBufferTooShort : public EOperationFailed {};
       
     private:
       typedef std::deque<unsigned char> CBufferArray;
@@ -72,16 +70,16 @@ namespace freettcn {
       unsigned long BitLength() const;
       const BinaryString &Message() const;
       
-      void UIntPack(unsigned long value, unsigned short bitLength) throw(EOperationFailed);
-      unsigned long UIntUnpack(unsigned short bitLength) throw(EOperationFailed);
+      void UIntPack(unsigned long value, unsigned short bitLength);
+      unsigned long UIntUnpack(unsigned short bitLength);
       
-      void IntPack(long value, unsigned short bitLength) throw(EOperationFailed);
-      long IntUnpack(unsigned short bitLength) throw(EOperationFailed);
+      void IntPack(long value, unsigned short bitLength);
+      long IntUnpack(unsigned short bitLength);
       
       void RawDataPack(const unsigned char buffer[], unsigned int bitLength, TByteOrder byteOrder = BYTE_ORDER_BIG_ENDIAN);
       void RawDataPack(const CBuffer &buffer);
       
-//       const unsigned char *Get(unsigned long bitLength) throw(EOperationFailed, EBufferTooShort) = 0;
+//       const unsigned char *Get(unsigned long bitLength) = 0;
     };
     
     
@@ -101,7 +99,7 @@ namespace freettcn {
 //     public:
 //       CDecoder();
 //       const unsigned char *Buffer(unsigned long len) const;
-//       CInteger Integer(unsigned short len, bool signedValue = false) const throw(CBuffer::EBufferTooShort);
+//       CInteger Integer(unsigned short len, bool signedValue = false) const;
 //     };
     
 //     class EDecodeFailure : public EOperationFailed {};
@@ -113,8 +111,8 @@ namespace freettcn {
 //       CType(TciValue v);
 //       virtual ~CType() = 0;
 //       TciValue Value() const;
-//       virtual void Decode(freettcn::CBuffer &buffer) throw(EDecodeFailure);
-//       virtual void Encode(freettcn::CBuffer &buffer) const throw(EEncodeFailure);
+//       virtual void Decode(freettcn::CBuffer &buffer);
+//       virtual void Encode(freettcn::CBuffer &buffer) const;
 //     };
     
 //     class CRecord : public CType {

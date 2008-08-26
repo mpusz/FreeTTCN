@@ -34,12 +34,12 @@ extern "C" {
 #include "freettcn/te/basicTypes.h"
 #include "freettcn/te/modulesContainer.h"
 #include "freettcn/te/module.h"
-#include <iostream>
+#include "freettcn/tools/exception.h"
 #include <cstring>
 
 
 
-TciType tciGetTypeForName(String typeName)
+Type tciGetTypeForName(String typeName)
 {
   // check if qualified name
   const char *dot = strchr(typeName, '.');
@@ -66,7 +66,7 @@ TciType tciGetTypeForName(String typeName)
 //     if (!strcmp(typeName, "objid"))
 //       return ;
     
-    std::cout << "ERROR: Predefined type with name: " << typeName << " not found!!!" << std::endl;
+    throw freettcn::ENotFound(E_DATA, "Predefined type with name: " + std::string(typeName) + " not found!!!");
   }
   else {
     // prepare module name
@@ -82,7 +82,7 @@ TciType tciGetTypeForName(String typeName)
       const char *name = dot + 1;
       
       // obtain module parameters
-      const freettcn::TE::CType &type = module.Type(name);
+      const freettcn::TE::CType &type = module.TypeGet(name);
       
       delete moduleId;
       
@@ -97,65 +97,65 @@ TciType tciGetTypeForName(String typeName)
 }
 
 
-TciType tciGetIntegerType()
+Type tciGetIntegerType()
 {
   return const_cast<void *>(static_cast<const void *>(&freettcn::TE::CBasicTypes::Integer()));
 }
 
 
-// TciType tciGetFloatType()
+// Type tciGetFloatType()
 // {
 // }
 
 
-TciType tciGetBooleanType()
+Type tciGetBooleanType()
 {
   return const_cast<void *>(static_cast<const void *>(&freettcn::TE::CBasicTypes::Boolean()));
 }
 
 
-// TciType tciGetTciObjidType()
+// Type tciGetTciObjidType()
 // {
 // }
 
 
-// TciType tciGetCharType()
+// Type tciGetCharType()
 // {
 // }
 
 
-// TciType tciGetUniversalCharType()
+// Type tciGetUniversalCharType()
 // {
 // }
 
 
-// TciType tciGetTciCharstringType()
+// Type tciGetTciCharstringType()
 // {
 // }
 
 
-// TciType tciGetUniversalCharstringType()
+// Type tciGetUniversalCharstringType()
 // {
 // }
 
 
-// TciType tciGetHexstringType()
+// Type tciGetHexstringType()
 // {
 // }
 
 
-// TciType tciGetBitstringType()
+// Type tciGetBitstringType()
 // {
 // }
 
 
-TciType tciGetOctetstringType()
+Type tciGetOctetstringType()
 {
   return const_cast<void *>(static_cast<const void *>(&freettcn::TE::CBasicTypes::Octetstring()));
 }
 
 
-TciType tciGetVerdictType()
+Type tciGetVerdictType()
 {
   return const_cast<void *>(static_cast<const void *>(&freettcn::TE::CBasicTypes::Verdict()));
 }

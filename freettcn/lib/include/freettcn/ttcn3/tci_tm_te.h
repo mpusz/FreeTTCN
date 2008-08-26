@@ -83,9 +83,8 @@ void tciRootModule(String moduleId);
  * The TE provides to the management a list of imported modules of the root module. If no
  * imported module exist, an empty module list is returned. If the TE cannot provide a list, the
  * distinct null value shall be returned.
- *
- * @todo There is no definition in the TTCN-3 standard specification
  */
+TciModuleIdListType tciGetImportedModules();
 
 
 /** 
@@ -101,8 +100,6 @@ void tciRootModule(String moduleId);
  * 
  * @return A list of all module parameters of the identified module. The parameters are ordered as they appear
  *         in the TTCN-3 module. If no parameters exist, an empty module parameter list is returned.
- *
- * @todo TciModuleParameterIdListType type redefined as TciModuleParameterListType
  */
 TciModuleParameterListType tciGetModuleParameters(TciModuleIdType moduleName);
 
@@ -179,7 +176,8 @@ TriPortIdList tciGetTestCaseTSI(TciTestCaseIdType testCaseId);
  *                      test case. If no parameters have to be passed either the @c null value or an
  *                      empty @p parameterList, i.e. a list of length zero shall be passed.
  */
-void tciStartTestCase(TciTestCaseIdType testCaseId, TciParameterListType parameterlist);
+void tciStartTestCase(TciTestCaseIdType testCaseId,
+                      TciParameterListType parameterlist);
 
 
 /** 

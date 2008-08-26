@@ -51,40 +51,32 @@
  * @{
  */
 
-/********************* -V-  M O J E  -V- *******************/
+/********************* -V-  M Y   T Y P E S  -V- *******************/
 
 /**
- * @todo TciType type not defined in specification
+ * @todo Type type not defined in specification
  */
-typedef void *TciType;
+typedef void *Type;
 
 /**
- * @todo TciValue type not defined in specification
+ * @todo Value type not defined in specification
  */
-typedef void *TciValue;
+typedef void *Value;
 
 /**
  * @todo TciVerdictValue type not defined in specification
  */
-typedef TciValue TciVerdictValue;
+typedef Value VerdictValue;
 
 /**
  * @todo TciValueTemplate type not defined in specification
  */
-typedef TciValue TciValueTemplate;
+typedef Value TciValueTemplate;
 
 /**
  * @todo TciNonValueTemplate type not defined in specification
  */
-typedef TciValue TciNonValueTemplate;
-
-/**
- * A value of type TciModuleIdListType is a list of TciModuleIdType. This
- * abstract type is used when retrieving the list of modules which are imported by a
- * TTCN-3 module.
- *
- * @todo There is no definition in the TTCN-3 standard specification
- */
+typedef Value TciNonValueTemplate;
 
 /**
  * A value of TciModuleParameterIdType is the qualified name of a TTCN-3 module parameter
@@ -104,9 +96,30 @@ typedef String TciModuleParameterIdType;
  * @todo There is no definition in the TTCN-3 standard specification
  */
 
+/**
+ * A value of TciValueList is a list of values.
+ *
+ * @todo There is no definition in the TTCN-3 standard specification
+ */
+typedef struct TciValueList {                                         
+  long int          length;
+  Value             *valueList;
+} TciValueList;
+
+
+/**
+ * @todo TciStatus type not defined in specification
+ */
+typedef long int TciStatus;
+
+#define TCI_ERROR -1
+#define TCI_OK 0
+
+
 /// @} TciTypesUndocumented
 
-/********************* -^-  M O J E  -^- *******************/
+
+/********************* -^-  M Y   T Y P E S  -^- *******************/
 
 
 /**
@@ -126,14 +139,26 @@ typedef String TciModuleParameterIdType;
 typedef QualifiedName TciModuleIdType;
 
 /**
+ * A value of type TciModuleIdListType is a list of TciModuleIdType. This
+ * abstract type is used when retrieving the list of modules which are imported by a
+ * TTCN-3 module.
+ *
+ * @todo There is no definition in the TTCN-3 standard specification
+ */
+typedef struct TciModuleIdListType {                                         
+  long int          length;
+  TciModuleIdType   *idList;
+} TciModuleIdListType;
+
+/**
  * A value of type TciModuleParameterType is a structure of
  * TciModuleParameterIdType and Value. This abstract type is used to
  * represent the parameter name and the default value of a module parameter.
  */
 typedef struct TciModuleParameterType {
-//   String parName;                              /**< my change */
+//   String parName;                              /**< @todo my change */
   TciModuleParameterIdType parName;
-  TciValue defaultValue;
+  Value defaultValue;
 } TciModuleParameterType;
 
 /**
@@ -163,9 +188,9 @@ typedef enum {
  * specified for the parameter in the TTCN-3 ATS.
  */
 typedef struct TciParameterType {
-  String   parName;
+  String                      parName;
   TciParameterPassingModeType parPassMode;
-  TciValue                    parValue;
+  Value                       parValue;
 } TciParameterType;
 
 /**
@@ -189,7 +214,7 @@ typedef struct TciParameterListType {
  */
 typedef struct TciParameterTypeListType {                                         
   long int length;
-  TciType *parList;
+  Type *parList;
 } TciParameterTypeListType;
 
 /**
@@ -200,9 +225,12 @@ typedef QualifiedName TciTestCaseIdType;
 
 /**
  * length 0 shall be interpreted as "empty list".
+ *
+ * @todo idList type changed to TciTestCaseIdType
  */
 typedef struct TciTestCaseIdListType {                                         
   long int          length;
+  //  QualifiedName     *idList;
   TciTestCaseIdType *idList;
 } TciTestCaseIdListType;
 
@@ -279,18 +307,11 @@ typedef QualifiedName TciBehaviourIdType;
  */
 
 /**
- * A value of TciValueList is a list of values.
- *
- * @todo There is no definition in the TTCN-3 standard specification
- */
-
-
-/**
  * A value of TciValueDifference is a structure containing a value, a
  * template, and a description for the reason of this difference.
  */
 typedef struct TciValueDifference {
-  TciValue val;
+  Value val;
   TciValueTemplate tmpl;
   String desc;
 } TciValueDifference;
@@ -310,37 +331,43 @@ typedef struct TciValueDifferenceList {
 /**
  * A value of ComponentStatusType is either "inactiveC", "runningC",
  *"stoppedC", or "killedC".
+ *
+ * @todo There is no definition in the TTCN-3 standard specification
  */
 /// @todo 3.2.1
 typedef enum {
-  TCI_inactiveC,
-  TCI_runningC,
-  TCI_stoppedC,
-  TCI_killedC
+  inactiveC,
+  runningC,
+  stoppedC,
+  killedC
 } ComponentStatus;
 
 /**
  * A value of TimerStatusType is either "runningT", "inactiveT", or
  * "expiredT".
+ *
+ * @todo There is no definition in the TTCN-3 standard specification
  */
 /// @todo 3.2.1
 typedef enum {
-  TCI_runningT,
-  TCI_inactiveT,
-  TCI_expiredT
+  runningT,
+  inactiveT,
+  expiredT
 } TimerStatus;
 
 
 /**
  * A value of PortStatusType is either " startedP", "haltedP", or "
  * stoppedP".
+ *
+ * @todo There is no definition in the TTCN-3 standard specification
  */
 /// @todo 3.2.1 - not used???
 typedef enum {
   TCI_startedP,
   TCI_haltedP,
   TCI_stoppedP
-} PortStatus;
+} TciPortStatus;
 
 
 /// @} TciDataLoggingValue
@@ -384,13 +411,13 @@ const int TCI_VERDICT_ERROR    = 4;
  * a representation must be defined.
  */
 typedef struct TciObjidElemValue {
-  char*    elem_as_ascii;
+  char     *elem_as_ascii;
   long int elem_as_number;
-  void*    aux;
+  void     *aux;
 } TciObjidElemValue;
 
 typedef struct TciObjidValue {                                             
-  long int      length;
+  long int          length;
   //  TciObjidElem *elements;                     /**< @todo My change of TciObjidElem->TciObjidElemValue */
   TciObjidElemValue *elements;
 } TciObjidValue;
@@ -399,11 +426,12 @@ typedef struct TciObjidValue {
 // CharstringValue representation
 typedef struct TciCharStringValue {
   unsigned long int length;
-  char*              string;
+  char              *string;
 } TciCharStringValue;
 
 // Universal Character[string] representation
 typedef unsigned char TciUCValue[4];
+
 typedef struct TciUCStringValue {
   unsigned long int length;
 //   TciUCType         *string;                   /**< @todo My change of TciUCType->TciUCValue */

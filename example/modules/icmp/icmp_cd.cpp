@@ -42,10 +42,10 @@ freettcn::icmp::CCodec::CCodec():
 }
 
 
-bool freettcn::icmp::CCodec::CapabilityCheck(TciValue value, unsigned int &valueId) const
+bool freettcn::icmp::CCodec::CapabilityCheck(const Value &value, unsigned int &valueId) const
 {
   // obtain type and module name of a value
-  TciType type = tciGetType(value);
+  Type type = tciGetType(value);
   TciModuleIdType moduleId = tciGetDefiningModule(type);
   
   if (!strcmp(moduleId.moduleName, "icmp")) {
@@ -60,24 +60,24 @@ bool freettcn::icmp::CCodec::CapabilityCheck(TciValue value, unsigned int &value
 }
 
 
-void freettcn::icmp::CCodec::Encode(unsigned int valueId, TciValue value, CD::CBuffer &buffer) const
+void freettcn::icmp::CCodec::Encode(unsigned int valueId, const Value &value, CD::CBuffer &buffer) const
 {
   switch(valueId) {
   case ID_ICMPMSG:
     {
-      TciValue msgTypeVal = tciGetRecFieldValue(value, "msgType");
+      Value msgTypeVal = tciGetRecFieldValue(value, "msgType");
       buffer.UIntPack(atoi(tciGetIntAbs(msgTypeVal)), 8);
-      TciValue codeVal = tciGetRecFieldValue(value, "code");
+      Value codeVal = tciGetRecFieldValue(value, "code");
       buffer.UIntPack(atoi(tciGetIntAbs(codeVal)), 8);
-      TciValue crcVal = tciGetRecFieldValue(value, "crc");
+      Value crcVal = tciGetRecFieldValue(value, "crc");
       buffer.UIntPack(atoi(tciGetIntAbs(crcVal)), 16);
-      TciValue dataVal = tciGetRecFieldValue(value, "data");
-      TciValue pingVal = tciGetRecFieldValue(dataVal, "ping");
-      TciValue idVal = tciGetRecFieldValue(pingVal, "id");
+      Value dataVal = tciGetRecFieldValue(value, "data");
+      Value pingVal = tciGetRecFieldValue(dataVal, "ping");
+      Value idVal = tciGetRecFieldValue(pingVal, "id");
       buffer.UIntPack(atoi(tciGetIntAbs(idVal)), 16);
-      TciValue seqVal = tciGetRecFieldValue(pingVal, "seqNumber");
+      Value seqVal = tciGetRecFieldValue(pingVal, "seqNumber");
       buffer.UIntPack(atoi(tciGetIntAbs(seqVal)), 16);
-      TciValue optDataVal = tciGetRecFieldValue(pingVal, "data");
+      Value optDataVal = tciGetRecFieldValue(pingVal, "data");
       if (!tciNotPresent(optDataVal)) {
         const char *octetstringValue = tciGetOStringValue(optDataVal);
         // strip octetstring prefix and postfix

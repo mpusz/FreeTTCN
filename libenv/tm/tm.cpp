@@ -35,9 +35,9 @@ extern "C" {
 }
 #include <freettcn/tools/tools.h>
 #include <freettcn/tools/ttcnWrappers.h>
-#include <freettcn/tools/timeStamp.h>
+#include <freettcn/tools/timeStampMgr.h>
+#include <freettcn/tools/exception.h>
 #include <iostream>
-
 
 
 // ******************************** T E S T    C A S E ************************************
@@ -84,7 +84,7 @@ void freettcn::TM::CTestManagement::CTestCase::Started(const TciParameterListTyp
 {
 }
 
-void freettcn::TM::CTestManagement::CTestCase::Terminated(TciVerdictValue verdict, const TciParameterListType &parameterlist)
+void freettcn::TM::CTestManagement::CTestCase::Terminated(const VerdictValue &verdict, const TciParameterListType &parameterlist)
 {
 }
 
@@ -112,23 +112,21 @@ std::string freettcn::TM::CTestManagement::CModuleParameter::Name() const
   return _parName;
 }
 
-TciValue freettcn::TM::CTestManagement::CModuleParameter::DefaultValue() const
+const Value &freettcn::TM::CTestManagement::CModuleParameter::DefaultValue() const
 {
   return _defaultValue;
 }
 
-void freettcn::TM::CTestManagement::CModuleParameter::Value(TciValue value)
+void freettcn::TM::CTestManagement::CModuleParameter::ValueSet(const Value &value)
 {
   _value = value;
 }
 
-TciValue freettcn::TM::CTestManagement::CModuleParameter::Value() throw(freettcn::EOperationFailed)
+const Value &freettcn::TM::CTestManagement::CModuleParameter::ValueGet() const
 {
   if (!_value) {
-    if (tciNotPresent(_defaultValue)) {
-      std::cout << "ERROR: Module Parameter value not set" << std::endl;
-      throw freettcn::EOperationFailed();
-    }
+    if (tciNotPresent(_defaultValue))
+      throw EOperationFailed(E_DATA, "Module Parameter value not set!!!");
     
     return 0;
   }
@@ -155,12 +153,12 @@ freettcn::TM::CLogMask::~CLogMask()
 
 freettcn::TM::CTestManagement *freettcn::TM::CTestManagement::_instance = 0;
 
-freettcn::TM::CTestManagement &freettcn::TM::CTestManagement::Instance() throw(ENotFound)
+freettcn::TM::CTestManagement &freettcn::TM::CTestManagement::Instance()
 {
   if (_instance)
     return *_instance;
   
-  throw ENotFound();
+  throw ENotInitialized(E_DATA, "Test Management instance not inited!!!");
 }
 
 freettcn::TM::CTestManagement::CTestManagement() :
@@ -188,15 +186,14 @@ void freettcn::TM::CTestManagement::Clear()
   _status = NOT_RUNNING;
 }
 
-freettcn::TM::CTestManagement::CTestCase &freettcn::TM::CTestManagement::TestCaseGet(const std::string &testCaseId) const throw(freettcn::ENotFound)
+freettcn::TM::CTestManagement::CTestCase &freettcn::TM::CTestManagement::TestCaseGet(const std::string &testCaseId) const
 {
   for(CTCList::const_iterator it = _tcList.begin(); it != _tcList.end(); ++it) {
     if ((*it)->Name() == testCaseId)
       return *(*it);
   }
   
-  std::cout << "ERROR: Test case not found" << std::endl;
-  throw freettcn::ENotFound();
+  throw ENotFound(E_DATA, "Test case '" + testCaseId + "' not found!!!");
 }
 
 
@@ -210,12 +207,10 @@ const freettcn::TM::CTestManagement::CModuleParList &freettcn::TM::CTestManageme
   return _modParList;
 }
 
-void freettcn::TM::CTestManagement::Init(const std::string &moduleId) throw(freettcn::EOperationFailed)
+void freettcn::TM::CTestManagement::Init(const std::string &moduleId)
 {
-  if (_status != NOT_RUNNING) {
-    std::cout << "ERROR: Module already running" << std::endl;
-    throw freettcn::EOperationFailed();
-  }
+  if (_status != NOT_RUNNING)
+    throw EOperationFailed(E_DATA, "Module '" + moduleId + "' already running!!!");
   
   // free previous state
   Clear();
@@ -267,18 +262,18 @@ void freettcn::TM::CTestManagement::Abort()
 }
 
 
-TciValue freettcn::TM::CTestManagement::ModuleParameterGet(const TciModuleParameterIdType &parameterId) const
+const Value &freettcn::TM::CTestManagement::ModuleParameterGet(const TciModuleParameterIdType &parameterId) const
 {
   for(CModuleParList::const_iterator it = _modParList.begin(); it != _modParList.end(); ++it) {
     if ((*it)->Name() == parameterId)
-      return (*it)->Value();
+      return (*it)->ValueGet();
   }
   
   return 0;
 }
 
 
-void freettcn::TM::CTestManagement::TestCaseStart(const std::string &testCaseId, const TciParameterListType &parameterlist) throw(ENotFound)
+void freettcn::TM::CTestManagement::TestCaseStart(const std::string &testCaseId, const TciParameterListType &parameterlist)
 {
   _status = RUNNING_TEST_CASE;
   _tc = &TestCaseGet(testCaseId);
@@ -296,15 +291,14 @@ void freettcn::TM::CTestManagement::TestCaseStarted(const TciTestCaseIdType &tes
     comp.compName = "";
     comp.compType.moduleName = "";
     comp.compType.objectName = "";
-    TriParameterList parList;                     /**< @todo Paramters list should be translated */
-    parList.length = 0;
-    parList.parList = 0;
-    tliTcStarted(0, TimeStamp().Get(), 0, 0, comp, testCaseId, parList, timer);
+
+    TciParameterListType parList(parameterList);
+    tliTcStarted(0, TimeStampMgr().Get(), 0, 0, comp, testCaseId, parList, timer);
   }
 }
 
 
-void freettcn::TM::CTestManagement::TestCaseTerminated(TciVerdictValue verdict, const TciParameterListType &parameterlist)
+void freettcn::TM::CTestManagement::TestCaseTerminated(const VerdictValue &verdict, const TciParameterListType &parameterList)
 {
   if (_tc) {
     if (Logging() && LogMask().Get(freettcn::CLogMask::CMD_TM_TC_TERMINATED)) {
@@ -312,13 +306,12 @@ void freettcn::TM::CTestManagement::TestCaseTerminated(TciVerdictValue verdict, 
       comp.compName = "";
       comp.compType.moduleName = "";
       comp.compType.objectName = "";
-      TriParameterList parList;                     /**< @todo Paramters list should be translated */
-      parList.length = 0;
-      parList.parList = 0;
-      tliTcTerminated(0, TimeStamp().Get(), 0, 0, comp, _tc->Id(), parList, verdict);
+
+      TciParameterListType parList(parameterList);
+      tliTcTerminated(0, TimeStampMgr().Get(), 0, 0, comp, _tc->Id(), parList, verdict);
     }
     
-    _tc->Terminated(verdict, parameterlist);
+    _tc->Terminated(verdict, parameterList);
     
     _tc = 0;
   }
@@ -328,20 +321,16 @@ void freettcn::TM::CTestManagement::TestCaseTerminated(TciVerdictValue verdict, 
 }
 
 
-void freettcn::TM::CTestManagement::TestCaseStop()  throw(EOperationFailed)
+void freettcn::TM::CTestManagement::TestCaseStop()
 {
   if (_status == RUNNING_TEST_CASE) {
     if (_tc)
       _tc->Stop();
-    else {
-      std::cout << "ERROR: Test Case not set" << std::endl;
-      throw freettcn::EOperationFailed();
-    }
+    else
+      throw EOperationFailed(E_DATA, "Test Case not set!!!");
   }
-  else {
-    std::cout << "ERROR: TestCase not running" << std::endl;
-    throw freettcn::EOperationFailed();
-  }
+  else
+    throw EOperationFailed(E_DATA, "TestCase not running!!!");
 }
 
 
@@ -352,23 +341,21 @@ void freettcn::TM::CTestManagement::ControlStart()
 }
 
 
-void freettcn::TM::CTestManagement::ControlStop() throw(EOperationFailed)
+void freettcn::TM::CTestManagement::ControlStop()
 {
   if (_status == RUNNING_CONTROL) {
     _status = NOT_RUNNING;
     tciStopControl();
   }
-  else {
-    std::cout << "ERROR: Control not running" << std::endl;
-    throw freettcn::EOperationFailed();
-  }
+  else
+    throw EOperationFailed(E_DATA, "Control not running");
 }
 
 
 void freettcn::TM::CTestManagement::ControlTerminated()
 {
   if (Logging() && LogMask().Get(freettcn::CLogMask::CMD_TM_CTRL_TERMINATED))
-    tliCtrlTerminated(0, TimeStamp().Get(), 0, 0, _ctrlCompId->Id());
+    tliCtrlTerminated(0, TimeStampMgr().Get(), 0, 0, _ctrlCompId->Id());
   
   delete _ctrlCompId;
   _ctrlCompId = 0;

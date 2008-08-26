@@ -59,22 +59,22 @@
  */
 
 typedef struct BinaryString {
-  unsigned char* data;
-  long int bits;
-  void* aux;
+  unsigned char *data;                            /**< @brief Non-null terminated string */
+  long int bits;                                  /**< @brief Number of bits used in data. Value @c -1 is used to denote omitted value. */
+  void *aux;                                      /**< @brief For future extensibility of TRI functionality */
 } BinaryString;
 
 
 typedef struct QualifiedName {
-  char* moduleName;
-  char* objectName;
-  void* aux;
+  char *moduleName;                               /**< @brief TTCN-3 identifier literally */
+  char *objectName;                               /**< @brief TTCN-3 identifier literally */
+  void *aux;                                      /**< @brief For future extensibility of TRI functionality */
 } QualifiedName;
 
 
-typedef unsigned char Boolean;
+typedef unsigned char Boolean;                    /**< @brief From OMG IDL to C++ mapping */
 
-typedef char* String;
+typedef char *String;                             /**< @brief From OMG IDL to C++ mapping */
 
 /**
  * @todo 'Double' type not in specification

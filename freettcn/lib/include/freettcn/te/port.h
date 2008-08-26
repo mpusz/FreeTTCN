@@ -66,8 +66,8 @@ namespace freettcn {
       CTypeList _outList;
       
     protected:
-      void TypeAdd(const CType &type, TDirection dir) throw(EOperationFailed);
-      void TypeAddAll(TDirection dir) throw(EOperationFailed);
+      void TypeAdd(const CType &type, TDirection dir);
+      void TypeAddAll(TDirection dir);
       
     public:
       CPortType(const CModule &module, const char *name, TType type);
@@ -120,8 +120,8 @@ namespace freettcn {
 //       CMessageQueue _valueQueue;                /**< not yet consumed messages,calls, replies and exceptions */
       // SNAP_VALUE - when a snapshot is taken the first element from VALUE_QUEUE is copied (NULL if VALUE_QUEUE is empty or STATUS = STOPPED)
       
-      void Connect(CConnectionList &list, const TriPortId &remoteId) throw(EOperationFailed);
-      void Disconnect(CConnectionList &list, const TriPortId &remoteId) throw(ENotFound);
+      void Connect(CConnectionList &list, const TriPortId &remoteId);
+      void Disconnect(CConnectionList &list, const TriPortId &remoteId);
       
     public:
       CPort(const CPortInfo &portInfo, const CTestComponentType::CInstanceLocal &component);
@@ -129,15 +129,15 @@ namespace freettcn {
       
       const TriPortId &Id() const;
       
-//         const TriPortId &RemoteId(const CTestComponentType::CInstance &component) const throw(ENotFound);
+//         const TriPortId &RemoteId(const CTestComponentType::CInstance &component) const;
 //         TStatus Status() const;
-      void Connect(const TriPortId &remoteId) throw(EOperationFailed);
-      void Disconnect(const TriPortId &remoteId) throw(ENotFound);
+      void Connect(const TriPortId &remoteId);
+      void Disconnect(const TriPortId &remoteId);
       
-      void Map(const TriPortId &remoteId) throw(EOperationFailed);
-      void Unmap(const TriPortId &remoteId) throw(ENotFound);
+      void Map(const TriPortId &remoteId);
+      void Unmap(const TriPortId &remoteId);
       
-      void Send(const freettcn::TE::CType::CInstance &value) const throw(EOperationFailed);
+      void Send(const freettcn::TE::CType::CInstance &value) const;
     };
     
     
@@ -164,16 +164,16 @@ namespace freettcn {
 //   protected:
 //     BinaryString Id() const;
 //   public:
-//     virtual void Start(double duration) throw(EOperationFailed) = 0;
-//     virtual void Stop() throw(EOperationFailed) = 0;
-//     virtual double Read() const throw(EOperationFailed) = 0;
-//     virtual bool Running() const throw(EOperationFailed) = 0;
+//     virtual void Start(double duration) = 0;
+//     virtual void Stop() = 0;
+//     virtual double Read() const = 0;
+//     virtual bool Running() const = 0;
 //     virtual void TimeOut() const = 0;
 //   };
   
 //   class PA {
 //   public:
-//     virtual void Reset() throw(EOperationFailed) = 0;
+//     virtual void Reset() = 0;
 //   };
   
   
@@ -192,50 +192,50 @@ namespace freettcn {
 //     Mode mode;
 //   public:
 //     // Connection handling
-//     virtual void Map(const TriPortId* tsiPortId) throw(EOperationFailed) = 0;
-//     virtual void Unmap(const TriPortId* tsiPortId) throw(EOperationFailed) = 0;
+//     virtual void Map(const TriPortId* tsiPortId) = 0;
+//     virtual void Unmap(const TriPortId* tsiPortId) = 0;
     
 //     // Message based communication
 //     virtual void MsgSend(const TriAddress* sutAddress,
-//                          const TriMessage* sendMessage) throw(EOperationFailed) = 0;
-//     virtual void MsgSendBC(const TriMessage* sendMessage) throw(EOperationFailed) = 0;
+//                          const TriMessage* sendMessage) = 0;
+//     virtual void MsgSendBC(const TriMessage* sendMessage) = 0;
 //     virtual void MsgSendMC(const TriAddressList* sutAddresses,
-//                            const TriMessage* sendMessage) throw(EOperationFailed) = 0;
+//                            const TriMessage* sendMessage) = 0;
 //     virtual void MsgEnqueue(const TriAddress* sutAddress,
 //                             const TriMessage* receivedMessage) = 0;
     
 //     // Procedure based communication
 //     virtual void ProcCall(const TriAddress* sutAddress,
 //                           const TriSignatureId* signatureId,
-//                           const TriParameterList* parameterList) throw(EOperationFailed) = 0;
+//                           const TriParameterList* parameterList) = 0;
 //     virtual void ProcCallBC(const TriSignatureId* signatureId,
-//                             const TriParameterList* parameterList) throw(EOperationFailed) = 0;
+//                             const TriParameterList* parameterList) = 0;
 //     virtual void ProcCallMC(const TriAddressList* sutAddresses,
 //                             const TriSignatureId* signatureId,
-//                             const TriParameterList* parameterList) throw(EOperationFailed) = 0;
+//                             const TriParameterList* parameterList) = 0;
 //     virtual void ProcCallEnqueue(const TriAddress* sutAddress,
 //                                  const TriSignatureId* signatureId,
 //                                  const TriParameterList* parameterList) = 0;
 //     virtual const TriParameter* ProcReply(const TriAddress* sutAddress,
 //                                           const TriSignatureId* signatureId,
-//                                           const TriParameterList* parameterList) throw(EOperationFailed) = 0;
+//                                           const TriParameterList* parameterList) = 0;
 //     virtual const TriParameter* ProcReplyBC(const TriSignatureId* signatureId,
-//                                             const TriParameterList* parameterList) throw(EOperationFailed) = 0;
+//                                             const TriParameterList* parameterList) = 0;
 //     virtual const TriParameter* ProcReplyMC(const TriAddressList* sutAddresses,
 //                                             const TriSignatureId* signatureId,
-//                                             const TriParameterList* parameterList) throw(EOperationFailed) = 0;
+//                                             const TriParameterList* parameterList) = 0;
 //     virtual void ProcReplyEnqueue(const TriAddress* sutAddress,
 //                                   const TriSignatureId* signatureId,
 //                                   const TriParameterList* parameterList,
 //                                   const TriParameter* returnValue) = 0;
 //     virtual void ProcRaise(const TriAddress* sutAddress,
 //                            const TriSignatureId* signatureId,
-//                            const TriException* exception) throw(EOperationFailed) = 0;
+//                            const TriException* exception) = 0;
 //     virtual void ProcRaiseBC(const TriSignatureId* signatureId,
-//                              const TriException* exception) throw(EOperationFailed) = 0;
+//                              const TriException* exception) = 0;
 //     virtual void ProcRaiseMC(const TriAddressList* sutAddresses,
 //                              const TriSignatureId* signatureId,
-//                              const TriException* exception) throw(EOperationFailed) = 0;
+//                              const TriException* exception) = 0;
 //     virtual void ProcExceptionEnqueue(const TriAddress* sutAddress,
 //                                       const TriSignatureId* signatureId,
 //                                       const TriException* exception) = 0;

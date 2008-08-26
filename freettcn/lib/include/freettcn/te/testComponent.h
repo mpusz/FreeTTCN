@@ -82,7 +82,7 @@ namespace freettcn {
         virtual void Stop() = 0;
         virtual void Kill() = 0;
         
-        const TriPortId &PortId(const char *name, int idx) const throw(ENotFound);
+        const TriPortId &PortId(const char *name, int idx) const;
       };
       
       
@@ -147,8 +147,8 @@ namespace freettcn {
           
           void Register(CType::CInstance *value);
           void Register(CTimer *timer);
-          CType::CInstance &Value(unsigned int valueIdx) const throw(ENotFound);
-          CTimer &Timer(unsigned int timerIdx) const throw(ENotFound);
+          CType::CInstance &Value(unsigned int valueIdx) const;
+          CTimer &Timer(unsigned int timerIdx) const;
         };
         
       private:
@@ -200,34 +200,34 @@ namespace freettcn {
         
         TStatus Status() const;
         void Status(TStatus status);
-        CModule &Module() const throw(ENotInited);
+        CModule &Module() const;
         
         void Init(CModule &module, TciTestComponentKindType kind, const char *name);
         void Reset();
         
         void Verdict(const char *src, int line, TVerdict verdict);
         
-        CPort &Port(const char *name, int idx) const throw(ENotFound);
+        CPort &Port(const char *name, int idx) const;
         
-        void Run(unsigned int offset) throw(ENotStarted);
+        void Run(unsigned int offset);
         void Execute(const char *src, int line, CTestCase &testCase, TriTimerDuration duration, int returnOffset);
         
         void TimerAdd(const CTimer &timer, bool implicit = false);
-        void TimerRemove(const CTimer &timer, bool implicit = false) throw(ENotFound);
+        void TimerRemove(const CTimer &timer, bool implicit = false);
         
-        //       void Map(const CPort &fromPort, const CPort &toPort) throw(ENotInited);
+        //       void Map(const CPort &fromPort, const CPort &toPort);
         
         void ScopeEnter(const char *src, int line, const char *kind);
-        CScope &Scope() const throw(ENotFound);
+        CScope &Scope() const;
         void ScopeLeave(const char *src, int line);
         
         void StopReq(const char *src, int line, CInstanceRemote *comp = 0);
-        void StopAllReq(const char *src, int line) throw(EOperationFailed);
+        void StopAllReq(const char *src, int line);
         
-        void ConnectReq(const TriPortId &port1, const TriPortId &port2) throw(EOperationFailed);
-        void DisconnectReq(const TriPortId &port1, const TriPortId &port2) throw(ENotFound);
-        void MapReq(const TriPortId &port1, const TriPortId &port2) throw(EOperationFailed);
-        void UnmapReq(const TriPortId &port1, const TriPortId &port2) throw(ENotFound);
+        void ConnectReq(const TriPortId &port1, const TriPortId &port2);
+        void DisconnectReq(const TriPortId &port1, const TriPortId &port2);
+        void MapReq(const TriPortId &port1, const TriPortId &port2);
+        void UnmapReq(const TriPortId &port1, const TriPortId &port2);
       };
       
       
@@ -249,7 +249,7 @@ namespace freettcn {
       
       TriPortIdList Ports() const;
       unsigned int PortInfoNum() const;
-      const CPortInfo &PortInfo(unsigned int idx) const throw(ENotFound);
+      const CPortInfo &PortInfo(unsigned int idx) const;
     };
     
     

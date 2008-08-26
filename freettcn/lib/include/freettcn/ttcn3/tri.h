@@ -52,10 +52,13 @@
  */
 
 /**
- * A value of type TriComponentId includes an identifier, a name and the component
- * type. The distinct value of the latter is the component type name as specified in the
- * TTCN-3 ATS. This abstract type is mainly used to resolve TRI communication
- * operations on TSI ports that have mappings to many test component ports.
+ * A value of type TriComponentId includes an identifier, a name and the
+ * component type. The distinct value of the latter is the component type name
+ * as specified in the TTCN-3 ATS. This abstract type is mainly used to resolve
+ * TRI communication operations on TSI ports that have mappings to many test
+ * component ports.
+ *
+ * @note #compInst is for component instance
  */
 typedef struct TriComponentId {
   BinaryString compInst;
@@ -68,26 +71,33 @@ typedef struct TriComponentId {
  * A value of type TriComponentIdList is a list of TriComponentId. This
  * abstract type is used for multicast communication in TCI.
  *
- * @sa TriComponentId
+ * @note No special values mark the end of #compIdList. The #length field shall
+ *       be used to traverse this array properly.
  */
 typedef struct TriComponentIdList {
-  TriComponentId** compIdList;
+  TriComponentId **compIdList;
   long int length;
 } TriComponentIdList;
 
 
 /**
  * A value of type TriPortId includes a value of type TriComponentId to
- * represent the component to which the port belongs, a port index (if present), and the
- * port name as specified in the TTCN-3 ATS. The TriPortId type is mainly required
- * to pass information about the TSI and connections to the TSI from the TE to the SA.
+ * represent the component to which the port belongs, a port index (if present),
+ * and the port name as specified in the TTCN-3 ATS. The TriPortId type is
+ * mainly required to pass information about the TSI and connections to the TSI
+ * from the TE to the SA.
+ *
+ * @note #compInst is for component instance
+ * @note For a singular (non-array) declaration, the #portIndex value should
+ *       be @c -1
+ * @note The #aux is for future extensibility of TRI functionality
  */
 typedef struct TriPortId {
   TriComponentId compInst;
-  char* portName;
+  char *portName;
   long int portIndex;
   QualifiedName portType;
-  void* aux;
+  void *aux;
 } TriPortId;                
 
 
@@ -95,10 +105,11 @@ typedef struct TriPortId {
  * A value of type TriPortIdList is a list of TriPortId. This abstract type is
  * used for initialization purposes after the invocation of a TTCN-3 test case.
  *
- * @sa TriPortId
+ * @note No special values mark the end of #portIdList. The #length field shall
+ *       be used to traverse this array properly.
  */
 typedef struct TriPortIdList {
-  TriPortId** portIdList;
+  TriPortId **portIdList;
   long int length;
 } TriPortIdList;
 
@@ -131,10 +142,11 @@ typedef BinaryString TriAddress;
  * A value of type TriAddressList is a list of #TriAddress. This abstract
  * type is used for multicast communication in TRI.
  *
- * @sa TriAddress
+ * @note No special values mark the end of #addrList. The #length field shall be
+ *       used to traverse this array properly.
  */
 typedef struct TriAddressList {
-  TriAddress** addrList;
+  TriAddress **addrList;
   long int length;
 } TriAddressList;
 
@@ -148,14 +160,17 @@ typedef QualifiedName TriSignatureId;
 
 
 /**
- * A value of type TriParameterPassingMode is either @a in, @a inout, or @a out. This
- * abstract type is used in procedure based TRI communication operations and for
- * external function calls.
+ * A value of type TriParameterPassingMode is either @a in, @a inout, or @a out.
+ * This abstract type is used in procedure based TRI communication operations
+ * and for external function calls.
+ *
+ * @note The values of instances of this type shall reflect the parameter
+ *       passing mode defined in the corresponding TTCN-3 procedure signatures.
  */
 typedef enum TriParameterPassingMode {
-  TRI_IN = 0,
+  TRI_IN    = 0,
   TRI_INOUT = 1,
-  TRI_OUT = 2
+  TRI_OUT   = 2
 } TriParameterPassingMode;
 
 
@@ -175,10 +190,11 @@ typedef struct TriParameter {
  * abstract type is used in procedure based TRI communication operations and for
  * external function calls.
  *
- * @sa TriParameter
+ * @note No special values mark the end of #parList. The #length field shall be
+ *       used to traverse this array properly.
  */
 typedef struct TriParameterList {
-  TriParameter** parList;
+  TriParameter **parList;
   long int length;
 } TriParameterList;
 
@@ -203,6 +219,9 @@ typedef BinaryString TriException;
 /**
  * A value of type TriTimerId specifies an identifier for a timer. This abstract
  * type is required for all TRI timer operations.
+ *
+ * @note Pending ETSI statement on timer and snapshot semantics may influence
+ *       future representation!
  */
 typedef BinaryString TriTimerId;
 
@@ -238,8 +257,11 @@ typedef QualifiedName TriFunctionId;
 
 
 /**
- * A value of type TriStatus is either @c TRI_OK or @c TRI_Error indicating the
+ * A value of type TriStatus is either @c TRI_OK or @c TRI_ERROR indicating the
  * success or failure of a TRI operation.
+ *
+ * @note All negative values are reserverd for future extension of TRI
+ *       functionality
  */
 typedef long int TriStatus;
 

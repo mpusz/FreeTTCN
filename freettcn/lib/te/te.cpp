@@ -35,15 +35,15 @@
 #include "freettcn/te/testCase.h"
 #include "freettcn/te/timer.h"
 #include "freettcn/tools/logMask.h"
-#include "freettcn/tools/timeStamp.h"
+#include "freettcn/tools/timeStampMgr.h"
+#include "freettcn/tools/exception.h"
 extern "C" {
 #include "freettcn/ttcn3/tci_te_tm.h"
 #include "freettcn/ttcn3/tci_te_ch.h"
 #include "freettcn/ttcn3/tri_te_sa.h"
 #include "freettcn/ttcn3/tci_tl.h"
 }
-#include <iostream>
-
+#include <cstring>
 
 
 freettcn::TE::CTTCNExecutable freettcn::TE::CTTCNExecutable::_instance;
@@ -65,13 +65,12 @@ freettcn::TE::CTTCNExecutable::~CTTCNExecutable()
 }
 
 
-freettcn::TE::CModule &freettcn::TE::CTTCNExecutable::RootModule() const throw(ENotFound)
+freettcn::TE::CModule &freettcn::TE::CTTCNExecutable::RootModule() const
 {
   if (_rootModule)
     return *_rootModule;
   
-  std::cout << "ERROR: Root Module not set" << std::endl;
-  throw freettcn::ENotFound();
+  throw ENotFound(E_DATA, "Root Module not set!!!");
 }
 
 
@@ -252,31 +251,18 @@ void freettcn::TE::CTTCNExecutable::ControlStop() const
 }
 
 
-void freettcn::TE::CTTCNExecutable::ConnectedMsgEnqueue(const TriPortId &sender, const TriComponentId &receiver, TciValue rcvdMessage) const
+void freettcn::TE::CTTCNExecutable::ConnectedMsgEnqueue(const TriPortId &sender, const TriComponentId &receiver, const Value &rcvdMessage) const
 {
   /// @todo enqueue new message
 }
 
 
 const TriComponentId &freettcn::TE::CTTCNExecutable::TestComponentCreate(TciTestComponentKindType kind,
-                                                                         TciType componentType,
+                                                                         const Type &componentType,
                                                                          String name) const
 {
-  if (kind == TCI_CTRL_COMP && componentType) {
-    std::cout << "ERROR: 'componentType' given for Control component!!!" << std::endl;
-    
-    // return dummy data
-    TriComponentId ctrlId;
-    ctrlId.compInst.data = 0;
-    ctrlId.compInst.bits = 0;
-    ctrlId.compInst.aux = 0;
-    ctrlId.compName = 0;
-    ctrlId.compType.moduleName = 0;
-    ctrlId.compType.objectName = 0;
-    ctrlId.compType.aux = 0;
-    
-    return ctrlId;
-  }
+  if (kind == TCI_CTRL_COMP && componentType)
+    throw EOperationFailed(E_DATA, "'componentType' given for Control component!!!");
   
   return RootModule().TestComponentCreate(kind, componentType, name);
 }
@@ -323,7 +309,7 @@ void freettcn::TE::CTTCNExecutable::Unmap(const TriPortId &fromPort, const TriPo
 }
 
 void freettcn::TE::CTTCNExecutable::TestComponentTerminated(const TriComponentId &componentId,
-                                                            TciVerdictValue verdict) const
+                                                            const VerdictValue &verdict) const
 {
   RootModule().TestComponentTerminated(componentId, verdict);
 }
@@ -350,19 +336,16 @@ void freettcn::TE::CTTCNExecutable::Reset() const
 
 
 // PA requests
-void freettcn::TE::CTTCNExecutable::Timeout(const TriTimerId* timerId) throw(freettcn::ENotFound)
+void freettcn::TE::CTTCNExecutable::Timeout(const TriTimerId *timerId)
 {
-  if (!timerId) {
-    std::cout << "ERROR: TimerId = NULL!!!" << std::endl;
-    throw freettcn::ENotFound();
-  }
+  if (!timerId)
+    throw ENotInitialized(E_DATA, "'timerId' not specified!!!");
   
   freettcn::TE::CIdObject &object = CIdObject::Get(*timerId);
   try {
     dynamic_cast<freettcn::TE::CTimer &>(object).Timeout();
   }
   catch(std::exception &ex) {
-    std::cout << "ERROR: System exception: " << ex.what() << " caught!!!" << std::endl;
-    throw freettcn::ENotFound();
+    throw EOperationFailed(E_DATA, "'timerId' does not point to Timer type!!!");
   }
 }

@@ -31,12 +31,11 @@ extern "C" {
 #include "freettcn/ttcn3/tci_ch_te.h"
 }
 #include "freettcn/te/te.h"
-#include <iostream>
 
 
 void tciEnqueueMsgConnected(TriPortId sender,
                             TriComponentId receiver,
-                            TciValue rcvdMessage)
+                            Value rcvdMessage)
 {
   freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
   return te.ConnectedMsgEnqueue(sender, receiver, rcvdMessage);
@@ -44,7 +43,7 @@ void tciEnqueueMsgConnected(TriPortId sender,
 
 
 TriComponentId tciCreateTestComponent(TciTestComponentKindType kind,
-                                      TciType componentType,
+                                      Type componentType,
                                       String name)
 {
   freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
@@ -101,7 +100,7 @@ void tciUnmap(TriPortId fromPort,
 
 
 void tciTestComponentTerminated(TriComponentId component,
-                                TciVerdictValue verdict)
+                                VerdictValue verdict)
 {
   freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
   te.TestComponentTerminated(component, verdict);

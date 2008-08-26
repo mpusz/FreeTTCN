@@ -72,8 +72,8 @@ namespace freettcn {
       virtual ~CTestCase();
       
       TciTestCaseIdType Id() const;
-      CTestComponentType::CInstanceRemote &MTC() const throw(ENotFound);
-      CTestComponentType::CInstanceRemote &System() const throw(ENotFound);
+      CTestComponentType::CInstanceRemote &MTC() const;
+      CTestComponentType::CInstanceRemote &System() const;
       
       const CVerdictType::CInstance &Verdict() const;
       void Verdict(TVerdict verdict);

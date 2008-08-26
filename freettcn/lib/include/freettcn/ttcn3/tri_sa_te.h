@@ -80,10 +80,10 @@
  * @param componentId identifier of the receiving test component
  * @param receivedMessage the encoded received message
  */
-void triEnqueueMsg(const TriPortId* tsiPortId,
-                   const TriAddress* sutAddress,
-                   const TriComponentId* componentId,
-                   const TriMessage* receivedMessage);
+void triEnqueueMsg(const TriPortId *tsiPortId,
+                   const TriAddress *sutAddress,
+                   const TriComponentId *componentId,
+                   const TriMessage *receivedMessage);
 
 
 /// @} TriMsgCommunication_SA_TE
@@ -125,11 +125,11 @@ void triEnqueueMsg(const TriPortId* tsiPortId,
  *                      declaration. Description of data passed as parameters to the operation from the
  *                      calling entity to the called entity.
  */
-void triEnqueueCall(const TriPortId* tsiPortId,
-                    const TriAddress* sutAddress,
-                    const TriComponentId* componentId,
-                    const TriSignatureId* signatureId,
-                    const TriParameterList* parameterList);
+void triEnqueueCall(const TriPortId *tsiPortId,
+                    const TriAddress *sutAddress,
+                    const TriComponentId *componentId,
+                    const TriSignatureId *signatureId,
+                    const TriParameterList *parameterList);
 
 
 /** 
@@ -159,12 +159,12 @@ void triEnqueueCall(const TriPortId* tsiPortId,
  *                      signature declaration.
  * @param returnValue (optional) encoded return value of the procedure call
  */
-void triEnqueueReply(const TriPortId* tsiPortId,
-                     const TriAddress* sutAddress,
-                     const TriComponentId* componentId,
-                     const TriSignatureId* signatureId,
-                     const TriParameterList* parameterList,
-                     const TriParameter* returnValue);
+void triEnqueueReply(const TriPortId *tsiPortId,
+                     const TriAddress *sutAddress,
+                     const TriComponentId *componentId,
+                     const TriSignatureId *signatureId,
+                     const TriParameterList *parameterList,
+                     const TriParameter *returnValue);
 
 
 /** 
@@ -186,11 +186,11 @@ void triEnqueueReply(const TriPortId* tsiPortId,
  * @param signatureId identifier of the signature of the procedure call which the exception is associated with
  * @param exception the encoded exception
  */
-void triEnqueueException(const TriPortId* tsiPortId,
-                         const TriAddress* sutAddress,
-                         const TriComponentId* componentId,
-                         const TriSignatureId* signatureId,
-                         const TriException* exception);
+void triEnqueueException(const TriPortId *tsiPortId,
+                         const TriAddress *sutAddress,
+                         const TriComponentId *componentId,
+                         const TriSignatureId *signatureId,
+                         const TriException *exception);
 
 /// @} TriProcCommunication_SA_TE
 

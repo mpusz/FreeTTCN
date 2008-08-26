@@ -58,16 +58,16 @@ namespace freettcn {
       void ModuleInfoPrint() const;
   
       void TestCasesPrint() const;
-      void TestCasesInfoPrint(const std::string &testCaseId) const throw(freettcn::ENotFound);
+      void TestCasesInfoPrint(const std::string &testCaseId) const;
   
       virtual void ParametersSet() const;
   
-      virtual void TestCaseStart(const std::string &testCaseId, const TciParameterListType &parameterlist) throw(freettcn::ENotFound);
-      virtual void TestCaseTerminated(TciVerdictValue verdict, const TciParameterListType &parameterlist);
-      virtual void TestCaseStop() throw(freettcn::EOperationFailed);
+      virtual void TestCaseStart(const std::string &testCaseId, const TciParameterListType &parameterlist);
+      virtual void TestCaseTerminated(const VerdictValue &verdict, const TciParameterListType &parameterlist);
+      virtual void TestCaseStop();
   
       virtual void ControlStart();
-      virtual void ControlStop() throw(freettcn::EOperationFailed);
+      virtual void ControlStop();
       virtual void ControlTerminated();
     };
 

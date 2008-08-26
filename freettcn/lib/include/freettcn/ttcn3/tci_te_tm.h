@@ -100,7 +100,7 @@ void tciTestCaseStarted(TciTestCaseIdType testCaseId,
  *                      @p parameterList are ordered as they appear in the TTCN-3 test case
  *                      declaration.
  */
-void tciTestCaseTerminated(TciVerdictValue verdict,
+void tciTestCaseTerminated(VerdictValue verdict,
                            TciParameterListType parameterlist);
 
 
@@ -137,7 +137,7 @@ void tciControlTerminated();
  *
  * @todo tciValue type redefiened as TciValue
  */
-TciValue tciGetModulePar(TciModuleParameterIdType parameterId);
+Value tciGetModulePar(TciModuleParameterIdType parameterId);
 
 
 /** 

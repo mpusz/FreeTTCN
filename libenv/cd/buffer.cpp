@@ -29,9 +29,10 @@
  */
 
 #include "freettcn/cd/buffer.h"
+#include "freettcn/tools/exception.h"
 #include <cmath>
-#include <iostream>
 #include <algorithm>
+#include <sstream>
 #include <netinet/in.h>
 
 
@@ -132,15 +133,18 @@ unsigned char freettcn::CD::CBuffer::ByteUnpack(unsigned short bitLength /* 8 */
 }
 
 
-void freettcn::CD::CBuffer::UIntPack(unsigned long value, unsigned short bitLength) throw(EOperationFailed)
+void freettcn::CD::CBuffer::UIntPack(unsigned long value, unsigned short bitLength)
 {
   if (!bitLength || value >= static_cast<unsigned long>(1 << bitLength)) {
-    std::cout << "ERROR: Incorrect value: " << value << " given for bitLength: " << bitLength << "!!!" << std::endl;
-    throw EOperationFailed();
+    std::stringstream stream;
+    stream << "Incorrect value: " << value << " given for bitLength: " << bitLength << "!!!";
+    throw EOperationFailed(E_DATA, stream.str());
   }
   
   if (bitLength > sizeof(unsigned long) * 8) {
-    std::cout << "ERROR: bitLength: " << bitLength << " too big for " << sizeof(unsigned long) * 8 << " byte value!!!" << std::endl;
+    std::stringstream stream;
+    stream << "ERROR: bitLength: " << bitLength << " too big for " << sizeof(unsigned long) * 8 << " byte value!!!";
+    throw EOperationFailed(E_DATA, stream.str());
   }
   
   // store value
@@ -156,7 +160,7 @@ void freettcn::CD::CBuffer::UIntPack(unsigned long value, unsigned short bitLeng
 }
 
 
-unsigned long freettcn::CD::CBuffer::UIntUnpack(unsigned short bitLength) throw(EOperationFailed)
+unsigned long freettcn::CD::CBuffer::UIntUnpack(unsigned short bitLength)
 {
 //   if (bitLength <= 8) {
 //     return *Get(bitLength);
@@ -193,7 +197,7 @@ void freettcn::CD::CBuffer::RawDataPack(const unsigned char buffer[], unsigned i
 
 
 
-// const unsigned char *freettcn::CD::CHexBuffer::Get(unsigned long bitLength) throw(EOperationFailed, EBufferTooShort)
+// const unsigned char *freettcn::CD::CHexBuffer::Get(unsigned long bitLength)
 // {
 //   if (BitLength() < bitLength)
 //     throw EBufferTooShort();
@@ -207,7 +211,7 @@ void freettcn::CD::CBuffer::RawDataPack(const unsigned char buffer[], unsigned i
 
 
 
-// CInteger CDecoder::Integer(CBuffer::iterator &it, unsigned short len, bool signedValue = false) const throw(EBufferTooShort)
+// CInteger CDecoder::Integer(CBuffer::iterator &it, unsigned short len, bool signedValue = false) const
 // {
 //   if (buffer.Length() < len)
 //     throw EBufferTooShort();
@@ -235,7 +239,7 @@ void freettcn::CD::CBuffer::RawDataPack(const unsigned char buffer[], unsigned i
 // }
 
 
-// void IP::CICMPType::Decode(freettcn::CBuffer &buffer) throw(EDecodeFailure)
+// void IP::CICMPType::Decode(freettcn::CBuffer &buffer)
 // {
 //   msgType.Decode(buffer);
 //   code.Decode(buffer);

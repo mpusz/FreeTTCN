@@ -35,9 +35,8 @@ extern "C" {
 // #include <freettcn/ttcn3/tci_cd_te.h>
 #include <freettcn/ttcn3/tci_tl.h>
 }
-#include <freettcn/tools/timeStamp.h>
-
-#include <iostream>
+#include <freettcn/tools/timeStampMgr.h>
+#include <freettcn/tools/exception.h>
 
 
 
@@ -53,12 +52,12 @@ freettcn::CD::CLogMask::~CLogMask()
 
 freettcn::CD::CCodingDecoding *freettcn::CD::CCodingDecoding::_instance = 0;
 
-freettcn::CD::CCodingDecoding &freettcn::CD::CCodingDecoding::Instance() throw(ENotFound)
+freettcn::CD::CCodingDecoding &freettcn::CD::CCodingDecoding::Instance()
 {
   if (_instance)
     return *_instance;
   
-  throw ENotFound();
+  throw ENotInitialized(E_DATA, "CD instance not initialized!!!");
 }
 
 freettcn::CD::CCodingDecoding::CCodingDecoding()
@@ -83,19 +82,18 @@ void freettcn::CD::CCodingDecoding::Register(const CCodec *codec)
 }
 
 
-const freettcn::CD::CCodec &freettcn::CD::CCodingDecoding::Codec(TciValue value, unsigned int &valueId) const throw(ENotFound)
+const freettcn::CD::CCodec &freettcn::CD::CCodingDecoding::Codec(const Value &value, unsigned int &valueId) const
 {
   for(CCodecList::const_iterator it=_codecList.begin(); it!=_codecList.end(); ++it)
     if ((*it)->CapabilityCheck(value, valueId))
       return *(*it);
   
-  std::cout << "ERROR: Codec not found for given value!!!" << std::endl;
-  throw ENotFound();
+  throw ENotFound(E_DATA, "Codec not found for given value!!!");
 }
 
 
 
-TciValue freettcn::CD::CCodingDecoding::Decode(const BinaryString &message, TciType decHypothesis) const
+const Value &freettcn::CD::CCodingDecoding::Decode(const BinaryString &message, const Type &decHypothesis) const
 {
 //   if (tciGetTypeClass(decHypothesis) == TCI_ANYTYPE_TYPE) {
 // //   tliDecode(String am,
@@ -125,21 +123,21 @@ TciValue freettcn::CD::CCodingDecoding::Decode(const BinaryString &message, TciT
 
 // //       TciValue msgType = tciGetRecFieldValue(icmpMsg, "msgType");
 // //       if (!msgType)
-// //         throw freettcn::CD::EDecodeFailure();
+// //         throw CD::EDecodeFailure();
 // //       tciSetIntSign(msgType, 1);
 // //       sprintf(str, "%lu", buffer.UIntGet(8));
 // //       tciSetIntAbs(msgType, str);
       
 // //       TciValue code = tciGetRecFieldValue(icmpMsg, "code");
 // //       if (!code)
-// //         throw freettcn::CD::EDecodeFailure();
+// //         throw CD::EDecodeFailure();
 // //       tciSetIntSign(code, 1);
 // //       sprintf(str, "%lu", buffer.UIntGet(8));
 // //       tciSetIntAbs(msgType, str);
       
 // //       TciValue crc = tciGetRecFieldValue(icmpMsg, "crc");
 // //       if (!crc)
-// //         throw freettcn::CD::EDecodeFailure();
+// //         throw CD::EDecodeFailure();
 // //       tciSetIntSign(crc, 1);
 // //       sprintf(str, "%lu", buffer.UIntGet(16));
 // //       tciSetIntAbs(msgType, str);
@@ -193,7 +191,7 @@ TciValue freettcn::CD::CCodingDecoding::Decode(const BinaryString &message, TciT
 }
 
 
-BinaryString freettcn::CD::CCodingDecoding::Encode(TciValue value) const
+BinaryString freettcn::CD::CCodingDecoding::Encode(const Value &value) const
 {
   // obtain codec for value
   unsigned int valueId = 0;
@@ -207,7 +205,7 @@ BinaryString freettcn::CD::CCodingDecoding::Encode(TciValue value) const
   // log
   if (Logging() && LogMask().Get(freettcn::CLogMask::CMD_CD_ENCODE)) {
     TriComponentId comp = { { 0 } };
-    tliEncode(0, TimeStamp().Get(), 0, 0, comp, value, TRI_OK, msg, const_cast<char *>(codec.Name()));
+    tliEncode(0, TimeStampMgr().Get(), 0, 0, comp, value, TRI_OK, msg, const_cast<char *>(codec.Name()));
   }
   
   return msg;

@@ -18,41 +18,12 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /**
- * @file   initObject.h
+ * @file   timeStampMgr.cpp
  * @author Mateusz Pusz
- * @date   Wed Apr 25 11:13:10 2007
+ * @date   Mon Apr 30 20:31:19 2007
  * 
- * @brief  
- * 
+ * @brief  Timestamp manager base class definition.
  * 
  */
 
-#ifndef __INITOBJECT_H__
-#define __INITOBJECT_H__
-
-#include <freettcn/tools/exception.h>
-#include <string>
-
-namespace freettcn {
-
-  namespace TE {
-    
-    class CInitObject {
-      bool _inited;
-      virtual void Initialize() = 0;
-      
-    protected:
-      bool Inited() const;
-      
-    public:
-      CInitObject();
-      virtual ~CInitObject();
-      void Init();
-    };
-    
-  } // namespace TE
-  
-} // namespace freettcn
-
-
-#endif /* __INITOBJECT_H__ */
+#include "freettcn/tools/timeStampMgr.h"

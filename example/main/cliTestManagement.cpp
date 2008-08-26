@@ -23,9 +23,10 @@
 extern "C" {
 #include <freettcn/ttcn3/tci_value.h>
 }
-#include <iostream>
 #include <sstream>
+#include <iostream>
 #include <iomanip>
+#include <cstdlib>
 
 
 freettcn::example::CCLITestManagement::CCLITestManagement(CMainLoop &mainLoop):
@@ -43,8 +44,8 @@ void freettcn::example::CCLITestManagement::ParameterDump(const CModuleParameter
   
   ostringstream ostring;
   
-  TciValue value = param.DefaultValue();
-  TciType type = tciGetType(value);
+  Value value = param.DefaultValue();
+  Type type = tciGetType(value);
   
   ostringstream typeString;
   typeString << "<" << (tciGetDefiningModule(type).moduleName ? tciGetDefiningModule(type).moduleName : "{freettcn}") << "." << tciGetName(type) << ">";
@@ -99,7 +100,7 @@ void freettcn::example::CCLITestManagement::TestCasesPrint() const
 }
 
 
-void freettcn::example::CCLITestManagement::TestCasesInfoPrint(const std::string &testCaseId) const throw(freettcn::ENotFound)
+void freettcn::example::CCLITestManagement::TestCasesInfoPrint(const std::string &testCaseId) const
 {
   CTestCase &tc = TestCaseGet(testCaseId);
   
@@ -135,8 +136,8 @@ void freettcn::example::CCLITestManagement::ParametersSet() const
     ParameterDump(*modParList[i]);
     cout << endl;
 
-    TciValue defaultValue = modParList[i]->DefaultValue();
-    TciType type = tciGetType(defaultValue);
+    Value defaultValue = modParList[i]->DefaultValue();
+    Type type = tciGetType(defaultValue);
     TciTypeClassType typeClass = tciGetTypeClass(type);
     bool omit = tciNotPresent(defaultValue);
     if (!omit)
@@ -170,9 +171,9 @@ void freettcn::example::CCLITestManagement::ParametersSet() const
             error = true;
           
           if (!error) {
-            TciValue newValue = tciNewInstance(type);
+            Value newValue = tciNewInstance(type);
             tciSetBooleanValue(newValue, value);
-            modParList[i]->Value(newValue);
+            modParList[i]->ValueSet(newValue);
           }
         }
         break;
@@ -191,9 +192,9 @@ void freettcn::example::CCLITestManagement::ParametersSet() const
             char buffer[32];
             sprintf(buffer, "%lu", value);
             
-            TciValue newValue = tciNewInstance(type);
+            Value newValue = tciNewInstance(type);
             tciSetIntAbs(newValue, buffer);
-            modParList[i]->Value(newValue);
+            modParList[i]->ValueSet(newValue);
           }
         }
         break;
@@ -207,14 +208,14 @@ void freettcn::example::CCLITestManagement::ParametersSet() const
 }
 
 
-void freettcn::example::CCLITestManagement::TestCaseStart(const std::string &testCaseId, const TciParameterListType &parameterlist) throw(freettcn::ENotFound)
+void freettcn::example::CCLITestManagement::TestCaseStart(const std::string &testCaseId, const TciParameterListType &parameterlist)
 {
   freettcn::TM::CTestManagement::TestCaseStart(testCaseId, parameterlist);
   _mainLoop.Start();
 }
 
 
-void freettcn::example::CCLITestManagement::TestCaseTerminated(TciVerdictValue verdict, const TciParameterListType &parameterlist)
+void freettcn::example::CCLITestManagement::TestCaseTerminated(const VerdictValue &verdict, const TciParameterListType &parameterlist)
 {
   TStatus status = Status();
   freettcn::TM::CTestManagement::TestCaseTerminated(verdict, parameterlist);
@@ -223,7 +224,7 @@ void freettcn::example::CCLITestManagement::TestCaseTerminated(TciVerdictValue v
 }
 
 
-void freettcn::example::CCLITestManagement::TestCaseStop() throw(freettcn::EOperationFailed)
+void freettcn::example::CCLITestManagement::TestCaseStop()
 {
   TStatus status = Status();
   freettcn::TM::CTestManagement::TestCaseStop();
@@ -241,7 +242,7 @@ void freettcn::example::CCLITestManagement::ControlStart()
 }
 
 
-void freettcn::example::CCLITestManagement::ControlStop() throw(freettcn::EOperationFailed)
+void freettcn::example::CCLITestManagement::ControlStop()
 {
   freettcn::TM::CTestManagement::ControlStop();
   _mainLoop.Stop();

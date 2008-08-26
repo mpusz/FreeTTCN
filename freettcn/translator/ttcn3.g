@@ -1,4 +1,4 @@
-grammar ttcn3;
+tree grammar ttcn3;
 
 options
 {
@@ -155,12 +155,16 @@ tokens {
   int main(int argc, char * argv[])
   {
     pANTLR3_INPUT_STREAM input = antlr3AsciiFileStreamNew(argv[1]);
-    pttcn3Lexer lex = ttcn3LexerNew(input);
-    pANTLR3_COMMON_TOKEN_STREAM tokens = antlr3CommonTokenStreamSourceNew(ANTLR3_SIZE_HINT, lex->pLexer->tokSource);
+    pttcn3Lexer lexer = ttcn3LexerNew(input);
+    pANTLR3_COMMON_TOKEN_STREAM tokens = antlr3CommonTokenStreamSourceNew(ANTLR3_SIZE_HINT, lexer->pLexer->tokSource);
     pttcn3Parser parser = ttcn3ParserNew(tokens);
-
+    Token *token;
+    
     parser->expr(parser);
-
+    while ((token = lexer->nextToken())!=Token.EOF_TOKEN) {
+        printf("Token: %s\n", token->getText());
+    }
+        
     // Must manually clean up
     parser->free(parser);
     tokens->free(tokens);
@@ -177,18 +181,18 @@ tokens {
 
 /* A.1.6.0 - TTCN-3 module*/
 
-ttcn3Module		: ttcn3ModuleKeyword ttcn3ModuleId
+ttcn3Module		: ^ ( ttcn3ModuleKeyword ttcn3ModuleId
 			'{'
 			moduleDefinitionsPart?
 			moduleControlPart?
 			'}'
-			withStatement? SEMICOLON? EOF;
+			withStatement? SEMICOLON? ) EOF;
 ttcn3ModuleKeyword	: MODULE;
 ttcn3ModuleId		: moduleId;
 moduleId		: globalModuleId languageSpec?;
 globalModuleId		: moduleIdentifier;
 moduleIdentifier	: IDENTIFIER;
-languageSpec		: languageKeyword FREE_TEXT;
+languageSpec		: languageKeyword freeText;
 languageKeyword		: LANGUAGE;
 
 
@@ -941,30 +945,30 @@ valueReference		: ( globalModuleId DOT )? ( constIdentifier | extConstIdentifier
 			moduleParIdentifier ) |
 			valueParIdentifier |
 			varIdentifier;
-NUMBER			: ( NON_ZERO_NUM NUM* ) | '0';
-NON_ZERO_NUM		: '1'..'9';
-DECIMAL_NUMBER		: NUM+;
-NUM			: '0' | NON_ZERO_NUM;
+fragment NUMBER		: ( NON_ZERO_NUM NUM* ) | '0';
+fragment NON_ZERO_NUM	: '1'..'9';
+fragment DECIMAL_NUMBER	: NUM+;
+fragment NUM		: '0' | NON_ZERO_NUM;
 B_STRING		: '\'' BIN* '\'' 'B';
-BIN			: '0' | '1';
+fragment BIN		: '0' | '1';
 H_STRING		: '\'' HEX* '\'' 'H';
-HEX			: NUM | 'A'..'F' | 'a'..'f';
+fragment HEX		: NUM | 'A'..'F' | 'a'..'f';
 O_STRING		: '\'' OCT* '\'' 'O';
-OCT			: HEX HEX;
+fragment OCT		: HEX HEX;
 C_STRING		: '"' CH* '"';
-CH			: ALPHA_NUM | UNDERSCORE;
+fragment CH		: ALPHA_NUM | UNDERSCORE;
 /* REFERENCE - A character defined by the relevant characterString type. For charstring a character from the character
 set defined in ISO/IEC 646. For universal charstring a character from any character set defined in ISO/IEC 10646 */
 IDENTIFIER		: ALPHA ( ALPHA_NUM | UNDERSCORE )*;
-ALPHA			: UPPER_ALPHA | LOWER_ALPHA;
-ALPHA_NUM		: ALPHA | NUM;
-UPPER_ALPHA		: 'A'..'Z';
-LOWER_ALPHA		: 'a'..'z';
-EXTENDED_ALPHA_NUM	: ALPHA_NUM | UNDERSCORE;
+fragment ALPHA		: UPPER_ALPHA | LOWER_ALPHA;
+fragment ALPHA_NUM	: ALPHA | NUM;
+fragment UPPER_ALPHA	: 'A'..'Z';
+fragment LOWER_ALPHA	: 'a'..'z';
+fragment EXTENDED_ALPHA_NUM	: ALPHA_NUM | UNDERSCORE;
 /* REFERENCE - A graphical character from the BASIC LATIN or from rthe LATIN-1 SUPPLEMENT character sets defined in
 ISO/IEC 10646 (characters from char (0,0,0,32) to char (0,0,0,126), from char (0,0,0,161) to char (0,0,0,172) and
 from char (0,0,0,174) to char (0,0,0,255). */
-FREE_TEXT		: '"' EXTENDED_ALPHA_NUM* '"';
+freeText		: '"' EXTENDED_ALPHA_NUM* '"';
 addressValue		: NULL;
 omitValue		: omitKeyword;
 omitKeyword		: OMIT;
@@ -1030,7 +1034,7 @@ allRef			: ( groupKeyword allKeyword ( exceptKeyword '{' groupRefList '}' )? ) |
 			( functionKeyword allKeyword ( exceptKeyword '{' functionRefList '}' )? ) |
 			( signatureKeyword allKeyword ( exceptKeyword '{' signatureRefList '}' )? ) |
 			( moduleParKeyword allKeyword ( exceptKeyword '{' moduleParList '}' )? );
-attribSpec		: FREE_TEXT;
+attribSpec		: freeText;
 
 
 /* A.1.6.7 - Behaviour statements */
@@ -1051,9 +1055,9 @@ verdictOps		: getLocalVerdict;
 setLocalVerdict		: setVerdictKeyword '(' singleExpression ')';
 setVerdictKeyword	: SET_VERDICT;
 getLocalVerdict		: GET_VERDICT;
-sutStatements		: actionKeyword '(' actionText? ( STRING_OP actionText )* ')';
+sutStatements		: actionKeyword '(' actionText? ( stringOp actionText )* ')';
 actionKeyword		: ACTION;
-actionText		: FREE_TEXT | expression;
+actionText		: freeText | expression;
 returnStatement		: returnKeyword expression?;
 altConstruct		: altKeyword '{' altGuardList '}';
 altKeyword		: ALT;
@@ -1130,13 +1134,13 @@ andExpression		: notExpression ( AND notExpression )*;
 specific values of compatible types. */
 notExpression		: NOT? equalExpression;
 /* STATIC SEMANTICS - Operands of the not operator shall be of type boolean or derivates of type boolean. */
-equalExpression		: relExpression ( EQUAL_OP relExpression )*;
+equalExpression		: relExpression ( equalOp relExpression )*;
 /* STATIC SEMANTICS - If more than one relExpression exists, then the relExpressions shall evaluate to
 specific values of compatible types. */
-relExpression		: shiftExpression ( REL_OP shiftExpression )?;
+relExpression		: shiftExpression ( relOp shiftExpression )?;
 /* STATIC SEMANTICS - If both shiftExpressions exist, then each shiftExpression shall evaluate to a specific
 integer, enumerated or float value or derivates of these types. */
-shiftExpression		: bitOrExpression ( SHIFT_OP bitOrExpression )*;
+shiftExpression		: bitOrExpression ( shiftOp bitOrExpression )*;
 /* STATIC SEMANTICS - Each result shall resolve to a specific value. If more than one result exists the right-hand
 operand shall be of type integer or derivates and if the shift op is '<<' or '>>' then the left-hand operand shall
 resolve to either bitstring, hexstring or octetstring type or derivates of these types. If the shift op is
@@ -1154,16 +1158,16 @@ specific values of compatible types. */
 bitNotExpression	: NOT4B? addExpression;
 /* STATIC SEMANTICS - If the not4b operator exist, the operand shall be of type bitstring, octetstring or
 hexstring or derivates of these types. */
-addExpression		: mulExpression ( ADD_OP mulExpression )*;
+addExpression		: mulExpression ( addOp mulExpression )*;
 /* STATIC SEMANTICS - Each mulExpression shall resolve to a specific value. If more than one mulExpression
 exists and the addOp resolves to stringOp then the mulExpressions shall resolve to same type which shall be
 of bitstring, hexstring, octetstring, charstring or universal charstring or derivatives of these types. If
 more than one mulExpression exists and the addOp does not resolve to stringOp then the mulExpression shall
 both resolve to type integer or float or derivatives of these types. */
-mulExpression		: unaryExpression ( MULTIPLY_OP unaryExpression )*;
+mulExpression		: unaryExpression ( multiplyOp unaryExpression )*;
 /* STATIC SEMANTICS - Each unaryExpression shall resolve to a specific value. If more than one unaryExpression
 exists then the unaryExpressions shall resolve to type integer or float or derivatives of these types. */
-unaryExpression		: UNARY_OP? primary;
+unaryExpression		: unaryOp? primary;
 /* STATIC SEMANTICS - primary shall resolve to a specific value of type integer or float or derivatives of
 these types. */
 primary			: opCall | value | '(' singleExpression ')';
@@ -1178,25 +1182,25 @@ opCall			: configurationOps |
 			functionInstance |
 			templateOps |
 			activateOp;
-ADD_OP			: '+' | '-' | STRING_OP;
+addOp			: '+' | '-' | stringOp;
 /* STATIC SEMANTICS - Operands of the '+' or '-' operators shall be of type integer of float or derivations
 of integer of loat (i.e. subrange) */
-MULTIPLY_OP		: '*' | '/' | MOD | REM;
+multiplyOp		: '*' | '/' | MOD | REM;
 /* STATIC SEMANTICS - Operands of the '*', '/', rem or mod operators shall be of type integer or float or
 derivations of integer or float (i.e. subrange). */
-UNARY_OP		: '+' | '-';
+unaryOp			: '+' | '-';
 /* STATIC SEMANTICS - Operands of the '+' or '-' operators shall be of type integer or float or derivations
 of integer or float (i.e. subrange). */
-REL_OP			: '<' | '>' | '>=' | '<=';
+relOp			: '<' | '>' | '>=' | '<=';
 /* STATIC SEMANTICS - the precedence of the operators is defined in Table 6 */
-EQUAL_OP		: '==' | '!=';
-STRING_OP		: '&';
+equalOp			: '==' | '!=';
+stringOp		: '&';
 /* STATIC SEMANTICS - Operands of the string operator shall be bitstring, hexstring, octetstring or character
 string */
-SHIFT_OP		: '<<' | '>>' | '<@' | '>@';
+shiftOp			: '<<' | '>>' | '<@' | '>@';
 logStatement		: logKeyword '(' logItem ( ',' logItem )* ')';
 logKeyword		: LOG;
-logItem			: FREE_TEXT | templateInstance;
+logItem			: freeText | templateInstance;
 loopConstruct		: forStatement |
 			whileStatement |
 			doWhileStatement;
@@ -1242,9 +1246,9 @@ ASSIGNMENT_CHAR		: ':=';
 /* ADDED */
 
 WHITESPACE		: ( '\t' | ' ' | '\r' | '\n'| '\u000C' )+
-				{ $channel = HIDDEN; };
+				{ channel = HIDDEN; };
 
 COMMENT			: '/*' ( options {greedy=false;} : . )* '*/'
-				{ $channel=99; };
+				{ channel = HIDDEN; };
 LINE_COMMENT		: '//' ~('\n'|'\r')* '\r'? '\n'
-				{ $ channel=99; };
+				{ channel = HIDDEN; };

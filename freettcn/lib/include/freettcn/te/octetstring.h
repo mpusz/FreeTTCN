@@ -45,11 +45,11 @@ namespace freettcn {
       public:
         CInstance(const CType &type);
         
-        const char *Value() const throw(EOmitSet);
-        void Value(const char *value) throw(EOperationFailed);
+        const char *Value() const;
+        void Value(const char *value);
         
-        int Element(unsigned int position) const throw(EOperationFailed, EOmitSet);
-        void Element(unsigned int position, int value) throw(EOperationFailed);
+        int Element(unsigned int position) const;
+        void Element(unsigned int position, int value);
         
         unsigned int Length() const;
         void Length(unsigned int length);

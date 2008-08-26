@@ -30,7 +30,6 @@
 #ifndef __TYPE_H__
 #define __TYPE_H__
 
-#include <freettcn/tools/exception.h>
 extern "C" {
 #include <freettcn/ttcn3/tci.h>
 }
@@ -44,9 +43,6 @@ namespace freettcn {
     class CType {
     public:
       class CInstance {
-      public:
-        class EOmitSet : public EOperationFailed {};
-        
       private:
         const CType &_type;
         bool _omit;
@@ -55,7 +51,7 @@ namespace freettcn {
         CInstance(const CType &type);
         virtual ~CInstance();
         
-        CInstance &operator=(const CInstance &value) throw(EOperationFailed);
+        CInstance &operator=(const CInstance &value);
         
         const CType &Type() const;
         bool Omit() const;

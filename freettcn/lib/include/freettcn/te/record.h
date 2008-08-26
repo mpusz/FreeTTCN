@@ -51,8 +51,8 @@ namespace freettcn {
         void Register(CType::CInstance *field);
         
 //         unsigned int FieldNum() const;
-        CType::CInstance &Field(const char *fieldName) const throw(ENotFound, EOmitSet);
-        CType::CInstance &Field(unsigned int fieldIdx) const throw(ENotFound, EOmitSet);
+        CType::CInstance &Field(const char *fieldName) const;
+        CType::CInstance &Field(unsigned int fieldIdx) const;
         char const * const * FieldNames() const;
       };
       
@@ -71,7 +71,7 @@ namespace freettcn {
       CFieldDataArray _fieldDataArray;
       char **_fieldNames;
       
-      unsigned int FieldIdx(const char *fieldName) const throw(ENotFound);
+      unsigned int FieldIdx(const char *fieldName) const;
       
     protected:
       void Register(const CType &type, const char *name, bool optional = false);

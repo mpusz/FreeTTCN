@@ -58,7 +58,7 @@ namespace freettcn {
       static CModulesContainer &Instance();
       
       void Register(CModule &module);
-      CModule &Get(const std::string &moduleId) const throw(ENotFound);
+      CModule &Get(const std::string &moduleId) const;
       const CModuleList &List() const;
     };
 

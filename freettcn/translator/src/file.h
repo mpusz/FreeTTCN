@@ -1,7 +1,6 @@
 #ifndef FILE_H
 #define FILE_H
 
-#include "exception.h"
 #include <string>
 
 
@@ -26,7 +25,7 @@ namespace TTCN3 {
     const std::string &Name() const { return name; } /**< @brief Returns TTCN-3 module file name. */
     
     void Module(CModule &mod) { module = &mod; }  /**< @brief Sets TTCN-3 module defined in a file. */
-    CModule &Module() const throw(ENotFound);
+    CModule &Module() const;
   };
   
   

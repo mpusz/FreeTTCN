@@ -22,54 +22,105 @@
  * @author Mateusz Pusz
  * @date   Mon Apr 30 20:38:18 2007
  * 
- * @brief  
- * 
+ * @brief  TTCN-3 entities base class definition
  * 
  */
 
 #include "freettcn/tools/entity.h"
+#include "freettcn/tools/exception.h"
 
 
+/** 
+ * @brief CEntity class constructor
+ */
 freettcn::CEntity::CEntity():
-  _ts(0), _logMask(0), _logging(false)
+  _logging(false), _ts(0), _logMask(0)
 {
 }
 
+
+/** 
+ * @brief CEntity class destructor
+ */
 freettcn::CEntity::~CEntity()
 {
 }
 
-freettcn::CTimeStamp &freettcn::CEntity::TimeStamp() const throw(freettcn::ENotFound)
+
+/** 
+ * @brief Returns class that handles timestamp
+ *
+ * Methods returns class that handles timestamp.
+ * 
+ * @exception freettcn::ENotFound Timestamps handler class not set.
+ * 
+ * @return Class that handles timestamps
+ */
+freettcn::CTimeStampMgr &freettcn::CEntity::TimeStampMgr() const
 {
   if (_ts)
     return *_ts;
   else
-    throw freettcn::ENotFound();
+    throw ENotFound(E_DATA, "Timestamps handler class not set!!!");
 }
 
-freettcn::CLogMask &freettcn::CEntity::LogMask() const throw(freettcn::ENotFound)
+
+/** 
+ * @brief Returns class that defines logging mask
+ *
+ * Method returns class that defines logging mask.
+ *
+ * @exception freettcn::ENotFound Logging mask not set
+ * 
+ * @return Class that defines logging mask
+ */
+freettcn::CLogMask &freettcn::CEntity::LogMask() const
 {
   if (_logMask)
     return *_logMask;
   else
-    throw freettcn::ENotFound();
+    throw ENotFound(E_DATA, "Logging mask not set!!!");
 }
 
-void freettcn::CEntity::LogEnable(freettcn::CTimeStamp &ts, freettcn::CLogMask &logMask)
+
+/** 
+ * @brief Specifies if logging is enabled
+ * 
+ * Method specifies if logging is enabled for current entity.
+ * 
+ * @return Logging flag
+ */
+bool freettcn::CEntity::Logging() const
+{
+  return _logging;
+}
+
+
+/** 
+ * @brief Starts logging on current entity
+ * 
+ * Method enables logging on current entity end sets classes that handles
+ * timestamping and defines which events should be logged.
+ * 
+ * @param ts Timestamps manager class
+ * @param logMask Logging mask definition
+ */
+void freettcn::CEntity::LogEnable(freettcn::CTimeStampMgr &ts, freettcn::CLogMask &logMask)
 {
   _ts = &ts;
   _logMask = &logMask;
   _logging = true;
 }
 
+
+/** 
+ * @brief Stops logging on current entity
+ * 
+ * Method disables logging on current entity.
+ */
 void freettcn::CEntity::LogDisable()
 {
   _ts = 0;
   _logMask = 0;
   _logging = false;
-}
-
-bool freettcn::CEntity::Logging() const
-{
-  return _logging;
 }

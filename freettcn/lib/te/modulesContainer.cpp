@@ -29,12 +29,13 @@
 
 #include "freettcn/te/modulesContainer.h"
 #include "freettcn/te/module.h"
-#include <iostream>
+#include "freettcn/tools/exception.h"
 
 
 freettcn::TE::CModulesContainer::CModulesContainer()
 {
 }
+
 
 freettcn::TE::CModulesContainer &freettcn::TE::CModulesContainer::Instance()
 {
@@ -43,19 +44,21 @@ freettcn::TE::CModulesContainer &freettcn::TE::CModulesContainer::Instance()
   return container;
 }
 
+
 void freettcn::TE::CModulesContainer::Register(CModule &module)
 {
   _modList.push_back(&module);
 }
 
-freettcn::TE::CModule &freettcn::TE::CModulesContainer::Get(const std::string &moduleId) const throw(ENotFound)
+
+freettcn::TE::CModule &freettcn::TE::CModulesContainer::Get(const std::string &moduleId) const
 {
   for(CModuleList::const_iterator it=_modList.begin(); it != _modList.end(); ++it)
     if ((*it)->Id().moduleName == moduleId)
       return *(*it);
-  std::cout << "ERROR: Module not found" << std::endl;
-  throw freettcn::ENotFound();
+  throw ENotFound(E_DATA, "Module '" + moduleId + "' not found!!!");
 }
+
 
 const freettcn::TE::CModulesContainer::CModuleList &freettcn::TE::CModulesContainer::List() const
 {

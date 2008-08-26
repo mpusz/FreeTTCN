@@ -43,8 +43,8 @@ namespace freettcn {
       };
     public:
       CCodec();
-      bool CapabilityCheck(TciValue value, unsigned int &valueId) const;
-      void Encode(unsigned int valueId, TciValue value, CD::CBuffer &buffer) const;
+      bool CapabilityCheck(const Value &value, unsigned int &valueId) const;
+      void Encode(unsigned int valueId, const Value &value, CD::CBuffer &buffer) const;
     };
     
   } // namespace icmp

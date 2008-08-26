@@ -36,13 +36,13 @@ extern "C" {
 }
 
 
-void triEnqueueMsg(const TriPortId* tsiPortId,
-                   const TriAddress* sutAddress,
-                   const TriComponentId* componentId,
-                   const TriMessage* receivedMessage)
+void triEnqueueMsg(const TriPortId *tsiPortId,
+                   const TriAddress *sutAddress,
+                   const TriComponentId *componentId,
+                   const TriMessage *receivedMessage)
 {
   /// @todo Handle message properly
-  if (TciValue value = tciDecode(*receivedMessage, 0)) {
+  if (Value value = tciDecode(*receivedMessage, 0)) {
 //     void tliMReceive_m(String am,
 //                        int ts,
 //                        String src,

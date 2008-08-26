@@ -72,7 +72,7 @@
  * 
  * @param timerId identifier of the timer instance
  */
-void triTimeout(const TriTimerId* timerId);
+void triTimeout(const TriTimerId *timerId);
 
 /// @} TriIfacePlatformTimer_PA_TE
 

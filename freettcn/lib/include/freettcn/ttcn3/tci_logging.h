@@ -56,21 +56,21 @@
  */
 
 /**
- * Returns true if the template is an omit template.
+ * Returns @c true if the template is an @c omit template.
  *
  * Boolean type reused from IDL (OMG recommendation)
  */
 Boolean tciIsOmit(TciValueTemplate inst);
 
 /**
- * Returns true if the template is an any template.
+ * Returns @c true if the template is an @c any template.
  *
  * Boolean type reused from IDL (OMG recommendation)
  */
 Boolean tciIsAny(TciValueTemplate inst);
 
 /**
- * Returns true if the template is an any or omit template.
+ * Returns @c true if the template is an @c any or @c omit template.
  *
  * Boolean type reused from IDL (OMG recommendation)
  */
@@ -92,31 +92,130 @@ String tciGetTemplateDef(TciValueTemplate inst);
  */
 
 /**
- * Returns true if the template is an any template.
+ * Returns @c true if the template is an @c any template.
  *
  * Boolean type reused from IDL (OMG recommendation)
- *
- * @todo Redeclaration
  */
-Boolean tciIsAny(TciNonValueTemplate inst);
+Boolean tciIsAnyNonValue(TciNonValueTemplate inst);
 
 /**
- * Returns true if the template is an all template.
+ * Returns @c true if the template is an @c all template.
  *
  * Boolean type reused from IDL (OMG recommendation)
  */
-Boolean tciIsAll(TciNonValueTemplate inst);
+Boolean tciIsAllNonValue(TciNonValueTemplate inst);
+
+/**
+ * Returns the definition of that template.
+ *
+ * String type reused from IDL (OMG recommendation)
+ */
+String tciGetTemplateDefNonValue(TciNonValueTemplate inst);
+
+/// @} TciInterfaceNonValueTemplate
+
+
+/**
+ * @defgroup TciInterfaceValueListAndMismatchTypes Tci Value List and Mismatch Types
+ * @{
+ */
+
+/**
+ * Returns @c true if the template is an any template.
+ *
+ * @todo Should be renamed to tciSize()
+ */
+int size(TciValueList inst);
+
+/**
+ * Returns @c true if the template is an all template.
+ *
+ * Boolean type reused from IDL (OMG recommendation)
+ *
+ * @todo Renamed to tciIsEmpty()
+ */
+//Boolean isEmpty(TciValueList inst);
+Boolean tciIsEmpty(TciValueList inst);
+
+/**
+ * Returns the definition of that template.
+ *
+ * @todo Renamed to tciGet()
+ * @todo Value renamed to tciValue
+ */
+//Value get(TciValueList inst, int index);
+TciValue tciGet(TciValueList inst, int index);
+
+/// @} TciInterfaceValueListAndMismatchTypes
+
+
+/**
+ * @defgroup TciInterfaceValueDifference TciValueDifference
+ * @{
+ */
+
+/**
+ * Returns @c true if the template is an any template.
+ *
+ * @todo Renamed to tciGetValue()
+ * @todo Value renamed to tciValue
+ */
+//Value getValue(TciValueDifference inst);
+TciValue tciGetValue(TciValueDifference inst);
+
+/**
+ * Returns @c true if the template is an all template.
+ *
+ * @todo Renamed to tciGetValueTemplate()
+ */
+//TciValueTemplate getTciValueTemplate(TciValueDifference inst);
+TciValueTemplate tciGetValueTemplate(TciValueDifference inst);
 
 /**
  * Returns the definition of that template.
  *
  * String type reused from IDL (OMG recommendation)
  *
- * @todo Redeclaration
+ * @todo Renamed to tciGetDescription()
  */
-String tciGetTemplateDef(TciNonValueTemplate inst);
+//String getDescription(TciValueDifference inst);
+String tciGetDescription(TciValueDifference inst);
 
-/// @} TciInterfaceNonValueTemplate
+
+/**
+ * @defgroup TciInterfaceValueDifferenceList TciValueDifferenceList
+ * @{
+ */
+
+/**
+ * Returns @c true if the template is an any template.
+ *
+ * @todo Renamed to tciSize()
+ */
+//int size(TciValueDifferenceList inst);
+int tciSize(TciValueDifferenceList inst);
+
+/**
+ * Returns @c true if the template is an all template.
+ *
+ * Boolean type reused from IDL (OMG recommendation)
+ *
+ * @todo Renamed to tciIsEmpty()
+ */
+//Boolean isEmpty(TciValueDifferenceList inst);
+Boolean tciIsEmpty(TciValueDifferenceList inst);
+
+/**
+ * Returns the definition of that template.
+ *
+ * @todo Renamed to tciGet()
+ */
+//TciValueDifference get(TciValueDifferenceList inst, int index);
+TciValueDifference tciGet(TciValueDifferenceList inst, int index);
+
+/// @} TciInterfaceValueListAndMismatchTypes
+
+/// @} TciInterfaceValueDifference
 
 /// @} TciInterfaceLogging
 

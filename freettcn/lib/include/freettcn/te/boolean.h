@@ -44,7 +44,7 @@ namespace freettcn {
         CInstance(const CType &type);
         CInstance(const CType &type, bool value);
         
-        bool Value() const throw(EOmitSet);
+        bool Value() const;
         void Value(bool value);
       };
       

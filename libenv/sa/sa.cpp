@@ -24,7 +24,8 @@ extern "C" {
 #include <freettcn/ttcn3/tri_sa_te.h>
 #include <freettcn/ttcn3/tci_tl.h>
 }
-#include <freettcn/tools/timeStamp.h>
+#include <freettcn/tools/timeStampMgr.h>
+#include <freettcn/tools/exception.h>
 
 
 
@@ -40,12 +41,12 @@ freettcn::SA::CLogMask::~CLogMask()
 
 freettcn::SA::CSUTAdaptor *freettcn::SA::CSUTAdaptor::_instance = 0;
 
-freettcn::SA::CSUTAdaptor &freettcn::SA::CSUTAdaptor::Instance() throw(ENotFound)
+freettcn::SA::CSUTAdaptor &freettcn::SA::CSUTAdaptor::Instance()
 {
   if (_instance)
     return *_instance;
   
-  throw ENotFound();
+  throw ENotInitialized(E_DATA, "SA instance not inited!!!");
 }
 
 freettcn::SA::CSUTAdaptor::CSUTAdaptor()
@@ -78,7 +79,7 @@ TriStatus freettcn::SA::CSUTAdaptor::Map(const TriPortId &compPortId, const TriP
   if (Logging() && LogMask().Get(freettcn::CLogMask::CMD_SA_P_MAP)) {
     TriComponentId comp = { { 0 } };
     // log
-    tliPMap(0, TimeStamp().Get(), 0, 0, comp, compPortId.compInst, compPortId, tsiPortId.compInst, tsiPortId);
+    tliPMap(0, TimeStampMgr().Get(), 0, 0, comp, compPortId, tsiPortId);
   }
   
   /// @todo mapping on SA
@@ -91,7 +92,7 @@ TriStatus freettcn::SA::CSUTAdaptor::Unmap(const TriPortId &compPortId, const Tr
   if (Logging() && LogMask().Get(freettcn::CLogMask::CMD_SA_P_UNMAP)) {
     TriComponentId comp = { { 0 } };
     // log
-    tliPUnmap(0, TimeStamp().Get(), 0, 0, comp, compPortId.compInst, compPortId, tsiPortId.compInst, tsiPortId);
+    tliPUnmap(0, TimeStampMgr().Get(), 0, 0, comp, compPortId.compInst, compPortId, tsiPortId.compInst, tsiPortId);
   }
   
   /// @todo unmapping on SA

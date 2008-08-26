@@ -32,21 +32,21 @@
 #include "freettcn/pa/timer.h"
 #include <freettcn/tools/tools.h>
 #include "freettcn/pa/paLogMask.h"
-#include <freettcn/tools/timeStamp.h>
+#include <freettcn/tools/timeStampMgr.h>
+#include <freettcn/tools/exception.h>
 extern "C" {
 #include <freettcn/ttcn3/tci_tl.h>
 }
-#include <iostream>
 
 
 freettcn::PA::CPlatformAdaptor *freettcn::PA::CPlatformAdaptor::_instance = 0;
 
-freettcn::PA::CPlatformAdaptor &freettcn::PA::CPlatformAdaptor::Instance() throw(ENotFound)
+freettcn::PA::CPlatformAdaptor &freettcn::PA::CPlatformAdaptor::Instance()
 {
   if (_instance)
     return *_instance;
   
-  throw ENotFound();
+  throw ENotInitialized(E_DATA, "PA instance not inited!!!");
 }
 
 freettcn::PA::CPlatformAdaptor::CPlatformAdaptor()
@@ -77,14 +77,13 @@ TriStatus freettcn::PA::CPlatformAdaptor::Reset()
 
 
 
-freettcn::PA::CTimer &freettcn::PA::CPlatformAdaptor::TimerGet(const TriTimerId &timerId) const throw(freettcn::ENotFound)
+freettcn::PA::CTimer &freettcn::PA::CPlatformAdaptor::TimerGet(const TriTimerId &timerId) const
 {
   for(CTimerList::const_iterator it=_timerList.begin(); it!=_timerList.end(); ++it)
     if (&timerId == &(*it)->Id())
       return *(*it);
   
-  std::cout << "ERROR: Timer not found!!!" << std::endl;
-  throw freettcn::ENotFound();
+  throw ENotFound(E_DATA, "Timer not found!!!");
 }
 
 
@@ -113,7 +112,7 @@ TriStatus freettcn::PA::CPlatformAdaptor::TimerStart(const TriTimerId *timerId, 
   
   if (Logging() && LogMask().Get(freettcn::CLogMask::CMD_PA_T_START)) {
     TriComponentId comp = { { 0 } };
-    tliTStart(0, TimeStamp().Get(), 0, 0, comp, *timerId, timerDuration);
+    tliTStart(0, TimeStampMgr().Get(), 0, 0, comp, *timerId, timerDuration);
   }
   
   return TRI_OK;
@@ -131,7 +130,7 @@ TriStatus freettcn::PA::CPlatformAdaptor::TimerStop(const TriTimerId *timerId)
     
     if (Logging() && LogMask().Get(freettcn::CLogMask::CMD_PA_T_STOP)) {
       TriComponentId comp = { { 0 } };
-      tliTStop(0, TimeStamp().Get(), 0, 0, comp, *timerId);
+      tliTStop(0, TimeStampMgr().Get(), 0, 0, comp, *timerId, timer.Read());
     }
 
     return TRI_OK;
@@ -156,7 +155,7 @@ TriStatus freettcn::PA::CPlatformAdaptor::TimerRead(const TriTimerId* timerId, T
     
     if (Logging() && LogMask().Get(freettcn::CLogMask::CMD_PA_T_READ)) {
       TriComponentId comp = { { 0 } };
-      tliTStart(0, TimeStamp().Get(), 0, 0, comp, *timerId, *elapsedTime);
+      tliTStart(0, TimeStampMgr().Get(), 0, 0, comp, *timerId, *elapsedTime);
     }
     
     return TRI_OK;
@@ -181,7 +180,7 @@ TriStatus freettcn::PA::CPlatformAdaptor::TimerRunning(const TriTimerId* timerId
 
     if (Logging() && LogMask().Get(freettcn::CLogMask::CMD_PA_T_RUNNING)) {
       TriComponentId comp = { { 0 } };
-      tliTRunning(0, TimeStamp().Get(), 0, 0, comp, *timerId, *running ? TCI_runningT : TCI_expiredT);
+      tliTRunning(0, TimeStampMgr().Get(), 0, 0, comp, *timerId, *running ? runningT : expiredT);
     }
   }
   catch(freettcn::Exception) {

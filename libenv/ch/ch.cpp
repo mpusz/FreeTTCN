@@ -32,9 +32,9 @@ extern "C" {
 #include <freettcn/ttcn3/tci_ch_te.h>
 #include <freettcn/ttcn3/tci_tl.h>
 }
-#include <freettcn/tools/timeStamp.h>
+#include <freettcn/tools/timeStampMgr.h>
+#include <freettcn/tools/exception.h>
 
-#include <iostream>
 
 
 
@@ -50,12 +50,12 @@ freettcn::CH::CLogMask::~CLogMask()
 
 freettcn::CH::CComponentHandler *freettcn::CH::CComponentHandler::_instance = 0;
 
-freettcn::CH::CComponentHandler &freettcn::CH::CComponentHandler::Instance() throw(ENotFound)
+freettcn::CH::CComponentHandler &freettcn::CH::CComponentHandler::Instance()
 {
   if (_instance)
     return *_instance;
   
-  throw ENotFound();
+  throw ENotInitialized(E_DATA, "CH instance not initialized!!!");
 }
 
 freettcn::CH::CComponentHandler::CComponentHandler()
@@ -81,24 +81,24 @@ void freettcn::CH::CComponentHandler::ResetReq()
 
 
 
-void freettcn::CH::CComponentHandler::ConnectedSend(const TriPortId &sender, const TriComponentId &receiver, TciValue sendMessage)
+void freettcn::CH::CComponentHandler::ConnectedSend(const TriPortId &sender, const TriComponentId &receiver, const Value &sendMessage)
 {
   ConnectedMsgEnqueue(sender, receiver, sendMessage);
 }
 
-void freettcn::CH::CComponentHandler::ConnectedMsgEnqueue(const TriPortId &sender, const TriComponentId &receiver, TciValue rcvdMessage)
+void freettcn::CH::CComponentHandler::ConnectedMsgEnqueue(const TriPortId &sender, const TriComponentId &receiver, const Value &rcvdMessage)
 {
   tciEnqueueMsgConnected(sender, receiver, rcvdMessage);
 }
 
 
 
-TriComponentId freettcn::CH::CComponentHandler::TestComponentCreateReq(TciTestComponentKindType kind, TciType componentType, String name)
+TriComponentId freettcn::CH::CComponentHandler::TestComponentCreateReq(TciTestComponentKindType kind, const Type &componentType, String name)
 {
   return TestComponentCreate(kind, componentType, name);
 }
 
-TriComponentId freettcn::CH::CComponentHandler::TestComponentCreate(TciTestComponentKindType kind, TciType componentType, String name)
+TriComponentId freettcn::CH::CComponentHandler::TestComponentCreate(TciTestComponentKindType kind, const Type &componentType, String name)
 {
   return tciCreateTestComponent(kind, componentType, name);
 }
@@ -132,7 +132,7 @@ void freettcn::CH::CComponentHandler::TestComponentStop(const TriComponentId &co
 
 
 
-void freettcn::CH::CComponentHandler::TestComponentTerminatedReq(const TriComponentId &component, TciVerdictValue verdict)
+void freettcn::CH::CComponentHandler::TestComponentTerminatedReq(const TriComponentId &component, const VerdictValue &verdict)
 {
   const unsigned int teNum = 1;                     /**< @todo define TEs for the test case */
   for (unsigned int i = 0; i < teNum; i++) {
@@ -141,7 +141,7 @@ void freettcn::CH::CComponentHandler::TestComponentTerminatedReq(const TriCompon
   }
 }
 
-void freettcn::CH::CComponentHandler::TestComponentTerminated(const TriComponentId &component, TciVerdictValue verdict)
+void freettcn::CH::CComponentHandler::TestComponentTerminated(const TriComponentId &component, const VerdictValue &verdict)
 {
   tciTestComponentTerminated(component, verdict);
 }
@@ -181,7 +181,7 @@ void freettcn::CH::CComponentHandler::ConnectReq(const TriPortId &fromPort, cons
   if (Logging() && LogMask().Get(freettcn::CLogMask::CMD_CH_P_CONNECT)) {
     TriComponentId comp = { { 0 } };
     // log
-    tliPConnect(0, TimeStamp().Get(), 0, 0, comp, fromPort.compInst, fromPort, toPort.compInst, toPort);
+    tliPConnect(0, TimeStampMgr().Get(), 0, 0, comp, fromPort, toPort);
   }
   
   Connect(fromPort, toPort);
@@ -202,7 +202,7 @@ void freettcn::CH::CComponentHandler::DisconnectReq(const TriPortId &fromPort, c
   if (Logging() && LogMask().Get(freettcn::CLogMask::CMD_CH_P_DISCONNECT)) {
     TriComponentId comp = { { 0 } };
     // log
-    tliPDisconnect(0, TimeStamp().Get(), 0, 0, comp, fromPort.compInst, fromPort, toPort.compInst, toPort);
+    tliPDisconnect(0, TimeStampMgr().Get(), 0, 0, comp, fromPort.compInst, fromPort, toPort.compInst, toPort);
   }
   
   Disconnect(fromPort, toPort);

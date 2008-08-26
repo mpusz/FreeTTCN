@@ -29,6 +29,7 @@
  */
 
 #include "freettcn/te/boolean.h"
+#include "freettcn/tools/exception.h"
 
 
 freettcn::TE::CBooleanType::CBooleanType() :
@@ -52,10 +53,10 @@ freettcn::TE::CBooleanType::CInstance::CInstance(const CType &type, bool value) 
 {
 }
 
-bool freettcn::TE::CBooleanType::CInstance::Value() const throw(EOmitSet)
+bool freettcn::TE::CBooleanType::CInstance::Value() const
 {
   if (Omit())
-    throw EOmitSet();
+    throw EOperationFailed(E_DATA, "Cannot get value for an instance with Omit set!!!");
   return _value;
 }
 

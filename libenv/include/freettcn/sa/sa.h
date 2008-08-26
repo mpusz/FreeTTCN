@@ -54,7 +54,7 @@ namespace freettcn {
       CSUTAdaptor& operator=(CSUTAdaptor&);  // Disallowed
       CSUTAdaptor(const CSUTAdaptor&);       // Disallowed
     public:
-      static CSUTAdaptor &Instance() throw(ENotFound);
+      static CSUTAdaptor &Instance();
       
       CSUTAdaptor();
       virtual ~CSUTAdaptor();

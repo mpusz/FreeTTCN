@@ -36,7 +36,7 @@ extern "C" {
 
 void tciSendConnected(TriPortId sender,
                       TriComponentId receiver,
-                      TciValue sendMessage)
+                      Value sendMessage)
 {
   freettcn::CH::CComponentHandler &ch = freettcn::CH::CComponentHandler::Instance();
   ch.ConnectedSend(sender, receiver, sendMessage);
@@ -45,7 +45,7 @@ void tciSendConnected(TriPortId sender,
 
 
 TriComponentId tciCreateTestComponentReq(TciTestComponentKindType kind,
-                                         TciType componentType,
+                                         Type componentType,
                                          String name)
 {
   freettcn::CH::CComponentHandler &ch = freettcn::CH::CComponentHandler::Instance();
@@ -98,7 +98,7 @@ void tciUnmapReq(TriPortId fromPort, TriPortId toPort)
 }
 
 void tciTestComponentTerminatedReq(TriComponentId component,
-                                   TciVerdictValue verdict)
+                                   VerdictValue verdict)
 {
   freettcn::CH::CComponentHandler &ch = freettcn::CH::CComponentHandler::Instance();
   return ch.TestComponentTerminatedReq(component, verdict);

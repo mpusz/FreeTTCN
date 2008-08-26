@@ -86,7 +86,7 @@
  * 
  * @return A type representing the requested TTCN-3 type.
  */
-TciType tciGetTypeForName(String typeName);
+Type tciGetTypeForName(String typeName);
 
 
 /** 
@@ -96,7 +96,7 @@ TciType tciGetTypeForName(String typeName);
  * 
  * @return An instance of Type representing a TTCN-3 integer type.
  */
-TciType tciGetIntegerType();
+Type tciGetIntegerType();
 
 
 /** 
@@ -106,7 +106,7 @@ TciType tciGetIntegerType();
  * 
  * @return An instance of Type representing a TTCN-3 float type.
  */
-TciType tciGetFloatType();
+Type tciGetFloatType();
 
 
 /** 
@@ -116,7 +116,7 @@ TciType tciGetFloatType();
  * 
  * @return An instance of Type representing a TTCN-3 boolean type.
  */
-TciType tciGetBooleanType();
+Type tciGetBooleanType();
 
 
 /** 
@@ -126,19 +126,19 @@ TciType tciGetBooleanType();
  * 
  * @return An instance of Type representing a TTCN-3 object id type.
  */
-TciType tciGetTciObjidType();
+Type tciGetTciObjidType();
 
 
 /**
  *  @todo No description in the TTCN-3 specification
  */
-TciType tciGetCharType();
+Type tciGetCharType();
 
 
 /**
  *  @todo No description in the TTCN-3 specification
  */
-TciType tciGetUniversalCharType();
+Type tciGetUniversalCharType();
 
 
 /** 
@@ -148,7 +148,7 @@ TciType tciGetUniversalCharType();
  * 
  * @return An instance of Type representing a TTCN-3 charstring type.
  */
-TciType tciGetTciCharstringType();
+Type tciGetTciCharstringType();
 
 
 /** 
@@ -158,7 +158,7 @@ TciType tciGetTciCharstringType();
  * 
  * @return An instance of Type representing a TTCN-3 universal charstring type.
  */
-TciType tciGetUniversalCharstringType();
+Type tciGetUniversalCharstringType();
 
 
 /** 
@@ -168,7 +168,7 @@ TciType tciGetUniversalCharstringType();
  * 
  * @return An instance of Type representing a TTCN-3 hexstring type.
  */
-TciType tciGetHexstringType();
+Type tciGetHexstringType();
 
 
 /** 
@@ -178,7 +178,7 @@ TciType tciGetHexstringType();
  * 
  * @return An instance of Type representing a TTCN-3 bitstring type.
  */
-TciType tciGetBitstringType();
+Type tciGetBitstringType();
 
 
 /** 
@@ -188,7 +188,7 @@ TciType tciGetBitstringType();
  * 
  * @return An instance of Type representing a TTCN-3 octetstring type.
  */
-TciType tciGetOctetstringType();
+Type tciGetOctetstringType();
 
 
 /** 
@@ -198,7 +198,7 @@ TciType tciGetOctetstringType();
  * 
  * @return An instance of Type representing a TTCN-3 verdict type.
  */
-TciType tciGetVerdictType();
+Type tciGetVerdictType();
 
 
 /** 

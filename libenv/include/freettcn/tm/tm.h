@@ -76,21 +76,21 @@ namespace freettcn {
         
         void Start(const TciParameterListType &parameterlist);
         void Started(const TciParameterListType &parameterList, double timer);
-        void Terminated(TciVerdictValue verdict, const TciParameterListType &parameterlist);
+        void Terminated(const VerdictValue &verdict, const TciParameterListType &parameterlist);
         void Stop();
       };
       
       class CModuleParameter {
         TciModuleParameterIdType _parName;
-        TciValue _defaultValue;
-        TciValue _value;
+        Value _defaultValue;
+        Value _value;
       public:
         CModuleParameter(const TciModuleParameterType &par);
         ~CModuleParameter();
         std::string Name() const;
-        TciValue DefaultValue() const;
-        void Value(TciValue value);
-        TciValue Value() throw(EOperationFailed);
+        const Value &DefaultValue() const;
+        void ValueSet(const Value &value);
+        const Value &ValueGet() const;
       };
       
       typedef std::vector<CTestCase *> CTCList;
@@ -113,30 +113,30 @@ namespace freettcn {
     protected:
       TStatus Status() const;
       const CTCList &TCList() const;
-      CTestCase &TestCaseGet(const std::string &testCaseId) const throw(ENotFound);
+      CTestCase &TestCaseGet(const std::string &testCaseId) const;
       const CModuleParList &ModuleParameterList() const;
       
     public:
-      static CTestManagement &Instance() throw(ENotFound);
+      static CTestManagement &Instance();
       
       CTestManagement();
       virtual ~CTestManagement();
       
-      void Init(const std::string &moduleId) throw(EOperationFailed);
+      void Init(const std::string &moduleId);
       
       virtual void Log(const TriComponentId &testComponentId, String message);
       virtual void Error(String message);
       void Abort();
       
-      virtual TciValue ModuleParameterGet(const TciModuleParameterIdType &parameterId) const;
+      virtual const Value &ModuleParameterGet(const TciModuleParameterIdType &parameterId) const;
       
-      virtual void TestCaseStart(const std::string &testCaseId, const TciParameterListType &parameterlist) throw(ENotFound);
+      virtual void TestCaseStart(const std::string &testCaseId, const TciParameterListType &parameterlist);
       virtual void TestCaseStarted(const TciTestCaseIdType &testCaseId, const TciParameterListType &parameterList, double timer);
-      virtual void TestCaseTerminated(TciVerdictValue verdict, const TciParameterListType &parameterlist);
-      virtual void TestCaseStop() throw(EOperationFailed);
+      virtual void TestCaseTerminated(const VerdictValue &verdict, const TciParameterListType &parameterList);
+      virtual void TestCaseStop();
       
       virtual void ControlStart();
-      virtual void ControlStop() throw(EOperationFailed);
+      virtual void ControlStop();
       virtual void ControlTerminated();
     };
     

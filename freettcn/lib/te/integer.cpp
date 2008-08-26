@@ -29,8 +29,10 @@
  */
 
 #include "freettcn/te/integer.h"
+#include "freettcn/tools/exception.h"
 #include <cstdlib>
 #include <cstdio>
+
 
 freettcn::TE::CIntegerType::CIntegerType() :
   CType(0, "integer", TCI_INTEGER_TYPE, "", "", "")
@@ -53,24 +55,24 @@ freettcn::TE::CIntegerType::CInstance::CInstance(const CType &type, long value) 
 {
 }
 
-freettcn::TE::CIntegerType::CInstance &freettcn::TE::CIntegerType::CInstance::operator=(const CInstance &value) throw(EOperationFailed)
+freettcn::TE::CIntegerType::CInstance &freettcn::TE::CIntegerType::CInstance::operator=(const CInstance &value)
 {
   CType::CInstance::operator=(value);
   _value = value._value;
   return *this;
 }
 
-void freettcn::TE::CIntegerType::CInstance::AbsValue(const char *value) throw(EOperationFailed)
+void freettcn::TE::CIntegerType::CInstance::AbsValue(const char *value)
 {
   if (*value == '\0')
-    throw freettcn::EOperationFailed();
+    throw EOperationFailed(E_DATA, "Empty value specified!!!");
   
   char *endPtr;
   //  std::errno = 0;    /* To distinguish success/failure after call */
   unsigned long val = strtoul(value, &endPtr, 10);
   if (*endPtr != '\0' || value == endPtr) // ||
 //       (errno == ERANGE && (val == LONG_MAX || val == LONG_MIN)))
-    throw freettcn::EOperationFailed();
+    throw EOperationFailed(E_DATA, "Cannot cast value '" + std::string(value) + "' to an integer!!!");
   
   Value(val);
 }
@@ -95,10 +97,10 @@ const char *freettcn::TE::CIntegerType::CInstance::AbsValue() const
 // }
 
 
-long freettcn::TE::CIntegerType::CInstance::Value() const throw(EOmitSet)
+long freettcn::TE::CIntegerType::CInstance::Value() const
 {
   if (Omit())
-    throw EOmitSet();
+    throw EOperationFailed(E_DATA, "Cannot get value for an instance with Omit set!!!");
   return _value;
 }
 

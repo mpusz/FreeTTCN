@@ -82,8 +82,8 @@
  * @retval TRI_OK success
  * @retval TRI_Error failure
  */
-TriStatus triExecuteTestCase(const TriTestCaseId* testCaseId,
-                             const TriPortIdList* tsiPortList);
+TriStatus triExecuteTestCase(const TriTestCaseId *testCaseId,
+                             const TriPortIdList *tsiPortList);
 
 
 /** 
@@ -103,8 +103,8 @@ TriStatus triExecuteTestCase(const TriTestCaseId* testCaseId,
  * @retval TRI_OK success
  * @retval TRI_Error failure
  */
-TriStatus triMap(const TriPortId* compPortId,
-                 const TriPortId* tsiPortId);
+TriStatus triMap(const TriPortId *compPortId,
+                 const TriPortId *tsiPortId);
 
 
 /** 
@@ -124,8 +124,8 @@ TriStatus triMap(const TriPortId* compPortId,
  * @retval TRI_OK success
  * @retval TRI_Error failure
  */
-TriStatus triUnmap(const TriPortId* compPortId,
-                   const TriPortId* tsiPortId);
+TriStatus triUnmap(const TriPortId *compPortId,
+                   const TriPortId *tsiPortId);
 
 
 /** 
@@ -181,10 +181,10 @@ TriStatus triEndTestCase();
  * @retval TRI_OK success
  * @retval TRI_Error failure
  */
-TriStatus triSend(const TriComponentId* componentId,
-                  const TriPortId* tsiPortId,
-                  const TriAddress* sutAddress,
-                  const TriMessage* sendMessage);
+TriStatus triSend(const TriComponentId *componentId,
+                  const TriPortId *tsiPortId,
+                  const TriAddress *sutAddress,
+                  const TriMessage *sendMessage);
 
 
 /** 
@@ -209,9 +209,9 @@ TriStatus triSend(const TriComponentId* componentId,
  * @retval TRI_OK success
  * @retval TRI_Error failure
  */
-TriStatus triSendBC(const TriComponentId* componentId,
-                    const TriPortId* tsiPortId,
-                    const TriMessage* sendMessage);
+TriStatus triSendBC(const TriComponentId *componentId,
+                    const TriPortId *tsiPortId,
+                    const TriMessage *sendMessage);
 
 
 
@@ -238,10 +238,10 @@ TriStatus triSendBC(const TriComponentId* componentId,
  * @retval TRI_OK success
  * @retval TRI_Error failure
  */
-TriStatus triSendMC(const TriComponentId* componentId,
-                    const TriPortId* tsiPortId,
-                    const TriAddressList* sutAddresses,
-                    const TriMessage* sendMessage);
+TriStatus triSendMC(const TriComponentId *componentId,
+                    const TriPortId *tsiPortId,
+                    const TriAddressList *sutAddresses,
+                    const TriMessage *sendMessage);
 
 /// @} TriMsgCommunication_TE_SA
 
@@ -298,11 +298,11 @@ TriStatus triSendMC(const TriComponentId* componentId,
  * @retval TRI_OK success
  * @retval TRI_Error failure
  */
-TriStatus triCall(const TriComponentId* componentId,
-                  const TriPortId* tsiPortId,
-                  const TriAddress* sutAddress,
-                  const TriSignatureId* signatureId,
-                  const TriParameterList* parameterList);
+TriStatus triCall(const TriComponentId *componentId,
+                  const TriPortId *tsiPortId,
+                  const TriAddress *sutAddress,
+                  const TriSignatureId *signatureId,
+                  const TriParameterList *parameterList);
 
 
 
@@ -344,10 +344,10 @@ TriStatus triCall(const TriComponentId* componentId,
  * @retval TRI_OK success
  * @retval TRI_Error failure
  */
-TriStatus triCallBC(const TriComponentId* componentId,
-                    const TriPortId* tsiPortId,
-                    const TriSignatureId* signatureId,
-                    const TriParameterList* parameterList);
+TriStatus triCallBC(const TriComponentId *componentId,
+                    const TriPortId *tsiPortId,
+                    const TriSignatureId *signatureId,
+                    const TriParameterList *parameterList);
 
 
 /** 
@@ -389,11 +389,11 @@ TriStatus triCallBC(const TriComponentId* componentId,
  * @retval TRI_OK success
  * @retval TRI_Error failure
  */
-TriStatus triCallMC(const TriComponentId* componentId,
-                    const TriPortId* tsiPortId,
-                    const TriAddressList* sutAddresses,
-                    const TriSignatureId* signatureId,
-                    const TriParameterList* parameterList);
+TriStatus triCallMC(const TriComponentId *componentId,
+                    const TriPortId *tsiPortId,
+                    const TriAddressList *sutAddresses,
+                    const TriSignatureId *signatureId,
+                    const TriParameterList *parameterList);
 
 
 /** 
@@ -429,12 +429,12 @@ TriStatus triCallMC(const TriComponentId* componentId,
  * @retval TRI_OK success
  * @retval TRI_Error failure
  */
-TriStatus triReply(const TriComponentId* componentId,
-                   const TriPortId* tsiPortId,
-                   const TriAddress* sutAddress,
-                   const TriSignatureId* signatureId,
-                   const TriParameterList* parameterList,
-                   const TriParameter* returnValue);
+TriStatus triReply(const TriComponentId *componentId,
+                   const TriPortId *tsiPortId,
+                   const TriAddress *sutAddress,
+                   const TriSignatureId *signatureId,
+                   const TriParameterList *parameterList,
+                   const TriParameter *returnValue);
 
 
 /** 
@@ -469,11 +469,11 @@ TriStatus triReply(const TriComponentId* componentId,
  * @retval TRI_OK success
  * @retval TRI_Error failure
  */
-TriStatus triReplyBC(const TriComponentId* componentId,
-                     const TriPortId* tsiPortId,
-                     const TriSignatureId* signatureId,
-                     const TriParameterList* parameterList,
-                     const TriParameter* returnValue);
+TriStatus triReplyBC(const TriComponentId *componentId,
+                     const TriPortId *tsiPortId,
+                     const TriSignatureId *signatureId,
+                     const TriParameterList *parameterList,
+                     const TriParameter *returnValue);
 
 
 
@@ -510,12 +510,12 @@ TriStatus triReplyBC(const TriComponentId* componentId,
  * @retval TRI_OK success
  * @retval TRI_Error failure
  */
-TriStatus triReplyMC(const TriComponentId* componentId,
-                     const TriPortId* tsiPortId,
-                     const TriAddressList* sutAddresses,
-                     const TriSignatureId* signatureId,
-                     const TriParameterList* parameterList,
-                     const TriParameter* returnValue);
+TriStatus triReplyMC(const TriComponentId *componentId,
+                     const TriPortId *tsiPortId,
+                     const TriAddressList *sutAddresses,
+                     const TriSignatureId *signatureId,
+                     const TriParameterList *parameterList,
+                     const TriParameter *returnValue);
 
 
 /** 
@@ -542,11 +542,11 @@ TriStatus triReplyMC(const TriComponentId* componentId,
  * @retval TRI_OK success
  * @retval TRI_Error failure
  */
-TriStatus triRaise(const TriComponentId* componentId,
-                   const TriPortId* tsiPortId,
-                   const TriAddress* sutAddress,
-                   const TriSignatureId* signatureId,
-                   const TriException* exception);
+TriStatus triRaise(const TriComponentId *componentId,
+                   const TriPortId *tsiPortId,
+                   const TriAddress *sutAddress,
+                   const TriSignatureId *signatureId,
+                   const TriException *exception);
 
 
 /** 
@@ -572,10 +572,10 @@ TriStatus triRaise(const TriComponentId* componentId,
  * @retval TRI_OK success
  * @retval TRI_Error failure
  */
-TriStatus triRaiseBC(const TriComponentId* componentId,
-                     const TriPortId* tsiPortId,
-                     const TriSignatureId* signatureId,
-                     const TriException* exception);
+TriStatus triRaiseBC(const TriComponentId *componentId,
+                     const TriPortId *tsiPortId,
+                     const TriSignatureId *signatureId,
+                     const TriException *exception);
 
 
 /** 
@@ -602,11 +602,11 @@ TriStatus triRaiseBC(const TriComponentId* componentId,
  * @retval TRI_OK success
  * @retval TRI_Error failure
  */
-TriStatus triRaiseMC(const TriComponentId* componentId,
-                     const TriPortId* tsiPortId,
-                     const TriAddressList* sutAddresses,
-                     const TriSignatureId* signatureId,
-                     const TriException* exception);
+TriStatus triRaiseMC(const TriComponentId *componentId,
+                     const TriPortId *tsiPortId,
+                     const TriAddressList *sutAddresses,
+                     const TriSignatureId *signatureId,
+                     const TriException *exception);
 
 
 /// @} TriProcCommunication_TE_SA
@@ -659,7 +659,7 @@ TriStatus triSAReset();
  * @retval TRI_OK success
  * @retval TRI_Error failure
  */
-TriStatus triSUTActionInformal(const char* description);
+TriStatus triSUTActionInformal(const char *description);
 
 
 /// @} TriIfaceCommunicationMisc_TE_SA

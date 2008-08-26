@@ -51,7 +51,7 @@ const BinaryString &freettcn::TE::CIdObject::InstanceId() const
   return _id;
 }
 
-freettcn::TE::CIdObject &freettcn::TE::CIdObject::Get(const BinaryString &id) throw(freettcn::ENotFound)
+freettcn::TE::CIdObject &freettcn::TE::CIdObject::Get(const BinaryString &id)
 {
   return _manager.Object(id);
 }
@@ -119,18 +119,17 @@ void freettcn::TE::CIdObject::CIdManager::Allocate(freettcn::TE::CIdObject &obje
   id.aux = 0;
 }
 
-freettcn::TE::CIdObject &freettcn::TE::CIdObject::CIdManager::Object(const BinaryString &id) throw(freettcn::ENotFound)
+freettcn::TE::CIdObject &freettcn::TE::CIdObject::CIdManager::Object(const BinaryString &id)
 {
   unsigned int idx = Id2Index(id);
   
   if (idx < _idArray.size() && _idArray[idx].valid)
     return *_idArray[idx].ptr;
   
-  std::cout << "ERROR: Id not found" << std::endl;
-  throw freettcn::ENotFound();
+  throw ENotFound(E_DATA, "Id not found!!!");
 }
 
-void freettcn::TE::CIdObject::CIdManager::Free(const BinaryString &id) throw(freettcn::ENotFound)
+void freettcn::TE::CIdObject::CIdManager::Free(const BinaryString &id)
 {
   unsigned int idx = Id2Index(id);
   
@@ -139,8 +138,6 @@ void freettcn::TE::CIdObject::CIdManager::Free(const BinaryString &id) throw(fre
     _idArray[idx].ptr = 0;
     delete[] id.data;
   }
-  else {
-    std::cout << "ERROR: Id not found" << std::endl;
-    throw freettcn::ENotFound();
-  }
+  else
+    throw ENotFound(E_DATA, "Id not found!!!");
 }

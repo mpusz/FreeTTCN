@@ -25,7 +25,7 @@ BIN_DIR = ../bin
 CPPFLAGS += -fPIC
 
 # files
-CPP_FILES = exception.cpp tools.cpp ttcnWrappers.cpp timeStamp.cpp entity.cpp logMask.cpp
+CPP_FILES = exception.cpp tools.cpp ttcnWrappers.cpp timeStampMgr.cpp timeStampMgrSeconds.cpp entity.cpp logMask.cpp
 
 
 include ../../../Makefile.rules

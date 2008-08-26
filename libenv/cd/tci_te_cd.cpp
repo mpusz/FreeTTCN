@@ -27,15 +27,15 @@ extern "C" {
 
 
 
-TciValue tciDecode(BinaryString message,
-                   TciType decHypothesis)
+Value tciDecode(BinaryString message,
+                Type         decHypothesis)
 {
   freettcn::CD::CCodingDecoding &cd = freettcn::CD::CCodingDecoding::Instance();
   return cd.Decode(message, decHypothesis);
 }
 
 
-BinaryString tciEncode(TciValue value)
+BinaryString tciEncode(Value value)
 {
   freettcn::CD::CCodingDecoding &cd = freettcn::CD::CCodingDecoding::Instance();
   return cd.Encode(value);

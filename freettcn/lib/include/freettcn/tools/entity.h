@@ -22,8 +22,7 @@
  * @author Mateusz Pusz
  * @date   Mon Apr 30 20:38:47 2007
  * 
- * @brief  
- * 
+ * @brief  TTCN-3 entities base class declaration
  * 
  */
 
@@ -31,39 +30,56 @@
 #define __ENTITY_H__
 
 
-#include <freettcn/tools/exception.h>
-
 namespace freettcn {
   
-  class CTimeStamp;
+  class CTimeStampMgr;
   class CLogMask;
   
+  
+  /**
+   * @brief Base class for all TTCN-3 entities
+   * 
+   * freettcn::CEntity Class is a base class for all TTCN-3 entities (TE,
+   * TM, SA, ...). It holds global @b logging flag that enables logging feature
+   * on given entity. User can specify detailed @b logMask that defines
+   * which events should trigger log messages in runtime (logging everything 
+   * may be expensive).@n
+   * If logging is enabled user also should provide a reference to a class
+   * that will handle @b timestamping (see freettcn::CTimeStamp for more info).
+   * That class is responsible for collecting, interpreting and printing
+   * timestamps.
+   */
   class CEntity {
   public:
+    /**
+     * @brief TTCN-3 entity type
+     */
     enum TType {
-      TYPE_TE,
-      TYPE_TM,
-      TYPE_CH,
-      TYPE_CD,
-      TYPE_SA,
-      TYPE_PA,
-      TYPE_TL
+      TYPE_TE,                                    /**< @brief TTCN Executable */
+      TYPE_TM,                                    /**< @brief Test Management */
+      TYPE_CH,                                    /**< @brief Component Handler */
+      TYPE_CD,                                    /**< @brief Coding Decoding */
+      TYPE_SA,                                    /**< @brief SUT Adaptor */
+      TYPE_PA,                                    /**< @brief Platform Adaptor */
+      TYPE_TL                                     /**< @brief Test Logging */
     };
     
   private:
-    CTimeStamp *_ts;
-    CLogMask *_logMask;
-    bool _logging;
+    bool _logging;                                /**< @brief global logging mask */
+    CTimeStampMgr *_ts;                           /**< @brief class responsible for
+                                                     handling system timestamps */
+    CLogMask *_logMask;                           /**< @brief class that specifies
+                                                     which events should be logged */
+
   public:
     CEntity();
     virtual ~CEntity() = 0;
     
-    CTimeStamp &TimeStamp() const throw(ENotFound);
-    CLogMask &LogMask() const throw(ENotFound);
-    
-    void LogEnable(CTimeStamp &ts, CLogMask &logMask);
-    void LogDisable();
+    CTimeStampMgr &TimeStampMgr() const;
+    CLogMask &LogMask() const;
     bool Logging() const;
+    void LogEnable(CTimeStampMgr &ts, CLogMask &logMask);
+    void LogDisable();
   };
   
 } // namespace freettcn

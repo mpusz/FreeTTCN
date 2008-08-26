@@ -74,7 +74,7 @@
  */
 void tciEnqueueMsgConnected(TriPortId sender,
                             TriComponentId receiver,
-                            TciValue rcvdMessage);
+                            Value rcvdMessage);
 
 
 /** 
@@ -126,7 +126,7 @@ void tciEnqueueReplyConnected(TriPortId sender,
                               TriComponentId receiver,
                               TriSignatureId signature,
                               TciParameterListType parameterList,
-                              TciValue returnValue);
+                              Value returnValue);
 
 
 /** 
@@ -147,7 +147,7 @@ void tciEnqueueReplyConnected(TriPortId sender,
 void tciEnqueueRaiseConnected(TriPortId sender,
                               TriComponentId receiver,
                               TriSignatureId signature,
-                              TciValue exception);
+                              Value exception);
 
 
 /** 
@@ -169,7 +169,7 @@ void tciEnqueueRaiseConnected(TriPortId sender,
  * @return A @c TriComponentIdType value for the created component.
  */
 TriComponentId tciCreateTestComponent(TciTestComponentKindType kind,
-                                      TciType componentType,
+                                      Type componentType,
                                       String name);
 
 
@@ -286,7 +286,7 @@ void tciUnmap(TriPortId fromPort,
  * @param verdict Verdict after termination of the component.
  */
 void tciTestComponentTerminated(TriComponentId component,
-                                TciVerdictValue verdict);
+                                VerdictValue verdict);
 
 
 /** 

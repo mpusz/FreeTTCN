@@ -63,18 +63,18 @@ namespace freettcn {
       CCodingDecoding& operator=(CCodingDecoding&);  // Disallowed
       CCodingDecoding(const CCodingDecoding&);       // Disallowed
       
-      virtual const CCodec &Codec(TciValue value, unsigned int &valueId) const throw(ENotFound);
+      virtual const CCodec &Codec(const Value &value, unsigned int &valueId) const;
       
     public:
-      static CCodingDecoding &Instance() throw(ENotFound);
+      static CCodingDecoding &Instance();
       
       CCodingDecoding();
       virtual ~CCodingDecoding();
       
       void Register(const CCodec *codec);
       
-      TciValue Decode(const BinaryString &message, TciType decHypothesis) const;
-      BinaryString Encode(TciValue value) const;
+      const Value &Decode(const BinaryString &message, const Type &decHypothesis) const;
+      BinaryString Encode(const Value &value) const;
     };
     
   } // namespace CD

@@ -37,14 +37,14 @@
 #include "freettcn/te/basicTypes.h"
 #include "freettcn/te/sourceData.h"
 #include "freettcn/tools/logMask.h"
-#include "freettcn/tools/timeStamp.h"
+#include "freettcn/tools/timeStampMgr.h"
 #include "freettcn/tools/tools.h"
 extern "C" {
 #include "freettcn/ttcn3/tci_te_ch.h"
 #include "freettcn/ttcn3/tci_tl.h"
 }
+#include <cstring>
 #include <iostream>
-
 
 
 
@@ -78,7 +78,7 @@ void freettcn::TE::CTestComponentType::CInstance::PortIdArrayCreate()
   }
 }
 
-const TriPortId &freettcn::TE::CTestComponentType::CInstance::PortId(const char *name, int idx) const throw(ENotFound)
+const TriPortId &freettcn::TE::CTestComponentType::CInstance::PortId(const char *name, int idx) const
 {
   for(unsigned int i=0; i<_portIdArray.size(); i++) {
     if (!strcmp(name, _portIdArray[i]->portName)) {
@@ -98,8 +98,7 @@ const TriPortId &freettcn::TE::CTestComponentType::CInstance::PortId(const char 
     }
   }
   
-  std::cout << "ERROR: Port ID not found!!!" << std::endl;
-  throw ENotFound();
+  throw ENotFound(E_DATA, "Port ID not found!!!");
 }
 
 
@@ -184,7 +183,7 @@ freettcn::TE::CTestComponentType::CInstanceLocal::~CInstanceLocal()
 const TriComponentId &freettcn::TE::CTestComponentType::CInstanceLocal::Id() const
 {
   if (_status == NOT_INITED)
-    throw ENotInited();
+    throw ENotInitialized(E_DATA, "Status not inited!!!");
   return _id;
 }
 
@@ -192,7 +191,7 @@ const TriComponentId &freettcn::TE::CTestComponentType::CInstanceLocal::Id() con
 TciTestComponentKindType freettcn::TE::CTestComponentType::CInstanceLocal::Kind() const
 {
   if (_status == NOT_INITED)
-    throw ENotInited();
+    throw ENotInitialized(E_DATA, "Status not inited!!!");
   return _kind;
 }
 
@@ -200,7 +199,7 @@ TciTestComponentKindType freettcn::TE::CTestComponentType::CInstanceLocal::Kind(
 void freettcn::TE::CTestComponentType::CInstanceLocal::Start(const CBehavior &behavior, TciParameterListType parameterList)
 {
   if (_status == NOT_INITED)
-    throw ENotInited();
+    throw ENotInitialized(E_DATA, "Status not inited");
   
   _behavior = &behavior;
   
@@ -218,7 +217,7 @@ void freettcn::TE::CTestComponentType::CInstanceLocal::Stop()
   freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
   if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_C_TERMINATED))
     // log
-    tliCTerminated(0, te.TimeStamp().Get(), 0, 0, Id(), &_verdict);
+    tliCTerminated(0, te.TimeStampMgr().Get(), 0, 0, Id(), &_verdict);
   
   tciTestComponentTerminatedReq(Id(), &_verdict);
   
@@ -241,7 +240,7 @@ void freettcn::TE::CTestComponentType::CInstanceLocal::Kill()
   freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
   if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_C_TERMINATED))
     // log
-    tliCTerminated(0, te.TimeStamp().Get(), 0, 0, Id(), &_verdict);
+    tliCTerminated(0, te.TimeStampMgr().Get(), 0, 0, Id(), &_verdict);
   
   tciTestComponentTerminatedReq(Id(), &_verdict);
   
@@ -273,10 +272,10 @@ void freettcn::TE::CTestComponentType::CInstanceLocal::Reset()
 }
 
 
-freettcn::TE::CModule &freettcn::TE::CTestComponentType::CInstanceLocal::Module() const throw(ENotInited)
+freettcn::TE::CModule &freettcn::TE::CTestComponentType::CInstanceLocal::Module() const
 {
   if (_status == NOT_INITED)
-    throw ENotInited();
+    throw ENotInitialized(E_DATA, "Status not inited!!!");
   
   return *_module;
 }
@@ -382,7 +381,7 @@ void freettcn::TE::CTestComponentType::CInstanceLocal::Execute(const char *src, 
 // }
 
 
-freettcn::TE::CPort &freettcn::TE::CTestComponentType::CInstanceLocal::Port(const char *name, int idx) const throw(ENotFound)
+freettcn::TE::CPort &freettcn::TE::CTestComponentType::CInstanceLocal::Port(const char *name, int idx) const
 {
   for(unsigned int i=0; i<_portArray.size(); i++) {
     const TriPortId *portId = &_portArray[i]->Id();
@@ -404,15 +403,14 @@ freettcn::TE::CPort &freettcn::TE::CTestComponentType::CInstanceLocal::Port(cons
     }
   }
   
-  std::cout << "ERROR: Port not found!!!" << std::endl;
-  throw ENotFound();
+  throw ENotFound(E_DATA, "Port not found!!!");
 }
         
 
-void freettcn::TE::CTestComponentType::CInstanceLocal::Run(unsigned int offset) throw(ENotStarted)
+void freettcn::TE::CTestComponentType::CInstanceLocal::Run(unsigned int offset)
 {
   if (!_behavior)
-    throw ENotStarted();
+    throw EOperationFailed(E_DATA, "Behavior not started!!!");
   
   if (offset == CBehavior::GUARD_TIMEOUT) {
     // kill MTC
@@ -453,7 +451,7 @@ void freettcn::TE::CTestComponentType::CInstanceLocal::StopReq(const char *src, 
 //   freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
 //   if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_C_STOP))
 //     // log
-//     tliCStop(0, te.TimeStamp().Get(), src, line, Id(), &_verdict);
+//     tliCStop(0, te.TimeStampMgr().Get(), src, line, Id(), &_verdict);
   
   if (!comp) {
     // self
@@ -476,12 +474,10 @@ void freettcn::TE::CTestComponentType::CInstanceLocal::StopReq(const char *src, 
 }
 
 
-void freettcn::TE::CTestComponentType::CInstanceLocal::StopAllReq(const char *src, int line) throw(EOperationFailed)
+void freettcn::TE::CTestComponentType::CInstanceLocal::StopAllReq(const char *src, int line)
 {
-  if (_kind != TCI_MTC_COMP) {
-    std::cout << "ERROR: Only MTC component can stop ALL running test comopnents!!!" << std::endl;
-    throw EOperationFailed();
-  }
+  if (_kind != TCI_MTC_COMP)
+    throw EOperationFailed(E_DATA, "Only MTC component can stop ALL running test comopnents!!!");
   
   _module->TestComponentAllStop(src, line, *this);
 }
@@ -494,7 +490,7 @@ void freettcn::TE::CTestComponentType::CInstanceLocal::TimerAdd(const CTimer &ti
 }
 
 
-void freettcn::TE::CTestComponentType::CInstanceLocal::TimerRemove(const CTimer &timer, bool implicit /* false */) throw(ENotFound)
+void freettcn::TE::CTestComponentType::CInstanceLocal::TimerRemove(const CTimer &timer, bool implicit /* false */)
 {
   CTimerList &list = implicit ? _implicitTimers : _explicitTimers;
   
@@ -505,15 +501,14 @@ void freettcn::TE::CTestComponentType::CInstanceLocal::TimerRemove(const CTimer 
     }
   }
   
-  std::cout << "ERROR: Timer not found!!!" << std::endl;
-  throw ENotFound();
+  throw ENotFound(E_DATA, "Timer not found!!!");
 }
 
 
-// void freettcn::TE::CTestComponentType::CInstanceLocal::Map(const freettcn::TE::CPort &fromPort, const freettcn::TE::CPort &toPort) throw(ENotInited)
+// void freettcn::TE::CTestComponentType::CInstanceLocal::Map(const freettcn::TE::CPort &fromPort, const freettcn::TE::CPort &toPort)
 // {
 //   if (_status == NOT_INITED)
-//     throwfreettcn::TE::CTestComponentType::CInstanceLocal::ENotInited();
+//     throwfreettcn::TE::CTestComponentType::CInstanceLocal::ENotInitialized();
 // }
 
 
@@ -523,7 +518,7 @@ void freettcn::TE::CTestComponentType::CInstanceLocal::Verdict(const char *src, 
   if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_C_TERMINATED)) {
     // log
     CVerdictType::CInstance tciVerdict(CBasicTypes::Verdict(), verdict);
-    tliSetVerdict(0, te.TimeStamp().Get(), const_cast<char *>(src), line, Id(), &tciVerdict);
+    tliSetVerdict(0, te.TimeStampMgr().Get(), const_cast<char *>(src), line, Id(), &tciVerdict);
   }
   
   // update verdict
@@ -560,21 +555,25 @@ void freettcn::TE::CTestComponentType::CInstanceLocal::ScopeEnter(const char *sr
   freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
   if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_S_ENTER)) {
     // log
+    /// @todo parameters dump
     TciParameterListType parList;
     parList.length = 0;
     parList.parList = 0;
-    tliSEnter(0, te.TimeStamp().Get(), const_cast<char *>(src), line, Id(), "", parList, const_cast<char *>(kind));
+
+    /// @todo scope name
+    QualifiedName name = { 0, 0, 0 };
+    
+    tliSEnter(0, te.TimeStampMgr().Get(), const_cast<char *>(src), line, Id(), name, parList, const_cast<char *>(kind));
   }
 }
 
 
-freettcn::TE::CTestComponentType::CInstanceLocal::CScope &freettcn::TE::CTestComponentType::CInstanceLocal::Scope() const throw(ENotFound)
+freettcn::TE::CTestComponentType::CInstanceLocal::CScope &freettcn::TE::CTestComponentType::CInstanceLocal::Scope() const
 {
   if (_scope)
     return *_scope;
   
-  std::cout << "ERROR: Scope not found!!!" << std::endl;
-  throw ENotFound();
+  throw ENotFound(E_DATA, "Scope not found!!!");
 }
 
 
@@ -582,36 +581,45 @@ void freettcn::TE::CTestComponentType::CInstanceLocal::ScopeLeave(const char *sr
 {
   if (_scope) {
     freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
-    if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_S_ENTER))
+    if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_S_ENTER)) {
       // log
-      tliSLeave(0, te.TimeStamp().Get(), const_cast<char *>(src), line, Id(), "", 0, const_cast<char *>(_scope->Kind()));
+      /// @todo parameters dump
+      TciParameterListType parList;
+      parList.length = 0;
+      parList.parList = 0;
+      
+      /// @todo scope name
+      QualifiedName name = { 0, 0, 0 };
+      
+      /// @todo return value
+      
+      tliSLeave(0, te.TimeStampMgr().Get(), const_cast<char *>(src), line, Id(), name, parList, 0, const_cast<char *>(_scope->Kind()));
+    }
     
     ScopePop();
   }
-  else {
-    std::cout << "ERROR: Already on the top scope\n" << std::cout;
-    throw EOperationFailed();
-  }
+  else
+    throw EOperationFailed(E_DATA, "Already on the top scope!!!");
 }
 
 
 
-void freettcn::TE::CTestComponentType::CInstanceLocal::ConnectReq(const TriPortId &port1, const TriPortId &port2) throw(EOperationFailed)
+void freettcn::TE::CTestComponentType::CInstanceLocal::ConnectReq(const TriPortId &port1, const TriPortId &port2)
 {
   tciConnectReq(port1, port2);
 }
 
-void freettcn::TE::CTestComponentType::CInstanceLocal::DisconnectReq(const TriPortId &port1, const TriPortId &port2) throw(ENotFound)
+void freettcn::TE::CTestComponentType::CInstanceLocal::DisconnectReq(const TriPortId &port1, const TriPortId &port2)
 {
   tciDisconnectReq(port1, port2);
 }
 
-void freettcn::TE::CTestComponentType::CInstanceLocal::MapReq(const TriPortId &port1, const TriPortId &port2) throw(EOperationFailed)
+void freettcn::TE::CTestComponentType::CInstanceLocal::MapReq(const TriPortId &port1, const TriPortId &port2)
 {
   tciMapReq(port1, port2);
 }
 
-void freettcn::TE::CTestComponentType::CInstanceLocal::UnmapReq(const TriPortId &port1, const TriPortId &port2) throw(ENotFound)
+void freettcn::TE::CTestComponentType::CInstanceLocal::UnmapReq(const TriPortId &port1, const TriPortId &port2)
 {
   tciUnmapReq(port1, port2);
 }
@@ -655,13 +663,14 @@ void freettcn::TE::CTestComponentType::CInstanceLocal::CScope::Register(CType::C
 }
 
 
-freettcn::TE::CType::CInstance &freettcn::TE::CTestComponentType::CInstanceLocal::CScope::Value(unsigned int valueIdx) const throw(ENotFound)
+freettcn::TE::CType::CInstance &freettcn::TE::CTestComponentType::CInstanceLocal::CScope::Value(unsigned int valueIdx) const
 {
   if (valueIdx < _valueArray.size())
     return *_valueArray[valueIdx];
   
-  std::cout << "ERROR: Value index: " << valueIdx << " too big (size: " << _valueArray.size() << ")" << std::endl;
-  throw ENotFound();
+  std::stringstream stream;
+  stream << "Value index: " << valueIdx << " too big (size: " << _valueArray.size() << ")";
+  throw EOutOfRange(E_DATA, stream.str());
 }
 
 
@@ -671,13 +680,14 @@ void freettcn::TE::CTestComponentType::CInstanceLocal::CScope::Register(CTimer *
 }
 
 
-freettcn::TE::CTimer &freettcn::TE::CTestComponentType::CInstanceLocal::CScope::Timer(unsigned int timerIdx) const throw(ENotFound)
+freettcn::TE::CTimer &freettcn::TE::CTestComponentType::CInstanceLocal::CScope::Timer(unsigned int timerIdx) const
 {
   if (timerIdx < _timerArray.size())
     return *_timerArray[timerIdx];
   
-  std::cout << "ERROR: Timer index: " << timerIdx << " too big (size: " << _timerArray.size() << ")" << std::endl;
-  throw ENotFound();
+  std::stringstream stream;
+  stream << "Timer index: " << timerIdx << " too big (size: " << _timerArray.size() << ")";
+  throw EOutOfRange(E_DATA, stream.str());
 }
 
 
@@ -744,13 +754,14 @@ unsigned int freettcn::TE::CTestComponentType::PortInfoNum() const
 }
 
 
-const freettcn::TE::CPortInfo &freettcn::TE::CTestComponentType::PortInfo(unsigned int idx) const throw(ENotFound)
+const freettcn::TE::CPortInfo &freettcn::TE::CTestComponentType::PortInfo(unsigned int idx) const
 {
   if (idx < _portInfoArray.size())
     return *_portInfoArray[idx];
   
-  std::cout << "ERROR: Port info index: " << idx << " too big (size: " << _portInfoArray.size() << ")" << std::endl;
-  throw ENotFound();
+  std::stringstream stream;
+  stream << "Port info index: " << idx << " too big (size: " << _portInfoArray.size() << ")";
+  throw EOutOfRange(E_DATA, stream.str());
 }
 
 

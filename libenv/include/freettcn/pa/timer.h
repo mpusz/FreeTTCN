@@ -31,7 +31,6 @@
 #ifndef __TIMER_H__
 #define __TIMER_H__
 
-#include <freettcn/tools/exception.h>
 extern "C" {
 #include <freettcn/ttcn3/tri.h>
 }
@@ -52,10 +51,10 @@ namespace freettcn {
       
       const TriTimerId &Id() const;
       
-      virtual void Start(TriTimerDuration duration) throw(EOperationFailed) = 0;
-      virtual void Stop() throw(EOperationFailed) = 0;
-      virtual TriTimerDuration Read() const throw(EOperationFailed) = 0;
-      virtual bool Running() const throw(EOperationFailed) = 0;
+      virtual void Start(TriTimerDuration duration) = 0;
+      virtual void Stop() = 0;
+      virtual TriTimerDuration Read() const = 0;
+      virtual bool Running() const = 0;
     };
     
   } // namespace PA

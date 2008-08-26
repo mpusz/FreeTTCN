@@ -5,7 +5,6 @@
 #include <list>
 #include "types.h"
 #include "grammar.tab.h"
-#include "exception.h"
 #include "file.h"
 
 namespace TTCN3 {

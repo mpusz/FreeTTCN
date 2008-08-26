@@ -75,7 +75,7 @@
  */
 void tciSendConnected(TriPortId sender,
                       TriComponentId receiver,
-                      TciValue sendMessage);
+                      Value sendMessage);
 
 
 /** 
@@ -92,7 +92,7 @@ void tciSendConnected(TriPortId sender,
  * @param sendMessage The message to be send.
  */
 void tciSendConnectedBC(TriPortId sender,
-                        TciValue sendMessage);
+                        Value sendMessage);
 
 
 /** 
@@ -110,7 +110,7 @@ void tciSendConnectedBC(TriPortId sender,
  */
 void tciSendConnectedMC(TriPortId sender,
                         TriComponentIdList receivers,
-                        TciValue sendMessage);
+                        Value sendMessage);
 
 
 /** 
@@ -234,7 +234,7 @@ void tciReplyConnected(TriPortId sender,
                        TriComponentId receiver,
                        TriSignatureId signature,
                        TciParameterListType parameterList,
-                       TciValue returnValue);
+                       Value returnValue);
 
 
 /** 
@@ -266,7 +266,7 @@ void tciReplyConnected(TriPortId sender,
 void tciReplyConnectedBC(TriPortId sender,
                          TriSignatureId signature,
                          TciParameterListType parameterList,
-                         TciValue returnValue);
+                         Value returnValue);
 
 
 /** 
@@ -300,7 +300,7 @@ void tciReplyConnectedMC(TriPortId sender,
                          TriComponentIdList receivers,
                          TriSignatureId signature,
                          TciParameterListType parameterList,
-                         TciValue returnValue);
+                         Value returnValue);
 
 
 /** 
@@ -322,7 +322,7 @@ void tciReplyConnectedMC(TriPortId sender,
 void tciRaiseConnected(TriPortId sender,
                        TriComponentId receiver,
                        TriSignatureId signature,
-                       TciValue exception);
+                       Value exception);
 
 
 /** 
@@ -342,7 +342,7 @@ void tciRaiseConnected(TriPortId sender,
  */
 void tciRaiseConnectedBC(TriPortId sender,
                          TriSignatureId signature,
-                         TciValue exception);
+                         Value exception);
 
 
 /** 
@@ -364,7 +364,7 @@ void tciRaiseConnectedBC(TriPortId sender,
 void tciRaiseConnectedMC(TriPortId sender,
                          TriComponentIdList receivers,
                          TriSignatureId signature,
-                         TciValue exception);
+                         Value exception);
 
 
 /** 
@@ -385,7 +385,7 @@ void tciRaiseConnectedMC(TriPortId sender,
  * @return A TriComponentIdType value for the created component.
  */
 TriComponentId tciCreateTestComponentReq(TciTestComponentKindType kind,
-                                         TciType componentType,
+                                         Type componentType,
                                          String name);
 
 
@@ -508,7 +508,7 @@ void tciUnmapReq(TriPortId fromPort,
  * @param verdict Verdict after termination of the component.
  */
 void tciTestComponentTerminatedReq(TriComponentId component,
-                                   TciVerdictValue verdict);
+                                   VerdictValue verdict);
 
 
 /** 
@@ -579,8 +579,7 @@ TriComponentId tciGetMTCReq();
  *                    If no ports have to be passed either the @c null value or an empty @p tsiPortList,
  *                    i.e. a list of length zero shall be passed.
  */
-void tciExecuteTestCaseReq(TciTestCaseIdType testCaseId,
-                           TriPortIdList tsiPortList);
+void tciExecuteTestCaseReq(TciTestCaseIdType testCaseId, TriPortIdList tsiPortList);
 
 
 /** 

@@ -35,7 +35,7 @@ extern "C" {
 #include <freettcn/ttcn3/tri_te_sa.h>
 }
 #include <cmath>
-#include <iostream>
+#include <cstring>
 
 
 freettcn::TE::CPortType::CPortType(const freettcn::TE::CModule &module, const char *name, TType type):
@@ -50,40 +50,32 @@ freettcn::TE::CPortType::~CPortType()
 {
 }
 
-void freettcn::TE::CPortType::TypeAdd(const CType &type, TDirection dir) throw(EOperationFailed)
+void freettcn::TE::CPortType::TypeAdd(const CType &type, TDirection dir)
 {
   if (dir == IN || dir == INOUT) {
-    if (_inAll) {
-      std::cout << "ERROR: Cannot add IN type for port because ALL flag is selected!!!" << std::endl;
-      throw EOperationFailed();
-    }
+    if (_inAll)
+      throw EOperationFailed(E_DATA, "Cannot add IN type for port because ALL flag is selected!!!");
     _inList.push_back(&type);
   }
   if (dir == OUT || dir == INOUT) {
-    if (_outAll) {
-      std::cout << "ERROR: Cannot add OUT type for port because ALL flag is selected!!!" << std::endl;
-      throw EOperationFailed();
-    }
+    if (_outAll)
+      throw EOperationFailed(E_DATA, "Cannot add OUT type for port because ALL flag is selected!!!");
     _outList.push_back(&type);
   }
 }
 
 
 /// Usage of @b all is deprecated
-void freettcn::TE::CPortType::TypeAddAll(TDirection dir) throw(EOperationFailed)
+void freettcn::TE::CPortType::TypeAddAll(TDirection dir)
 {
   if (dir == IN || dir == INOUT) {
-    if (_inList.size()) {
-      std::cout << "ERROR: Cannot set ALL flag for port because IN types are given!!!" << std::endl;
-      throw EOperationFailed();
-    }
+    if (_inList.size())
+      throw EOperationFailed(E_DATA, "Cannot set ALL flag for port because IN types are given!!!");
     _inAll = true;
   }
   if (dir == OUT || dir == INOUT) {
-    if (_outList.size()) {
-      std::cout << "ERROR: Cannot set ALL flag for port because OUT types are given!!!" << std::endl;
-      throw EOperationFailed();
-    }
+    if (_outList.size())
+      throw EOperationFailed(E_DATA, "Cannot set ALL flag for port because OUT types are given!!!");
     _outAll = true;
   }
 }
@@ -157,24 +149,21 @@ const TriPortId &freettcn::TE::CPort::Id() const
 }
 
 
-void freettcn::TE::CPort::Connect(CConnectionList &list, const TriPortId &remoteId) throw(EOperationFailed)
+void freettcn::TE::CPort::Connect(CConnectionList &list, const TriPortId &remoteId)
 {
-  for(CConnectionList::iterator it=list.begin(); it!=list.end(); ++it) {
+  for(CConnectionList::iterator it=list.begin(); it!=list.end(); ++it)
     // check if remote port component is on the list already
     if ((*it)->compInst.compInst.bits == remoteId.compInst.compInst.bits &&
         !memcmp((*it)->compInst.compInst.data, remoteId.compInst.compInst.data,
-                static_cast<int>(ceil((*it)->compInst.compInst.bits / 8.0)))) {
-      std::cout << "ERROR: Cannot connect port with more than one port on the other component!!!" << std::endl;
-      throw EOperationFailed();
-    }
-  }
+                static_cast<int>(ceil((*it)->compInst.compInst.bits / 8.0))))
+      throw EOperationFailed(E_DATA, "Cannot connect port with more than one port on the other component!!!");
   
   // add connection
   list.push_back(&remoteId);
 }
 
 
-void freettcn::TE::CPort::Disconnect(CConnectionList &list, const TriPortId &remoteId) throw(ENotFound)
+void freettcn::TE::CPort::Disconnect(CConnectionList &list, const TriPortId &remoteId)
 {
   for(CConnectionList::iterator it=list.begin(); it!=list.end(); ++it) {
     if (*it == &remoteId) {
@@ -183,68 +172,57 @@ void freettcn::TE::CPort::Disconnect(CConnectionList &list, const TriPortId &rem
     }
   }
   
-  std::cout << "ERROR: Port not found!!!" << std::endl;
-  throw ENotFound();
+  throw ENotFound(E_DATA, "Port not found!!!");
 }
 
 
-void freettcn::TE::CPort::Connect(const TriPortId &remoteId) throw(EOperationFailed)
+void freettcn::TE::CPort::Connect(const TriPortId &remoteId)
 {
   // check if it is not a SYSTEM component
-  if (_component.Kind() == TCI_SYS_COMP) {
-    std::cout << "ERROR: Cannot connect SYSTEM port (use 'map' instead)!!!" << std::endl;
-    throw EOperationFailed();
-  }
+  if (_component.Kind() == TCI_SYS_COMP)
+    throw EOperationFailed(E_DATA, "Cannot connect SYSTEM port (use 'map' instead)!!!");
   
   // check if that port is not mapped
-  if (_mapList.size()) {
-    std::cout << "ERROR: Cannot connect a port that is mapped already!!!" << std::endl;
-    throw EOperationFailed();
-  }
+  if (_mapList.size())
+    throw EOperationFailed(E_DATA, "Cannot connect a port that is mapped already!!!");
   
   Connect(_connectList, remoteId);
 }
 
 
-void freettcn::TE::CPort::Disconnect(const TriPortId &remoteId) throw(ENotFound)
+void freettcn::TE::CPort::Disconnect(const TriPortId &remoteId)
 {
   Disconnect(_connectList, remoteId);
 }
 
 
-void freettcn::TE::CPort::Map(const TriPortId &remoteId) throw(EOperationFailed)
+void freettcn::TE::CPort::Map(const TriPortId &remoteId)
 {
   // check if it is not a connection within SYSTEM component
   if (_component.Kind() == TCI_SYS_COMP &&
       _component.Id().compInst.bits == remoteId.compInst.compInst.bits &&
       !memcmp(_component.Id().compInst.data, remoteId.compInst.compInst.data,
-              static_cast<int>(ceil(_component.Id().compInst.bits / 8.0)))) {
-    std::cout << "ERROR: Cannot map 2 ports of SYSTEM component with each other!!!" << std::endl;
-    throw EOperationFailed();
-  }
+              static_cast<int>(ceil(_component.Id().compInst.bits / 8.0))))
+    throw EOperationFailed(E_DATA, "Cannot map 2 ports of SYSTEM component with each other!!!");
   
   // check if that port is not connected
-  if (_connectList.size()) {
-    std::cout << "ERROR: Cannot map a port that is connected already!!!" << std::endl;
-    throw EOperationFailed();
-  }
+  if (_connectList.size())
+    throw EOperationFailed(E_DATA, "Cannot map a port that is connected already!!!");
   
   Connect(_mapList, remoteId);
 }
 
-void freettcn::TE::CPort::Unmap(const TriPortId &remoteId) throw(ENotFound)
+void freettcn::TE::CPort::Unmap(const TriPortId &remoteId)
 {
   Disconnect(_mapList, remoteId);
 }
 
 
-void freettcn::TE::CPort::Send(const CType::CInstance &value) const throw(EOperationFailed)
+void freettcn::TE::CPort::Send(const CType::CInstance &value) const
 {
   // check if value type is allowed
-  if (!_portInfo.Type().Check(value.Type(), CPortType::OUT)) {
-    std::cout << "ERROR: Message type not supported for port type!!!" << std::endl;
-    throw EOperationFailed();
-  }
+  if (!_portInfo.Type().Check(value.Type(), CPortType::OUT))
+    throw EOperationFailed(E_DATA, "Message type not supported for port type!!!");
   
   /// @todo check for IN on system component
   

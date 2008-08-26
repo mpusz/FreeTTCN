@@ -52,7 +52,7 @@ namespace freettcn {
         CInstance(const CType &type);
         CInstance(const CType &type, TVerdict value);
         
-        TVerdict Value() const throw(EOmitSet);
+        TVerdict Value() const;
         void Value(TVerdict value);
       };
       

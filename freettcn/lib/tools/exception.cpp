@@ -28,16 +28,20 @@
  */
 
 #include "freettcn/tools/exception.h"
+#ifndef _WIN32
 #include <cxxabi.h>
-#include <cstdio>
 #include <cstdlib>
+#else
+#include <typeinfo>
+#endif
+#include <cstdio>
 
 
 /** 
  * @brief TTCN-3 base exception constructor.
  */
-freettcn::Exception::Exception() throw():
-  std::exception()
+freettcn::Exception::Exception(const char *func, const char *file, int line, const std::string &message) throw():
+  _func(func), _file(file), _line(line), _message(message)
 {
 }
 
@@ -60,23 +64,41 @@ freettcn::Exception::~Exception() throw()
  */
 const char* freettcn::Exception::what() const throw()
 {
+  std::string name;
+#ifndef _WIN32
   int status = 0;
   char *namePtr;
-  
+
   // demangle C++ mangler type name
   namePtr = abi::__cxa_demangle(typeid(*this).name(), 0, 0, &status);
   if (!namePtr && status) {
     // some error encountered during demangling
     fprintf(stderr, "Symbol demangling failed (%u)\n", status);
-    sprintf(_msg, "%s", typeid(*this).name());
+    name = typeid(*this).name();
   }
   else {
     // copy demagled name to buffer
-    sprintf(_msg, "%s", namePtr);
-    
-    // free pointer allocated by demangler
-    free(namePtr);
+    name = namePtr;
   }
-  
-  return _msg;
+#else
+  name = typeid(*this).name();
+#endif
+
+  char buf[512];
+  std::string fileShort;
+  size_t pos = _file.find_last_of("/\\");
+  if(pos != std::string::npos)
+    fileShort = _file.substr(pos + 1);
+  else
+    fileShort = _file;
+  sprintf(buf, "%.48s(%i): %.128s()", fileShort.c_str(), _line, _func.c_str());
+  _buffer = _message + "\n" + "<" + name + " at " + buf + ">\n";
+
+#ifndef _WIN32
+  // free pointer allocated by demangler
+  if(!namePtr && status)
+    free(namePtr);  
+#endif
+
+  return _buffer.c_str();
 }

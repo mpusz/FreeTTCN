@@ -34,7 +34,6 @@ extern "C" {
 #include <freettcn/ttcn3/tci.h>
 #include <freettcn/ttcn3/tri.h>
 }
-#include <freettcn/tools/exception.h>
 #include <freettcn/tools/entity.h>
 #include <vector>
 #include <string>
@@ -42,7 +41,7 @@ extern "C" {
 
 namespace freettcn {
   
-  class CTimeStamp;
+  class CTimeStampMgr;
     
   namespace TL {
 
@@ -82,13 +81,13 @@ namespace freettcn {
       };
       
     private:
-      freettcn::CTimeStamp &_ts;
+      freettcn::CTimeStampMgr &_ts;
       
     protected:
-      freettcn::CTimeStamp &TimeStamp() const;
+      freettcn::CTimeStampMgr &TimeStampMgr() const;
       
     public:
-      CLogger(freettcn::CTimeStamp &ts);
+      CLogger(freettcn::CTimeStampMgr &ts);
       virtual ~CLogger();
       
       virtual void Push(const CData *data);
@@ -107,7 +106,7 @@ namespace freettcn {
       CLogger &Logger() const;
       
     public:
-      static CTestLogging &Instance() throw(ENotFound);
+      static CTestLogging &Instance();
       
       CTestLogging(CLogger &logger);
       virtual ~CTestLogging();
@@ -120,25 +119,25 @@ namespace freettcn {
       virtual void TcExecute(const char *am, int ts, const char *src, int line,
                              const TriComponentId &c,
                              const TciTestCaseIdType &tcId,
-                             const TriParameterList &pars,
+                             const TciParameterListType &pars,
                              TriTimerDuration dur) const;
       virtual void TcStart(const char *am, int ts, const char *src, int line,
                            const TriComponentId &c,
                            const TciTestCaseIdType &tcId,
-                           const TriParameterList &pars,
+                           const TciParameterListType &pars,
                            TriTimerDuration dur) const;
       virtual void TcStop(const char *am, int ts, const char *src, int line,
                           const TriComponentId &c) const;
       virtual void TcStarted(const char *am, int ts, const char *src, int line,
                              const TriComponentId &c,
                              const TciTestCaseIdType &tcId,
-                             const TriParameterList &pars,
+                             const TciParameterListType &tciPars,
                              TriTimerDuration dur) const;
       virtual void TcTerminated(const char *am, int ts, const char *src, int line,
                                 const TriComponentId &c,
                                 const TciTestCaseIdType &tcId,
-                                const TriParameterList &pars,
-                                TciVerdictValue outcome) const;
+                                const TciParameterListType &tciPars,
+                                const VerdictValue &verdict) const;
       
       virtual void CtrlStart(const char *am, int ts, const char *src, int line,
                              const TriComponentId &c) const;
@@ -149,31 +148,31 @@ namespace freettcn {
       
       virtual void MDetected_m(const char *am, int ts, const char *src, int line,
                                const TriComponentId &c,
-                               const TriPortId &port,
+                               const TriPortId &at,
+                               const TriPortId &from,
                                const TriMessage &msg,
                                const TriAddress &address) const;
       
       virtual void CCreate(const char *am, int ts, const char *src, int line,
                            const TriComponentId &c,
                            const TriComponentId &comp,
-                           const char *name) const;
+                           const char *name,
+                           bool alive) const;
       virtual void CStart(const char *am, int ts, const char *src, int line,
                           const TriComponentId &c,
                           const TriComponentId &comp,
                           const TciBehaviourIdType &name,
-                          const TciParameterListType &parsValue) const;
+                          const TciParameterListType &tciPars) const;
       virtual void CKilled(const char *am, int ts, const char *src, int line,
                            const TriComponentId &c,
-                           TciNonValueTemplate compTmpl) const;
+                           const TciNonValueTemplate &compTmpl) const;
       virtual void CTerminated(const char *am, int ts, const char *src, int line,
                                const TriComponentId &c,
-                               TciVerdictValue verdict) const;
+                               const VerdictValue &verdict) const;
 
       virtual void PConnect(const char *am, int ts, const char *src, int line,
                             const TriComponentId &c,
-                            const TriComponentId &c1,
                             const TriPortId &port1,
-                            const TriComponentId &c2,
                             const TriPortId &port2) const;
       virtual void PDisconnect(const char *am, int ts, const char *src, int line,
                                const TriComponentId &c,
@@ -183,9 +182,7 @@ namespace freettcn {
                                const TriPortId &port2) const;
       virtual void PMap(const char *am, int ts, const char *src, int line,
                         const TriComponentId &c,
-                        const TriComponentId &c1,
                         const TriPortId &port1,
-                        const TriComponentId &c2,
                         const TriPortId &port2) const;
       virtual void PUnmap(const char *am, int ts, const char *src, int line,
                           const TriComponentId &c,
@@ -196,10 +193,10 @@ namespace freettcn {
       
       virtual void Encode(const char *am, int ts, const char *src, int line,
                           const TriComponentId &c,
-                          TciValue val,
+                          const Value &val,
                           TriStatus encoderFailure,
                           const TriMessage &msg,
-                          String codec) const;
+                          const char *codec) const;
       
       virtual void TTimeoutDetected(const char *am, int ts, const char *src, int line,
                                     const TriComponentId &c,
@@ -222,18 +219,19 @@ namespace freettcn {
 
       virtual void SEnter(const char *am, int ts, const char *src, int line,
                           const TriComponentId &c,
-                          const char *name,
-                          const TciParameterListType &parsValue,
+                          const QualifiedName &name,
+                          const TciParameterListType &tciPars,
                           const char *kind) const;
       virtual void SLeave(const char *am, int ts, const char *src, int line,
                           const TriComponentId &c,
-                          const char *name,
-                          TciValue returnValue,
+                          const QualifiedName &name,
+                          const TciParameterListType &tciPars,
+                          const Value &returnValue,
                           const char *kind) const;
       
       virtual void VerdictSet(const char *am, int ts, const char *src, int line,
                               const TriComponentId &c,
-                              TciVerdictValue verdict) const;
+                              const VerdictValue &verdict) const;
     };
     
   } // namespace TL

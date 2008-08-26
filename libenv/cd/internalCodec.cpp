@@ -39,10 +39,10 @@ freettcn::CD::CInternalCodec::CInternalCodec():
 }
 
 
-bool freettcn::CD::CInternalCodec::CapabilityCheck(TciValue value, unsigned int &valueId) const
+bool freettcn::CD::CInternalCodec::CapabilityCheck(const Value &value, unsigned int &valueId) const
 {
   // obtain type and module name of a value
-  TciType type = tciGetType(value);
+  Type type = tciGetType(value);
   TciModuleIdType moduleId = tciGetDefiningModule(type);
   
   if (!moduleId.moduleName) {
@@ -62,7 +62,7 @@ bool freettcn::CD::CInternalCodec::CapabilityCheck(TciValue value, unsigned int 
 }
 
 
-void freettcn::CD::CInternalCodec::Encode(unsigned int valueId, TciValue value, CBuffer &buffer) const
+void freettcn::CD::CInternalCodec::Encode(unsigned int valueId, const Value &value, CBuffer &buffer) const
 {
   switch(valueId) {
   case ID_INTEGER:

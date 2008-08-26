@@ -63,8 +63,8 @@ namespace freettcn {
         CIdManager();
         ~CIdManager();
         void Allocate(CIdObject &object, BinaryString &id);
-        CIdObject &Object(const BinaryString &id) throw(ENotFound);
-        void Free(const BinaryString &id) throw(ENotFound);
+        CIdObject &Object(const BinaryString &id);
+        void Free(const BinaryString &id);
       };
       
       static CIdManager _manager;
@@ -75,7 +75,7 @@ namespace freettcn {
       const BinaryString &InstanceId() const;
       
     public:
-      static CIdObject &Get(const BinaryString &id) throw(ENotFound);
+      static CIdObject &Get(const BinaryString &id);
       
       CIdObject();
       virtual ~CIdObject() = 0;

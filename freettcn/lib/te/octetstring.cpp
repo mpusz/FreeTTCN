@@ -29,7 +29,9 @@
  */
 
 #include "freettcn/te/octetstring.h"
-#include <iostream>
+#include "freettcn/tools/exception.h"
+#include <sstream>
+#include <cstdlib>
 
 
 freettcn::TE::COctetstringType::COctetstringType():
@@ -52,23 +54,21 @@ freettcn::TE::COctetstringType::CInstance::CInstance(const CType &type) :
 }
 
 
-const char *freettcn::TE::COctetstringType::CInstance::Value() const throw(EOmitSet)
+const char *freettcn::TE::COctetstringType::CInstance::Value() const
 {
   if (Omit())
-    throw EOmitSet();
+    throw EOperationFailed(E_DATA, "Cannot return a value when 'omit' is set!!!");
   return _value.c_str();
 }
 
 
-void freettcn::TE::COctetstringType::CInstance::Value(const char *value) throw(EOperationFailed)
+void freettcn::TE::COctetstringType::CInstance::Value(const char *value)
 {
   const char *ptr = value;
 
   // check if the string starts with '
-  if (*ptr != '\'') {
-    std::cout << "ERROR: Value should start with a ' sign!!!" << std::endl;
-    throw EOperationFailed();
-  }
+  if (*ptr != '\'')
+    throw EOperationFailed(E_DATA, "Value should start with a ' sign!!!");
   ptr++;
   
   // find the end of the string
@@ -77,16 +77,12 @@ void freettcn::TE::COctetstringType::CInstance::Value(const char *value) throw(E
   for(len=0; *tempPtr && *tempPtr != '\''; len++, tempPtr++);
 
   // check if the string ends with 'O
-  if (*tempPtr != '\'' || *(++tempPtr) != 'O' || *(++tempPtr)) {
-    std::cout << "ERROR: Value should end with a 'O signs!!!" << std::endl;
-    throw EOperationFailed();
-  }
+  if (*tempPtr != '\'' || *(++tempPtr) != 'O' || *(++tempPtr))
+    throw EOperationFailed(E_DATA, "Value should end with a 'O signs!!!");
   
   // check the length of the string
-  if (len % 2) {
-    std::cout << "ERROR: Bad value length detected - octetstring should contain pairs of hex values!!!" << std::endl;
-    throw EOperationFailed();
-  }
+  if (len % 2)
+    throw EOperationFailed(E_DATA, "Bad value length detected - octetstring should contain pairs of hex values!!!");
   
   // set new length and reset string
   Length(len / 2);
@@ -96,10 +92,8 @@ void freettcn::TE::COctetstringType::CInstance::Value(const char *value) throw(E
     char tempStr[3] = { *ptr, *(ptr + 1), '\0' };
     char *end;
     int value = strtol(tempStr, &end, 16);
-    if (end == tempStr || *end != '\0') {
-      std::cout << "ERROR: Octetstring should contain pairs of hex values!!!" << std::endl;
-      throw EOperationFailed();
-    }
+    if (end == tempStr || *end != '\0')
+      throw EOperationFailed(E_DATA, "Octetstring should contain pairs of hex values!!!");
     
     // store new value
     sprintf(tempStr, "%02X", value);
@@ -109,14 +103,15 @@ void freettcn::TE::COctetstringType::CInstance::Value(const char *value) throw(E
 }
 
 
-int freettcn::TE::COctetstringType::CInstance::Element(unsigned int position) const throw(EOperationFailed, EOmitSet)
+int freettcn::TE::COctetstringType::CInstance::Element(unsigned int position) const
 {
   if (Omit())
-    throw EOmitSet();
+    throw EOperationFailed(E_DATA, "Cannot set element when 'omit' is set!!!");
   
   if (position >= Length()) {
-    std::cout << "ERROR: Element position: " << position << " too big (size: " << Length() << ")" << std::endl;
-    throw EOperationFailed();
+    std::stringstream stream;
+    stream << "Element position: " << position << " too big (size: " << Length() << ")";
+    throw EOutOfRange(E_DATA, stream.str());
   }
   
   unsigned int index = position * 2 + 1;
@@ -125,17 +120,16 @@ int freettcn::TE::COctetstringType::CInstance::Element(unsigned int position) co
 }
 
 
-void freettcn::TE::COctetstringType::CInstance::Element(unsigned int position, int value) throw(EOperationFailed)
+void freettcn::TE::COctetstringType::CInstance::Element(unsigned int position, int value)
 {
   if (position >= Length()) {
-    std::cout << "ERROR: Element position: " << position << " too big (size: " << Length() << ")" << std::endl;
-    throw EOperationFailed();
+    std::stringstream stream;
+    stream << "Element position: " << position << " too big (size: " << Length() << ")";
+    throw EOperationFailed(E_DATA, stream.str());
   }
   
-  if (value < 0 || value > 0xFF) {
-    std::cout << "ERROR: Octetstring element must be between 0.255!!!" << std::endl;
-    throw EOperationFailed();
-  }
+  if (value < 0 || value > 0xFF)
+    throw EOperationFailed(E_DATA, "Octetstring element must be between 0.255!!!");
   
   char tempStr[3];
   sprintf(tempStr, "%02X", value);

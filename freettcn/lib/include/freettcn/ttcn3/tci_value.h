@@ -60,7 +60,7 @@
  * Returns the distinct value null if type is a TTCN-3 base type, e.g. boolean,
  * integer, etc.).
  */
-TciModuleIdType tciGetDefiningModule(TciType inst);
+TciModuleIdType tciGetDefiningModule(Type inst);
 
 
 /**
@@ -68,7 +68,7 @@ TciModuleIdType tciGetDefiningModule(TciType inst);
  * 
  * @note String type reused from IDL (OMG recommendation)
  */
-String tciGetName(TciType inst);
+String tciGetName(Type inst);
 
 /**
  * Returns the type class of the respective type. A value of
@@ -78,30 +78,33 @@ String tciGetName(TciType inst);
  * OBJID, OCTETSTRING, RECORD, RECORD_OF, SET,
  * SET_OF, UNION, UNIVERSAL_CHARSTRING, VERDICT.
  */
-TciTypeClassType tciGetTypeClass(TciType inst);
+TciTypeClassType tciGetTypeClass(Type inst);
 
 /**
  * Returns a freshly created value of the given type. This initial value of the
  * created value is undefined.
  */
-TciValue tciNewInstance(TciType inst);
+Value tciNewInstance(Type inst);
 
 /**
  * Returns the type encoding attribute as defined in the TTCN-3 module.
  */
-String tciGetTypeEncoding(TciType inst);
+String tciGetTypeEncoding(Type inst);
 
 /**
  * This operation returns the value encoding variant attribute as defined in
  * TTCN-3, if any. If no encoding variant attribute is defined the distinct value
  * null is returned.
  */
-String tciGetTypeEncodingVariant(TciType inst);
+String tciGetTypeEncodingVariant(Type inst);
 
 /**
  * Returns the type extension attribute as defined in the TTCN-3 module.
+ *
+ * @todo getTypeExtension() renamed to tciGetTypeExtension()
  */
-String* getTypeExtension(TciType inst);
+// String *getTypeExtension(Type inst);
+String *tciGetTypeExtension(Type inst);
 
   
 /// @} TciInterfaceTypes
@@ -120,26 +123,26 @@ String* getTypeExtension(TciType inst);
 /**
  * Returns the type of the specified value.
  */
-TciType tciGetType(TciValue inst);
+Type tciGetType(Value inst);
 
 /**
  * Returns @c true if the specified value is @c omit, @c false otherwise.
  *
  * Boolean type reused from IDL (OMG recommendation)
  */
-Boolean tciNotPresent(TciValue inst);
+Boolean tciNotPresent(Value inst);
 
 /**
  * Returns the value encoding attribute as defined in TTCN-3, if any. If no
  * encoding attribute is defined the distinct value @c null is returned.
  */
-String tciGetValueEncoding(TciValue inst);
+String tciGetValueEncoding(Value inst);
 
 /**
  * Returns the value encoding variant attribute as defined in TTCN-3, if any. If
  * no encoding variant attribute is defined the distinct value @c null is returned.
  */
-String tciGetValueEncodingVariant(TciValue inst);
+String tciGetValueEncodingVariant(Value inst);
 
 /// @} TciInterfaceValue
 
@@ -152,43 +155,43 @@ String tciGetValueEncodingVariant(TciValue inst);
 /**
  * Returns the (10-base) integer absolute value as an ASCII string.
  */
-String tciGetIntAbs(TciValue inst);
+String tciGetIntAbs(Value inst);
 
 /**
  * Returns the number of digits in an integer value.
  */
-unsigned long int tciGetIntNumberOfDigits(TciValue inst);
+unsigned long int tciGetIntNumberOfDigits(Value inst);
 
 /**
  * Returns true if the number is positive, false otherwise
  */
-Boolean tciGetIntSign(TciValue inst);
+Boolean tciGetIntSign(Value inst);
 
 /**
  * Returns the value of the digit at position 'position', where position 0 is the least significant digit.
  */
-char tciGetIntDigit(TciValue inst, unsigned long int position);
+char tciGetIntDigit(Value inst, unsigned long int position);
 
 /**
  * Sets the (10-base) absolute value of the integer via an ASCII string. The
  * first digit must not be 0 unless the value is 0.
  */
-void tciSetIntAbs(TciValue inst, String value);
+void tciSetIntAbs(Value inst, String value);
 
 /**
  * Sets the number of digits in an integer value.
  */
-void tciSetIntNumberOfDigits(TciValue inst, unsigned long int dig_num);
+void tciSetIntNumberOfDigits(Value inst, unsigned long int dig_num);
 
 /**
  * Sets the sign to + (true) or - (false).
  */
-void tciSetIntSign(TciValue inst, Boolean sign);
+void tciSetIntSign(Value inst, Boolean sign);
 
 /**
  * Sets the value of the digit at position 'position', where position 0 is the least significant digit.
  */
-void tciSetIntDigit(TciValue inst, unsigned long int position, char digit);
+void tciSetIntDigit(Value inst, unsigned long int position, char digit);
 
 /// @} TciInterfaceIntegerValue
 
@@ -201,12 +204,12 @@ void tciSetIntDigit(TciValue inst, unsigned long int position, char digit);
 /**
  * Returns the float value of this TTCN-3 float.
  */
-double tciGetFloatValue(TciValue inst);
+double tciGetFloatValue(Value inst);
 
 /**
  * Sets this FloatValue to value.
  */
-void tciSetFloatValue(TciValue inst, double value);
+void tciSetFloatValue(Value inst, double value);
 
 /// @} TciInterfaceFloatValue
 
@@ -219,12 +222,12 @@ void tciSetFloatValue(TciValue inst, double value);
 /**
  * Returns the boolean value of the TTCN-3 boolean.
  */
-Boolean tciGetBooleanValue(TciValue inst);
+Boolean tciGetBooleanValue(Value inst);
 
 /**
  * Sets this boolean value to value.
  */
-void tciSetBooleanValue(TciValue inst, Boolean value);
+void tciSetBooleanValue(Value inst, Boolean value);
 
 /// @} TciInterfaceBooleanValue
 
@@ -237,12 +240,12 @@ void tciSetBooleanValue(TciValue inst, Boolean value);
 /**
  * Returns the object id value of the TTCN-3 objid.
  */
-TciObjidValue tciGetTciObjidValue(TciValue inst);
+TciObjidValue tciGetTciObjidValue(Value inst);
 
 /**
  * Sets this ObjidValue to value.
  */
-void tciSetObjidValue(TciValue inst, TciObjidValue value);
+void tciSetObjidValue(Value inst, TciObjidValue value);
 
 /// @} TciInterfaceObjidValue
 
@@ -257,39 +260,39 @@ void tciSetObjidValue(TciValue inst, TciObjidValue value);
  * representation of the empty TTCN-3 charstring is '', while its length
  * is zero.
  */
-TciCharStringValue tciGetCStringValue(TciValue inst);
+TciCharStringValue tciGetCStringValue(Value inst);
 
 /**
  * Sets this CharstringValue to value.
  *
  * @todo TciCharString type redefined to TciCharStringValue
  */
-void tciSetCStringValue(TciValue inst, TciCharStringValue value);
+void tciSetCStringValue(Value inst, TciCharStringValue value);
 
 /**
  * Returns the char value of the TTCN-3 charstring at position. Position 0
  * denotes the first char of the TTCN-3 charstring. Valid values for
  * position are from 0 to length - 1.
  */
-char tciGetCStringCharValue(TciValue inst, long int position);
+char tciGetCStringCharValue(Value inst, long int position);
 
 /**
  * Set the character at position to value. Valid values for position are from 0
  * to length - 1.
  */
-void tciSetCStringCharValue(TciValue inst, long int position, char value);
+void tciSetCStringCharValue(Value inst, long int position, char value);
 
 /**
  * Returns the length of this CharstringValue in chars, zero if the value of this
  * CharstringValue is omit.
  */
-unsigned long int tciGetCStringLength(TciValue inst);
+unsigned long int tciGetCStringLength(Value inst);
 
 /**
  * setLength first resets this CharstringValue to its initial value and afterwards
  * sets the length of this CharstringValue in chars to len.
  */
-void tciSetCStringLength(TciValue inst, unsigned long int len);
+void tciSetCStringLength(Value inst, unsigned long int len);
 
 /// @} TciInterfaceCharstringValue
 
@@ -303,13 +306,13 @@ void tciSetCStringLength(TciValue inst, unsigned long int len);
  * Returns the textual representation of this
  * UniversalCharstringValue, as defined in TTCN-3.
  */
-TciUCStringValue tciGetUCStringValue(TciValue inst);
+TciUCStringValue tciGetUCStringValue(Value inst);
 
 /**
  * Sets the value of this UniversalCharstringValue according to the
  * textual representation as defined by value.
  */
-void tciSetUCStringValue(TciValue inst, TciUCStringValue value);
+void tciSetUCStringValue(Value inst, TciUCStringValue value);
 
 /**
  * Returns the universal char value of the TTCN-3 universal
@@ -317,26 +320,26 @@ void tciSetUCStringValue(TciValue inst, TciUCStringValue value);
  * of the TTCN-3 universal charstring. Valid values for position
  * are from 0 to length - 1.
  */
-void tciGetUCStringCharValue(TciValue inst, unsigned long int position, TciUCValue result);
+void tciGetUCStringCharValue(Value inst, unsigned long int position, TciUCValue result);
 
 /**
  * Sets the universal char at position to value. Valid values for position
  * are from 0 to length - 1.
  */
-void tciSetUCStringCharValue(TciValue inst, unsigned long int position, TciUCValue value);
+void tciSetUCStringCharValue(Value inst, unsigned long int position, TciUCValue value);
 
 /**
  * Returns the length of this universal charstring value in universal chars, zero
  * if the value of this universal charstring value is omit.
  */
-unsigned long int tciGetUCStringLength(TciValue inst);
+unsigned long int tciGetUCStringLength(Value inst);
 
 /**
  * setLength first resets this UniversalCharstringValue to its initial value and
  * afterwards sets the length of this UniversalCharstringValue in
  * universal chars to @p len.
  */
-void tciSetUCStringLength(TciValue inst, unsigned long int len);
+void tciSetUCStringLength(Value inst, unsigned long int len);
 
 /// @} TciInterfaceUniversalCharstringValue
 
@@ -352,7 +355,7 @@ void tciSetUCStringLength(TciValue inst, unsigned long int len);
  * textual representation of the empty TTCN-3 bitstring is ""B, while its
  * length is zero.
  */
-String tciGetBStringValue(TciValue inst);
+String tciGetBStringValue(Value inst);
 
 /**
  * Sets the value of this BitstringValue according to the textual
@@ -360,33 +363,33 @@ String tciGetBStringValue(TciValue inst);
  * BitstringValue is 0101 if the textual representation in value is
  * "0101"B.
  */
-void tciSetBStringValue(TciValue inst, String value);
+void tciSetBStringValue(Value inst, String value);
 
 /**
  * Returns the value (0 | 1) at position of this TTCN-3 bitstring as a
  * character. Position 0 denotes the first bit of the TTCN-3 bitstring. Valid
  * values for position are from 0 to length - 1.
  */
-int tciGetBStringBitValue(TciValue inst, long int position);
+int tciGetBStringBitValue(Value inst, long int position);
 
 /**
  * Sets the bit at position to the value (0 | 1). Position 0 denotes the first
  * bit in this BitstringValue. Valid values for position are from 0 to
  * length - 1.
  */
-void tciSetBStringBitValue(TciValue inst, unsigned long int position, int value);
+void tciSetBStringBitValue(Value inst, unsigned long int position, int value);
 
 /**
  * Returns the length of this BitstringValue in bits, zero if the value of
  * this BitstringValue is @c omit.
  */
-unsigned long int tciGetBStringLength(TciValue inst);
+unsigned long int tciGetBStringLength(Value inst);
 
 /**
  * setLength first resets this BitstringValue to its initial value and afterwards
  * sets the length of this BitstringValue in bits to @p len.
  */
-void tciSetBStringLength(TciValue inst, long int len);
+void tciSetBStringLength(Value inst, long int len);
 
 /// @} TciInterfaceBitstringValue
 
@@ -402,7 +405,7 @@ void tciSetBStringLength(TciValue inst, long int len);
  * "CAFFEE"O. The textual representation of the empty TTCN-3
  * octetstring is ""O, while its length is zero.
  */
-String tciGetOStringValue(TciValue inst);
+String tciGetOStringValue(Value inst);
 
 /**
  * Sets the value of this OctetstringValue according to the textual
@@ -410,34 +413,34 @@ String tciGetOStringValue(TciValue inst);
  * OctetstringValue is 0xCAFFEE if the textual representation in
  * value is "CAFFEE"O.
  */
-void tciSetOStringValue(TciValue inst, String value);
+void tciSetOStringValue(Value inst, String value);
 
 /**
  * Returns the value (0..255) at position of this TTCN-3 octetstring.
  * Position 0 denotes the first octet of the TTCN-3 octetstring. Valid values
  * for position are from 0 to length - 1.
  */
-int tciGetOStringOctetValue(TciValue inst, unsigned long int position);
+int tciGetOStringOctetValue(Value inst, unsigned long int position);
 
 /**
  * Sets the octet at position to value (0..255). Position 0 denotes the
  * first octet in the octetstring. Valid values for position are from 0 to
  * length - 1.
  */
-void tciSetOStringOctetValue(TciValue inst, unsigned long int position, int value);
+void tciSetOStringOctetValue(Value inst, unsigned long int position, int value);
 
 /**
  * Returns the length of this OctetstringValue in octets, zero if the
  * value of this OctetstringValue is omit.
  */
-unsigned long int tciGetOStringLength(TciValue inst);
+unsigned long int tciGetOStringLength(Value inst);
 
 /**
  * setLength first resets this OctetstringValue to its initial value and
  * afterwards sets the length of this OctetstringValue in octets to
  * len.
  */
-void tciSetOStringLength(TciValue inst, unsigned long int len);
+void tciSetOStringLength(Value inst, unsigned long int len);
 
 /// @} TciInterfaceOctetstringValue
 
@@ -453,7 +456,7 @@ void tciSetOStringLength(TciValue inst, unsigned long int len);
  * The textual representation of the empty TTCN-3 hexstring is ""H,
  * while its length is zero.
  */
-String tciGetHStringValue(TciValue inst);
+String tciGetHStringValue(Value inst);
 
 /**
  * Sets the value of this HexstringValue according to the textual
@@ -461,34 +464,34 @@ String tciGetHStringValue(TciValue inst);
  * HexstringValue is 0xAFFEE if the textual representation in value
  * is "AFFEE"H.
  */
-void tciSetHStringValue(TciValue inst, String value);
+void tciSetHStringValue(Value inst, String value);
 
 /**
  * Returns the value (0..15) at position of this TTCN-3 hexstring.
  * Position 0 denotes the first hex digits of the TTCN-3 hexstring. Valid
  * values for position are from 0 to length - 1.
  */
-int tciGetHStringHexValue(TciValue inst, unsigned long int position);
+int tciGetHStringHexValue(Value inst, unsigned long int position);
 
 /**
  * Sets the hex digit at position to value (0..15). Position 0 denotes the first
  * octet in the hexstring. Valid values for position are from 0 to
  * length - 1.
  */
-void tciSetHStringHexValue(TciValue inst, unsigned long int position, int value);
+void tciSetHStringHexValue(Value inst, unsigned long int position, int value);
 
 /**
  * Returns the length of this HexstringValue in octets, zero if the value of
  * this HexstringValue is omit.
  */
-long int tciGetHStringLength(TciValue inst);
+long int tciGetHStringLength(Value inst);
 
 /**
  * setLength first resets this HexstringValue to its initial value and
  * afterwards sets the length of this HexstringValue in hex digits to
  * len.
  */
-void tciSetHStringLength(TciValue inst, unsigned long int len);
+void tciSetHStringLength(Value inst, unsigned long int len);
 
 /// @} TciInterfaceHexstringValue
 
@@ -504,7 +507,7 @@ void tciSetHStringLength(TciValue inst, unsigned long int len);
  * defined in TTCN-3. If the field can not be obtained from the record the
  * distinct value @c null is returned.
  */
-TciValue tciGetRecFieldValue(TciValue inst, String fieldName);
+Value tciGetRecFieldValue(Value inst, String fieldName);
 
 /**
  * Sets the field named @p fieldName of the record to value. No assumption
@@ -514,7 +517,7 @@ TciValue tciGetRecFieldValue(TciValue inst, String fieldName);
  * be relied on that subsequent modifications of @p value will not be
  * considered in the record.
  */
-void tciSetRecFieldValue(TciValue inst, String fieldName, TciValue value);
+void tciSetRecFieldValue(Value inst, String fieldName, Value value);
 
 /**
  * Returns a sequence of string of field names, the empty sequence, if the
@@ -522,7 +525,7 @@ void tciSetRecFieldValue(TciValue inst, String fieldName, TciValue value);
  *
  * Returns a NULL-terminated array of the field names.
  */
-char** tciGetRecFieldNames(TciValue inst);
+char **tciGetRecFieldNames(Value inst);
 
 
 /**
@@ -530,8 +533,8 @@ char** tciGetRecFieldNames(TciValue inst);
  *
  * @todo setFieldOmitted() redefined as tciSetFieldOmitted()
  */
-void tciSetFieldOmitted(TciValue inst, String fieldName);
-// void setFieldOmitted(String fieldName)
+void tciSetFieldOmitted(Value inst, String fieldName);
+// void setFieldOmitted(Value inst, String fieldName)
 
 /// @} TciInterfaceRecordValue
 
@@ -548,7 +551,7 @@ void tciSetFieldOmitted(TciValue inst, String fieldName);
  * return value is the common abstract base type @c Value, as a record of
  * can have fields of any type defined in TTCN-3.
  */
-TciValue tciGetRecOfFieldValue(TciValue inst, unsigned long int position);
+Value tciGetRecOfFieldValue(Value inst, unsigned long int position);
 
 /**
  * Sets the field at @p position to @p value. If position is greater than
@@ -561,7 +564,7 @@ TciValue tciGetRecOfFieldValue(TciValue inst, unsigned long int position);
  * be relied on that subsequent modifications of @p value will not be
  * considered in the record of.
  */
-void tciSetRecOfFieldValue(TciValue inst, unsigned long int position, TciValue value);
+void tciSetRecOfFieldValue(Value inst, unsigned long int position, Value value);
 
 /**
  * Appends the value at the end of the record of, i.e. at position length.
@@ -571,25 +574,25 @@ void tciSetRecOfFieldValue(TciValue inst, unsigned long int position, TciValue v
  * it should be relied on that subsequent modifications of @p value will not be
  * considered in the record of.
  */
-void tciAppendRecOfFieldValue(TciValue inst, TciValue value);
+void tciAppendRecOfFieldValue(Value inst, Value value);
 
 /**
  * Returns the Type of the elements of this record of.
  */
-TciType tciGetRecOfElementType(TciValue inst);
+Type tciGetRecOfElementType(Value inst);
 
 /**
  * Returns the actual length of the record of value, zero if the record
  * of value is @c omit.
  */
-unsigned long int tciGetRecOfLength(TciValue inst);
+unsigned long int tciGetRecOfLength(Value inst);
 
 /**
  * Sets the length of the record of to len. If len is greater than the
  * original length, newly created elements have the value omit. If len is
  * less or equal than the original length this operation is ignored.
  */
-void tciSetRecOfLength(TciValue inst, unsigned long int len);
+void tciSetRecOfLength(Value inst, unsigned long int len);
 
 /// @} TciInterfaceRecordOfValue
 
@@ -606,21 +609,21 @@ void tciSetRecOfLength(TciValue inst, unsigned long int len);
  * distinct value @c null otherwise. @p variantName denotes the name of the
  * union variant as defined in TTCN-3.
  */
-TciValue tciGetUnionVariant(TciValue inst, String variantName);
+Value tciGetUnionVariant(Value inst, String variantName);
 
 /**
  * Sets @p variantName of the union to value. If @p variantName is not
  * defined for this union this operation is ignored. If another variant was
  * selected the new variant is selected instead.
  */
-void tciSetUnionVariant(TciValue inst, String variantName, TciValue value);
+void tciSetUnionVariant(Value inst, String variantName, Value value);
 
 /**
  * Returns a String representing the currently selected variant name in the
  * given TTCN-3 union. The distinct value @c null is returned if no variant is
  * selected.
  */
-String tciGetUnionPresentVariantName(TciValue inst);
+String tciGetUnionPresentVariantName(Value inst);
 
 /**
  * Returns a sequence of string of variant names, the distinct value null, if
@@ -630,7 +633,7 @@ String tciGetUnionPresentVariantName(TciValue inst);
  *
  * Returns a NULL-terminated array of the field names.
  */
-char** tciGetUnionVariantNames(TciValue inst);
+char **tciGetUnionVariantNames(Value inst);
 
 /// @} TciInterfaceUnionValue
 
@@ -645,13 +648,13 @@ char** tciGetUnionVariantNames(TciValue inst);
  * Returns the string identifier of this EnumeratedValue. This identifier
  * equals the identifier in the TTCN-3 specification.
  */
-String tciGetEnumValue(TciValue inst);
+String tciGetEnumValue(Value inst);
 
 /**
  * Sets the enum to @p enumValue. If @p enumValue is not an allowed value for
  * this enumeration the operation is ignored.
  */
-void tciSetEnumValue(TciValue inst, String enumValue);
+void tciSetEnumValue(Value inst, String enumValue);
 
 /// @} TciInterfaceEnumeratedValue
 
@@ -666,7 +669,7 @@ void tciSetEnumValue(TciValue inst, String enumValue);
  * Returns the integer value for this VerdictValue. The integer is one of
  * the following constants: @c ERROR, @c FAIL, @c INCONC, @c NONE, @c PASS.
  */
-int tciGetVerdictValue(TciValue inst);
+int tciGetVerdictValue(Value inst);
 
 /**
  * Sets this VerdictValue to @p verdict. Note that a VerdictValue
@@ -675,7 +678,7 @@ int tciGetVerdictValue(TciValue inst);
  * TTCN-3. For example, it is legal to set the VerdictValue first to
  * @c ERROR and then to @c PASS.
  */
-void tciSetVerdictValue(TciValue inst, int verdict);
+void tciSetVerdictValue(Value inst, int verdict);
 
 /// @} TciInterfaceVerdictValue
 
@@ -691,12 +694,12 @@ void tciSetVerdictValue(TciValue inst, int verdict);
  * Returns the address value, which will no longer be of type class ADDRESS
  * but rather of the actual type used for address.
  */
-TciValue tciGetAddressValue(TciValue inst);
+Value tciGetAddressValue(Value inst);
 
 /**
  * Sets this address value to @p value.
  */
-void tciSetAddressValue(TciValue inst, TciValue value);
+void tciSetAddressValue(Value inst, Value value);
 
 /// @} TciInterfaceAddressValue
 

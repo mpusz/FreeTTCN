@@ -70,8 +70,10 @@
  * @param line The line number where the request is performed.
  * @param c The component which produces this event.
  * @param tcId The testcase to be executed.
- * @param pars The list of parameters required by the testcase.
+ * @param tciPars The list of parameters required by the testcase.
  * @param dur Duration of the execution.
+ *
+ * @todo TciParameterList renamed to TciParameterListType
  */
 void tliTcExecute(String am,
                   int ts,
@@ -79,7 +81,7 @@ void tliTcExecute(String am,
                   int line,
                   TriComponentId c,
                   TciTestCaseIdType tcId,
-                  TriParameterList pars,
+                  TciParameterListType tciPars,
                   TriTimerDuration dur);
 
 
@@ -94,7 +96,7 @@ void tliTcExecute(String am,
  * @param line The line number where the request is performed.
  * @param c The component which produces this event.
  * @param tcId The testcase to be executed.
- * @param pars The list of parameters required by the testcase.
+ * @param tciPars The list of parameters required by the testcase.
  * @param dur Duration of the execution.
  */
 void tliTcStart(String am,
@@ -103,7 +105,7 @@ void tliTcStart(String am,
                 int line,
                 TriComponentId c,
                 TciTestCaseIdType tcId,
-                TriParameterList pars,
+                TciParameterListType tciPars,
                 TriTimerDuration dur);
 
 
@@ -136,7 +138,7 @@ void tliTcStop(String am,
  * @param line The line number where the request is performed.
  * @param c  The component which produces this event.
  * @param tcId The testcase to be executed.
- * @param pars The list of parameters required by the testcase.
+ * @param tciPars The list of parameters required by the testcase.
  * @param dur Duration of the execution.
  */
 void tliTcStarted(String am,
@@ -145,7 +147,7 @@ void tliTcStarted(String am,
                   int line,
                   TriComponentId c,
                   TciTestCaseIdType tcId,
-                  TriParameterList pars,
+                  TciParameterListType tciPars,
                   TriTimerDuration dur);
 
 
@@ -163,8 +165,6 @@ void tliTcStarted(String am,
  * @param tcId The testcase to be executed.
  * @param pars The list of parameters required by the testcase.
  * @param outcome The verdict of the testcase.
- * 
- * @todo VerdictValue type redefined as TciVerdictValue
  */
 void tliTcTerminated(String am,
                      int ts,
@@ -172,8 +172,8 @@ void tliTcTerminated(String am,
                      int line,
                      TriComponentId c,
                      TciTestCaseIdType tcId,
-                     TriParameterList pars,
-                     TciVerdictValue outcome);
+                     TciParameterListType tciPars,
+                     VerdictValue verdict);
 
 
 /** 
@@ -250,19 +250,19 @@ void tliCtrlTerminated(String am,
  * @param encoderFailure The failure message which might occur at encoding.
  * @param msg The encoded message.
  * @param transmissionFailure The failure message which might occur at transmission.
- *
- * @todo Value type redefined to TciValue
  */
 void tliMSend_m(String am,
                 int ts,
                 String src,
                 int line,
                 TriComponentId c,
-                TriPortId port,
-                TciValue msgValue,
-                TriAddress address,
-                TriStatus encoderFailure,
+                TriPortId at,
+                TriPortId to,
+                Value msgValue,
+                Value addrValue,
+                TciStatus encoderFailure,
                 TriMessage msg,
+                TriAddress address,
                 TriStatus transmissionFailure);
 
 
@@ -282,17 +282,16 @@ void tliMSend_m(String am,
  * @param encoderFailure The failure message which might occur at encoding.
  * @param msg  The encoded message.
  * @param transmissionFailure The failure message which might occur at transmission.
- *
- * @todo Value type redefined to TciValue
  */
 void tliMSend_m_BC(String am,
                    int ts,
                    String src,
                    int line,
                    TriComponentId c,
-                   TriPortId port,
-                   TciValue msgValue,
-                   TriStatus encoderFailure,
+                   TriPortId at,
+                   TriPortId to,
+                   Value msgValue,
+                   TciStatus encoderFailure,
                    TriMessage msg,
                    TriStatus transmissionFailure);
 
@@ -314,19 +313,19 @@ void tliMSend_m_BC(String am,
  * @param encoderFailure The failure message which might occur at encoding.
  * @param msg The encoded message.
  * @param transmissionFailure The failure message which might occur at transmission.
- *
- * @todo Value type redefined to TciValue
  */
 void tliMSend_m_MC(String am,
                    int ts,
                    String src,
                    int line,
                    TriComponentId c,
-                   TriPortId port,
-                   TciValue msgValue,
-                   TriAddressList addresses,
-                   TriStatus encoderFailure,
+                   TriPortId at,
+                   TriPortId to,
+                   Value msgValue,
+                   TciValueList addrValues,
+                   TciStatus encoderFailure,
                    TriMessage msg,
+                   TriAddressList addresses,
                    TriStatus transmissionFailure);
 
 
@@ -345,17 +344,15 @@ void tliMSend_m_MC(String am,
  * @param msgValue The value to be encoded and sent.
  * @param to The component which will receive the message.
  * @param transmissionFailure The failure message which might occur at transmission.
- *
- * @todo Value type redefined to TciValue
  */
 void tliMSend_c(String am,
                 int ts,
                 String src,
                 int line,
                 TriComponentId c,
-                TriPortId port,
-                TciValue msgValue,
-                TriComponentId to,
+                TriPortId at,
+                TriPortId to,
+                Value msgValue,
                 TriStatus transmissionFailure);
 
 
@@ -373,16 +370,15 @@ void tliMSend_c(String am,
  * @param port The port via which the message is sent.
  * @param msgValue The value to be encoded and sent.
  * @param transmissionFailure  The failure message which might occur at transmission.
- *
- * @todo Value type redefined to TciValue
  */
 void tliMSend_c_BC(String am,
                    int ts,
                    String src,
                    int line,
                    TriComponentId c,
-                   TriPortId port,
-                   TciValue msgValue,
+                   TriPortId at,
+                   TriPortIdList to,
+                   Value msgValue,
                    TriStatus transmissionFailure);
 
 
@@ -401,17 +397,15 @@ void tliMSend_c_BC(String am,
  * @param msgValue The value to be encoded and sent.
  * @param toList The components which will receive the message.
  * @param transmissionFailure The failure message which might occur at transmission.
- *
- * @todo Value type redefined to TciValue
  */
 void tliMSend_c_MC(String am,
                    int ts,
                    String src,
                    int line,
                    TriComponentId c,
-                   TriPortId port,
-                   TciValue msgValue,
-                   TriComponentIdList toList,
+                   TriPortId at,
+                   TriPortIdList to,
+                   Value msgValue,
                    TriStatus transmissionFailure);
 
 
@@ -426,7 +420,8 @@ void tliMSend_c_MC(String am,
  * @param src The source file of the test specification.
  * @param line The line number where the request is performed.
  * @param c The component which produces this event.
- * @param port The port via which the message is received.
+ * @param at The port via which the message is received.
+ * @param from The port from which the message has been sent
  * @param msg The received encoded message.
  * @param address The address of the source within the SUT.
  */
@@ -435,7 +430,8 @@ void tliMDetected_m(String am,
                     String src,
                     int line,
                     TriComponentId c,
-                    TriPortId port,
+                    TriPortId at,
+                    TriPortId from,
                     TriMessage msg,
                     TriAddress address);
 
@@ -454,17 +450,15 @@ void tliMDetected_m(String am,
  * @param port The port via which the message is received.
  * @param msgValue The received message.
  * @param from The component which sent the message.
- *
- * @todo Value type redefined to TciValue
  */
 void tliMDetected_c(String am,
                     int ts,
                     String src,
                     int line,
                     TriComponentId c,
-                    TriPortId port,
-                    TciValue msgValue,
-                    TriComponentId from);
+                    TriPortId at,
+                    TriPortId from,
+                    Value msgValue);
 
 
 /**
@@ -484,19 +478,17 @@ void tliMDetected_c(String am,
  * @param diffs The difference/the mismatch between message and template
  * @param address The address of the source within the SUT.
  * @param addressTmpl The expected address of the source within the SUT.
- *
- * @todo Value type redefined to TciValue
  */
 void tliMMismatch_m(String am,
                     int ts,
                     String src,
                     int line,
                     TriComponentId c,
-                    TriPortId port,
-                    TciValue msgValue,
+                    TriPortId at,
+                    Value msgValue,
                     TciValueTemplate msgTmpl,
                     TciValueDifferenceList diffs,
-                    TriAddress address,
+                    Value addrValue,
                     TciValueTemplate addressTmpl);
 
 
@@ -517,16 +509,14 @@ void tliMMismatch_m(String am,
  * @param diffs The difference/the mismatch between message and template
  * @param from The component which sent the message.
  * @param fromTmpl The expected sender component.
- *
- * @todo Value type redefined to TciValue
  */
 void tliMMismatch_c(String am,
                     int ts,
                     String src,
                     int line,
                     TriComponentId c,
-                    TriPortId port,
-                    TciValue msgValue,
+                    TriPortId at,
+                    Value msgValue,
                     TciValueTemplate msgTmpl,
                     TciValueDifferenceList diffs,
                     TriComponentId from,
@@ -549,18 +539,16 @@ void tliMMismatch_c(String am,
  * @param msgTmpl The template used to check the message match.
  * @param address The address of the source within the SUT.
  * @param addressTmpl The expected address of the source within the SUT.
- *
- * @todo Value type redefined to TciValue
  */
 void tliMReceive_m(String am,
                    int ts,
                    String src,
                    int line,
                    TriComponentId c,
-                   TriPortId port,
-                   TciValue msgValue,
+                   TriPortId at,
+                   Value msgValue,
                    TciValueTemplate msgTmpl,
-                   TriAddress address,
+                   Value addrValue,
                    TciValueTemplate addressTmpl);
 
 
@@ -580,16 +568,14 @@ void tliMReceive_m(String am,
  * @param msgTmpl The template used to check the message match.
  * @param from The component which sent the message.
  * @param fromTmpl The expected sender component.
- *
- * @todo Value type redefined to TciValue
  */
 void tliMReceive_c(String am,
                    int ts,
                    String src,
                    int line,
                    TriComponentId c,
-                   TriPortId port,
-                   TciValue msgValue,
+                   TriPortId at,
+                   Value msgValue,
                    TciValueTemplate msgTmpl,
                    TriComponentId from,
                    TciNonValueTemplate fromTmpl);
@@ -613,19 +599,22 @@ void tliMReceive_c(String am,
  * @param encoderFailure The failure message which might occur at encoding.
  * @param pars The encoded parameters.
  * @param transmissionFailure The failure message which might occur at transmission.
+ *
+ * @todo TriParameterListType renamed to TriParameterList
  */
 void tliPrCall_m(String am,
                  int ts,
                  String src,
                  int line,
                  TriComponentId c,
-                 TriPortId port,
+                 TriPortId at,
                  TriSignatureId signature,
-                 TciParameterListType parsValue,
-                 TriAddress address,
+                 TciParameterListType tciPars,
+                 Value addrValue,
                  TriStatus encoderFailure,
-                 TriParameterList pars,
-                 TriStatus transmissionFailure);
+                 TriParameterList triPars,
+                 TriAddress address,
+                 TciStatus transmissionFailure);
 
 
 /**
@@ -645,17 +634,20 @@ void tliPrCall_m(String am,
  * @param encoderFailure The failure message which might occur at encoding.
  * @param pars The encoded parameters.
  * @param transmissionFailure 
+ *
+ * @todo TriParameterListType renamed to TriParameterList
  */
 void tliPrCall_m_BC(String am,
                     int ts,
                     String src,
                     int line,
                     TriComponentId c,
-                    TriPortId port,
+                    TriPortId at,
+                    TriPortId to,
                     TriSignatureId signature,
-                    TciParameterListType parsValue,
-                    TriStatus encoderFailure,
-                    TriParameterList pars,
+                    TciParameterListType tciPars,
+                    TciStatus encoderFailure,
+                    TriParameterList triPars,
                     TriStatus transmissionFailure);
 
 
@@ -677,18 +669,22 @@ void tliPrCall_m_BC(String am,
  * @param encoderFailure The failure message which might occur at encoding.
  * @param pars The encoded parameters.
  * @param transmissionFailure The failure message which might occur at transmission.
+ *
+ * @todo TriParameterListType renamed to TriParameterList
  */
 void tliPrCall_m_MC(String am,
                     int ts,
                     String src,
                     int line,
                     TriComponentId c,
-                    TriPortId port,
+                    TriPortId at,
+                    TriPortId to,
                     TriSignatureId signature,
-                    TciParameterListType parsValue,
+                    TciParameterListType tciPars,
+                    TciValueList addrValues,
+                    TciStatus encoderFailure,
+                    TriParameterList triPars,
                     TriAddressList addresses,
-                    TriStatus encoderFailure,
-                    TriParameterList pars,
                     TriStatus transmissionFailure);
 
 
@@ -710,14 +706,12 @@ void tliPrCall_m_MC(String am,
  * @param transmissionFailure The failure message which might occur at transmission.
  */
 void tliPrCall_c(String am,
-                 int ts,
-                 String src,
+                 int ts,String src,
                  int line,
                  TriComponentId c,
-                 TriPortId port,
+                 TriPortId at,
                  TriSignatureId signature,
-                 TciParameterListType parsValue,
-                 TriComponentId to,
+                 TciParameterListType tciPars,
                  TriStatus transmissionFailure);
 
 
@@ -742,9 +736,10 @@ void tliPrCall_c_BC(String am,
                     String src,
                     int line,
                     TriComponentId c,
-                    TriPortId port,
+                    TriPortId at,
+                    TriPortIdList to,
                     TriSignatureId signature,
-                    TciParameterListType parsValue,
+                    TciParameterListType tciPars,
                     TriStatus transmissionFailure);
 
 
@@ -770,10 +765,10 @@ void tliPrCall_c_MC(String am,
                     String src,
                     int line,
                     TriComponentId c,
-                    TriPortId port,
+                    TriPortId at,
+                    TriPortIdList to,
                     TriSignatureId signature,
-                    TciParameterListType parsValue,
-                    TriComponentIdList toList,
+                    TciParameterListType tciPars,
                     TriStatus transmissionFailure);
 
 
@@ -792,15 +787,18 @@ void tliPrCall_c_MC(String am,
  * @param signature The signature of the detected call.
  * @param pars The encoded parameters of detected call.
  * @param address The address of the destination within the SUT.
+ *
+ * @todo TriParameterListType renamed to TriParameterList
  */
 void tliPrGetCallDetected_m(String am,
                             int ts,
                             String src,
                             int line,
                             TriComponentId c,
-                            TriPortId port,
+                            TriPortId at,
+                            TriPortId from,
                             TriSignatureId signature,
-                            TriParameterList pars,
+                            TriParameterList triPars,
                             TriAddress address);
 
 
@@ -827,10 +825,10 @@ void tliPrGetCallDetected_c(String am,
                             String src,
                             int line,
                             TriComponentId c,
-                            TriPortId port,
+                            TriPortId at,
+                            TriPortId from,
                             TriSignatureId signature,
-                            TciParameterListType parsValue,
-                            TriComponentId from);
+                            TciParameterListType tciPars);
 
 
 /** 
@@ -857,12 +855,12 @@ void tliPrGetCallMismatch_m(String am,
                             String src,
                             int line,
                             TriComponentId c,
-                            TriPortId port,
+                            TriPortId at,
                             TriSignatureId signature,
-                            TciParameterListType parsValue,
+                            TciParameterListType tciPars,
                             TciValueTemplate parsTmpl,
                             TciValueDifferenceList diffs,
-                            TriAddress address,
+                            Value addrValue,
                             TciValueTemplate addressTmpl);
 
 
@@ -890,9 +888,9 @@ void tliPrGetCallMismatch_c(String am,
                             String src,
                             int line,
                             TriComponentId c,
-                            TriPortId port,
+                            TriPortId at,
                             TriSignatureId signature,
-                            TciParameterListType parsValue,
+                            TciParameterListType tciPars,
                             TciValueTemplate parsTmpl,
                             TciValueDifferenceList diffs,
                             TriComponentId from,
@@ -922,11 +920,11 @@ void tliPrGetCall_m(String am,
                     String src,
                     int line,
                     TriComponentId c,
-                    TriPortId port,
+                    TriPortId at,
                     TriSignatureId signature,
-                    TciParameterListType parsValue,
+                    TciParameterListType tciPars,
                     TciValueTemplate parsTmpl,
-                    TriAddress address,
+                    Value addrValue,
                     TciValueTemplate addressTmpl);
 
 
@@ -953,9 +951,9 @@ void tliPrGetCall_c(String am,
                     String src,
                     int line,
                     TriComponentId c,
-                    TriPortId port,
+                    TriPortId at,
                     TriSignatureId signature,
-                    TciParameterListType parsValue,
+                    TciParameterListType tciPars,
                     TciValueTemplate parsTmpl,
                     TriComponentId from,
                     TciNonValueTemplate fromTmpl);
@@ -985,20 +983,23 @@ void tliPrGetCall_c(String am,
  *
  * @todo TciParameterList type redefined to TciParameterListType
  *
- * @todo Value type redefined to TciValue
+ * @todo TriParameterListType renamed to TriParameterList
  */
 void tliPrReply_m(String am,
                   int ts,
                   String src,
                   int line,
                   TriComponentId c,
-                  TriPortId port,
+                  TriPortId at,
+                  TriPortId to,
                   TriSignatureId signature,
-                  TciParameterListType parsValue,
-                  TciValue replValue,
-                  TriAddress address,
-                  TriStatus encoderFailure,
+                  TciParameterListType tciPars,
+                  Value replValue,
+                  Value addrValue,
+                  TciStatus encoderFailure,
+                  TriParameterList triPars,
                   TriParameter repl,
+                  TriAddress address,
                   TriStatus transmissionFailure);
 
 
@@ -1025,18 +1026,20 @@ void tliPrReply_m(String am,
  *
  * @todo TciParameterList type redefined to TciParameterListType
  *
- * @todo Value type redefined to TciValue
+ * @todo TriParameterListType renamed to TriParameterList
  */
 void tliPrReply_m_BC(String am,
                      int ts,
                      String src,
                      int line,
                      TriComponentId c,
-                     TriPortId port,
+                     TriPortId at,
+                     TriPortId to,
                      TriSignatureId signature,
-                     TciParameterListType parsValue,
-                     TciValue replValue,
-                     TriStatus encoderFailure,
+                     TciParameterListType tciPars,
+                     Value replValue,
+                     TciStatus encoderFailure,
+                     TriParameterList triPars,
                      TriParameter repl,
                      TriStatus transmissionFailure);
 
@@ -1065,21 +1068,24 @@ void tliPrReply_m_BC(String am,
  *
  * @todo TciParameterList type redefined to TciParameterListType
  *
- * @todo Value type redefined to TciValue
+ * @todo TriParameterListType renamed to TriParameterList
  */
 void tliPrReply_m_MC(String am,
                      int ts,
                      String src,
                      int line,
                      TriComponentId c,
-                     TriPortId port,
+                     TriPortId at,
+                     TriPortId to,
                      TriSignatureId signature,
-                     TciParameterListType parsValue,
-                     TciValue replValue,
-                     TriAddressList addresses,
+                     TciParameterListType tciPars,
+                     Value replValue,
+                     TciValueList addrValues,
                      TriStatus encoderFailure,
+                     TriParameterList triPars,
                      TriParameter repl,
-                     TriStatus transmissionFailure);
+                     TriAddressList addresses,
+                     TciStatus transmissionFailure);
 
 
 /** 
@@ -1099,19 +1105,17 @@ void tliPrReply_m_MC(String am,
  * @param replValue The reply to be sent.
  * @param to The component which will receive the reply.
  * @param transmissionFailure The failure message which might occur at transmission.
- *
- * @todo Value type redefined to TciValue
  */
 void tliPrReply_c(String am,
                   int ts,
                   String src,
                   int line,
                   TriComponentId c,
-                  TriPortId port,
+                  TriPortId at,
+                  TriPortId to,
                   TriSignatureId signature,
-                  TciParameterListType parsValue,
-                  TciValue replValue,
-                  TriComponentId to,
+                  TciParameterListType tciPars,
+                  Value replValue,
                   TriStatus transmissionFailure);
 
 
@@ -1131,18 +1135,17 @@ void tliPrReply_c(String am,
  * @param parsValue The signature parameters relating to the reply.
  * @param replValue The reply to be sent.
  * @param transmissionFailure The failure message which might occur at transmission.
- *
- * @todo Value type redefined to TciValue
  */
 void tliPrReply_c_BC(String am,
                      int ts,
                      String src,
                      int line,
                      TriComponentId c,
-                     TriPortId port,
+                     TriPortId at,
+                     TriPortIdList to,
                      TriSignatureId signature,
-                     TciParameterListType parsValue,
-                     TciValue replValue,
+                     TciParameterListType tciPars,
+                     Value replValue,
                      TriStatus transmissionFailure);
 
 
@@ -1163,19 +1166,17 @@ void tliPrReply_c_BC(String am,
  * @param replValue The reply to be sent.
  * @param toList The components which will receive the reply.
  * @param transmissionFailure The failure message which might occur at transmission.
- *
- * @todo Value type redefined to TciValue
  */
 void tliPrReply_c_MC(String am,
                      int ts,
                      String src,
                      int line,
                      TriComponentId c,
-                     TriPortId port,
+                     TriPortId at,
+                     TriPortIdList to,
                      TriSignatureId signature,
-                     TciParameterListType parsValue,
-                     TciValue replValue,
-                     TriComponentIdList toList,
+                     TciParameterListType tciPars,
+                     Value replValue,
                      TriStatus transmissionFailure);
 
 
@@ -1194,14 +1195,18 @@ void tliPrReply_c_MC(String am,
  * @param signature The signature relating to the reply.
  * @param repl The received encoded reply.
  * @param address The address of the source within the SUT.
+ *
+ * @todo TriParameterListType renamed to TriParameterList
  */
 void tliPrGetReplyDetected_m(String am,
                              int ts,
                              String src,
                              int line,
                              TriComponentId c,
-                             TriPortId port,
+                             TriPortId at,
+                             TriPortId from,
                              TriSignatureId signature,
+                             TriParameterList triPars,
                              TriParameter repl,
                              TriAddress address);
 
@@ -1221,18 +1226,17 @@ void tliPrGetReplyDetected_m(String am,
  * @param signature The signature relating to the reply.
  * @param replValue The received reply.
  * @param from The component which sent the reply.
- *
- * @todo Value type redefined to TciValue
  */
 void tliPrGetReplyDetected_c(String am,
                              int ts,
                              String src,
                              int line,
                              TriComponentId c,
-                             TriPortId port,
+                             TriPortId at,
+                             TriPortId from,
                              TriSignatureId signature,
-                             TciValue replValue,
-                             TriComponentId from);
+                             TciParameterListType tciPars,
+                             Value replValue);
 
 
 /** 
@@ -1254,21 +1258,20 @@ void tliPrGetReplyDetected_c(String am,
  * @param diffs The difference/the mismatch between reply and template
  * @param address The address of the source within the SUT.
  * @param addressTmpl The expected address of the source within the SUT.
- *
- * @todo Value type redefined to TciValue
  */
 void tliPrGetReplyMismatch_m(String am,
                              int ts,
                              String src,
                              int line,
                              TriComponentId c,
-                             TriPortId port,
+                             TriPortId at,
                              TriSignatureId signature,
-                             TciParameterListType parsValue,
-                             TciValue replValue,
+                             TciParameterListType tciPars,
+                             TciValueTemplate parsTmpl,
+                             Value replValue,
                              TciValueTemplate replyTmpl,
                              TciValueDifferenceList diffs,
-                             TriAddress address,
+                             Value addrValue,
                              TciValueTemplate addressTmpl);
 
 
@@ -1291,18 +1294,17 @@ void tliPrGetReplyMismatch_m(String am,
  * @param diffs The difference/the mismatch between reply and template.
  * @param from The component which sent the reply.
  * @param fromTmpl The expected replying component.
- *
- * @todo Value type redefined to TciValue
  */
 void tliPrGetReplyMismatch_c(String am,
                              int ts,
                              String src,
                              int line,
                              TriComponentId c,
-                             TriPortId port,
+                             TriPortId at,
                              TriSignatureId signature,
-                             TciParameterListType parsValue,
-                             TciValue replValue,
+                             TciParameterListType tciPars,
+                             TciValueTemplate parsTmpl,
+                             Value replValue,
                              TciValueTemplate replyTmpl,
                              TciValueDifferenceList diffs,
                              TriComponentId from,
@@ -1327,20 +1329,19 @@ void tliPrGetReplyMismatch_c(String am,
  * @param replyTmpl The template used to check the reply match.
  * @param address The address of the source within the SUT.
  * @param addressTmpl The expected address of the source within the SUT.
- *
- * @todo Value type redefined to TciValue
  */
 void tliPrGetReply_m(String am,
                      int ts,
                      String src,
                      int line,
                      TriComponentId c,
-                     TriPortId port,
+                     TriPortId at,
                      TriSignatureId signature,
-                     TciParameterListType parsValue,
-                     TciValue replValue,
+                     TciParameterListType tciPars,
+                     TciValueTemplate parsTmpl,
+                     Value replValue,
                      TciValueTemplate replyTmpl,
-                     TriAddress address,
+                     Value addrValue,
                      TciValueTemplate addressTmpl);
 
 
@@ -1362,18 +1363,17 @@ void tliPrGetReply_m(String am,
  * @param replyTmpl The template used to check the reply match.
  * @param from The component which sent the reply.
  * @param fromTmpl The expected replying component.
- *
- * @todo Value type redefined to TciValue
  */
 void tliPrGetReply_c(String am,
                      int ts,
                      String src,
                      int line,
                      TriComponentId c,
-                     TriPortId port,
+                     TriPortId at,
                      TriSignatureId signature,
-                     TciParameterListType parsValue,
-                     TciValue replValue,
+                     TciParameterListType tciPars,
+                     TciValueTemplate parsTmpl,
+                     Value replValue,
                      TciValueTemplate replyTmpl,
                      TriComponentId from,
                      TciNonValueTemplate fromTmpl);
@@ -1398,21 +1398,21 @@ void tliPrGetReply_c(String am,
  * @param encoderFailure The failure message which might occur at encoding.
  * @param exc The encoded exception.
  * @param transmissionFailure The failure message which might occur at transmission.
- *
- * @todo Value type redefined to TciValue
  */
 void tliPrRaise_m(String am,
                   int ts,
                   String src,
                   int line,
                   TriComponentId c,
-                  TriPortId port,
+                  TriPortId at,
+                  TriPortId to,
                   TriSignatureId signature,
-                  TciParameterListType parsValue,
-                  TciValue excValue,
-                  TriAddress address,
-                  TriStatus encoderFailure,
+                  TciParameterListType tciPars,
+                  Value excValue,
+                  Value addrValue,
+                  TciStatus encoderFailure,
                   TriException exc,
+                  TriAddress address,
                   TriStatus transmissionFailure);
 
 
@@ -1434,19 +1434,18 @@ void tliPrRaise_m(String am,
  * @param encoderFailure The failure message which might occur at encoding.
  * @param exc The encoded exception.
  * @param transmissionFailure The failure message which might occur at transmission.
- *
- * @todo Value type redefined to TciValue
  */
 void tliPrRaise_m_BC(String am,
                      int ts,
                      String src,
                      int line,
                      TriComponentId c,
-                     TriPortId port,
+                     TriPortId at,
+                     TriPortId to,
                      TriSignatureId signature,
-                     TciParameterListType parsValue,
-                     TciValue excValue,
-                     TriStatus encoderFailure,
+                     TciParameterListType tciPars,
+                     Value excValue,
+                     TciStatus encoderFailure,
                      TriException exc,
                      TriStatus transmissionFailure);
 
@@ -1470,21 +1469,21 @@ void tliPrRaise_m_BC(String am,
  * @param encoderFailure The failure message which might occur at encoding.
  * @param exc The encoded exception.
  * @param transmissionFailure The failure message which might occur at transmission.
- *
- * @todo Value type redefined to TciValue
  */
 void tliPrRaise_m_MC(String am,
                      int ts,
                      String src,
                      int line,
                      TriComponentId c,
-                     TriPortId port,
+                     TriPortId at,
+                     TriPortId to,
                      TriSignatureId signature,
-                     TciParameterListType parsValue,
-                     TciValue excValue,
-                     TriAddressList addresses,
-                     TriStatus encoderFailure,
+                     TciParameterListType tciPars,
+                     Value excValue,
+                     TciValueList addrValues,
+                     TciStatus encoderFailure,
                      TriException exc,
+                     TriAddressList addresses,
                      TriStatus transmissionFailure);
 
 
@@ -1505,19 +1504,17 @@ void tliPrRaise_m_MC(String am,
  * @param excValue The exception to be sent.
  * @param to The component which will receive the reply.
  * @param transmissionFailure The failure message which might occur at transmission.
- *
- * @todo Value type redefined to TciValue
  */
 void tliPrRaise_c(String am,
                   int ts,
                   String src,
                   int line,
                   TriComponentId c,
-                  TriPortId port,
+                  TriPortId at,
+                  TriPortId to,
                   TriSignatureId signature,
-                  TciParameterListType parsValue,
-                  TciValue excValue,
-                  TriComponentId to,
+                  TciParameterListType tciPars,
+                  Value excValue,
                   TriStatus transmissionFailure);
 
 
@@ -1537,18 +1534,17 @@ void tliPrRaise_c(String am,
  * @param parsValue The signature parameters relating to the exception.
  * @param excValue The exception to be sent.
  * @param transmissionFailure The failure message which might occur at transmission.
- *
- * @todo Value type redefined to TciValue
  */
 void tliPrRaise_c_BC(String am,
                      int ts,
                      String src,
                      int line,
                      TriComponentId c,
-                     TriPortId port,
+                     TriPortId at,
+                     TriPortIdList to,
                      TriSignatureId signature,
-                     TciParameterListType parsValue,
-                     TciValue excValue,
+                     TciParameterListType tciPars,
+                     Value excValue,
                      TriStatus transmissionFailure);
 
 
@@ -1569,19 +1565,17 @@ void tliPrRaise_c_BC(String am,
  * @param excValue The exception to be sent.
  * @param toList The components which will receive the reply.
  * @param transmissionFailure The failure message which might occur at transmission.
- *
- * @todo Value type redefined to TciValue
  */
 void tliPrRaise_c_MC(String am,
                      int ts,
                      String src,
                      int line,
                      TriComponentId c,
-                     TriPortId port,
+                     TriPortId at,
+                     TriPortIdList to,
                      TriSignatureId signature,
-                     TciParameterListType parsValue,
-                     TciValue excValue,
-                     TriComponentIdList toList,
+                     TciParameterListType tciPars,
+                     Value excValue,
                      TriStatus transmissionFailure);
 
 
@@ -1606,7 +1600,8 @@ void tliPrCatchDetected_m(String am,
                           String src,
                           int line,
                           TriComponentId c,
-                          TriPortId port,
+                          TriPortId at,
+                          TriPortId from,
                           TriSignatureId signature,
                           TriException exc,
                           TriAddress address);
@@ -1627,18 +1622,16 @@ void tliPrCatchDetected_m(String am,
  * @param signature The signature relating to the exception.
  * @param excValue The catched exception.
  * @param from The component which sent the reply.
- *
- * @todo Value type redefined to TciValue
  */
 void tliPrCatchDetected_c(String am,
                           int ts,
                           String src,
                           int line,
                           TriComponentId c,
-                          TriPortId port,
+                          TriPortId at,
+                          TriPortId from,
                           TriSignatureId signature,
-                          TciValue excValue,
-                          TriComponentId from);
+                          Value excValue);
 
 
 /** 
@@ -1660,21 +1653,18 @@ void tliPrCatchDetected_c(String am,
  * @param diffs The difference/the mismatch between exception and template
  * @param address The address of the source within the SUT.
  * @param addressTmpl The expected address of the source within the SUT.
- *
- * @todo Value type redefined to TciValue
  */
 void tliPrCatchMismatch_m(String am,
                           int ts,
                           String src,
                           int line,
                           TriComponentId c,
-                          TriPortId port,
+                          TriPortId at,
                           TriSignatureId signature,
-                          TciParameterListType parsValue,
-                          TciValue excValue,
+                          Value excValue,
                           TciValueTemplate excTmpl,
                           TciValueDifferenceList diffs,
-                          TriAddress address,
+                          Value addrValue,
                           TciValueTemplate addressTmpl);
 
 
@@ -1697,18 +1687,15 @@ void tliPrCatchMismatch_m(String am,
  * @param diffs The difference/the mismatch between exception and template
  * @param from The component which sent the reply.
  * @param fromTmpl The expected replying component.
- *
- * @todo Value type redefined to TciValue
  */
 void tliPrCatchMismatch_c(String am,
                           int ts,
                           String src,
                           int line,
                           TriComponentId c,
-                          TriPortId port,
+                          TriPortId at,
                           TriSignatureId signature,
-                          TciParameterListType parsValue,
-                          TciValue excValue,
+                          Value excValue,
                           TciValueTemplate excTmpl,
                           TciValueDifferenceList diffs,
                           TriComponentId from,
@@ -1733,20 +1720,17 @@ void tliPrCatchMismatch_c(String am,
  * @param excTmpl The template used to check the exception match.
  * @param address The address of the source within the SUT.
  * @param addressTmpl The expected address of the source within the SUT.
- *
- * @todo Value type redefined to TciValue
  */
 void tliPrCatch_m(String am,
                   int ts,
                   String src,
                   int line,
                   TriComponentId c,
-                  TriPortId port,
+                  TriPortId at,
                   TriSignatureId signature,
-                  TciParameterListType parsValue,
-                  TciValue excValue,
+                  Value excValue,
                   TciValueTemplate excTmpl,
-                  TriAddress address,
+                  Value addrValue,
                   TciValueTemplate addressTmpl);
 
 
@@ -1768,18 +1752,15 @@ void tliPrCatch_m(String am,
  * @param excTmpl The template used to check the exception match.
  * @param from The component which sent the reply.
  * @param fromTmpl The expected replying component.
- *
- * @todo Value type redefined to TciValue
  */
 void tliPrCatch_c(String am,
                   int ts,
                   String src,
                   int line,
                   TriComponentId c,
-                  TriPortId port,
+                  TriPortId at,
                   TriSignatureId signature,
-                  TciParameterListType parsValue,
-                  TciValue excValue,
+                  Value excValue,
                   TciValueTemplate excTmpl,
                   TriComponentId from,
                   TciNonValueTemplate fromTmpl);
@@ -1804,7 +1785,7 @@ void tliPrCatchTimeoutDetected(String am,
                                String src,
                                int line,
                                TriComponentId c,
-                               TriPortId port,
+                               TriPortId at,
                                TriSignatureId signature);
 
 
@@ -1828,9 +1809,8 @@ void tliPrCatchTimeout(String am,
                        String src,
                        int line,
                        TriComponentId c,
-                       TriPortId port,
-                       TriSignatureId signature,
-                       TciParameterListType parsValue);
+                       TriPortId at,
+                       TriSignatureId signature);
 
 
 /** 
@@ -1846,6 +1826,7 @@ void tliPrCatchTimeout(String am,
  * @param c The component which produces this event.
  * @param comp The component which is created.
  * @param name The name of the component which is created.
+ * @param alive If the component is an alive component
  */
 void tliCCreate(String am,
                 int ts,
@@ -1853,7 +1834,8 @@ void tliCCreate(String am,
                 int line,
                 TriComponentId c,
                 TriComponentId comp,
-                String name);
+                String name,
+                Boolean alive);
 
 
 /** 
@@ -1877,7 +1859,7 @@ void tliCStart(String am,
                TriComponentId c,
                TriComponentId comp,
                TciBehaviourIdType name,
-               TciParameterListType parsValue);
+               TciParameterListType tciPars);
 
 
 /**
@@ -1948,6 +1930,15 @@ void tliCStop(String am,
               TriComponentId comp);
 
 
+/** @todo  Description */
+void tliCKill(String am,
+              int ts,
+              String src,
+              int line,
+              TriComponentId c,
+              TriComponentId comp);
+
+
 /** 
  * @brief TE logs the mismatch of a done component operation.
  * 
@@ -1966,6 +1957,7 @@ void tliCDoneMismatch(String am,
                       String src,
                       int line,
                       TriComponentId c,
+                      TriComponentId comp,
                       TciNonValueTemplate compTmpl);
 
 
@@ -1990,13 +1982,13 @@ void tliCDone(String am,
               TciNonValueTemplate compTmpl);
 
 
+
+
 /** 
  * @brief TE logs the mismatch of a killed component operation.
  * 
  * Shall be called by TE to log the mismatch of a killed component operation. This event occurs after
  * killed is checked against a template.
- * 
- * @todo Function C declaration not in specification.
  * 
  * @param am An additional message.
  * @param ts The time when the event is produced.
@@ -2010,6 +2002,7 @@ void tliCKilledMismatch(String am,
                         String src,
                         int line,
                         TriComponentId c,
+                        TriComponentId comp,
                         TciNonValueTemplate compTmpl);
 
 
@@ -2018,8 +2011,6 @@ void tliCKilledMismatch(String am,
  * 
  * Shall be called by TE to log the killed component operation. This event occurs after the killed
  * operation.
- * 
- * @todo Function C declaration not in specification.
  * 
  * @param am An additional message.
  * @param ts The time when the event is produced.
@@ -2048,15 +2039,13 @@ void tliCKilled(String am,
  * @param line The line number where the request is performed.
  * @param c The component which produces this event.
  * @param verdict The verdict of the component.
- * 
- * @todo VerdictValue type redefined as TciVerdictValue
  */
 void tliCTerminated(String am,
                     int ts,
                     String src,
                     int line,
                     TriComponentId c,
-                    TciVerdictValue verdict);
+                    VerdictValue verdict);
 
 
 /** 
@@ -2069,9 +2058,7 @@ void tliCTerminated(String am,
  * @param src The source file of the test specification.
  * @param line The line number where the request is performed.
  * @param c The component which produces this event.
- * @param c1 The component of the first port to be connected.
  * @param port1 The first port to be connected.
- * @param c2 The component of the second port to be connected.
  * @param port2 The second port to be connected.
  */
 void tliPConnect(String am,
@@ -2079,9 +2066,7 @@ void tliPConnect(String am,
                  String src,
                  int line,
                  TriComponentId c,
-                 TriComponentId c1,
                  TriPortId port1,
-                 TriComponentId c2,
                  TriPortId port2);
 
 
@@ -2100,6 +2085,8 @@ void tliPConnect(String am,
  * @param port1 The first port to be disconnected.
  * @param c2 The component of the second port to be disconnected.
  * @param port2 The second port to be disconnected.
+ *
+ * @todo Not compatible with tliPConnect()
  */
 void tliPDisconnect(String am,
                     int ts,
@@ -2122,9 +2109,7 @@ void tliPDisconnect(String am,
  * @param src The source file of the test specification.
  * @param line The line number where the request is performed.
  * @param c The component which produces this event.
- * @param c1 The component of the first port to be mapped.
  * @param port1 The first port to be mapped.
- * @param c2 The component of the second port to be mapped.
  * @param port2 The second port to be mapped.
  */
 void tliPMap(String am,
@@ -2132,9 +2117,7 @@ void tliPMap(String am,
              String src,
              int line,
              TriComponentId c,
-             TriComponentId c1,
              TriPortId port1,
-             TriComponentId c2,
              TriPortId port2);
 
 
@@ -2152,6 +2135,8 @@ void tliPMap(String am,
  * @param port1 The first port to be unmapped.
  * @param c2 The component of the second port to be unmapped.
  * @param port2 The second port to be unmapped.
+ *
+ * @todo Not compatible with tliPMap()
  */
 void tliPUnmap(String am,
                int ts,
@@ -2260,16 +2245,14 @@ void tliPHalt(String am,
  * @param encoderFailure The failure message which might occur at encoding.
  * @param msg The encoded value.
  * @param codec The used encoder.
- *
- * @todo Value type redefined to TciValue
  */
 void tliEncode(String am,
                int ts,
                String src,
                int line,
                TriComponentId c,
-               TciValue val,
-               TriStatus encoderFailure,
+               Value val,
+               TciStatus encoderFailure,
                TriMessage msg,
                String codec);
 
@@ -2288,8 +2271,6 @@ void tliEncode(String am,
  * @param decoderFailure The failure message which might occur at decoding.
  * @param val The decoded value.
  * @param codec The used decoder.
- *
- * @todo Value type redefined to TciValue
  */
 void tliDecode(String am,
                int ts,
@@ -2297,8 +2278,8 @@ void tliDecode(String am,
                int line,
                TriComponentId c,
                TriMessage msg,
-               TriStatus decoderFailure,
-               TciValue val,
+               TciStatus decoderFailure,
+               Value val,
                String codec);
 
 
@@ -2340,6 +2321,7 @@ void tliTTimeoutMismatch(String am,
                          String src,
                          int line,
                          TriComponentId c,
+                         TriTimerId timer,
                          TciNonValueTemplate timerTmpl);
 
 
@@ -2360,6 +2342,7 @@ void tliTTimeout(String am,
                  String src,
                  int line,
                  TriComponentId c,
+                 TriTimerId timer,
                  TciNonValueTemplate timerTmpl);
 
 
@@ -2403,7 +2386,8 @@ void tliTStop(String am,
               String src,
               int line,
               TriComponentId c,
-              TriTimerId timer);
+              TriTimerId timer,
+              TriTimerDuration dur);
 
 
 /** 
@@ -2466,14 +2450,16 @@ void tliTRunning(String am,
  * @param name The name of the scope.
  * @param parsValue The parameters of the scope.
  * @param kind The kind of the scope.
+ * 
+ * @todo TciParameterList renamed to TciParameterListType
  */
 void tliSEnter(String am,
                int ts,
                String src,
                int line,
                TriComponentId c,
-               String name,
-               TciParameterListType parsValue,
+               QualifiedName name,
+               TciParameterListType tciPars,
                String kind);
 
 
@@ -2489,18 +2475,18 @@ void tliSEnter(String am,
  * @param line The line number where the request is performed.
  * @param c The component which produces this event.
  * @param name The name of the scope.
+ * @param parsValue The parameters of the scope.
  * @param returnValue The return value of the scope.
  * @param kind The kind of the scope.
- *
- * @todo Value type redefined to TciValue
  */
 void tliSLeave(String am,
                int ts,
                String src,
                int line,
                TriComponentId c,
-               String name,
-               TciValue returnValue,
+               QualifiedName name,
+               TciParameterListType tciPars,
+               Value returnValue,
                String kind);
 
 
@@ -2517,16 +2503,14 @@ void tliSLeave(String am,
  * @param c The component which produces this event.
  * @param name The name of the variable.
  * @param varValue The new value of the variable.
- *
- * @todo Value type redefined to TciValue
  */
 void tliVar(String am,
             int ts,
             String src,
             int line,
             TriComponentId c,
-            String name,
-            TciValue varValue);
+            QualifiedName name,
+            Value varValue);
 
 
 /** 
@@ -2542,16 +2526,14 @@ void tliVar(String am,
  * @param c The component which produces this event.
  * @param name The name of the module parameter.
  * @param parValue The value of the module parameter.
- *
- * @todo Value type redefined to TciValue
  */
 void tliModulePar(String am,
                   int ts,
                   String src,
                   int line,
                   TriComponentId c,
-                  String name,
-                  TciValue parValue);
+                  QualifiedName name,
+                  Value parValue);
 
 
 /** 
@@ -2566,15 +2548,13 @@ void tliModulePar(String am,
  * @param line The line number where the request is performed.
  * @param c The component which produces this event.
  * @param verdict The current value of the local verdict.
- * 
- * @todo VerdictValue type redefined as TciVerdictValue
  */
 void tliGetVerdict(String am,
                    int ts,
                    String src,
                    int line,
                    TriComponentId c,
-                   TciVerdictValue verdict);
+                   VerdictValue verdict);
 
 
 /** 
@@ -2589,15 +2569,13 @@ void tliGetVerdict(String am,
  * @param line The line number where the request is performed.
  * @param c The component which produces this event.
  * @param verdict The value to be set to the local verdict.
- * 
- * @todo VerdictValue type redefined as TciVerdictValue
  */
 void tliSetVerdict(String am,
                    int ts,
                    String src,
                    int line,
                    TriComponentId c,
-                   TciVerdictValue verdict);
+                   VerdictValue verdict);
 
 
 /** 
@@ -2612,15 +2590,13 @@ void tliSetVerdict(String am,
  * @param line The line number where the request is performed.
  * @param c The component which produces this event.
  * @param log The string to be logged.
- *
- * @todo Value type redefined to TciValue
  */
 void tliLog(String am,
             int ts,
             String src,
             int line,
             TriComponentId c,
-            TciValue log[]);
+            String log);
 
 
 /** 
@@ -2727,17 +2703,15 @@ void tliADefaults(String am,
  * @param name The name of the default.
  * @param pars The parameter of the default.
  * @param ref The resulting default reference.
- *
- * @todo Value type redefined to TciValue
  */
 void tliAActivate(String am,
                   int ts,
                   String src,
                   int line,
                   TriComponentId c,
-                  String name,
-                  TciParameterListType pars,
-                  TciValue ref);
+                  QualifiedName name,
+                  TciParameterListType tciPars,
+                  Value ref);
 
 
 /** 
@@ -2752,15 +2726,13 @@ void tliAActivate(String am,
  * @param line The line number where the request is performed.
  * @param c The component which produces this event.
  * @param ref The resulting default reference.
- *
- * @todo Value type redefined to TciValue
  */
 void tliADeactivate(String am,
                     int ts,
                     String src,
                     int line,
                     TriComponentId c,
-                    TciValue ref);
+                    Value ref);
 
 
 /** 
@@ -2819,7 +2791,7 @@ void tliMatch(String am,
               String src,
               int line,
               TriComponentId c,
-              TciValue expr,
+              Value expr,
               TciValueTemplate tmpl);
 
 
@@ -2843,7 +2815,7 @@ void tliMatchMismatch(String am,
                       String src,
                       int line,
                       TriComponentId c,
-                      TciValue expr,
+                      Value expr,
                       TciValueTemplate tmpl,
                       TciValueDifferenceList diffs);
 

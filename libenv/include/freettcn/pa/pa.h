@@ -51,7 +51,7 @@ namespace freettcn {
       
       CTimerList _timerList;
       
-      CTimer &TimerGet(const TriTimerId &timerId) const throw(ENotFound);
+      CTimer &TimerGet(const TriTimerId &timerId) const;
       virtual CTimer *TimerCreate(const TriTimerId &timerId) const = 0;
       
     protected:
@@ -59,7 +59,7 @@ namespace freettcn {
       CPlatformAdaptor(const CPlatformAdaptor&);       // Disallowed
       
     public:
-      static CPlatformAdaptor &Instance() throw(ENotFound);
+      static CPlatformAdaptor &Instance();
       
       CPlatformAdaptor();
       virtual ~CPlatformAdaptor();

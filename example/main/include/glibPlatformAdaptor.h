@@ -59,10 +59,10 @@ namespace freettcn {
         CTimer(const TriTimerId &timerId);
         ~CTimer();
     
-        virtual void Start(TriTimerDuration duration) throw(freettcn::EOperationFailed);
-        virtual void Stop() throw(freettcn::EOperationFailed);
-        virtual TriTimerDuration Read() const throw(freettcn::EOperationFailed);
-        virtual bool Running() const throw(freettcn::EOperationFailed);
+        virtual void Start(TriTimerDuration duration);
+        virtual void Stop();
+        virtual TriTimerDuration Read() const;
+        virtual bool Running() const;
       };
   
       virtual CTimer *TimerCreate(const TriTimerId &timerId) const;

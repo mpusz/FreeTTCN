@@ -86,7 +86,7 @@ namespace freettcn {
 //     {
 //     }
     
-//     Item &Next(item) const throw
+//     Item &Next(item) const
 //     {
 //     }
 

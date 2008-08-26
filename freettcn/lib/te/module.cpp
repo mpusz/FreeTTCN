@@ -37,7 +37,7 @@
 #include "freettcn/te/basicTypes.h"
 #include "freettcn/tools/tools.h"
 #include "freettcn/tools/logMask.h"
-#include "freettcn/tools/timeStamp.h"
+#include "freettcn/tools/timeStampMgr.h"
 extern "C" {
 #include "freettcn/ttcn3/tci_te_tm.h"
 #include "freettcn/ttcn3/tci_te_ch.h"
@@ -46,18 +46,19 @@ extern "C" {
 #include "freettcn/ttcn3/tci_tl.h"
 #include "freettcn/ttcn3/tci_value.h"
 }
-#include <iostream>
+#include <sstream>
+#include <cstring>
 
 
 
 
 /* ********************************** P A R A M E T E R ********************************* */
 
-freettcn::TE::CModule::CParameter::CParameter(const char *name, const CType::CInstance *defaultValue) throw(EOperationFailed):
+freettcn::TE::CModule::CParameter::CParameter(const char *name, const CType::CInstance *defaultValue):
   _defaultValue(defaultValue), _value(0)
 {
   if (!_defaultValue)
-    throw EOperationFailed();
+    throw EOperationFailed(E_DATA, "Default value not set!!!");
   _id = const_cast<char *>(name);
 }
 
@@ -87,21 +88,19 @@ void freettcn::TE::CModule::CParameter::Value(const CType::CInstance *value)
   _value = value;
 }
 
-const freettcn::TE::CType::CInstance &freettcn::TE::CModule::CParameter::Value() const throw(EOperationFailed)
+const freettcn::TE::CType::CInstance &freettcn::TE::CModule::CParameter::Value() const
 {
   if (_value) {
     if (!_value->Omit())
       return *_value;
     
-    std::cout << "ERROR: Value is set to omit!!!" << std::endl;
-    throw EOperationFailed();
+    throw EOperationFailed(E_DATA, "Value is set to omit!!!");
   }
   else {
     if (!_defaultValue->Omit())
       return *_defaultValue;
     
-    std::cout << "ERROR: Default value is set to omit!!!" << std::endl;
-    throw EOperationFailed();
+    throw EOperationFailed(E_DATA, "Default value is set to omit!!!");
   }
 }
 
@@ -247,64 +246,63 @@ TciModuleParameterListType freettcn::TE::CModule::Parameters() const
 }
 
 
-void freettcn::TE::CModule::ParametersGet() const throw(EOperationFailed)
+void freettcn::TE::CModule::ParametersGet() const
 {
   // obtain and set module parameters values
   for(unsigned int i=0; i<_parameterArray.size(); i++) {
-    TciValue val = tciGetModulePar(_parameterArray[i]->Id());
+    Value val = tciGetModulePar(_parameterArray[i]->Id());
     const CType::CInstance *value = static_cast<const CType::CInstance *>(val);
     
     if (val)
       _parameterArray[i]->Value(value);
     else {
-      if (_parameterArray[i]->DefaultValue().Omit()) {
-        std::cout << "ERROR: Parameter value not given and default not set" << std::endl;
-        throw freettcn::EOperationFailed();
-      }
+      if (_parameterArray[i]->DefaultValue().Omit())
+        throw EOperationFailed(E_DATA, "Parameter value not given and default not set!!!");
     }
   }
 }
 
 
-const freettcn::TE::CModule::CParameter &freettcn::TE::CModule::Parameter(unsigned int parameterIdx) const throw(ENotFound)
+const freettcn::TE::CModule::CParameter &freettcn::TE::CModule::Parameter(unsigned int parameterIdx) const
 {
   if (parameterIdx < _parameterArray.size())
     return *_parameterArray[parameterIdx];
-  
-  std::cout << "ERROR: Parameter index: " << parameterIdx << " too big (size: " << _parameterArray.size() << ")" << std::endl;
-  throw ENotFound();
+
+  std::stringstream stream;
+  stream << "Parameter index: " << parameterIdx << " too big (size: " << _parameterArray.size() << ")!!!";
+  throw EOutOfRange(E_DATA, stream.str());
 }
 
 
-const freettcn::TE::CType &freettcn::TE::CModule::Type(const char *typeName) const throw(ENotFound)
+const freettcn::TE::CType &freettcn::TE::CModule::TypeGet(const char *typeName) const
 {
   for(unsigned int i=0; i<_typeArray.size(); i++)
     if (!strcmp(_typeArray[i]->Name(), typeName))
       return *_typeArray[i];
   
-  std::cout << "ERROR: " << __FUNCTION__ << ":" << __LINE__ <<
-    " Requested type: '" << typeName << "'not found" << std::endl;
-  throw ENotFound();
+  throw ENotFound(E_DATA, "Requested type: '" + std::string(typeName) + "' not found!!!");
 }
 
 
-const freettcn::TE::CType &freettcn::TE::CModule::Type(unsigned int typeIdx) const throw(ENotFound)
+const freettcn::TE::CType &freettcn::TE::CModule::TypeGet(unsigned int typeIdx) const
 {
   if (typeIdx < _typeArray.size())
     return *_typeArray[typeIdx];
   
-  std::cout << "ERROR: Type index: " << typeIdx << " too big (size: " << _typeArray.size() << ")" << std::endl;
-  throw ENotFound();
+  std::stringstream stream;
+  stream << "Type index: " << typeIdx << " too big (size: " << _typeArray.size() << ")!!!";
+  throw EOutOfRange(E_DATA, stream.str());
 }
 
 
-const freettcn::TE::CPortType &freettcn::TE::CModule::PortType(unsigned int portTypeIdx) const throw(ENotFound)
+const freettcn::TE::CPortType &freettcn::TE::CModule::PortType(unsigned int portTypeIdx) const
 {
   if (portTypeIdx < _portTypeArray.size())
     return *_portTypeArray[portTypeIdx];
   
-  std::cout << "ERROR: Port Type index: " << portTypeIdx << " too big (size: " << _portTypeArray.size() << ")" << std::endl;
-  throw ENotFound();
+  std::stringstream stream;
+  stream << "Port Type index: " << portTypeIdx << " too big (size: " << _portTypeArray.size() << ")!!!";
+  throw EOutOfRange(E_DATA, stream.str());
 }
 
 
@@ -323,22 +321,24 @@ TciTestCaseIdListType freettcn::TE::CModule::TestCases() const
 }
 
 
-freettcn::TE::CTestCase &freettcn::TE::CModule::TestCase(const char *tcId) const throw(ENotFound)
+freettcn::TE::CTestCase &freettcn::TE::CModule::TestCase(const char *tcId) const
 {
   for(unsigned int i=0; i<_testCaseArray.size(); i++)
     if (!strcmp(_testCaseArray[i]->Id().objectName, tcId))
       return *_testCaseArray[i];
-  std::cout << "ERROR: Test Case not found" << std::endl;
-  throw freettcn::ENotFound();
+  
+  throw ENotFound(E_DATA, "Test Case '" + std::string(tcId) + "' not found!!!");
 }
 
-freettcn::TE::CTestCase &freettcn::TE::CModule::TestCase(unsigned int tcIdx) const throw(ENotFound)
+
+freettcn::TE::CTestCase &freettcn::TE::CModule::TestCase(unsigned int tcIdx) const
 {
   if (tcIdx < _testCaseArray.size())
     return *_testCaseArray[tcIdx];
   
-  std::cout << "ERROR: Test Case index: " << tcIdx << " too big (size: " << _testCaseArray.size() << ")" << std::endl;
-  throw ENotFound();
+  std::stringstream stream;
+  stream << "Test Case index: " << tcIdx << " too big (size: " << _testCaseArray.size() << ")!!!";
+  throw EOutOfRange(E_DATA, stream.str());
 }
 
 
@@ -348,13 +348,12 @@ void freettcn::TE::CModule::ActiveTestCase(freettcn::TE::CTestCase &tc)
 }
 
 
-freettcn::TE::CTestCase &freettcn::TE::CModule::ActiveTestCase() const throw(ENotFound)
+freettcn::TE::CTestCase &freettcn::TE::CModule::ActiveTestCase() const
 {
   if (_activeTestCase)
     return *_activeTestCase;
   
-  std::cout << "ERROR: Test Case not running!!!" << std::endl;
-  throw ENotFound();
+  throw ENotFound(E_DATA, "Test Case not running!!!");
 }
 
 
@@ -367,12 +366,12 @@ const TriComponentId &freettcn::TE::CModule::ControlStart()
 }
 
 
-void freettcn::TE::CModule::ControlStop() throw(EOperationFailed)
+void freettcn::TE::CModule::ControlStop()
 {
   freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
   if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_CTRL_STOP))
     // log
-    tliCtrlStop(0, te.TimeStamp().Get(), 0, 0, ModuleComponentId());
+    tliCtrlStop(0, te.TimeStampMgr().Get(), 0, 0, ModuleComponentId());
   
   if (_activeTestCase)
     _activeTestCase->Stop();
@@ -386,14 +385,12 @@ void freettcn::TE::CModule::ControlStop() throw(EOperationFailed)
 }
 
 
-const freettcn::TE::CBehavior &freettcn::TE::CModule::ControlBehavior() const throw(ENotFound)
+const freettcn::TE::CBehavior &freettcn::TE::CModule::ControlBehavior() const
 {
   if (_ctrlBehavior)
     return *_ctrlBehavior;
-  else {
-    std::cout << "ERROR: Control Behavior not set" << std::endl;
-    throw freettcn::EOperationFailed();
-  }
+  else
+    throw ENotFound(E_DATA, "Control Behavior not set!!!");
 }
 
 
@@ -403,7 +400,7 @@ void freettcn::TE::CModule::BehaviorAdd(freettcn::TE::CBehavior *behavior)
 }
 
 
-const freettcn::TE::CBehavior &freettcn::TE::CModule::Behavior(const TciBehaviourIdType &behavior) const throw(freettcn::ENotFound)
+const freettcn::TE::CBehavior &freettcn::TE::CModule::Behavior(const TciBehaviourIdType &behavior) const
 {
   for(CBehaviorList::const_iterator it=_behaviorList.begin(); it!=_behaviorList.end(); ++it) {
     TciBehaviourIdType id = (*it)->Id();
@@ -411,23 +408,21 @@ const freettcn::TE::CBehavior &freettcn::TE::CModule::Behavior(const TciBehaviou
       return *(*it);
   }
   
-  std::cout << "ERROR!!! Behavior not found" << std::endl;
-  throw freettcn::ENotFound();
+  throw ENotFound(E_DATA, "Behavior not found!!!");
 }
 
 
-freettcn::TE::CTestComponentType::CInstanceLocal &freettcn::TE::CModule::TestComponent(const TriComponentId &component) const throw(freettcn::ENotFound)
+freettcn::TE::CTestComponentType::CInstanceLocal &freettcn::TE::CModule::TestComponent(const TriComponentId &component) const
 {
-  freettcn::TE::CIdObject &object = CIdObject::Get(component.compInst);
   try {
+    freettcn::TE::CIdObject &object = CIdObject::Get(component.compInst);
     return dynamic_cast<freettcn::TE::CTestComponentType::CInstanceLocal &>(object);
   }
   catch(Exception) {
     throw;
   }
   catch(std::exception &ex) {
-    std::cout << "Error: System exception: " << ex.what() << " caught!!!" << std::endl;
-    throw freettcn::ENotFound();
+    throw ENotFound(E_DATA, "System exception: " + std::string(ex.what()) + " caught!!!");
   }
 }
 
@@ -442,7 +437,7 @@ freettcn::TE::CTestComponentType::CInstanceRemote &freettcn::TE::CModule::TestCo
   if (kind == TCI_CTRL_COMP) {
     if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_CTRL_START))
       // log
-      tliCtrlStart(0, te.TimeStamp().Get(), const_cast<char *>(src), line, creatorId);
+      tliCtrlStart(0, te.TimeStampMgr().Get(), const_cast<char *>(src), line, creatorId);
   }
   
   TriComponentId compId = tciCreateTestComponentReq(kind, kind == TCI_CTRL_COMP ? 0 : const_cast<void *>(reinterpret_cast<const void*>(&compType)), const_cast<char *>(name));
@@ -451,7 +446,7 @@ freettcn::TE::CTestComponentType::CInstanceRemote &freettcn::TE::CModule::TestCo
   
   if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_C_CREATE))
     // log
-    tliCCreate(0, te.TimeStamp().Get(), const_cast<char *>(src), line, creatorId, compId, const_cast<char *>(name));
+    tliCCreate(0, te.TimeStampMgr().Get(), const_cast<char *>(src), line, creatorId, compId, const_cast<char *>(name), kind == TCI_ALIVE_COMP);
   
   if (kind == TCI_CTRL_COMP) {
     // start control test component immediately using default control behavior
@@ -469,7 +464,7 @@ freettcn::TE::CTestComponentType::CInstanceRemote &freettcn::TE::CModule::TestCo
 
 
 const TriComponentId &freettcn::TE::CModule::TestComponentCreate(TciTestComponentKindType kind,
-                                                                 TciType componentType,
+                                                                 const Type &componentType,
                                                                  const char *name)
 {
   const freettcn::TE::CType *type = 0;
@@ -477,17 +472,13 @@ const TriComponentId &freettcn::TE::CModule::TestComponentCreate(TciTestComponen
     type = static_cast<const freettcn::TE::CType *>(componentType);
   else if (kind == TCI_CTRL_COMP)
     type = &freettcn::TE::CBasicTypes::ControlComponent();
-  else {
-    std::cout << "ERROR!!! TciType not defined" << std::endl;
-    throw EOperationFailed();
-  }
+  else
+    throw EOperationFailed(E_DATA, "Type not defined!!!");
   
   freettcn::TE::CType::CInstance *instance = type->InstanceCreate();
   freettcn::TE::CTestComponentType::CInstanceLocal *cInstance = dynamic_cast<freettcn::TE::CTestComponentType::CInstanceLocal *>(instance);
-  if (!cInstance) {
-    std::cout << "ERROR!!! TciType does not specify Component type" << std::endl;
-    throw EOperationFailed();
-  }
+  if (!cInstance)
+    throw EOperationFailed(E_DATA, "Type does not specify Component type!!!");
   
   cInstance->Init(*this, kind, name);
   
@@ -503,12 +494,12 @@ void freettcn::TE::CModule::TestComponentStartReq(const char *src, int line,
                                                   const TriComponentId &creatorId,
                                                   CTestComponentType::CInstanceRemote &component,
                                                   const CBehavior &behavior,
-                                                  const TciParameterListType &parameterList) throw(EOperationFailed)
+                                                  const TciParameterListType &parameterList)
 {
   freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
   if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_C_START))
     // log
-    tliCStart(0, te.TimeStamp().Get(), const_cast<char *>(src), line, creatorId, component.Id(), behavior.Id(), parameterList);
+    tliCStart(0, te.TimeStampMgr().Get(), const_cast<char *>(src), line, creatorId, component.Id(), behavior.Id(), parameterList);
   
   component.Start(behavior, parameterList);
   
@@ -519,10 +510,8 @@ void freettcn::TE::CModule::TestComponentStartReq(const char *src, int line,
         _done.erase(it);
         break;
       }
-      else {
-        std::cout << "ERROR: Killed test components can't be re-started!!!" << std::endl;
-        throw EOperationFailed();
-      }
+      else
+        throw EOperationFailed(E_DATA, "Killed test components can't be re-started!!!");
     }
   }
 }
@@ -530,19 +519,19 @@ void freettcn::TE::CModule::TestComponentStartReq(const char *src, int line,
 
 void freettcn::TE::CModule::TestComponentStart(const TriComponentId &componentId,
                                                const TciBehaviourIdType &behaviorId,
-                                               const TciParameterListType &parameterList) const throw(ENotFound)
+                                               const TciParameterListType &parameterList) const
 {
   TestComponent(componentId).Start(Behavior(behaviorId), parameterList);
 }
 
 
-void freettcn::TE::CModule::TestComponentStop(const TriComponentId &componentId) const throw(ENotFound)
+void freettcn::TE::CModule::TestComponentStop(const TriComponentId &componentId) const
 {
   TestComponent(componentId).Stop();
 }
 
 
-void freettcn::TE::CModule::TestComponentTerminated(const TriComponentId &componentId, TciVerdictValue verdict) throw(ENotFound)
+void freettcn::TE::CModule::TestComponentTerminated(const TriComponentId &componentId, const VerdictValue &verdict)
 {
   CTestComponentType::CInstanceRemote *comp = 0;
   
@@ -552,20 +541,16 @@ void freettcn::TE::CModule::TestComponentTerminated(const TriComponentId &compon
       break;
     }
   }
-  if (!comp) {
-    std::cout << "ERROR: Test component not found!!!" << std::endl;
-    throw ENotFound();
-  }
+  if (!comp)
+    throw ENotFound(E_DATA, "Test component not found!!!");
   
   switch (comp->Kind()) {
   case TCI_CTRL_COMP:
     // control terminated
     if (_allEntityStates.size() == 1)
       Purge(_allEntityStates);
-    else {
-      std::cout << "ERROR: Control component not found!!!" << std::endl;
-      throw ENotFound();
-    }
+    else
+      throw ENotFound(E_DATA, "Control component not found!!!");
     
     if (_ctrlComponent)
       _ctrlComponent = 0;
@@ -628,7 +613,7 @@ void freettcn::TE::CModule::TestComponentTerminated(const TriComponentId &compon
 }
 
 
-void freettcn::TE::CModule::TestComponentKill(const TriComponentId &componentId) const throw(ENotFound)
+void freettcn::TE::CModule::TestComponentKill(const TriComponentId &componentId) const
 {
   TestComponent(componentId).Kill();
 //   CTestComponentType::CInstance &comp = TestComponent(componentId);
@@ -640,7 +625,7 @@ void freettcn::TE::CModule::TestComponentKill(const TriComponentId &componentId)
 //   freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
 //   if (te.Logging() && te.LogMask().Get(freettcn::CLogMask::CMD_TE_C_KILLED))
 //     // log
-//     tliCKilled(0, te.TimeStamp().Get(), 0, 0, componentId, 0);
+//     tliCKilled(0, te.TimeStampMgr().Get(), 0, 0, componentId, 0);
 }
 
 
@@ -673,7 +658,7 @@ void freettcn::TE::CModule::TestComponentAllKill(const char *src, int line, CTes
 }
 
 
-void freettcn::TE::CModule::Connect(const TriPortId &fromPort, const TriPortId &toPort) const throw(ENotFound)
+void freettcn::TE::CModule::Connect(const TriPortId &fromPort, const TriPortId &toPort) const
 {
   unsigned int count = 0;
   try {
@@ -688,13 +673,12 @@ void freettcn::TE::CModule::Connect(const TriPortId &fromPort, const TriPortId &
   }
   catch(ENotFound) {
   }
-  if (count < 1) {
-    std::cout << "ERROR: Ports to connect not found!!!" << std::endl;
-    throw ENotFound();
-  }
+  if (count < 1)
+    throw ENotFound(E_DATA, "Ports to connect not found!!!");
 }
 
-void freettcn::TE::CModule::Disconnect(const TriPortId &fromPort, const TriPortId &toPort) const throw(ENotFound)
+
+void freettcn::TE::CModule::Disconnect(const TriPortId &fromPort, const TriPortId &toPort) const
 {
   unsigned int count = 0;
   try {
@@ -709,13 +693,11 @@ void freettcn::TE::CModule::Disconnect(const TriPortId &fromPort, const TriPortI
   }
   catch(ENotFound) {
   }
-  if (count < 1) {
-    std::cout << "ERROR: Ports to disconnect not found!!!" << std::endl;
-    throw ENotFound();
-  }
+  if (count < 1)
+    throw ENotFound(E_DATA, "Ports to disconnect not found!!!");
 }
 
-void freettcn::TE::CModule::Map(const TriPortId &fromPort, const TriPortId &toPort) const throw(ENotFound, EOperationFailed)
+void freettcn::TE::CModule::Map(const TriPortId &fromPort, const TriPortId &toPort) const
 {
   unsigned int count = 0;
   try {
@@ -730,18 +712,14 @@ void freettcn::TE::CModule::Map(const TriPortId &fromPort, const TriPortId &toPo
   }
   catch(ENotFound) {
   }
-  if (count < 1) {
-    std::cout << "ERROR: Ports to map not found!!!" << std::endl;
-    throw ENotFound();
-  }
+  if (count < 1)
+    throw ENotFound(E_DATA, "Ports to map not found!!!");
   
-  if (triMap(&fromPort, &toPort) != TRI_OK) {
-    std::cout << "ERROR: Mapping of ports failed!!!" << std::endl;
-    throw EOperationFailed();
-  }
+  if (triMap(&fromPort, &toPort) != TRI_OK)
+    throw EOperationFailed(E_DATA, "Mapping of ports failed!!!");
 }
 
-void freettcn::TE::CModule::Unmap(const TriPortId &fromPort, const TriPortId &toPort) const throw(ENotFound, EOperationFailed)
+void freettcn::TE::CModule::Unmap(const TriPortId &fromPort, const TriPortId &toPort) const
 {
   unsigned int count = 0;
   try {
@@ -756,13 +734,9 @@ void freettcn::TE::CModule::Unmap(const TriPortId &fromPort, const TriPortId &to
   }
   catch(ENotFound) {
   }
-  if (count < 1) {
-    std::cout << "ERROR: Ports to unmap not found!!!" << std::endl;
-    throw ENotFound();
-  }
+  if (count < 1)
+    throw ENotFound(E_DATA, "Ports to unmap not found!!!");
   
-  if (triUnmap(&fromPort, &toPort) != TRI_OK) {
-    std::cout << "ERROR: Unmapping of ports failed!!!" << std::endl;
-    throw EOperationFailed();
-  }
+  if (triUnmap(&fromPort, &toPort) != TRI_OK)
+    throw EOperationFailed(E_DATA, "Unmapping of ports failed!!!");
 }
