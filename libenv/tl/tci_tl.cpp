@@ -1197,7 +1197,7 @@ void tliTStop(String am,
               TriTimerDuration dur)
 {
   freettcn::TL::CTestLogging &tl = freettcn::TL::CTestLogging::Instance();
-  tl.TStop(am, ts, src, line, c, timer);
+  tl.TStop(am, ts, src, line, c, timer, dur);
 }
 
 

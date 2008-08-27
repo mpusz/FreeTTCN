@@ -61,4 +61,3 @@ const TriTimerId &freettcn::PA::CTimer::Id() const
 {
   return _id;
 }
-

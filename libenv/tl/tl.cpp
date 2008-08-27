@@ -687,7 +687,8 @@ void freettcn::TL::CTestLogging::TStart(const char *am, int ts, const char *src,
 
 void freettcn::TL::CTestLogging::TStop(const char *am, int ts, const char *src, int line,
                                        const TriComponentId &c,
-                                       const TriTimerId &timer) const
+                                       const TriTimerId &timer,
+                                       TriTimerDuration dur) const
 {
   freettcn::TL::CLogger::CData *data = new freettcn::TL::CLogger::CData(ts, src, line, am, freettcn::CEntity::TYPE_PA,
                                                                         freettcn::CLogMask::CMD_PA_T_STOP,
@@ -696,6 +697,9 @@ void freettcn::TL::CTestLogging::TStop(const char *am, int ts, const char *src, 
   char str[256];
   data->LineAdd("Timer Id", InstanceId2String(timer, str));
   
+  sprintf(str, "%f", dur);
+  data->LineAdd("Duration", str);
+
   Logger().Push(data);
 }
 

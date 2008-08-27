@@ -330,11 +330,11 @@ typedef struct TciValueDifferenceList {
 
 /**
  * A value of ComponentStatusType is either "inactiveC", "runningC",
- *"stoppedC", or "killedC".
+ * "stoppedC", or "killedC".
  *
  * @todo There is no definition in the TTCN-3 standard specification
+ * @todo 3.2.1
  */
-/// @todo 3.2.1
 typedef enum {
   inactiveC,
   runningC,
@@ -347,8 +347,8 @@ typedef enum {
  * "expiredT".
  *
  * @todo There is no definition in the TTCN-3 standard specification
+ * @todo 3.2.1
  */
-/// @todo 3.2.1
 typedef enum {
   runningT,
   inactiveT,
@@ -361,12 +361,12 @@ typedef enum {
  * stoppedP".
  *
  * @todo There is no definition in the TTCN-3 standard specification
+ * @todo 3.2.1 - not used???
  */
-/// @todo 3.2.1 - not used???
 typedef enum {
-  TCI_startedP,
-  TCI_haltedP,
-  TCI_stoppedP
+  startedP,
+  haltedP,
+  stoppedP
 } TciPortStatus;
 
 

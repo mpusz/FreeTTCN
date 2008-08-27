@@ -155,7 +155,7 @@ TriStatus freettcn::PA::CPlatformAdaptor::TimerRead(const TriTimerId* timerId, T
     
     if (Logging() && LogMask().Get(freettcn::CLogMask::CMD_PA_T_READ)) {
       TriComponentId comp = { { 0 } };
-      tliTStart(0, TimeStampMgr().Get(), 0, 0, comp, *timerId, *elapsedTime);
+      tliTRead(0, TimeStampMgr().Get(), 0, 0, comp, *timerId, *elapsedTime);
     }
     
     return TRI_OK;

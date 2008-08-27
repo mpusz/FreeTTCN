@@ -49,6 +49,7 @@ namespace freettcn {
     
         guint _id;
         TState _state;
+        GTimer *_timer;
     
         static gboolean CallbackFunc(gpointer data);
     

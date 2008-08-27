@@ -24,15 +24,15 @@
 
 
 freettcn::example::CGlibPlatformAdaptor::CTimer::CTimer(const TriTimerId &timerId):
-  freettcn::PA::CTimer(timerId), _state(STOPPED)
+  freettcn::PA::CTimer(timerId), _state(STOPPED), _timer(0)
 {
 }
 
 
 freettcn::example::CGlibPlatformAdaptor::CTimer::~CTimer()
 {
-//   if (gSource)
-//     ;
+  if(_timer)
+    g_timer_destroy(_timer);
 }
 
 
@@ -41,6 +41,10 @@ gboolean freettcn::example::CGlibPlatformAdaptor::CTimer::CallbackFunc(gpointer 
   CTimer *timer = static_cast<CTimer *>(data);
   timer->Timeout();
   timer->State(STOPPED);
+  if(timer->_timer) {
+    g_timer_destroy(timer->_timer);
+    timer->_timer = 0;
+  }
   
   return FALSE;
 }
@@ -63,6 +67,10 @@ void freettcn::example::CGlibPlatformAdaptor::CTimer::Start(TriTimerDuration dur
   _id = g_timeout_add_full(G_PRIORITY_HIGH, static_cast<guint>(round(duration * 1000)),
                            CallbackFunc, this, 0);
   _state = STARTED;
+  if(!_timer)
+    _timer = g_timer_new();
+  else
+    g_timer_start(_timer);
 }
 
 
@@ -71,11 +79,15 @@ void freettcn::example::CGlibPlatformAdaptor::CTimer::Stop()
   if (!g_source_remove(_id))
     throw EOperationFailed(E_DATA, "Removing of a timer failed!!!");
   _state = STOPPED;
+  g_timer_stop(_timer);
 }
 
 
 TriTimerDuration freettcn::example::CGlibPlatformAdaptor::CTimer::Read() const
 {
+  if(_timer)
+    return g_timer_elapsed(_timer, 0);
+  
   return 0;
 }
 

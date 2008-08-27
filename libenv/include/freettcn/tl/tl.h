@@ -207,7 +207,8 @@ namespace freettcn {
                           TriTimerDuration dur) const;
       virtual void TStop(const char *am, int ts, const char *src, int line,
                          const TriComponentId &c,
-                         const TriTimerId &timer) const;
+                         const TriTimerId &timer,
+                         TriTimerDuration dur) const;
       virtual void TRead(const char *am, int ts, const char *src, int line,
                          const TriComponentId &c,
                          const TriTimerId &timer,
