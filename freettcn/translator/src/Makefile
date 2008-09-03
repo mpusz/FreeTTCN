@@ -55,8 +55,6 @@ GEN_FILES = $(PARSER_C_FILE) $(LEXER_C_FILE)
 GEN_O_FILES = $(addprefix $(BIN_DIR)/, $(patsubst %.c,%.o,$(GEN_FILES)))
 
 
-Q = "echo "
-
 # targets
 .PHONY: all clean distclean tags 
 
@@ -65,10 +63,10 @@ all: $(O_FILES)
 
 clean:
 	$(Q)$(RM) -f $(LIB_PATH) $(O_FILES) $(DEPEND_FILES)
-	$(Q)$(RM) -f $(BIN_DIR)/$(EXAMPLE_NAME)
+	$(Q)$(RM) -f $(BIN_DIR)/$(TRANSLATOR_NAME)
 
 distclean: clean
-	$(Q)$(RM) -f *~ include/*~
+	$(Q)$(RM) -f *~
 
 tags:
 	@$(call cmd,cmd_tags_cpp)

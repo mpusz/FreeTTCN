@@ -37,14 +37,14 @@ PARSER_H_FILE := $(patsubst %.g,%Parser.h,$(GRAMMAR_FILE))
 LEXER_C_FILE := $(patsubst %.g,%Lexer.c,$(GRAMMAR_FILE))
 LEXER_H_FILE := $(patsubst %.g,%Lexer.h,$(GRAMMAR_FILE))
 C_FILES = $(PARSER_C_FILE) $(LEXER_C_FILE)
-GEN_FILES = $(C_FILES) $(PARSER_H_FILE) $(LEXER_H_FILE)
+GEN_FILES = $(C_FILES) $(PARSER_H_FILE) $(LEXER_H_FILE) $(patsubst %.g,%.tokens,$(GRAMMAR_FILE))
+GEN_FILES_PATH = $(addprefix $(GEN_DIR)/, $(GEN_FILES))
 
 
 # macros
 O_FILES = $(addprefix $(BIN_DIR)/, $(patsubst %.c,%.o,$(C_FILES)))
 DEPEND_FILES = $(patsubst %.c,%.d,$(C_FILES))
 
-Q = "echo "
 
 # targets
 .PHONY: all install clean distclean tags
@@ -61,7 +61,7 @@ install:
 
 clean:
 	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_clean,$(dir)))
-	$(Q)$(RM) -f $(O_FILES) $(DEPEND_FILES) $(GEN_FILES)
+	$(Q)$(RM) -f $(O_FILES) $(DEPEND_FILES) $(GEN_FILES_PATH)
 
 distclean: clean
 	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_distclean,$(dir)))
