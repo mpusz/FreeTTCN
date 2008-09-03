@@ -1,52 +1,128 @@
-include ../Makefile.macros
+#
+# Copyright (C) 2007 Mateusz Pusz
+#
+# This file is part of freettcn (Free TTCN) usage example.
+
+# This example is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+
+# This example is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this example; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+include ../../../Makefile.defines
 
 
-TOP_DIR = ..
-INCLUDE_DIRS = -I$(TOP_DIR)/$(GEN_DIR) -I.
+#
+# directories
+#
+GEN_DIR = ../gen
+BIN_DIR = ../bin
 
-LIB_FILES =  $(addprefix $(TOP_DIR)/, $(O_FILES))
+
+#
+# files
+#
+CPP_FILES = main.cpp
+
+
+#
+# defines
+#
+INCLUDE_DIRS = -I$(GEN_DIR)
+
+
+# macros
+O_FILES = $(addprefix $(BIN_DIR)/, $(patsubst %.cpp,%.o,$(CPP_FILES)))
+DEPEND_FILES = $(patsubst %.cpp,%.d,$(CPP_FILES))
+
+
+# files
+GRAMMAR_FILE = ttcn3.g
+PARSER_C_FILE := $(patsubst %.g,%Parser.c,$(GRAMMAR_FILE))
+LEXER_C_FILE := $(patsubst %.g,%Lexer.c,$(GRAMMAR_FILE))
+GEN_FILES = $(PARSER_C_FILE) $(LEXER_C_FILE)
+
+
+# macros
+GEN_O_FILES = $(addprefix $(BIN_DIR)/, $(patsubst %.c,%.o,$(GEN_FILES)))
+
+
+Q = "echo "
 
 # targets
-.PHONY: all bin tags classes doc clean clobber
+.PHONY: all clean distclean tags 
 
-all:
-	$(MAKE) -C $(TOP_DIR) all
-
-tags:
-	$(MAKE) -C $(TOP_DIR) tags
-
-classes:
-	$(MAKE) -C $(TOP_DIR) classes
-
-doc:
-	$(MAKE) -C $(TOP_DIR) doc
-
-clobber:
-	$(MAKE) -C $(TOP_DIR) clobber
+all: $(O_FILES)
+	@$(call cmd,cmd_translator_link)
 
 clean:
-	$(MAKE) -C $(TOP_DIR) clean
+	$(Q)$(RM) -f $(LIB_PATH) $(O_FILES) $(DEPEND_FILES)
+	$(Q)$(RM) -f $(BIN_DIR)/$(EXAMPLE_NAME)
+
+distclean: clean
+	$(Q)$(RM) -f *~ include/*~
+
+tags:
+	@$(call cmd,cmd_tags_cpp)
 
 
 # rules
-$(PROG_NAME): $(LIB_FILES)
+$(BIN_DIR)/%.o: %.cpp
+	@$(call cmd,cmd_cc_d_o)
 
-$(TOP_DIR)/$(LIB_DIR)/%.o: $(TOP_DIR)/$(GEN_DIR)/%.c
-	$(CPP) -c $(CFLAGS) $(INCLUDE_DIRS) $< -o $@
-
-$(TOP_DIR)/$(LIB_DIR)/%.o: %.cpp
-	$(CPP) -c $(CFLAGS) $(INCLUDE_DIRS) $< -o $@
-
-$(TOP_DIR)/$(GEN_DIR)/%.d: $(TOP_DIR)/$(GEN_DIR)/%.c
-	$(CPP) -MM $(CFLAGS) $(INCLUDE_DIRS) $< > $@.$$$$; \
-	sed 's,\($*\)\.o[ :]*,$(TOP_DIR)/$(LIB_DIR)/\1.o $@ : ,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$
-
-%.d: %.cpp
-	$(CPP) -MM $(CFLAGS) $(INCLUDE_DIRS) $< > $@.$$$$; \
-	sed 's,\($*\)\.o[ :]*,$(TOP_DIR)/$(LIB_DIR)/\1.o $@ : ,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$
 
 # include depends files
-include $(addprefix $(TOP_DIR)/$(GEN_DIR)/, $(C_FILES:.c=.d))
-include $(CPP_FILES:.cpp=.d)
+-include $(CPP_FILES:.cpp=.d)
+
+
+
+
+# all:
+# 	$(MAKE) -C $(TOP_DIR) all
+
+# tags:
+# 	$(MAKE) -C $(TOP_DIR) tags
+
+# classes:
+# 	$(MAKE) -C $(TOP_DIR) classes
+
+# doc:
+# 	$(MAKE) -C $(TOP_DIR) doc
+
+# clobber:
+# 	$(MAKE) -C $(TOP_DIR) clobber
+
+# clean:
+# 	$(MAKE) -C $(TOP_DIR) clean
+
+
+# # rules
+# $(PROG_NAME): $(LIB_FILES)
+
+# $(TOP_DIR)/$(LIB_DIR)/%.o: $(TOP_DIR)/$(GEN_DIR)/%.c
+# 	$(CPP) -c $(CFLAGS) $(INCLUDE_DIRS) $< -o $@
+
+# $(TOP_DIR)/$(LIB_DIR)/%.o: %.cpp
+# 	$(CPP) -c $(CFLAGS) $(INCLUDE_DIRS) $< -o $@
+
+# $(TOP_DIR)/$(GEN_DIR)/%.d: $(TOP_DIR)/$(GEN_DIR)/%.c
+# 	$(CPP) -MM $(CFLAGS) $(INCLUDE_DIRS) $< > $@.$$$$; \
+# 	sed 's,\($*\)\.o[ :]*,$(TOP_DIR)/$(LIB_DIR)/\1.o $@ : ,g' < $@.$$$$ > $@; \
+# 	rm -f $@.$$$$
+
+# %.d: %.cpp
+# 	$(CPP) -MM $(CFLAGS) $(INCLUDE_DIRS) $< > $@.$$$$; \
+# 	sed 's,\($*\)\.o[ :]*,$(TOP_DIR)/$(LIB_DIR)/\1.o $@ : ,g' < $@.$$$$ > $@; \
+# 	rm -f $@.$$$$
+
+# # include depends files
+# include $(addprefix $(TOP_DIR)/$(GEN_DIR)/, $(C_FILES:.c=.d))
+# include $(CPP_FILES:.cpp=.d)

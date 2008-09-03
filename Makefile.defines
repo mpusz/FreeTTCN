@@ -22,6 +22,7 @@
 PROJECT_NAME = freettcn
 
 # part names
+TRANSLATOR_NAME = $(PROJECT_NAME)
 LIB_NAME = lib$(PROJECT_NAME)
 LIB_ENV_NAME = lib$(PROJECT_NAME)env
 EXAMPLE_NAME = ttcn_example
@@ -45,6 +46,7 @@ AR = ar -c
 CD = cd
 CP = cp
 # LD = ld
+ANTLR = java -cp /downloads/APLIKACJE/Linux/ANTLR/antlr-3.1/lib/antlr-3.1.jar org.antlr.Tool
 RM = rm
 LN = ln
 SED = sed
@@ -61,6 +63,7 @@ TAR = tar
 #
 # directories
 #
+BIN_INSTALL_DIR = /usr/local/bin
 LIB_INSTALL_DIR = /usr/local/lib
 H_INSTALL_DIR = /usr/local/include
 LOCAL_FREETTCN_H_DIR = include/$(PROJECT_NAME)
@@ -134,6 +137,10 @@ quiet_cmd_make_distclean = MAKE_DIST_CLEAN $(LONG_DIR_NAME)/$(2)
 quiet_cmd_make_tags = MAKE_TAGS $(LONG_DIR_NAME)/$(2)
       cmd_make_tags = $(MAKE) -C $(2) DIR_NAME=$(2) LONG_DIR_NAME=$(LONG_DIR_NAME)/$(2) TAG_DIR=$(TAG_DIR) tags
 
+# make antlr
+quiet_cmd_antlr = ANTLR      $<
+      cmd_antlr = $(ANTLR) -o $(GEN_DIR) $<
+
 # compile source file, create depend file *.d, insert *.o file to library <bindir>\<dirname>.a
 quiet_cmd_cc_d_a = CC_D_A     $<
       cmd_cc_d_a = $(CPP) $(CPPFLAGS) -MD -MF $*.d_ $(INCLUDE_DIRS) -c $< -o $(@D)/$% && \
@@ -152,6 +159,9 @@ quiet_cmd_cc_d_o = CC_D_O     $<
 quiet_cmd_ttcn_cc = TTCN_CC    $<
       cmd_ttcn_cc = $(TOUCH) $@
 
+# link translator
+quiet_cmd_translator_link = LINK $(BIN_DIR)/$(TRANSLATOR_NAME)
+      cmd_translator_link = $(CPP) $(O_FILES) $(GEN_O_FILES) -lantlr3c -o $(BIN_DIR)/$(TRANSLATOR_NAME)
 
 # link library
 quiet_cmd_lib_link = LINK $(BIN_DIR)/$(LIB_FULL_NAME)
@@ -163,8 +173,12 @@ quiet_cmd_lib_link = LINK $(BIN_DIR)/$(LIB_FULL_NAME)
 		     $(RM) -f *.o
 
 # link example
-quiet_cmd_example_link = LINK       $(BIN_DIR)/$(EXAMPLE_NAME)
+quiet_cmd_example_link = LINK $(BIN_DIR)/$(EXAMPLE_NAME)
       cmd_example_link = $(CPP) $(O_FILES) $(MODULES_O_FILES) -l$(PROJECT_NAME) -l$(PROJECT_NAME)env `pkg-config --libs glib-2.0` -o $(BIN_DIR)/$(EXAMPLE_NAME)
+
+# install translator
+quiet_cmd_translator_install = INSTALL $(TRANSLATOR_NAME)
+      cmd_translator_install = $(INSTALL) -p $(BIN_DIR)/$(TRANSLATOR_NAME) $(BIN_INSTALL_DIR)
 
 # install library
 quiet_cmd_lib_install = INSTALL $(LIB_FULL_NAME)
