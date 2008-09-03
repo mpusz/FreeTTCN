@@ -1,8 +1,9 @@
-tree grammar ttcn3;
+grammar ttcn3;
 
 options
 {
     language = C;
+    backtrack = true;
 }
 
 tokens {
@@ -41,7 +42,7 @@ tokens {
 	ON = 'on';
 	MTC = 'mtc';
 	SIGNATURE = 'signature';
-	EXCEPTION = 'exception';
+	TTCN_EXCEPTION = 'exception';
 	NO_BLOCK = 'noblock';
 	TESTCASE = 'testcase';
 	SYSTEM = 'system';
@@ -109,7 +110,7 @@ tokens {
 	NONE = 'none';
 	ERROR = 'error';
 	CHAR = 'char';
-	NULL = 'null';
+	TTCN_NULL = 'null';
 	OMIT = 'omit';
 	IN = 'in';
 	OUT = 'out';
@@ -148,45 +149,28 @@ tokens {
 	ELSE = 'else';
 	SELECT = 'select';
 	CASE = 'case';
-}
-
-
-@members {
-  int main(int argc, char * argv[])
-  {
-    pANTLR3_INPUT_STREAM input = antlr3AsciiFileStreamNew(argv[1]);
-    pttcn3Lexer lexer = ttcn3LexerNew(input);
-    pANTLR3_COMMON_TOKEN_STREAM tokens = antlr3CommonTokenStreamSourceNew(ANTLR3_SIZE_HINT, lexer->pLexer->tokSource);
-    pttcn3Parser parser = ttcn3ParserNew(tokens);
-    Token *token;
+    MINUS = '-';
+    DOT = '.';
+    SEMICOLON = ';';
+    COLON = ',';
+    UNDERSCORE = '_';
+    ASSIGNMENT_CHAR = ':=';
     
-    parser->expr(parser);
-    while ((token = lexer->nextToken())!=Token.EOF_TOKEN) {
-        printf("Token: %s\n", token->getText());
-    }
-        
-    // Must manually clean up
-    parser->free(parser);
-    tokens->free(tokens);
-    lex->free(lex);
-    input->close(input);
-
-    return 0;
-  }
+    /* ADDED */
+    SCOPE_OPEN = '{';
+    SCOPE_CLOSE = '}';
 }
-
-
 
 
 
 /* A.1.6.0 - TTCN-3 module*/
 
-ttcn3Module		: ^ ( ttcn3ModuleKeyword ttcn3ModuleId
-			'{'
+ttcn3Module		: ttcn3ModuleKeyword ttcn3ModuleId
+			SCOPE_OPEN
 			moduleDefinitionsPart?
 			moduleControlPart?
-			'}'
-			withStatement? SEMICOLON? ) EOF;
+			SCOPE_CLOSE
+			withStatement? SEMICOLON? EOF;
 ttcn3ModuleKeyword	: MODULE;
 ttcn3ModuleId		: moduleId;
 moduleId		: globalModuleId languageSpec?;
@@ -232,7 +216,7 @@ structuredTypeDef	: recordDef |
 recordDef		: recordKeyword structDefBody;
 recordKeyword		: RECORD;
 structDefBody		: ( ( structTypeIdentifier structDefFormalParList? ) | addressKeyword )
-			'{' ( structFieldDef ( ',' structFieldDef )* )? '}';
+			SCOPE_OPEN ( structFieldDef ( ',' structFieldDef )* )? SCOPE_CLOSE;
 structTypeIdentifier	: IDENTIFIER;
 structDefFormalParList	: '(' structDefFormalPar ( ',' structDefFormalPar )* ')';
 structDefFormalPar	: formalValuePar;
@@ -244,18 +228,18 @@ nestedTypeDef		: nestedRecordDef |
 			nestedRecordOfDef |
 			nestedSetOfDef |
 			nestedEnumDef;
-nestedRecordDef		: recordKeyword '{' ( structFieldDef ( ',' structFieldDef )* )? '}';
-nestedUnionDef		: unionKeyword '{' unionFieldDef ( ',' unionFieldDef )* '}';
-nestedSetDef		: setKeyword '{' ( structFieldDef ( ',' structFieldDef )* )? '}';
+nestedRecordDef		: recordKeyword SCOPE_OPEN ( structFieldDef ( ',' structFieldDef )* )? SCOPE_CLOSE;
+nestedUnionDef		: unionKeyword SCOPE_OPEN unionFieldDef ( ',' unionFieldDef )* SCOPE_CLOSE;
+nestedSetDef		: setKeyword SCOPE_OPEN ( structFieldDef ( ',' structFieldDef )* )? SCOPE_CLOSE;
 nestedRecordOfDef	: recordKeyword stringLength? ofKeyword ( type | nestedTypeDef );
 nestedSetOfDef		: setKeyword stringLength? ofKeyword ( type | nestedTypeDef );
-nestedEnumDef		: enumKeyword '{' enumerationList '}';
+nestedEnumDef		: enumKeyword SCOPE_OPEN enumerationList SCOPE_CLOSE;
 structFieldIdentifier	: IDENTIFIER;
 optionalKeyword		: OPTIONAL;
 unionDef		: unionKeyword unionDefBody;
 unionKeyword		: UNION;
 unionDefBody		: ( structTypeIdentifier structDefFormalParList? | addressKeyword )
-			'{' unionFieldDef ( ',' unionFieldDef )* '}';
+			SCOPE_OPEN unionFieldDef ( ',' unionFieldDef )* SCOPE_CLOSE;
 unionFieldDef		: ( type | nestedTypeDef ) structFieldIdentifier arrayDef? subTypeSpec?;
 setDef			: setKeyword structDefBody;
 setKeyword		: SET;
@@ -264,7 +248,7 @@ ofKeyword		: OF;
 structOfDefBody		: ( type | nestedTypeDef ) ( structTypeIdentifier | addressKeyword ) subTypeSpec?;
 setOfDef		: setKeyword stringLength? ofKeyword structOfDefBody;
 enumDef			: enumKeyword ( enumTypeIdentifier | addressKeyword )
-			'{'  enumerationList '}';
+			SCOPE_OPEN  enumerationList SCOPE_CLOSE;
 enumKeyword		: ENUMERATED;
 enumTypeIdentifier	: IDENTIFIER;
 enumerationList		: enumeration ( ',' enumeration )*;
@@ -291,7 +275,7 @@ portKeyword		: PORT;
 portTypeIdentifier	: IDENTIFIER;
 portDefAttribs		: messageAttribs | procedureAttribs | mixedAttribs;
 messageAttribs		: messageKeyword
-			'{' ( messageList SEMICOLON? )+ '}';
+			SCOPE_OPEN ( messageList SEMICOLON? )+ SCOPE_CLOSE;
 messageList		: direction allOrTypeList;
 direction		: inParKeyword | outParKeyword | inOutParKeyword;
 messageKeyword		: MESSAGE;
@@ -300,20 +284,20 @@ allOrTypeList		: allKeyword | typeList;
 allKeyword		: ALL;
 typeList		: type ( ',' type )*;
 procedureAttribs	: procedureKeyword
-			'{' ( procedureList SEMICOLON? )+ '}';
+			SCOPE_OPEN ( procedureList SEMICOLON? )+ SCOPE_CLOSE;
 procedureKeyword	: PROCEDURE;
 procedureList		: direction allOrSignatureList;
 allOrSignatureList	: allKeyword | signatureList;
 signatureList		: signature ( ',' signature )*;
 mixedAttribs		: mixedKeyword
-			'{' ( mixedList SEMICOLON? )+ '}';
+			SCOPE_OPEN ( mixedList SEMICOLON? )+ SCOPE_CLOSE;
 mixedKeyword		: MIXED;
 mixedList 		: direction procOrTypeList;
 procOrTypeList		: allKeyword | ( procOrType ( ',' procOrType )* );
 procOrType		: signature | type;
 componentDef		: componentKeyword componentTypeIdentifier
 			( extendsKeyword componentType ( ',' componentType )* )?
-			'{' componentDefList? '}';
+			SCOPE_OPEN componentDefList? SCOPE_CLOSE;
 componentKeyword	: COMPONENT;
 extendsKeyword		: EXTENDS;
 componentType		: ( globalModuleId DOT )? componentTypeIdentifier;
@@ -348,7 +332,7 @@ templateFormalPar	: formalValuePar | formalTemplatePar;
 templateBody		: ( simpleSpec | fieldSpecList | arrayValueOrAttrib ) | extraMatchingAttributes?;
 /* STATIC SEMANTICS - Within templateBody the arrayValueOrAttrib can be used for array, record, record of and set of types. */
 simpleSpec		: singleValueOrAttrib;
-fieldSpecList		: '{' ( fieldSpec ( ',' fieldSpec )* )? '}';
+fieldSpecList		: SCOPE_OPEN ( fieldSpec ( ',' fieldSpec )* )? SCOPE_CLOSE;
 fieldSpec		: fieldReference ASSIGNMENT_CHAR templateBody;
 fieldReference		: structFieldRef | arrayOrBitRef | parRef;
 /* STATIC SEMANTICS - Within fieldReference arrayOrBitRef can be used for record of and set of templates/template fields
@@ -369,10 +353,10 @@ singleValueOrAttrib	: matchingSymbol |
 			templateRefWithParList;
 /* STATIC SEMANTICS - variableIdentifier (accessed via singleExpression) may only be used in in-line template definitions
 to reference variables in the current scope. */
-arrayValueOrAttrib	: '{' arrayElementSpecList '}';
+arrayValueOrAttrib	: SCOPE_OPEN arrayElementSpecList SCOPE_CLOSE;
 arrayElementSpecList	: arrayElementSpec ( ',' arrayElementSpec )*;
-arrayElementSpec	: NOT_USED_SYMBOL | permutationMatch | templateBody;
-NOT_USED_SYMBOL		: DASH;
+arrayElementSpec	: notUsedSymbol | permutationMatch | templateBody;
+notUsedSymbol		: dash;
 matchingSymbol		: complement |
 			anyValue |
 			anyOrOmit |
@@ -453,7 +437,7 @@ runsOnSpec		: runsKeyword onKeyword componentType;
 runsKeyword		: RUNS;
 onKeyword		: ON;
 mtcKeyword		: MTC;
-statementBlock		: '{' functionStatementOrDefList? '}';
+statementBlock		: SCOPE_OPEN functionStatementOrDefList? SCOPE_CLOSE;
 functionStatementOrDefList	: ( functionStatementOrDef SEMICOLON? )+;
 functionStatementOrDef	: functionLocalDef |
 			functionLocalInst |
@@ -492,7 +476,7 @@ signatureIdentifier	: IDENTIFIER;
 signatureFormalParList	: signatureFormalPar ( ',' signatureFormalPar )*;
 signatureFormalPar	: formalValuePar;
 exceptionSpec		: exceptionKeyword '(' exceptionTypeList ')';
-exceptionKeyword	: EXCEPTION;
+exceptionKeyword	: TTCN_EXCEPTION;
 exceptionTypeList	: type ( ',' type )*;
 noBlockKeyword		: NO_BLOCK;
 signature		: ( globalModuleId DOT )? signatureIdentifier;
@@ -525,7 +509,7 @@ production shall resolve to one or more singleExpressions i.e. equivalent to the
 
 altstepDef		: altstepKeyword altstepIdentifier
 			'(' altstepFormalParList? ')' runsOnSpec?
-			'{' altstepLocalDefList altGuardList '}';
+			SCOPE_OPEN altstepLocalDefList altGuardList SCOPE_CLOSE;
 altstepKeyword		: ALTSTEP;
 altstepIdentifier	: IDENTIFIER;
 altstepFormalParList	: functionFormalParList;
@@ -537,10 +521,10 @@ altstepRef		: ( globalModuleId DOT )? altstepIdentifier;
 
 /* A.1.6.1.8 - Import definitions */
 
-importDef		: importKeyword importFromSpec ( allWithExcepts | ( '{' importSpec '}' ) );
+importDef		: importKeyword importFromSpec ( allWithExcepts | ( SCOPE_OPEN importSpec SCOPE_CLOSE ) );
 importKeyword		: IMPORT;
 allWithExcepts		: allKeyword exceptsDef?;
-exceptsDef		: exceptKeyword '{' exceptSpec '}';
+exceptsDef		: exceptKeyword SCOPE_OPEN exceptSpec SCOPE_CLOSE;
 exceptKeyword		: EXCEPT;
 exceptSpec		: ( exceptElement SEMICOLON? )*;
 exceptElement		: exceptGroupSpec |
@@ -615,7 +599,7 @@ allModuleParWithExcept	: allKeyword ( exceptKeyword moduleParRefList )?;
 /* A.1.6.1.9 - Group definitions */
 
 groupDef		: groupKeyword groupIdentifier
-			'{' moduleDefinitionsPart? '}';
+			SCOPE_OPEN moduleDefinitionsPart? SCOPE_CLOSE;
 groupKeyword		: GROUP;
 groupIdentifier		: IDENTIFIER;
 
@@ -637,7 +621,7 @@ extConstIdentifier	: IDENTIFIER;
 
 /* A.1.6.1.12 - Module parameter definitions */
 
-moduleParDef		: moduleParKeyword ( modulePar | ( '{' multitypedModuleParList '}' ) );
+moduleParDef		: moduleParKeyword ( modulePar | ( SCOPE_OPEN multitypedModuleParList SCOPE_CLOSE ) );
 moduleParKeyword	: MODULE_PAR;
 multitypedModuleParList	: ( modulePar SEMICOLON? )*;
 modulePar		: moduleParType moduleParList;
@@ -652,7 +636,7 @@ moduleParIdentifier	: IDENTIFIER;
 /* A.1.6.2.0 - General */
 
 moduleControlPart	: controlKeyword
-			'{' moduleControlBody '}'
+			SCOPE_OPEN moduleControlBody SCOPE_CLOSE
 			withStatement? SEMICOLON?;
 controlKeyword		: CONTROL;
 moduleControlBody	: controlStatementOrDefList?;
@@ -779,7 +763,7 @@ callOpKeyword		: CALL;
 callParameters		: templateInstance ( ',' callTimerValue )?;
 callTimerValue		: timerValue | nowaitKeyword;
 nowaitKeyword		: NO_WAIT;
-portCallBody		: '{' callBodyStatementList '}';
+portCallBody		: SCOPE_OPEN callBodyStatementList SCOPE_CLOSE;
 callBodyStatementList	: ( callBodyStatement SEMICOLON? )+;
 callBodyStatement	: callBodyGuard statementBlock;
 callBodyGuard		: altGuardChar callBodyOps;
@@ -821,7 +805,7 @@ assignmentList		: variableAssignment ( ',' variableAssignment )*;
 variableAssignment	: variableRef ASSIGNMENT_CHAR parameterIdentifier;
 parameterIdentifier	: valueParIdentifier;
 variableList		: variableEntry ( ',' variableEntry )*;
-variableEntry		: variableRef | NOT_USED_SYMBOL;
+variableEntry		: variableRef | notUsedSymbol;
 getReplyStatement	: portOrAny DOT portGetReplyOp;
 portGetReplyOp		: getReplyOpKeyword ( '(' receiveParameter valueMatchSpec? ')' )?
 			fromClause? portRedirectWithValueAndParam?;
@@ -945,7 +929,7 @@ valueReference		: ( globalModuleId DOT )? ( constIdentifier | extConstIdentifier
 			moduleParIdentifier ) |
 			valueParIdentifier |
 			varIdentifier;
-fragment NUMBER		: ( NON_ZERO_NUM NUM* ) | '0';
+NUMBER		: ( NON_ZERO_NUM NUM* ) | '0';
 fragment NON_ZERO_NUM	: '1'..'9';
 fragment DECIMAL_NUMBER	: NUM+;
 fragment NUM		: '0' | NON_ZERO_NUM;
@@ -957,7 +941,7 @@ O_STRING		: '\'' OCT* '\'' 'O';
 fragment OCT		: HEX HEX;
 C_STRING		: '"' CH* '"';
 fragment CH		: ALPHA_NUM | UNDERSCORE;
-/* REFERENCE - A character defined by the relevant characterString type. For charstring a character from the character
+/* REFERENCE - A character defined by the relevant CharacterString type. For charstring a character from the character
 set defined in ISO/IEC 646. For universal charstring a character from any character set defined in ISO/IEC 10646 */
 IDENTIFIER		: ALPHA ( ALPHA_NUM | UNDERSCORE )*;
 fragment ALPHA		: UPPER_ALPHA | LOWER_ALPHA;
@@ -969,7 +953,7 @@ fragment EXTENDED_ALPHA_NUM	: ALPHA_NUM | UNDERSCORE;
 ISO/IEC 10646 (characters from char (0,0,0,32) to char (0,0,0,126), from char (0,0,0,161) to char (0,0,0,172) and
 from char (0,0,0,174) to char (0,0,0,255). */
 freeText		: '"' EXTENDED_ALPHA_NUM* '"';
-addressValue		: NULL;
+addressValue		: TTCN_NULL;
 omitValue		: omitKeyword;
 omitKeyword		: OMIT;
 
@@ -994,7 +978,7 @@ templateParIdentifier	: IDENTIFIER;
 
 withStatement		: withKeyword withAttribList;
 withKeyword		: WITH;
-withAttribList		: '{' multiWithAttrib '}';
+withAttribList		: SCOPE_OPEN multiWithAttrib SCOPE_CLOSE;
 multiWithAttrib		: ( singleWithAttrib SEMICOLON? )*;
 singleWithAttrib	: attribKeyword overrideKeyword? attribQualifier? attribSpec;
 attribKeyword		: encodeKeyword |
@@ -1025,15 +1009,15 @@ definitionRef		: structTypeIdentifier |
 			portIdentifier |
 			moduleParIdentifier |
 			fullGroupIdentifier;
-allRef			: ( groupKeyword allKeyword ( exceptKeyword '{' groupRefList '}' )? ) |
-			( typeDefKeyword allKeyword ( exceptKeyword '{' typeRefList '}' )? ) |
-			( templateKeyword allKeyword ( exceptKeyword '{' templateRefList '}' )? ) |
-			( constKeyword allKeyword ( exceptKeyword '{' constRefList '}' )? ) |
-			( altstepKeyword allKeyword ( exceptKeyword '{' altstepRefList '}' )? ) |
-			( testcaseKeyword allKeyword ( exceptKeyword '{' testcaseRefList '}' )? ) |
-			( functionKeyword allKeyword ( exceptKeyword '{' functionRefList '}' )? ) |
-			( signatureKeyword allKeyword ( exceptKeyword '{' signatureRefList '}' )? ) |
-			( moduleParKeyword allKeyword ( exceptKeyword '{' moduleParList '}' )? );
+allRef			: ( groupKeyword allKeyword ( exceptKeyword SCOPE_OPEN groupRefList SCOPE_CLOSE )? ) |
+			( typeDefKeyword allKeyword ( exceptKeyword SCOPE_OPEN typeRefList SCOPE_CLOSE )? ) |
+			( templateKeyword allKeyword ( exceptKeyword SCOPE_OPEN templateRefList SCOPE_CLOSE )? ) |
+			( constKeyword allKeyword ( exceptKeyword SCOPE_OPEN constRefList SCOPE_CLOSE )? ) |
+			( altstepKeyword allKeyword ( exceptKeyword SCOPE_OPEN altstepRefList SCOPE_CLOSE )? ) |
+			( testcaseKeyword allKeyword ( exceptKeyword SCOPE_OPEN testcaseRefList SCOPE_CLOSE )? ) |
+			( functionKeyword allKeyword ( exceptKeyword SCOPE_OPEN functionRefList SCOPE_CLOSE )? ) |
+			( signatureKeyword allKeyword ( exceptKeyword SCOPE_OPEN signatureRefList SCOPE_CLOSE )? ) |
+			( moduleParKeyword allKeyword ( exceptKeyword SCOPE_OPEN moduleParList SCOPE_CLOSE )? );
 attribSpec		: freeText;
 
 
@@ -1059,7 +1043,7 @@ sutStatements		: actionKeyword '(' actionText? ( stringOp actionText )* ')';
 actionKeyword		: ACTION;
 actionText		: freeText | expression;
 returnStatement		: returnKeyword expression?;
-altConstruct		: altKeyword '{' altGuardList '}';
+altConstruct		: altKeyword SCOPE_OPEN altGuardList SCOPE_CLOSE;
 altKeyword		: ALT;
 altGuardList		: ( guardStatement | elseStatement SEMICOLON? )*;
 guardStatement		: altGuardChar ( altstepInstance statementBlock? | guardOp statementBlock );
@@ -1074,7 +1058,7 @@ guardOp			: timeoutStatement |
 			getReplyStatement |
 			doneStatement |
 			killedStatement;
-interleavedConstruct	: interleavedKeyword '{' interleavedGuardList '}';
+interleavedConstruct	: interleavedKeyword SCOPE_OPEN interleavedGuardList SCOPE_CLOSE;
 interleavedKeyword	: INTERLEAVE;
 interleavedGuardList	: ( interleavedGuardElement SEMICOLON? )+;
 interleavedGuardElement	: interleavedGuard interleavedAction;
@@ -1100,11 +1084,11 @@ expression		: singleExpression | compoundExpression;
 compoundExpression	: fieldExpressionList | arrayExpression;
 /* STATIC  SEMANTICS - Within compoundExpression the arrayExpression can be used for arrays, record, record of
 and set of types. */
-fieldExpressionList	: '{' fieldExpressionSpec ( ',' fieldExpressionSpec )* '}';
+fieldExpressionList	: SCOPE_OPEN fieldExpressionSpec ( ',' fieldExpressionSpec )* SCOPE_CLOSE;
 fieldExpressionSpec	: fieldReference ASSIGNMENT_CHAR notUsedOrExpression;
-arrayExpression		: '{' arrayElementExpressionList? '}';
+arrayExpression		: SCOPE_OPEN arrayElementExpressionList? SCOPE_CLOSE;
 arrayElementExpressionList	: notUsedOrExpression ( ',' notUsedOrExpression )*;
-notUsedOrExpression	: expression | NOT_USED_SYMBOL;
+notUsedOrExpression	: expression | notUsedSymbol;
 constantExpression	: singleConstExpression | compoundConstExpression;
 singleConstExpression	: singleExpression;
 /* STATIC SEMANTICS - singleConstExpression shall not contain variables or module parameters and shall resolve
@@ -1114,9 +1098,9 @@ booleanExpression	: singleExpression;
 compoundConstExpression	: fieldConstExpressionList | arrayConstExpression;
 /* STATIC SEMANTICS - Within compoundConstExpression the arrayConstExpression can be used for arrays, record,
 record of and set of types. */
-fieldConstExpressionList	: '{' fieldConstExpressionSpec ( ',' fieldConstExpressionSpec ) '}';
+fieldConstExpressionList	: SCOPE_OPEN fieldConstExpressionSpec ( ',' fieldConstExpressionSpec ) SCOPE_CLOSE;
 fieldConstExpressionSpec	: fieldReference ASSIGNMENT_CHAR constantExpression;
-arrayConstExpression	: '{' arrayElementConstExpressionList? '}';
+arrayConstExpression	: SCOPE_OPEN arrayElementConstExpressionList? SCOPE_CLOSE;
 arrayElementConstExpressionList	: constantExpression ( ',' constantExpression )*;
 assignment		: variableRef ASSIGNMENT_CHAR ( expression | templateBody );
 /* STATIC SEMANTICS - The expression on the right hand side of assignment shall evaluate to an explicit
@@ -1182,13 +1166,13 @@ opCall			: configurationOps |
 			functionInstance |
 			templateOps |
 			activateOp;
-addOp			: '+' | '-' | stringOp;
+addOp			: '+' | MINUS | stringOp;
 /* STATIC SEMANTICS - Operands of the '+' or '-' operators shall be of type integer of float or derivations
 of integer of loat (i.e. subrange) */
 multiplyOp		: '*' | '/' | MOD | REM;
 /* STATIC SEMANTICS - Operands of the '*', '/', rem or mod operators shall be of type integer or float or
 derivations of integer or float (i.e. subrange). */
-unaryOp			: '+' | '-';
+unaryOp			: '+' | MINUS;
 /* STATIC SEMANTICS - Operands of the '+' or '-' operators shall be of type integer or float or derivations
 of integer or float (i.e. subrange). */
 relOp			: '<' | '>' | '>=' | '<=';
@@ -1225,7 +1209,7 @@ elseKeyword		: ELSE;
 elseClause		: elseKeyword statementBlock;
 selectCaseConstruct	: selectKeyword '(' singleExpression ')' selectCaseBody;
 selectKeyword		: SELECT;
-selectCaseBody		: '{' selectCase+ '}';
+selectCaseBody		: SCOPE_OPEN selectCase+ SCOPE_CLOSE;
 selectCase		: caseKeyword ( '(' templateInstance ( ',' templateInstance )* ')' | elseKeyword )
 			statementBlock;
 caseKeyword		: CASE;
@@ -1233,22 +1217,13 @@ caseKeyword		: CASE;
 
 /* A.1.6.9 - Miscellaneous productions */
 
-DOT			: '.';
-DASH			: '-';
-MINUS			: DASH;
-SEMICOLON		: ';';
-COLON			: ',';
-UNDERSCORE		: '_';
-ASSIGNMENT_CHAR		: ':=';
+dash			: MINUS;
 
-
-
-/* ADDED */
 
 WHITESPACE		: ( '\t' | ' ' | '\r' | '\n'| '\u000C' )+
-				{ channel = HIDDEN; };
+				{ $channel = HIDDEN; };
 
-COMMENT			: '/*' ( options {greedy=false;} : . )* '*/'
-				{ channel = HIDDEN; };
+COMMENT			: '/*' ( options { greedy=false; } : . )* '*/'
+				{ $channel = HIDDEN; };
 LINE_COMMENT		: '//' ~('\n'|'\r')* '\r'? '\n'
-				{ channel = HIDDEN; };
+				{ $channel = HIDDEN; };
