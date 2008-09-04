@@ -31,21 +31,22 @@ namespace freettcn {
     static void DisplayRecognitionError(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *tokenNames)
     {
       pANTLR3_EXCEPTION ex = recognizer->state->exception;
+      std::string fileName;
       
       // See if there is a 'filename' we can use
       if(!ex->streamName) {
-        if(((pANTLR3_COMMON_TOKEN)(ex->token))->type == ANTLR3_TOKEN_EOF)
-          std::cerr << "<EOF>";
+        if(((pANTLR3_COMMON_TOKEN)ex->token)->type == ANTLR3_TOKEN_EOF)
+          fileName = "<EOF>";
         else
-          std::cerr << "<UNKNOWN>";
+          fileName = "<UNKNOWN>";
       }
       else {
         pANTLR3_STRING ftext;
         ftext = ex->streamName->to8(ex->streamName);
-        std::cerr << ftext->chars;
+        fileName = (char *)ftext->chars;
       }
       
-      std::cerr << ":";
+      std::cerr << fileName << ":";
       
       // Next comes the line number
       std::cerr << ex->line << ":";
@@ -54,7 +55,7 @@ namespace freettcn {
       switch(recognizer->type) {
       case ANTLR3_TYPE_LEXER:
         {
-          pANTLR3_LEXER lexer = (pANTLR3_LEXER)(recognizer->super);
+          pANTLR3_LEXER lexer = (pANTLR3_LEXER)recognizer->super;
           
           std::cerr << ex->charPositionInLine + 1 << ":";
           std::cerr << " error: LEXER: ";
@@ -66,8 +67,8 @@ namespace freettcn {
 
           ANTLR3_INT32 width;
           
-          width = ANTLR3_UINT32_CAST(( (pANTLR3_UINT8)(lexer->input->data) + (lexer->input->size(lexer->input) )) - (pANTLR3_UINT8)(ex->index));
-          
+          width = ANTLR3_UINT32_CAST(( (pANTLR3_UINT8)lexer->input->data + (lexer->input->size(lexer->input) )) - (pANTLR3_UINT8)(ex->index));
+
           if(width >= 1) {
             if(isprint(ex->c))
               std::cerr << " near ‘" << (char)ex->c << "’";
@@ -76,17 +77,17 @@ namespace freettcn {
             // ANTLR3_FPRINTF(stderr, "\t%.*s\n", width > 20 ? 20 : width ,((pANTLR3_UINT8)ex->index));
           }
           else {
-            ANTLR3_FPRINTF(stderr, "(end of input).\n\t This indicates a poorly specified lexer RULE\n\t or unterminated input element such as: \"STRING[\"]\n");
-            ANTLR3_FPRINTF(stderr, "\t The lexer was matching from line %d, offset %d, which\n\t ", 
-                           (ANTLR3_UINT32)(lexer->rec->state->tokenStartLine),
-                           (ANTLR3_UINT32)(lexer->rec->state->tokenStartCharPositionInLine)
-                           );
-            width = ANTLR3_UINT32_CAST(((pANTLR3_UINT8)(lexer->input->data)+(lexer->input->size(lexer->input))) - (pANTLR3_UINT8)(lexer->rec->state->tokenStartCharIndex));
-            
+            std::cerr << " ‘<EOF>’" << std::endl;
+            std::cerr << fileName << ":" << (ANTLR3_UINT32)(lexer->rec->state->tokenStartLine) <<
+              ":" << (ANTLR3_UINT32)(lexer->rec->state->tokenStartCharPositionInLine) << ": ";
+            width = ANTLR3_UINT32_CAST(((pANTLR3_UINT8)lexer->input->data + (lexer->input->size(lexer->input))) - (pANTLR3_UINT8)lexer->rec->state->tokenStartCharIndex);
             if(width >= 1)
-              ANTLR3_FPRINTF(stderr, "looks like this:\n\t\t%.*s\n", width > 20 ? 20 : width ,(pANTLR3_UINT8)(lexer->rec->state->tokenStartCharIndex));
+              std::cerr << "The lexer was matching from: " << std::string((char *)lexer->rec->state->tokenStartCharIndex, 0, 20) << std::endl;
             else
-              ANTLR3_FPRINTF(stderr, "is also the end of the line, so you must check your lexer rules\n");
+              std::cerr << "The lexer was matching from the end of the line" << std::endl;
+            
+            std::cerr << "NOTE: Above errors indicates a poorly specified lexer RULE or unterminated input element" << std::endl;
+            std::cerr << "      such as: \"STRING[\"]";
           }
           std::cerr << std::endl;
         }
@@ -94,29 +95,43 @@ namespace freettcn {
 
       case ANTLR3_TYPE_PARSER:
         {
-          // pANTLR3_PARSER parser = (pANTLR3_PARSER)(recognizer->super);
-          pANTLR3_COMMON_TOKEN token = (pANTLR3_COMMON_TOKEN)(ex->token);
+          pANTLR3_COMMON_TOKEN token = (pANTLR3_COMMON_TOKEN)ex->token;
           
           std::cerr << ex->charPositionInLine + 1 << ":";
-          std::cerr << " error: PARSER: " << (pANTLR3_UINT8)ex->message;
+          std::cerr << " error: PARSER: ";
           
-          if(token) {
-            if (token->type == ANTLR3_TOKEN_EOF)
-              std::cerr << " at <EOF>";
-            else {
-              if(ex->type == ANTLR3_MISSING_TOKEN_EXCEPTION) {
-                if(!tokenNames)
-                  std::cerr << " [" << ex->expecting << "]";
+          if(ex->type == ANTLR3_NO_VIABLE_ALT_EXCEPTION)
+            std::cerr << "Cannot match ‘" << token->getText(token)->chars << "’ to any predicted input";
+          else {
+            std::cerr << (pANTLR3_UINT8)ex->message;
+          
+            if(token) {
+              if (token->type == ANTLR3_TOKEN_EOF)
+                std::cerr << " at ‘<EOF>’";
+              else {
+                if(ex->type == ANTLR3_MISSING_TOKEN_EXCEPTION) {
+                  if(!tokenNames)
+                    std::cerr << " [" << ex->expecting << "]";
+                  else {
+                    if(ex->expecting == ANTLR3_TOKEN_EOF)
+                      std::cerr << " ‘<EOF>’";
+                    else
+                      std::cerr << " ‘" << tokenNames[ex->expecting] << "’";
+                  }
+                }
                 else {
-                  if(ex->expecting == ANTLR3_TOKEN_EOF)
-                    std::cerr << " ‘<EOF>’";
-                  else
-                    std::cerr << " ‘" << tokenNames[ex->expecting] << "’";
+                  std::cerr << " near ‘" << token->getText(token)->chars << "’";
+                  // ANTLR3_FPRINTF(stderr, "\n    near %s\n    ", ttext == NULL ? (pANTLR3_UINT8)"<no text for the token>" : ttext->chars);
                 }
               }
-              else {
-                std::cerr << " near ‘" << token->getText(token)->chars << "’";
-                // ANTLR3_FPRINTF(stderr, "\n    near %s\n    ", ttext == NULL ? (pANTLR3_UINT8)"<no text for the token>" : ttext->chars);
+            }
+
+            if(ex->type == ANTLR3_UNWANTED_TOKEN_EXCEPTION) {
+              if(tokenNames) {
+                if(ex->expecting == ANTLR3_TOKEN_EOF)
+                  std::cerr << " (‘<EOF>’ expected)";
+                else
+                  std::cerr << " (‘" << tokenNames[ex->expecting] << "’ expected)";
               }
             }
           }
@@ -158,13 +173,15 @@ namespace freettcn {
         // correct stream. Then we can see that the token we are looking at
         // is just something that should not be there and throw this exception.
         //
-        if(tokenNames == NULL)
-          ANTLR3_FPRINTF(stderr, " : Extraneous input...");
-        else {
-          if(ex->expecting == ANTLR3_TOKEN_EOF)
-            ANTLR3_FPRINTF(stderr, " : Extraneous input - expected <EOF>\n");
-          else
-            ANTLR3_FPRINTF(stderr, " : Extraneous input - expected %s ...\n", tokenNames[ex->expecting]);
+        if(recognizer->type != ANTLR3_TYPE_PARSER) {
+          if(tokenNames == NULL)
+            ANTLR3_FPRINTF(stderr, " : Extraneous input...");
+          else {
+            if(ex->expecting == ANTLR3_TOKEN_EOF)
+              ANTLR3_FPRINTF(stderr, " : Extraneous input - expected <EOF>\n");
+            else
+              ANTLR3_FPRINTF(stderr, " : Extraneous input - expected %s ...\n", tokenNames[ex->expecting]);
+          }
         }
         break;
         
@@ -209,7 +226,7 @@ namespace freettcn {
         // you should. It means that at the point where the current token occurred
         // that the DFA indicates nowhere to go from here.
         //
-        if(recognizer->type != ANTLR3_TYPE_LEXER)
+        if(recognizer->type != ANTLR3_TYPE_LEXER && recognizer->type != ANTLR3_TYPE_PARSER)
           ANTLR3_FPRINTF(stderr, " : cannot match to any predicted input...\n");
         break;
         

@@ -131,6 +131,8 @@ tokens {
 	REPEAT = 'repeat';
 	ACTIVATE = 'activate';
 	DEACTIVATE = 'deactivate';
+	BREAK = 'break';
+	CONTINUE = 'continue';
 	OR = 'or';
 	XOR = 'xor';
 	AND = 'and';
@@ -152,7 +154,7 @@ tokens {
     MINUS = '-';
     DOT = '.';
     SEMICOLON = ';';
-    COLON = ',';
+    COLON = ':';
     UNDERSCORE = '_';
     ASSIGNMENT_CHAR = ':=';
 }
@@ -385,7 +387,8 @@ octetStringMatch	: '\'' octOrMatch* '\'' 'O';
 octOrMatch		: OCT | anyValue | anyOrOmit;
 charStringMatch		: patternKeyword C_STRING;
 patternKeyword		: PATTERN;
-complement		: complementKeyword valueList;
+complement		: complementKeyword valueOrAttribList; // valueOrAttribListValueList;
+/* ---A--- BUG ---A--- */
 complementKeyword	: COMPLEMENT;
 valueList		: '(' constantExpression ( ',' constantExpression )* ')';
 subsetMatch		: subsetKeyword valueList;
@@ -437,11 +440,12 @@ functionDef		: functionKeyword functionIdentifier
 functionKeyword		: FUNCTION;
 functionIdentifier	: IDENTIFIER;
 functionFormalParList	: functionFormalPar ( ',' functionFormalPar )*;
-functionFormalPar	: formalValuePar |
+functionFormalPar
+			: formalValuePar |
 			formalTimerPar |
 			formalTemplatePar | 
 			formalPortPar;
-returnType		: returnKeyword templateKeyword? type;
+returnType		: returnKeyword ( templateKeyword | restrictedTemplate )? type;
 returnKeyword		: RETURN;
 runsOnSpec		: runsKeyword onKeyword componentType;
 runsKeyword		: RUNS;
@@ -454,7 +458,8 @@ functionStatementOrDef	: functionLocalDef |
 			functionStatement;
 functionLocalInst	: varInstance | timerInstance;
 functionLocalDef	: constDef | templateDef;
-functionStatement	: configurationStatements |
+functionStatement
+			: configurationStatements |
 			timerStatements |
 			communicationStatements |
 			basicStatements |
@@ -468,7 +473,8 @@ preDefFunctionIdentifier	: IDENTIFIER;
 /* STATIC SEMANTICS - The identifier shall be one of the pre-defined TTCN-3 Function Identifiers from Annex C of
 ES 201 873-1 */
 functionActualParList	: functionActualPar ( ',' functionActualPar )*;
-functionActualPar	: timerRef |
+functionActualPar
+			: timerRef |
 			templateInstance |
 			port |
 			componentRef;
@@ -504,7 +510,8 @@ testcaseDef		: testcaseKeyword testcaseIdentifier
 testcaseKeyword		: TESTCASE;
 testcaseIdentifier	: IDENTIFIER;
 testcaseFormalParList	: testcaseFormalPar ( ',' testcaseFormalPar )*;
-testcaseFormalPar	: formalValuePar |
+testcaseFormalPar
+			: formalValuePar |
 			formalTemplatePar;
 configSpec		: runsOnSpec systemSpec?;
 systemSpec		: systemKeyword componentType;
@@ -564,7 +571,8 @@ exceptFunctionSpec	: functionKeyword ( functionRefList | allKeyword );
 exceptSignatureSpec	: signatureKeyword ( signatureRefList | allKeyword );
 exceptModuleParSpec	: moduleParKeyword ( moduleParRefList | allKeyword );
 importSpec		: ( importElement SEMICOLON? )*;
-importElement		: importGroupSpec |
+importElement
+			: importGroupSpec |
 			importTypeDefSpec |
 			importTemplateSpec |
 			importConstSpec |
@@ -586,7 +594,8 @@ exceptFullGroupIdentifier	: fullGroupIdentifier;
 importTypeDefSpec	: typeDefKeyword ( typeRefList | allTypesWithExcept );
 typeRefList		: typeDefIdentifier ( ',' typeDefIdentifier )*;
 allTypesWithExcept	: allKeyword ( exceptKeyword typeRefList )?;
-typeDefIdentifier	: structTypeIdentifier |
+typeDefIdentifier
+			: structTypeIdentifier |
 			enumTypeIdentifier |
 			portTypeIdentifier |
 			componentTypeIdentifier |
@@ -672,10 +681,12 @@ moduleControlPart	: controlKeyword
 controlKeyword		: CONTROL;
 moduleControlBody	: controlStatementOrDefList?;
 controlStatementOrDefList	: ( controlStatementOrDef SEMICOLON? )+;
-controlStatementOrDef	: functionLocalDef |
+controlStatementOrDef
+			: functionLocalDef |
 			functionLocalInst |
 			controlStatement;
-controlStatement	: timerStatements |
+controlStatement
+			: timerStatements |
 			basicStatements |
 			behaviourStatements |
 			sutStatements |
@@ -686,7 +697,7 @@ controlStatement	: timerStatements |
 
 // $<A.1.6.2.1 Variable instantiation
 
-varInstance		: varKeyword ( ( type varList ) | ( templateKeyword type tempVarList ) );
+varInstance		: varKeyword ( ( type varList ) | ( ( templateKeyword | restrictedTemplate ) type tempVarList ) );
 varList			: singleVarInstance ( ',' singleVarInstance )*;
 singleVarInstance	: varIdentifier arrayDef? ( ASSIGNMENT_CHAR varInitialValue )?;
 varInitialValue		: expression;
@@ -708,14 +719,15 @@ singleTimerInstance	: timerIdentifier arrayDef? ( ASSIGNMENT_CHAR timerValue )?;
 timerKeyword		: TIMER;
 timerIdentifier		: IDENTIFIER;
 timerValue		: expression;
-timerRef		: ( timerIdentifier | timerParIdentifier ) arrayOrBitRef;
+timerRef		: ( timerIdentifier | timerParIdentifier ) arrayOrBitRef*;
 
 // $>
 
 
 // $<A.1.6.2.3 Component operations
 
-configurationStatements	: connectStatement |
+configurationStatements
+			: connectStatement |
 			mapStatement |
 			disconnectStatement |
 			unmapStatement |
@@ -731,7 +743,8 @@ selfOp			: SELF;
 mtcOp			: mtcKeyword;
 doneStatement		: componentId DOT doneKeyword;
 killedStatement		: componentId DOT killedKeyword;
-componentId		: componentOrDefaultReference | ( anyKeyword | allKeyword ) componentKeyword;
+componentId		: componentOrDefaultReference | ( ( anyKeyword | allKeyword ) componentKeyword );
+/* ---A--- BUG ---A--- */
 doneKeyword		: DONE;
 killedKeyword		: KILLED;
 runningOp		: componentId DOT runningKeyword;
@@ -745,7 +758,8 @@ singleConnectionSpec	: '(' portRef ',' portRef ')';
 portRef			: componentRef COLON port;
 componentRef		: componentOrDefaultReference | systemOp | selfOp | mtcOp;
 disconnectStatement	: disconnectKeyword singleOrMultiConnectionSpec?;
-singleOrMultiConnectionSpec	: singleConnectionSpec |
+singleOrMultiConnectionSpec
+				: singleConnectionSpec |
 				allConnectionsSpec |
 				allPortsSpec |
 				allCompsAllPortsSpec;
@@ -773,7 +787,8 @@ killKeyword		: KILL;
 // $<A.1.6.2.4 Port operations
 
 port			: ( portIdentifier | portParIdentifier ) arrayOrBitRef*;
-communicationStatements	: sendStatement |
+communicationStatements
+			: sendStatement |
 			callStatement |
 			replyStatement |
 			raiseStatement |
@@ -792,7 +807,8 @@ sendOpKeyword		: SEND;
 sendParameter		: templateInstance;
 toClause		: toKeyword ( addressRef |
 			addressRefList |
-			allKeyword componentKeyword );
+			( allKeyword componentKeyword ) );
+/* ---A--- BUG ---A--- */
 addressRefList		: '(' addressRef ( ',' addressRef )* ')';
 toKeyword		: TO;
 addressRef		: templateInstance;
@@ -819,7 +835,10 @@ portOrAny		: port | anyKeyword portKeyword;
 portReceiveOp		: receiveOpKeyword ( '(' receiveParameter ')' )? fromClause? portRedirect?;
 receiveOpKeyword	: RECEIVE;
 receiveParameter	: templateInstance;
-fromClause		: fromKeyword addressRef;
+fromClause		: fromKeyword ( addressRef |
+			addressRefList |
+			( anyKeyword componentKeyword ) );
+/* ---A--- BUG ---A--- */
 fromKeyword		: FROM;
 portRedirect		: PORT_REDIRECT_SYMBOL ( valueSpec senderSpec? | senderSpec );
 PORT_REDIRECT_SYMBOL	: '->';
@@ -835,8 +854,9 @@ portGetCallOp		: getCallOpKeyword ( '(' receiveParameter ')' )? fromClause?
 			portRedirectWithParam?;
 getCallOpKeyword	: GET_CALL;
 portRedirectWithParam	: PORT_REDIRECT_SYMBOL redirectWithParamSpec;
-redirectWithParamSpec	: paramSpec senderSpec? |
+redirectWithParamSpec	: (paramSpec senderSpec?) |
 			senderSpec;
+/* ---A--- BUG ---A--- */
 paramSpec		: paramKeyword paramAssignmentList;
 paramKeyword		: PARAM;
 paramAssignmentList	: '(' ( assignmentList | variableList ) ')';
@@ -849,8 +869,8 @@ getReplyStatement	: portOrAny DOT portGetReplyOp;
 portGetReplyOp		: getReplyOpKeyword ( '(' receiveParameter valueMatchSpec? ')' )?
 			fromClause? portRedirectWithValueAndParam?;
 portRedirectWithValueAndParam	: PORT_REDIRECT_SYMBOL redirectWithValueAndParamSpec;
-redirectWithValueAndParamSpec	: paramSpec senderSpec? |
-				senderSpec;
+redirectWithValueAndParamSpec	: valueSpec paramSpec? senderSpec? |
+				redirectWithParamSpec;
 getReplyOpKeyword	: GET_REPLY;
 valueMatchSpec		: valueKeyword templateInstance;
 checkStatement		: portOrAny DOT portCheckOp;
@@ -900,7 +920,8 @@ timeoutKeyword		: TIMEOUT;
 // $<A.1.6.3 Type
 
 type			: predefinedType | referencedType;
-predefinedType		: bitstringKeyword |
+predefinedType
+			: bitstringKeyword |
 			booleanKeyword |
 			charStringKeyword |
 			universalCharString |
@@ -926,10 +947,11 @@ charStringKeyword	: CHAR_STRING;
 universalCharString	: universalKeyword charStringKeyword;
 universalKeyword	: UNIVERSAL;
 referencedType		: ( globalModuleId DOT )? typeReference extendedFieldReference?;
-typeReference		: structTypeIdentifier typeActualParList? |
+typeReference		: ( structTypeIdentifier typeActualParList?) |
 			enumTypeIdentifier |
 			subTypeIdentifier |
 			componentTypeIdentifier;
+/* ---A--- BUG ---A--- */
 typeActualParList	: '(' typeActualPar ( ',' typeActualPar )* ')';
 typeActualPar		: constantExpression;
 arrayDef		: ( '[' arrayBounds ( '..' arrayBounds )? ']' )+;
@@ -942,7 +964,8 @@ arrayBounds		: singleConstExpression;
 // $<A.1.6.4 Value
 
 value			: predefinedValue | referencedValue;
-predefinedValue		: bitStringValue |
+predefinedValue
+			: bitStringValue |
 			booleanValue |
 			charStringValue |
 			integerValue |
@@ -987,7 +1010,8 @@ fragment HEX		: NUM | 'A'..'F' | 'a'..'f';
 O_STRING		: '\'' OCT* '\'' 'O';
 fragment OCT		: HEX HEX;
 C_STRING		: '"' CH* '"';
-fragment CH		: ALPHA_NUM | UNDERSCORE;
+fragment CH		: '\u0000'..'\u007F';
+/* ---A--- TODO (universal charstring) ---A--- */
 /* REFERENCE - A character defined by the relevant CharacterString type. For charstring a character from the character
 set defined in ISO/IEC 646. For universal charstring a character from any character set defined in ISO/IEC 10646 */
 IDENTIFIER		: ALPHA ( ALPHA_NUM | UNDERSCORE )*;
@@ -995,11 +1019,12 @@ fragment ALPHA		: UPPER_ALPHA | LOWER_ALPHA;
 fragment ALPHA_NUM	: ALPHA | NUM;
 fragment UPPER_ALPHA	: 'A'..'Z';
 fragment LOWER_ALPHA	: 'a'..'z';
-fragment EXTENDED_ALPHA_NUM	: ALPHA_NUM | UNDERSCORE;
-/* REFERENCE - A graphical character from the BASIC LATIN or from rthe LATIN-1 SUPPLEMENT character sets defined in
+//EXTENDED_ALPHA_NUM	: '\u0020' | '\u0021' | '\u0023'..'\u007E' | '\u00A1'..'\u00AC' | '\u00AE'..'\u00FF';
+EXTENDED_ALPHA_NUM	: '\u0020'..'\u007E' | '\u00A1'..'\u00AC' | '\u00AE'..'\u00FF';
+/* REFERENCE - A graphical character from the BASIC LATIN or from the LATIN-1 SUPPLEMENT character sets defined in
 ISO/IEC 10646 (characters from char (0,0,0,32) to char (0,0,0,126), from char (0,0,0,161) to char (0,0,0,172) and
 from char (0,0,0,174) to char (0,0,0,255). */
-freeText		: '"' EXTENDED_ALPHA_NUM* '"';
+freeText		: '\"' EXTENDED_ALPHA_NUM* '\"';
 addressValue		: TTCN_NULL;
 omitValue		: omitKeyword;
 omitKeyword		: OMIT;
@@ -1019,8 +1044,10 @@ portParIdentifier	: IDENTIFIER;
 formalTimerPar		: inOutParKeyword? timerKeyword timerParIdentifier;
 timerParIdentifier	: IDENTIFIER;
 formalTemplatePar	: ( inParKeyword | outParKeyword | inOutParKeyword )?
-			templateKeyword type templateParIdentifier;
+			( templateKeyword | restrictedTemplate ) type templateParIdentifier;
 templateParIdentifier	: IDENTIFIER;
+restrictedTemplate  : omitKeyword | ( templateKeyword templateRestriction );
+templateRestriction : '(' omitKeyword ')';
 
 // $>
 
@@ -1032,7 +1059,8 @@ withKeyword		: WITH;
 withAttribList		: '{' multiWithAttrib '}';
 multiWithAttrib		: ( singleWithAttrib SEMICOLON? )*;
 singleWithAttrib	: attribKeyword overrideKeyword? attribQualifier? attribSpec;
-attribKeyword		: encodeKeyword |
+attribKeyword
+			: encodeKeyword |
 			variantKeyword |
 			displayKeyword |
 			extensionKeyword;
@@ -1044,7 +1072,8 @@ overrideKeyword		: OVERRIDE;
 attribQualifier		: '(' defOrFieldRefList ')';
 defOrFieldRefList	: defOrFieldRef ( ',' defOrFieldRef )*;
 defOrFieldRef		: definitionRef | fieldReference | allRef;
-definitionRef		: structTypeIdentifier |
+definitionRef
+			: structTypeIdentifier |
 			enumTypeIdentifier |
 			portTypeIdentifier |
 			componentTypeIdentifier |
@@ -1060,7 +1089,8 @@ definitionRef		: structTypeIdentifier |
 			portIdentifier |
 			moduleParIdentifier |
 			fullGroupIdentifier;
-allRef			: ( groupKeyword allKeyword ( exceptKeyword '{' groupRefList '}' )? ) |
+allRef
+			: ( groupKeyword allKeyword ( exceptKeyword '{' groupRefList '}' )? ) |
 			( typeDefKeyword allKeyword ( exceptKeyword '{' typeRefList '}' )? ) |
 			( templateKeyword allKeyword ( exceptKeyword '{' templateRefList '}' )? ) |
 			( constKeyword allKeyword ( exceptKeyword '{' constRefList '}' )? ) |
@@ -1068,7 +1098,7 @@ allRef			: ( groupKeyword allKeyword ( exceptKeyword '{' groupRefList '}' )? ) |
 			( testcaseKeyword allKeyword ( exceptKeyword '{' testcaseRefList '}' )? ) |
 			( functionKeyword allKeyword ( exceptKeyword '{' functionRefList '}' )? ) |
 			( signatureKeyword allKeyword ( exceptKeyword '{' signatureRefList '}' )? ) |
-			( moduleParKeyword allKeyword ( exceptKeyword '{' moduleParList '}' )? );
+			( moduleParKeyword allKeyword ( exceptKeyword '{' moduleParRefList '}' )? );
 attribSpec		: freeText;
 
 // $>
@@ -1076,7 +1106,8 @@ attribSpec		: freeText;
 
 // $<A.1.6.7 Behaviour statements
 
-behaviourStatements	: testcaseInstance |
+behaviourStatements
+			: testcaseInstance |
 			functionInstance |
 			returnStatement |
 			altConstruct |
@@ -1086,7 +1117,9 @@ behaviourStatements	: testcaseInstance |
 			repeatStatement |
 			deactivateStatement |
 			altstepInstance |
-			activateOp;
+			activateOp |
+			breakStatement |
+			continueStatement;
 verdictStatements	: setLocalVerdict;
 verdictOps		: getLocalVerdict;
 setLocalVerdict		: setVerdictKeyword '(' singleExpression ')';
@@ -1102,7 +1135,8 @@ altGuardList		: ( guardStatement | elseStatement SEMICOLON? )*;
 guardStatement		: altGuardChar ( altstepInstance statementBlock? | guardOp statementBlock );
 elseStatement		: '[' elseKeyword ']' statementBlock;
 altGuardChar		: '[' booleanExpression? ']';
-guardOp			: timeoutStatement |
+guardOp
+			: timeoutStatement |
 			receiveStatement |
 			triggerStatement |
 			getCallStatement |
@@ -1127,6 +1161,8 @@ activateOp		: activateKeyword '(' altstepInstance ')';
 activateKeyword		: ACTIVATE;
 deactivateStatement	: deactivateKeyword ( '(' componentOrDefaultReference ')' )?;
 deactivateKeyword	: DEACTIVATE;
+breakStatement		: BREAK;
+continueStatement	: CONTINUE;
 
 // $>
 
@@ -1183,8 +1219,8 @@ shiftExpression		: bitOrExpression ( shiftOp bitOrExpression )*;
 /* STATIC SEMANTICS - Each result shall resolve to a specific value. If more than one result exists the right-hand
 operand shall be of type integer or derivates and if the shift op is '<<' or '>>' then the left-hand operand shall
 resolve to either bitstring, hexstring or octetstring type or derivates of these types. If the shift op is
-'<@' or '@>' then the left-handoperand shall be of type bitstring, hexstring, charstring or universal charstriing
-or derivatives of these types. */
+'<@' or '@>' then the left-handoperand shall be of type bitstring, hexstring, octetstring, charstring, universal
+charstriing, record of, set of, o array, or derivatives of these types. */
 bitOrExpression		: bitXorExpression ( OR4B bitXorExpression )*;
 /* STATIC SEMANTICS - If more than one bitXorExpression exists, then the bitXorExpressions shall evaluate to
 specific values of compatible types. */
@@ -1199,8 +1235,7 @@ bitNotExpression	: NOT4B? addExpression;
 hexstring or derivates of these types. */
 addExpression		: mulExpression ( addOp mulExpression )*;
 /* STATIC SEMANTICS - Each mulExpression shall resolve to a specific value. If more than one mulExpression
-exists and the addOp resolves to stringOp then the mulExpressions shall resolve to same type which shall be
-of bitstring, hexstring, octetstring, charstring or universal charstring or derivatives of these types. If
+exists and the addOp resolves to stringOp then the mulExpressions shall be valid operands for stringOp. If
 more than one mulExpression exists and the addOp does not resolve to stringOp then the mulExpression shall
 both resolve to type integer or float or derivatives of these types. */
 mulExpression		: unaryExpression ( multiplyOp unaryExpression )*;
@@ -1214,33 +1249,35 @@ extendedFieldReference	: ( ( DOT ( structFieldIdentifier | typeDefIdentifier ) )
 			| arrayOrBitRef )+;
 /* STATIC SEMANTIC - The typedefidentifier shall be used only if the type of the varInstance or referencedValue
 in which the extendedFieldReference is used is anytype. */
-opCall			: configurationOps |
+opCall
+			: configurationOps |
 			verdictOps |
 			timerOps |
 			testcaseInstance |
 			functionInstance |
 			templateOps |
 			activateOp;
-addOp			: '+' | MINUS | stringOp;
+addOp			: '+' | '-' | stringOp;
 /* STATIC SEMANTICS - Operands of the '+' or '-' operators shall be of type integer of float or derivations
-of integer of loat (i.e. subrange) */
+of integer or float (i.e. subrange) */
 multiplyOp		: '*' | '/' | MOD | REM;
 /* STATIC SEMANTICS - Operands of the '*', '/', rem or mod operators shall be of type integer or float or
 derivations of integer or float (i.e. subrange). */
-unaryOp			: '+' | MINUS;
+unaryOp			: '+' | '-';
 /* STATIC SEMANTICS - Operands of the '+' or '-' operators shall be of type integer or float or derivations
 of integer or float (i.e. subrange). */
 relOp			: '<' | '>' | '>=' | '<=';
 /* STATIC SEMANTICS - the precedence of the operators is defined in Table 6 */
 equalOp			: '==' | '!=';
 stringOp		: '&';
-/* STATIC SEMANTICS - Operands of the string operator shall be bitstring, hexstring, octetstring or character
-string */
+/* STATIC SEMANTICS - Operands of the string operator shall be bitstring, hexstring, octetstring, (universal) 
+character string, record of, set of, or array types, or derivates of these types */
 shiftOp			: '<<' | '>>' | '<@' | '>@';
 logStatement		: logKeyword '(' logItem ( ',' logItem )* ')';
 logKeyword		: LOG;
 logItem			: freeText | templateInstance;
-loopConstruct		: forStatement |
+loopConstruct
+			: forStatement |
 			whileStatement |
 			doWhileStatement;
 forStatement		: forKeyword '(' initial SEMICOLON final SEMICOLON step ')'
