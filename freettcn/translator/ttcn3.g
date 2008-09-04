@@ -1,10 +1,32 @@
+//
+// Copyright (C) 2008 Mateusz Pusz
+//
+// This file is part of freettcn (Free TTCN) compiler.
+
+// freettcn is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+
+// freettcn is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with freettcn; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+
 grammar ttcn3;
 
 options
 {
     language = C;
     backtrack = true;
+//    k = 10;
 }
+
 
 tokens {
 	MODULE = 'module';
@@ -51,7 +73,7 @@ tokens {
 	IMPORT = 'import';
 	EXCEPT = 'except';
 	RECURSIVE = 'recursive';
-	GROUP = 'group';
+	TTCN_GROUP = 'group';
 	EXTERNAL = 'external';
 	MODULE_PAR = 'modulepar';
 	CONTROL = 'control';
@@ -109,7 +131,7 @@ tokens {
 	INCONC = 'inconc';
 	NONE = 'none';
 	ERROR = 'error';
-	CHAR = 'char';
+	TTCN_CHAR = 'char';
 	TTCN_NULL = 'null';
 	OMIT = 'omit';
 	IN = 'in';
@@ -161,6 +183,20 @@ tokens {
 
 
 
+// @lexer::postinclude {
+
+// bool textParsing = false;
+
+// }
+
+// @parser::postinclude {
+
+// extern bool textParsing;
+
+// }
+
+
+
 // $<A.1.6.0 TTCN-3 module
 
 ttcn3Module		: ttcn3ModuleKeyword ttcn3ModuleId
@@ -169,13 +205,13 @@ ttcn3Module		: ttcn3ModuleKeyword ttcn3ModuleId
 			moduleControlPart?
 			'}'
 			withStatement? SEMICOLON? EOF;
-ttcn3ModuleKeyword	: MODULE;
-ttcn3ModuleId		: moduleId;
+fragment ttcn3ModuleKeyword	: MODULE;
+fragment ttcn3ModuleId		: moduleId;
 moduleId			: globalModuleId languageSpec?;
-globalModuleId		: moduleIdentifier;
-moduleIdentifier	: IDENTIFIER;
-languageSpec		: languageKeyword freeText;
-languageKeyword		: LANGUAGE;
+fragment globalModuleId		: moduleIdentifier;
+fragment moduleIdentifier	: IDENTIFIER;
+languageSpec		: languageKeyword FREE_TEXT;
+fragment languageKeyword		: LANGUAGE;
 
 // $>
 
@@ -184,7 +220,7 @@ languageKeyword		: LANGUAGE;
 
 // $<A.1.6.1.0 General
 
-moduleDefinitionsPart	: moduleDefinitionsList;
+fragment moduleDefinitionsPart	: moduleDefinitionsList;
 moduleDefinitionsList	: ( moduleDefinition SEMICOLON? )+;
 moduleDefinition
 			: ( typeDef |
@@ -207,7 +243,7 @@ moduleDefinition
 
 typeDef			: typeDefKeyword typeDefBody;
 typeDefBody		: structuredTypeDef | subTypeDef;
-typeDefKeyword		: TYPE;
+fragment typeDefKeyword		: TYPE;
 structuredTypeDef
 			: recordDef |
 			unionDef |
@@ -218,12 +254,12 @@ structuredTypeDef
 			portDef |
 			componentDef;
 recordDef		: recordKeyword structDefBody;
-recordKeyword		: RECORD;
+fragment recordKeyword		: RECORD;
 structDefBody		: ( ( structTypeIdentifier structDefFormalParList? ) | addressKeyword )
 			'{' ( structFieldDef ( ',' structFieldDef )* )? '}';
-structTypeIdentifier	: IDENTIFIER;
+fragment structTypeIdentifier	: IDENTIFIER;
 structDefFormalParList	: '(' structDefFormalPar ( ',' structDefFormalPar )* ')';
-structDefFormalPar	: formalValuePar;
+fragment structDefFormalPar	: formalValuePar;
 structFieldDef		: ( type | nestedTypeDef ) structFieldIdentifier arrayDef? subTypeSpec?
 			optionalKeyword?;
 nestedTypeDef
@@ -239,28 +275,28 @@ nestedSetDef		: setKeyword '{' ( structFieldDef ( ',' structFieldDef )* )? '}';
 nestedRecordOfDef	: recordKeyword stringLength? ofKeyword ( type | nestedTypeDef );
 nestedSetOfDef		: setKeyword stringLength? ofKeyword ( type | nestedTypeDef );
 nestedEnumDef		: enumKeyword '{' enumerationList '}';
-structFieldIdentifier	: IDENTIFIER;
-optionalKeyword		: OPTIONAL;
+fragment structFieldIdentifier	: IDENTIFIER;
+fragment optionalKeyword		: OPTIONAL;
 unionDef		: unionKeyword unionDefBody;
-unionKeyword		: UNION;
+fragment unionKeyword		: UNION;
 unionDefBody		: ( structTypeIdentifier structDefFormalParList? | addressKeyword )
 			'{' unionFieldDef ( ',' unionFieldDef )* '}';
 unionFieldDef		: ( type | nestedTypeDef ) structFieldIdentifier arrayDef? subTypeSpec?;
 setDef			: setKeyword structDefBody;
-setKeyword		: SET;
+fragment setKeyword		: SET;
 recordOfDef		: recordKeyword stringLength? ofKeyword structOfDefBody;
-ofKeyword		: OF;
+fragment ofKeyword		: OF;
 structOfDefBody		: ( type | nestedTypeDef ) ( structTypeIdentifier | addressKeyword ) subTypeSpec?;
 setOfDef		: setKeyword stringLength? ofKeyword structOfDefBody;
 enumDef			: enumKeyword ( enumTypeIdentifier | addressKeyword )
 			'{'  enumerationList '}';
-enumKeyword		: ENUMERATED;
-enumTypeIdentifier	: IDENTIFIER;
+fragment enumKeyword		: ENUMERATED;
+fragment enumTypeIdentifier	: IDENTIFIER;
 enumerationList		: enumeration ( ',' enumeration )*;
 enumeration		: enumerationIdentifier ( '(' MINUS? NUMBER ')' )?;
-enumerationIdentifier	: IDENTIFIER;
+fragment enumerationIdentifier	: IDENTIFIER;
 subTypeDef		: type ( subTypeIdentifier | addressKeyword ) arrayDef? subTypeSpec?;
-subTypeIdentifier	: IDENTIFIER;
+fragment subTypeIdentifier	: IDENTIFIER;
 subTypeSpec		: allowedValues stringLength? | stringLength;
 /* STATIC SEMATICS - allowedValues shall be of the same type as the field being subtyped */
 allowedValues		: '(' ( ( valueOrRange ( ',' valueOrRange )* ) | charStringMatch ) ')';
@@ -272,46 +308,46 @@ rangeDef		: lowerBound '..' upperBound;
 stringLength		: lengthKeyword '(' singleConstExpression ( '..' upperBound )? ')';
 /* STATIC SEMANTICS - stringLength shall only be used with string types or to limit set of and record of. singleConstExpression
 and upperBound shall evaluate to non-negative integervalues (in case of upperBound including infinity) */
-lengthKeyword		: LENGTH;
+fragment lengthKeyword		: LENGTH;
 portType		: ( globalModuleId DOT )? portTypeIdentifier;
 portDef			: portKeyword portDefBody;
 portDefBody		: portTypeIdentifier portDefAttribs;
-portKeyword		: PORT;
-portTypeIdentifier	: IDENTIFIER;
+fragment portKeyword		: PORT;
+fragment portTypeIdentifier	: IDENTIFIER;
 portDefAttribs		: messageAttribs | procedureAttribs | mixedAttribs;
 messageAttribs		: messageKeyword
 			'{' ( messageList SEMICOLON? )+ '}';
 messageList		: direction allOrTypeList;
 direction		: inParKeyword | outParKeyword | inOutParKeyword;
-messageKeyword		: MESSAGE;
+fragment messageKeyword		: MESSAGE;
 allOrTypeList		: allKeyword | typeList;
 /* NOTE: The use of allKeyword in port definitions is deprecated */
-allKeyword		: ALL;
+fragment allKeyword		: ALL;
 typeList		: type ( ',' type )*;
 procedureAttribs	: procedureKeyword
 			'{' ( procedureList SEMICOLON? )+ '}';
-procedureKeyword	: PROCEDURE;
+fragment procedureKeyword	: PROCEDURE;
 procedureList		: direction allOrSignatureList;
 allOrSignatureList	: allKeyword | signatureList;
 signatureList		: signature ( ',' signature )*;
 mixedAttribs		: mixedKeyword
 			'{' ( mixedList SEMICOLON? )+ '}';
-mixedKeyword		: MIXED;
+fragment mixedKeyword		: MIXED;
 mixedList 		: direction procOrTypeList;
 procOrTypeList		: allKeyword | ( procOrType ( ',' procOrType )* );
 procOrType		: signature | type;
 componentDef		: componentKeyword componentTypeIdentifier
 			( extendsKeyword componentType ( ',' componentType )* )?
 			'{' componentDefList? '}';
-componentKeyword	: COMPONENT;
-extendsKeyword		: EXTENDS;
+fragment componentKeyword	: COMPONENT;
+fragment extendsKeyword		: EXTENDS;
 componentType		: ( globalModuleId DOT )? componentTypeIdentifier;
-componentTypeIdentifier	: IDENTIFIER;
+fragment componentTypeIdentifier	: IDENTIFIER;
 componentDefList	: ( componentElementDef SEMICOLON? )*;
 componentElementDef	: portInstance | varInstance | timerInstance | constDef;
 portInstance		: portKeyword portType portElement ( ',' portElement )*;
 portElement		: portIdentifier arrayDef?;
-portIdentifier		: IDENTIFIER;
+fragment portIdentifier		: IDENTIFIER;
 
 // $>
 
@@ -321,8 +357,8 @@ portIdentifier		: IDENTIFIER;
 constDef		: constKeyword type constList;
 constList		: singleConstDef ( ',' singleConstDef )*;
 singleConstDef		: constIdentifier arrayDef? ASSIGNMENT_CHAR constantExpression;
-constKeyword		: CONST;
-constIdentifier		: IDENTIFIER;
+fragment constKeyword		: CONST;
+fragment constIdentifier		: IDENTIFIER;
 
 // $>
 
@@ -331,16 +367,16 @@ constIdentifier		: IDENTIFIER;
 
 templateDef		: templateKeyword baseTemplate derivedDef? ASSIGNMENT_CHAR templateBody;
 baseTemplate		: ( type | signature ) templateIdentifier ( '(' templateFormalParList ')' )?;
-templateKeyword		: TEMPLATE;
-templateIdentifier	: IDENTIFIER;
+fragment templateKeyword		: TEMPLATE;
+fragment templateIdentifier	: IDENTIFIER;
 derivedDef		: modifiesKeyword templateRef;
-modifiesKeyword		: MODIFIES;
+fragment modifiesKeyword		: MODIFIES;
 templateFormalParList	: templateFormalPar ( ',' templateFormalPar )*;
 templateFormalPar	: formalValuePar | formalTemplatePar;
 /* STATIC SEMANTICS - formalValuePar shall resolve to an in parameter */
 templateBody		: ( simpleSpec | fieldSpecList | arrayValueOrAttrib ) | extraMatchingAttributes?;
 /* STATIC SEMANTICS - Within templateBody the arrayValueOrAttrib can be used for array, record, record of and set of types. */
-simpleSpec		: singleValueOrAttrib;
+fragment simpleSpec		: singleValueOrAttrib;
 fieldSpecList		: '{' ( fieldSpec ( ',' fieldSpec )* )? '}';
 fieldSpec		: fieldReference ASSIGNMENT_CHAR templateBody;
 fieldReference		: structFieldRef | arrayOrBitRef | parRef;
@@ -349,13 +385,13 @@ in modified templates only. */
 structFieldRef		: structFieldIdentifier | predefinedType | typeReference;
 /* STATIC SEMANTICS - predefinedType and typeReference shall be used for anytype value notation only. predefinedType shall
 not be anyTypeKeyword. */
-parRef			: signatureParIdentifier;
+fragment parRef			: signatureParIdentifier;
 /* STATIC SEMANTICS - signatureParIdentifier shall be a formal parameter identifier from the associated signature definition. */
-signatureParIdentifier	: valueParIdentifier;
+fragment signatureParIdentifier	: valueParIdentifier;
 arrayOrBitRef		: '[' fieldOrBitNumber ']';
 /* STATIC SEMANTICS - arrayRef shall be optionally used for array types and TTCN-3 record of and set of. The same notation
 can be used for a bit reference inside an TTCN-3 charstring, universal charstring, bitstring, octetstring and hexstring type. */
-fieldOrBitNumber	: singleExpression;
+fragment fieldOrBitNumber	: singleExpression;
 /* STATIC SEMANTICS - singleExpression will resolve to a value of integer type */
 singleValueOrAttrib	: matchingSymbol |
 			singleExpression |
@@ -365,11 +401,11 @@ to reference variables in the current scope. */
 arrayValueOrAttrib	: '{' arrayElementSpecList '}';
 arrayElementSpecList	: arrayElementSpec ( ',' arrayElementSpec )*;
 arrayElementSpec	: notUsedSymbol | permutationMatch | templateBody;
-notUsedSymbol		: dash;
+fragment notUsedSymbol		: dash;
 matchingSymbol
 			: complement |
-			anyValue |
-			anyOrOmit |
+			ANY_VALUE |
+			ANY_OR_OMIT |
 			valueOrAttribList |
 			range |
 			bitStringMatch |
@@ -380,39 +416,39 @@ matchingSymbol
 			supersetMatch;
 extraMatchingAttributes	: lengthMatch | ifPresentMatch | lengthMatch ifPresentMatch;
 bitStringMatch		: '\'' binOrMatch* '\'' 'B';
-binOrMatch		: BIN | anyValue | anyOrOmit;
+binOrMatch		: BIN | ANY_VALUE | ANY_OR_OMIT;
 hexStringMatch		: '\'' hexOrMatch* '\'' 'H';
-hexOrMatch		: HEX | anyValue | anyOrOmit;
+hexOrMatch		: HEX | ANY_VALUE | ANY_OR_OMIT;
 octetStringMatch	: '\'' octOrMatch* '\'' 'O';
-octOrMatch		: OCT | anyValue | anyOrOmit;
+octOrMatch		: OCT | ANY_VALUE | ANY_OR_OMIT;
 charStringMatch		: patternKeyword C_STRING;
-patternKeyword		: PATTERN;
+fragment patternKeyword		: PATTERN;
 complement		: complementKeyword valueOrAttribList; // valueOrAttribListValueList;
 /* ---A--- BUG ---A--- */
-complementKeyword	: COMPLEMENT;
+fragment complementKeyword	: COMPLEMENT;
 valueList		: '(' constantExpression ( ',' constantExpression )* ')';
 subsetMatch		: subsetKeyword valueList;
-subsetKeyword		: SUBSET;
+fragment subsetKeyword		: SUBSET;
 supersetMatch		: supersetKeyword valueList;
-supersetKeyword		: SUPERSET;
+fragment supersetKeyword		: SUPERSET;
 permutationMatch	: permutationKeyword permutationList;
-permutationKeyword	: PERMUTATION;
+fragment permutationKeyword	: PERMUTATION;
 permutationList		: '(' templateBody ( ',' templateBody )* ')';
 /* STATIC SEMANTICS - Restrictions on the content of templateBody are given in clause B.1.3.3 */
-anyValue		: '?';
-anyOrOmit		: '*';
+ANY_VALUE		: '?';
+ANY_OR_OMIT		: '*';
 valueOrAttribList	: '(' templateBody ( ',' templateBody )+ ')';
-lengthMatch		: stringLength;
-ifPresentMatch		: ifPresentKeyword;
-ifPresentKeyword	: IF_PRESENT;
+fragment lengthMatch		: stringLength;
+fragment ifPresentMatch		: ifPresentKeyword;
+fragment ifPresentKeyword	: IF_PRESENT;
 range			: '(' lowerBound '..' upperBound ')';
 lowerBound		: singleConstExpression | MINUS infinityKeyword;
 upperBound		: singleConstExpression | infinityKeyword;
 /* STATIC SEMANTICS - lowerBound and upperBound shall evaluate to types integer, charstring, universal charstring
 or float. In case lowerBound or upperBound evaluates to types charstring or universal charstring, only
 singleConstExpression may be present and the string length shall be 1 */
-infinityKeyword		: INFINITY;
-templateInstance	: inLineTemplate;
+fragment infinityKeyword		: INFINITY;
+fragment templateInstance	: inLineTemplate;
 templateRefWithParList	: ( globalModuleId DOT )? templateIdentifier templateActualParList? |
 			templateParIdentifier;
 templateRef		: ( globalModuleId DOT )? templateIdentifier | templateParIdentifier;
@@ -420,14 +456,14 @@ inLineTemplate		: ( ( type | signature ) COLON )? ( derivedRefWithParList ASSIGN
 			templateBody;
 derivedRefWithParList	: modifiesKeyword templateRefWithParList;
 templateActualParList	: '(' templateActualPar ( ',' templateActualPar )* ')';
-templateActualPar	: templateInstance;
+fragment templateActualPar	: templateInstance;
 /* STATIC SEMANTICS - When the corresponding formal parameter is not of template type the templateInstance
 production shall resolve to one or more singleExpressions. */
 templateOps		: matchOp | valueofOp;
 matchOp			: matchKeyword '(' expression ',' templateInstance ')';
-matchKeyword		: MATCH;
+fragment matchKeyword		: MATCH;
 valueofOp		: valueofKeyword '(' templateInstance ')';
-valueofKeyword		: VALUE_OF;
+fragment valueofKeyword		: VALUE_OF;
 
 // $>
 
@@ -437,8 +473,8 @@ valueofKeyword		: VALUE_OF;
 functionDef		: functionKeyword functionIdentifier
 			'(' functionFormalParList? ')' runsOnSpec? returnType?
 			statementBlock;
-functionKeyword		: FUNCTION;
-functionIdentifier	: IDENTIFIER;
+fragment functionKeyword		: FUNCTION;
+fragment functionIdentifier	: IDENTIFIER;
 functionFormalParList	: functionFormalPar ( ',' functionFormalPar )*;
 functionFormalPar
 			: formalValuePar |
@@ -446,11 +482,11 @@ functionFormalPar
 			formalTemplatePar | 
 			formalPortPar;
 returnType		: returnKeyword ( templateKeyword | restrictedTemplate )? type;
-returnKeyword		: RETURN;
+fragment returnKeyword		: RETURN;
 runsOnSpec		: runsKeyword onKeyword componentType;
-runsKeyword		: RUNS;
-onKeyword		: ON;
-mtcKeyword		: MTC;
+fragment runsKeyword		: RUNS;
+fragment onKeyword		: ON;
+fragment mtcKeyword		: MTC;
 statementBlock		: '{' functionStatementOrDefList? '}';
 functionStatementOrDefList	: ( functionStatementOrDef SEMICOLON? )+;
 functionStatementOrDef	: functionLocalDef |
@@ -469,7 +505,7 @@ functionStatement
 functionInstance	: functionRef '(' functionActualParList? ')';
 functionRef		: ( globalModuleId DOT )? ( functionIdentifier | extFunctionIdentifier ) |
 			preDefFunctionIdentifier;
-preDefFunctionIdentifier	: IDENTIFIER;
+fragment preDefFunctionIdentifier	: IDENTIFIER;
 /* STATIC SEMANTICS - The identifier shall be one of the pre-defined TTCN-3 Function Identifiers from Annex C of
 ES 201 873-1 */
 functionActualParList	: functionActualPar ( ',' functionActualPar )*;
@@ -489,14 +525,14 @@ shall resolve to one or more singleExpressions i.e. equivalent to the expression
 signatureDef		: signatureKeyword signatureIdentifier
 			'(' signatureFormalParList? ')' ( returnType | noBlockKeyword )?
 			exceptionSpec?;
-signatureKeyword	: SIGNATURE;
-signatureIdentifier	: IDENTIFIER;
+fragment signatureKeyword	: SIGNATURE;
+fragment signatureIdentifier	: IDENTIFIER;
 signatureFormalParList	: signatureFormalPar ( ',' signatureFormalPar )*;
 signatureFormalPar	: formalValuePar;
 exceptionSpec		: exceptionKeyword '(' exceptionTypeList ')';
-exceptionKeyword	: TTCN_EXCEPTION;
+fragment exceptionKeyword	: TTCN_EXCEPTION;
 exceptionTypeList	: type ( ',' type )*;
-noBlockKeyword		: NO_BLOCK;
+fragment noBlockKeyword		: NO_BLOCK;
 signature		: ( globalModuleId DOT )? signatureIdentifier;
 
 // $>
@@ -507,21 +543,21 @@ signature		: ( globalModuleId DOT )? signatureIdentifier;
 testcaseDef		: testcaseKeyword testcaseIdentifier
 			'(' testcaseFormalParList? ')' configSpec
 			statementBlock;
-testcaseKeyword		: TESTCASE;
-testcaseIdentifier	: IDENTIFIER;
+fragment testcaseKeyword		: TESTCASE;
+fragment testcaseIdentifier	: IDENTIFIER;
 testcaseFormalParList	: testcaseFormalPar ( ',' testcaseFormalPar )*;
 testcaseFormalPar
 			: formalValuePar |
 			formalTemplatePar;
 configSpec		: runsOnSpec systemSpec?;
 systemSpec		: systemKeyword componentType;
-systemKeyword		: SYSTEM;
+fragment systemKeyword		: SYSTEM;
 testcaseInstance	: executeKeyword '(' testcaseRef '(' testcaseActualParList? ')'
 			( ',' timerValue )? ')';
-executeKeyword		: EXECUTE;
+fragment executeKeyword		: EXECUTE;
 testcaseRef		: ( globalModuleId DOT )? testcaseIdentifier;
 testcaseActualParList	: testcaseActualPar ( ',' testcaseActualPar )*;
-testcaseActualPar	: templateInstance;
+fragment testcaseActualPar	: templateInstance;
 /* STATIC SEMANTICS - When the corresponding formal parameter is not of template type the templateInstance
 production shall resolve to one or more singleExpressions i.e. equivalent to the expression production. */
 
@@ -533,9 +569,9 @@ production shall resolve to one or more singleExpressions i.e. equivalent to the
 altstepDef		: altstepKeyword altstepIdentifier
 			'(' altstepFormalParList? ')' runsOnSpec?
 			'{' altstepLocalDefList altGuardList '}';
-altstepKeyword		: ALTSTEP;
-altstepIdentifier	: IDENTIFIER;
-altstepFormalParList	: functionFormalParList;
+fragment altstepKeyword		: ALTSTEP;
+fragment altstepIdentifier	: IDENTIFIER;
+fragment altstepFormalParList	: functionFormalParList;
 altstepLocalDefList	: ( altstepLocalDef SEMICOLON? )*;
 altstepLocalDef		: varInstance | timerInstance | constDef | templateDef;
 altstepInstance		: altstepRef '(' functionActualParList? ')';
@@ -547,10 +583,10 @@ altstepRef		: ( globalModuleId DOT )? altstepIdentifier;
 // $<A.1.6.1.8 Import definitions
 
 importDef		: importKeyword importFromSpec ( allWithExcepts | ( '{' importSpec '}' ) );
-importKeyword		: IMPORT;
+fragment importKeyword		: IMPORT;
 allWithExcepts		: allKeyword exceptsDef?;
 exceptsDef		: exceptKeyword '{' exceptSpec '}';
-exceptKeyword		: EXCEPT;
+fragment exceptKeyword		: EXCEPT;
 exceptSpec		: ( exceptElement SEMICOLON? )*;
 exceptElement		: exceptGroupSpec |
 			exceptTypeDefSpec |
@@ -582,7 +618,7 @@ importElement
 			importSignatureSpec |
 			importModuleParSpec;
 importFromSpec		: fromKeyword moduleId recursiveKeyword?;
-recursiveKeyword	: RECURSIVE;
+fragment recursiveKeyword	: RECURSIVE;
 importGroupSpec		: groupKeyword ( groupRefListWithExcept | allGroupsWithExcept );
 groupRefList		: fullGroupIdentifier ( ',' fullGroupIdentifier )*;
 groupRefListWithExcept	: fullGroupIdentifierWithExcept ( ',' fullGroupIdentifierWithExcept )*;
@@ -629,8 +665,8 @@ allModuleParWithExcept	: allKeyword ( exceptKeyword moduleParRefList )?;
 
 groupDef		: groupKeyword groupIdentifier
 			'{' moduleDefinitionsPart? '}';
-groupKeyword		: GROUP;
-groupIdentifier		: IDENTIFIER;
+fragment groupKeyword		: TTCN_GROUP;
+fragment groupIdentifier		: IDENTIFIER;
 
 // $>
 
@@ -639,8 +675,8 @@ groupIdentifier		: IDENTIFIER;
 
 extFunctionDef		: extKeyword functionKeyword extFunctionIdentifier
 			'(' functionFormalParList? ')' returnType?;
-extKeyword		: EXTERNAL;
-extFunctionIdentifier	: IDENTIFIER;
+fragment extKeyword		: EXTERNAL;
+fragment extFunctionIdentifier	: IDENTIFIER;
 
 // $>
 
@@ -649,7 +685,7 @@ extFunctionIdentifier	: IDENTIFIER;
 
 extConstDef		: extKeyword constKeyword type extConstIdentifierList;
 extConstIdentifierList	: extConstIdentifier ( ',' extConstIdentifier )*;
-extConstIdentifier	: IDENTIFIER;
+fragment extConstIdentifier	: IDENTIFIER;
 
 // $>
 
@@ -657,13 +693,13 @@ extConstIdentifier	: IDENTIFIER;
 // $<A.1.6.1.12 Module parameter definitions
 
 moduleParDef		: moduleParKeyword ( modulePar | ( '{' multitypedModuleParList '}' ) );
-moduleParKeyword	: MODULE_PAR;
+fragment moduleParKeyword	: MODULE_PAR;
 multitypedModuleParList	: ( modulePar SEMICOLON? )*;
 modulePar		: moduleParType moduleParList;
-moduleParType		: type;
+fragment moduleParType		: type;
 moduleParList		: moduleParIdentifier ( ASSIGNMENT_CHAR constantExpression )?
 			( ',' moduleParIdentifier ( ASSIGNMENT_CHAR constantExpression )? )*;
-moduleParIdentifier	: IDENTIFIER;
+fragment moduleParIdentifier	: IDENTIFIER;
 
 // $>
 
@@ -678,8 +714,8 @@ moduleParIdentifier	: IDENTIFIER;
 moduleControlPart	: controlKeyword
 			'{' moduleControlBody '}'
 			withStatement? SEMICOLON?;
-controlKeyword		: CONTROL;
-moduleControlBody	: controlStatementOrDefList?;
+fragment controlKeyword		: CONTROL;
+fragment moduleControlBody	: controlStatementOrDefList?;
 controlStatementOrDefList	: ( controlStatementOrDef SEMICOLON? )+;
 controlStatementOrDef
 			: functionLocalDef |
@@ -700,12 +736,12 @@ controlStatement
 varInstance		: varKeyword ( ( type varList ) | ( ( templateKeyword | restrictedTemplate ) type tempVarList ) );
 varList			: singleVarInstance ( ',' singleVarInstance )*;
 singleVarInstance	: varIdentifier arrayDef? ( ASSIGNMENT_CHAR varInitialValue )?;
-varInitialValue		: expression;
-varKeyword		: VAR;
-varIdentifier		: IDENTIFIER;
+fragment varInitialValue		: expression;
+fragment varKeyword		: VAR;
+fragment varIdentifier		: IDENTIFIER;
 tempVarList		: singleTempVarInstance ( ',' singleTempVarInstance )*;
 singleTempVarInstance	: varIdentifier arrayDef? ( ASSIGNMENT_CHAR tempVarInitialValue )?;
-tempVarInitialValue	: templateBody;
+fragment tempVarInitialValue	: templateBody;
 variableRef		: ( varIdentifier | valueParIdentifier ) extendedFieldReference?;
 
 // $>
@@ -716,9 +752,9 @@ variableRef		: ( varIdentifier | valueParIdentifier ) extendedFieldReference?;
 timerInstance		: timerKeyword timerList;
 timerList		: singleTimerInstance ( ',' singleTimerInstance )*;
 singleTimerInstance	: timerIdentifier arrayDef? ( ASSIGNMENT_CHAR timerValue )?;
-timerKeyword		: TIMER;
-timerIdentifier		: IDENTIFIER;
-timerValue		: expression;
+fragment timerKeyword		: TIMER;
+fragment timerIdentifier		: IDENTIFIER;
+fragment timerValue		: expression;
 timerRef		: ( timerIdentifier | timerParIdentifier ) arrayOrBitRef*;
 
 // $>
@@ -738,22 +774,22 @@ configurationStatements
 			killTCStatement;
 configurationOps	: createOp | selfOp | systemOp | mtcOp | runningOp | aliveOp;
 createOp		: componentType DOT createKeyword ( '(' singleExpression ')' )? aliveKeyword?;
-systemOp		: systemKeyword;
-selfOp			: SELF;
-mtcOp			: mtcKeyword;
+fragment systemOp		: systemKeyword;
+fragment selfOp			: SELF;
+fragment mtcOp			: mtcKeyword;
 doneStatement		: componentId DOT doneKeyword;
 killedStatement		: componentId DOT killedKeyword;
 componentId		: componentOrDefaultReference | ( ( anyKeyword | allKeyword ) componentKeyword );
 /* ---A--- BUG ---A--- */
-doneKeyword		: DONE;
-killedKeyword		: KILLED;
+fragment doneKeyword		: DONE;
+fragment killedKeyword		: KILLED;
 runningOp		: componentId DOT runningKeyword;
-runningKeyword		: RUNNING;
+fragment runningKeyword		: RUNNING;
 aliveOp			: componentId DOT aliveKeyword;
-createKeyword		: CREATE;
-aliveKeyword		: ALIVE;
+fragment createKeyword		: CREATE;
+fragment aliveKeyword		: ALIVE;
 connectStatement	: connectKeyword singleConnectionSpec;
-connectKeyword		: CONNECT;
+fragment connectKeyword		: CONNECT;
 singleConnectionSpec	: '(' portRef ',' portRef ')';
 portRef			: componentRef COLON port;
 componentRef		: componentOrDefaultReference | systemOp | selfOp | mtcOp;
@@ -766,20 +802,20 @@ singleOrMultiConnectionSpec
 allConnectionsSpec	: '(' portRef ')';
 allPortsSpec		: '(' componentRef ':' allKeyword portKeyword ')';
 allCompsAllPortsSpec	: '(' allKeyword componentKeyword ':' allKeyword portKeyword ')';
-disconnectKeyword	: DISCONNECT;
+fragment disconnectKeyword	: DISCONNECT;
 mapStatement		: mapKeyword singleConnectionSpec;
-mapKeyword		: MAP;
+fragment mapKeyword		: MAP;
 unmapStatement		: unmapKeyword singleOrMultiConnectionSpec?;
-unmapKeyword		: UNMAP;
+fragment unmapKeyword		: UNMAP;
 startTCStatement	: componentOrDefaultReference DOT startKeyword '(' functionInstance ')';
-startKeyword		: START;
+fragment startKeyword		: START;
 stopTCStatement		: stopKeyword | ( componentReferenceOrLiteral DOT stopKeyword ) |
 			( allKeyword componentKeyword DOT stopKeyword );
 componentReferenceOrLiteral	: componentOrDefaultReference | mtcOp | selfOp;
 killTCStatement		: killKeyword | ( componentReferenceOrLiteral DOT killKeyword ) |
 			( allKeyword componentKeyword DOT killKeyword );
 componentOrDefaultReference	: variableRef | functionInstance;
-killKeyword		: KILL;
+fragment killKeyword		: KILL;
 
 // $>
 
@@ -803,21 +839,21 @@ communicationStatements
 			stopStatement;
 sendStatement		: port DOT portSendOp;
 portSendOp		: sendOpKeyword '(' sendParameter ')' toClause?;
-sendOpKeyword		: SEND;
-sendParameter		: templateInstance;
+fragment sendOpKeyword		: SEND;
+fragment sendParameter		: templateInstance;
 toClause		: toKeyword ( addressRef |
 			addressRefList |
 			( allKeyword componentKeyword ) );
 /* ---A--- BUG ---A--- */
 addressRefList		: '(' addressRef ( ',' addressRef )* ')';
-toKeyword		: TO;
-addressRef		: templateInstance;
+fragment toKeyword		: TO;
+fragment addressRef		: templateInstance;
 callStatement		: port DOT portCallOp portCallBody?;
 portCallOp		: callOpKeyword '(' callParameters ')' toClause?;
-callOpKeyword		: CALL;
+fragment callOpKeyword		: CALL;
 callParameters		: templateInstance ( ',' callTimerValue )?;
 callTimerValue		: timerValue | nowaitKeyword;
-nowaitKeyword		: NO_WAIT;
+fragment nowaitKeyword		: NO_WAIT;
 portCallBody		: '{' callBodyStatementList '}';
 callBodyStatementList	: ( callBodyStatement SEMICOLON? )+;
 callBodyStatement	: callBodyGuard statementBlock;
@@ -825,44 +861,44 @@ callBodyGuard		: altGuardChar callBodyOps;
 callBodyOps		: getReplyStatement | catchStatement;
 replyStatement		: port DOT portReplyOp;
 portReplyOp		: replyKeyword '(' templateInstance replyValue? ')' toClause?;
-replyKeyword		: REPLY;
+fragment replyKeyword		: REPLY;
 replyValue		: valueKeyword expression;
 raiseStatement		: port DOT portRaiseOp;
 portRaiseOp		: raiseKeyword '(' signature ',' templateInstance ')' toClause?;
-raiseKeyword		: RAISE;
+fragment raiseKeyword		: RAISE;
 receiveStatement	: portOrAny DOT portReceiveOp;
 portOrAny		: port | anyKeyword portKeyword;
 portReceiveOp		: receiveOpKeyword ( '(' receiveParameter ')' )? fromClause? portRedirect?;
-receiveOpKeyword	: RECEIVE;
-receiveParameter	: templateInstance;
+fragment receiveOpKeyword	: RECEIVE;
+fragment receiveParameter	: templateInstance;
 fromClause		: fromKeyword ( addressRef |
 			addressRefList |
 			( anyKeyword componentKeyword ) );
 /* ---A--- BUG ---A--- */
-fromKeyword		: FROM;
+fragment fromKeyword		: FROM;
 portRedirect		: PORT_REDIRECT_SYMBOL ( valueSpec senderSpec? | senderSpec );
-PORT_REDIRECT_SYMBOL	: '->';
+fragment PORT_REDIRECT_SYMBOL	: '->';
 valueSpec		: valueKeyword variableRef;
-valueKeyword		: VALUE;
+fragment valueKeyword		: VALUE;
 senderSpec		: senderKeyword variableRef;
-senderKeyword		: SENDER;
+fragment senderKeyword		: SENDER;
 triggerStatement	: portOrAny DOT portTriggerOp;
 portTriggerOp		: triggerOpKeyword ( '(' receiveParameter ')' )? fromClause? portRedirect?;
-triggerOpKeyword	: TRIGGER;
+fragment triggerOpKeyword	: TRIGGER;
 getCallStatement	: portOrAny DOT portGetCallOp;
 portGetCallOp		: getCallOpKeyword ( '(' receiveParameter ')' )? fromClause?
 			portRedirectWithParam?;
-getCallOpKeyword	: GET_CALL;
+fragment getCallOpKeyword	: GET_CALL;
 portRedirectWithParam	: PORT_REDIRECT_SYMBOL redirectWithParamSpec;
 redirectWithParamSpec	: (paramSpec senderSpec?) |
 			senderSpec;
 /* ---A--- BUG ---A--- */
 paramSpec		: paramKeyword paramAssignmentList;
-paramKeyword		: PARAM;
+fragment paramKeyword		: PARAM;
 paramAssignmentList	: '(' ( assignmentList | variableList ) ')';
 assignmentList		: variableAssignment ( ',' variableAssignment )*;
 variableAssignment	: variableRef ASSIGNMENT_CHAR parameterIdentifier;
-parameterIdentifier	: valueParIdentifier;
+fragment parameterIdentifier	: valueParIdentifier;
 variableList		: variableEntry ( ',' variableEntry )*;
 variableEntry		: variableRef | notUsedSymbol;
 getReplyStatement	: portOrAny DOT portGetReplyOp;
@@ -871,29 +907,29 @@ portGetReplyOp		: getReplyOpKeyword ( '(' receiveParameter valueMatchSpec? ')' )
 portRedirectWithValueAndParam	: PORT_REDIRECT_SYMBOL redirectWithValueAndParamSpec;
 redirectWithValueAndParamSpec	: valueSpec paramSpec? senderSpec? |
 				redirectWithParamSpec;
-getReplyOpKeyword	: GET_REPLY;
+fragment getReplyOpKeyword	: GET_REPLY;
 valueMatchSpec		: valueKeyword templateInstance;
 checkStatement		: portOrAny DOT portCheckOp;
 portCheckOp		: checkOpKeyword ( '(' checkParameter ')' )?;
-checkOpKeyword		: CHECK;
+fragment checkOpKeyword		: CHECK;
 checkParameter		: checkPortOpsPresent | fromClausePresent | redirectPresent;
 fromClausePresent	: fromClause ( PORT_REDIRECT_SYMBOL senderSpec )?;
 redirectPresent		: PORT_REDIRECT_SYMBOL senderSpec;
 checkPortOpsPresent	: portReceiveOp | portGetCallOp | portGetReplyOp | portCatchOp;
 catchStatement		: portOrAny DOT portCatchOp;
 portCatchOp		: catchOpKeyword ( '(' catchOpParameters ')' )? fromClause? portRedirect?;
-catchOpKeyword		: CATCH;
+fragment catchOpKeyword		: CATCH;
 catchOpParameters	: signature ',' templateInstance | timeoutKeyword;
 clearStatement		: portOrAll DOT portClearOp;
 portOrAll		: port | allKeyword portKeyword;
-portClearOp		: clearOpKeyword;
-clearOpKeyword		: CLEAR;
+fragment portClearOp		: clearOpKeyword;
+fragment clearOpKeyword		: CLEAR;
 startStatement		: portOrAll DOT portStartOp;
-portStartOp		: startKeyword;
+fragment portStartOp		: startKeyword;
 stopStatement		: portOrAll DOT portStopOp;
-portStopOp		: stopKeyword;
-stopKeyword		: STOP;
-anyKeyword		: ANY;
+fragment portStopOp		: stopKeyword;
+fragment stopKeyword		: STOP;
+fragment anyKeyword		: ANY;
 
 // $>
 
@@ -906,11 +942,11 @@ startTimerStatement	: timerRef DOT startKeyword ( '(' timerValue ')' )?;
 stopTimerStatement	: timerRefOrAll DOT stopKeyword;
 timerRefOrAll		: timerRef | allKeyword timerKeyword;
 readTimerOp		: timerRef DOT readKeyword;
-readKeyword		: READ;
+fragment readKeyword		: READ;
 runningTimerOp		: timerRefOrAny DOT runningKeyword;
 timeoutStatement	: timerRefOrAny DOT timeoutKeyword;
 timerRefOrAny		: timerRef | anyKeyword timerKeyword;
-timeoutKeyword		: TIMEOUT;
+fragment timeoutKeyword		: TIMEOUT;
 
 // $>
 
@@ -933,19 +969,19 @@ predefinedType
 			addressKeyword |
 			defaultKeyword |
 			anyTypeKeyword;
-bitstringKeyword	: BIT_STRING;
-booleanKeyword		: BOOLEAN;
-integerKeyword		: INTEGER;
-octetStringKeyword	: OCTET_STRING;
-hexStringKeyword	: HEX_STRING;
-verdictTypeKeyword	: VERDICT_TYPE;
-floatKeyword		: FLOAT;
-addressKeyword		: ADDRESS;
-defaultKeyword		: DEFAULT;
-anyTypeKeyword		: ANY_TYPE;
-charStringKeyword	: CHAR_STRING;
-universalCharString	: universalKeyword charStringKeyword;
-universalKeyword	: UNIVERSAL;
+fragment bitstringKeyword	: BIT_STRING;
+fragment booleanKeyword		: BOOLEAN;
+fragment integerKeyword		: INTEGER;
+fragment octetStringKeyword	: OCTET_STRING;
+fragment hexStringKeyword	: HEX_STRING;
+fragment verdictTypeKeyword	: VERDICT_TYPE;
+fragment floatKeyword		: FLOAT;
+fragment addressKeyword		: ADDRESS;
+fragment defaultKeyword		: DEFAULT;
+fragment anyTypeKeyword		: ANY_TYPE;
+fragment charStringKeyword	: CHAR_STRING;
+fragment universalCharString	: universalKeyword charStringKeyword;
+fragment universalKeyword	: UNIVERSAL;
 referencedType		: ( globalModuleId DOT )? typeReference extendedFieldReference?;
 typeReference		: ( structTypeIdentifier typeActualParList?) |
 			enumTypeIdentifier |
@@ -953,9 +989,9 @@ typeReference		: ( structTypeIdentifier typeActualParList?) |
 			componentTypeIdentifier;
 /* ---A--- BUG ---A--- */
 typeActualParList	: '(' typeActualPar ( ',' typeActualPar )* ')';
-typeActualPar		: constantExpression;
+fragment typeActualPar		: constantExpression;
 arrayDef		: ( '[' arrayBounds ( '..' arrayBounds )? ']' )+;
-arrayBounds		: singleConstExpression;
+fragment arrayBounds		: singleConstExpression;
 /* STATIC SEMANTICS - arrayBounds will resolve to a non negative value of integer type */
 
 // $>
@@ -968,7 +1004,7 @@ predefinedValue
 			: bitStringValue |
 			booleanValue |
 			charStringValue |
-			integerValue |
+			INTEGER_VALUE |
 			octetStringValue |
 			hexStringValue |
 			verdictTypeValue |
@@ -976,30 +1012,30 @@ predefinedValue
 			floatValue |
 			addressValue |
 			omitValue;
-bitStringValue		: B_STRING;
-booleanValue		: TRUE | FALSE;
-integerValue		: NUMBER;
-octetStringValue	: O_STRING;
-hexStringValue		: H_STRING;
+fragment bitStringValue		: B_STRING;
+fragment booleanValue		: TRUE | FALSE;
+INTEGER_VALUE		: NUMBER;
+fragment octetStringValue	: O_STRING;
+fragment hexStringValue		: H_STRING;
 verdictTypeValue	: PASS | FAIL | INCONC | NONE | ERROR;
-enumeratedValue		: enumerationIdentifier;
-charStringValue		: C_STRING | quadruple;
-quadruple		: charKeyword '(' group ',' plane ',' row ',' cell ')';
-charKeyword		: CHAR;
-group			: NUMBER;
-plane			: NUMBER;
-row			: NUMBER;
-cell			: NUMBER;
-floatValue		: floatDotNotation | floatENotation;
-floatDotNotation	: NUMBER DOT DECIMAL_NUMBER;
-floatENotation		: NUMBER ( DOT DECIMAL_NUMBER )? EXPONENTIAL MINUS? NUMBER;
-EXPONENTIAL		: 'E';
+fragment enumeratedValue		: enumerationIdentifier;
+charStringValue		: C_STRING | QUADRUPLE;
+QUADRUPLE		    : CHAR_KEYWORD '(' GROUP ',' PLANE ',' ROW ',' CELL ')';
+fragment CHAR_KEYWORD	: TTCN_CHAR;
+fragment GROUP			: NUMBER;
+fragment PLANE			: NUMBER;
+fragment ROW		   	: NUMBER;
+fragment CELL			: NUMBER;
+floatValue		    : FLOAT_DOT_NOTATION | FLOAT_E_NOTATION;
+FLOAT_DOT_NOTATION	: NUMBER DOT DECIMAL_NUMBER;
+FLOAT_E_NOTATION	: NUMBER ( DOT DECIMAL_NUMBER )? EXPONENTIAL MINUS? NUMBER;
+fragment EXPONENTIAL		: 'E';
 referencedValue		: valueReference extendedFieldReference?;
 valueReference		: ( globalModuleId DOT )? ( constIdentifier | extConstIdentifier |
 			moduleParIdentifier ) |
 			valueParIdentifier |
 			varIdentifier;
-NUMBER		: ( NON_ZERO_NUM NUM* ) | '0';
+fragment NUMBER		: ( NON_ZERO_NUM NUM* ) | '0';
 fragment NON_ZERO_NUM	: '1'..'9';
 fragment DECIMAL_NUMBER	: NUM+;
 fragment NUM		: '0' | NON_ZERO_NUM;
@@ -1009,9 +1045,11 @@ H_STRING		: '\'' HEX* '\'' 'H';
 fragment HEX		: NUM | 'A'..'F' | 'a'..'f';
 O_STRING		: '\'' OCT* '\'' 'O';
 fragment OCT		: HEX HEX;
-C_STRING		: '"' CH* '"';
-fragment CH		: '\u0000'..'\u007F';
+C_STRING		: '"' CHAR* '"';
+//fragment CHAR		: '\u0000'..'\u007F';
+fragment CHAR		: '\u0000'..'\u0021' | '\u0023'..'\u007F';
 /* ---A--- TODO (universal charstring) ---A--- */
+/* ---A--- BUG (special escape needed for " sign) ---A--- */
 /* REFERENCE - A character defined by the relevant CharacterString type. For charstring a character from the character
 set defined in ISO/IEC 646. For universal charstring a character from any character set defined in ISO/IEC 10646 */
 IDENTIFIER		: ALPHA ( ALPHA_NUM | UNDERSCORE )*;
@@ -1019,33 +1057,34 @@ fragment ALPHA		: UPPER_ALPHA | LOWER_ALPHA;
 fragment ALPHA_NUM	: ALPHA | NUM;
 fragment UPPER_ALPHA	: 'A'..'Z';
 fragment LOWER_ALPHA	: 'a'..'z';
-//EXTENDED_ALPHA_NUM	: '\u0020' | '\u0021' | '\u0023'..'\u007E' | '\u00A1'..'\u00AC' | '\u00AE'..'\u00FF';
-EXTENDED_ALPHA_NUM	: '\u0020'..'\u007E' | '\u00A1'..'\u00AC' | '\u00AE'..'\u00FF';
+fragment EXTENDED_ALPHA_NUM	: '\u0020' | '\u0021' | '\u0023'..'\u007E' | '\u00A1'..'\u00AC' | '\u00AE'..'\u00FF';
+/* ---A--- BUG (special escape needed for " sign) ---A--- */
+//fragment EXTENDED_ALPHA_NUM	: '\u0020'..'\u007E' | '\u00A1'..'\u00AC' | '\u00AE'..'\u00FF';
 /* REFERENCE - A graphical character from the BASIC LATIN or from the LATIN-1 SUPPLEMENT character sets defined in
 ISO/IEC 10646 (characters from char (0,0,0,32) to char (0,0,0,126), from char (0,0,0,161) to char (0,0,0,172) and
 from char (0,0,0,174) to char (0,0,0,255). */
-freeText		: '\"' EXTENDED_ALPHA_NUM* '\"';
-addressValue		: TTCN_NULL;
-omitValue		: omitKeyword;
-omitKeyword		: OMIT;
+FREE_TEXT       : '"' EXTENDED_ALPHA_NUM* '"';
+fragment addressValue    : TTCN_NULL;
+fragment omitValue		: omitKeyword;
+fragment omitKeyword		: OMIT;
 
 // $>
 
 
 // $<A.1.6.5 Parametrization
 
-inParKeyword		: IN;
-outParKeyword		: OUT;
-inOutParKeyword		: INOUT;
+fragment inParKeyword		: IN;
+fragment outParKeyword		: OUT;
+fragment inOutParKeyword		: INOUT;
 formalValuePar		: ( inParKeyword | inOutParKeyword | outParKeyword )? type valueParIdentifier;
-valueParIdentifier	: IDENTIFIER;
+fragment valueParIdentifier	: IDENTIFIER;
 formalPortPar		: inOutParKeyword? portTypeIdentifier portParIdentifier;
-portParIdentifier	: IDENTIFIER;
+fragment portParIdentifier	: IDENTIFIER;
 formalTimerPar		: inOutParKeyword? timerKeyword timerParIdentifier;
-timerParIdentifier	: IDENTIFIER;
+fragment timerParIdentifier	: IDENTIFIER;
 formalTemplatePar	: ( inParKeyword | outParKeyword | inOutParKeyword )?
 			( templateKeyword | restrictedTemplate ) type templateParIdentifier;
-templateParIdentifier	: IDENTIFIER;
+fragment templateParIdentifier	: IDENTIFIER;
 restrictedTemplate  : omitKeyword | ( templateKeyword templateRestriction );
 templateRestriction : '(' omitKeyword ')';
 
@@ -1055,7 +1094,7 @@ templateRestriction : '(' omitKeyword ')';
 // $<A.1.6.6 With statement
 
 withStatement		: withKeyword withAttribList;
-withKeyword		: WITH;
+fragment withKeyword		: WITH;
 withAttribList		: '{' multiWithAttrib '}';
 multiWithAttrib		: ( singleWithAttrib SEMICOLON? )*;
 singleWithAttrib	: attribKeyword overrideKeyword? attribQualifier? attribSpec;
@@ -1064,11 +1103,11 @@ attribKeyword
 			variantKeyword |
 			displayKeyword |
 			extensionKeyword;
-encodeKeyword		: ENCODE;
-variantKeyword		: VARIANT;
-displayKeyword		: DISPLAY;
-extensionKeyword	: EXTENSION;
-overrideKeyword		: OVERRIDE;
+fragment encodeKeyword		: ENCODE;
+fragment variantKeyword		: VARIANT;
+fragment displayKeyword		: DISPLAY;
+fragment extensionKeyword	: EXTENSION;
+fragment overrideKeyword		: OVERRIDE;
 attribQualifier		: '(' defOrFieldRefList ')';
 defOrFieldRefList	: defOrFieldRef ( ',' defOrFieldRef )*;
 defOrFieldRef		: definitionRef | fieldReference | allRef;
@@ -1099,7 +1138,7 @@ allRef
 			( functionKeyword allKeyword ( exceptKeyword '{' functionRefList '}' )? ) |
 			( signatureKeyword allKeyword ( exceptKeyword '{' signatureRefList '}' )? ) |
 			( moduleParKeyword allKeyword ( exceptKeyword '{' moduleParRefList '}' )? );
-attribSpec		: freeText;
+fragment attribSpec		: FREE_TEXT;
 
 // $>
 
@@ -1120,17 +1159,17 @@ behaviourStatements
 			activateOp |
 			breakStatement |
 			continueStatement;
-verdictStatements	: setLocalVerdict;
-verdictOps		: getLocalVerdict;
+fragment verdictStatements	: setLocalVerdict;
+fragment verdictOps		: getLocalVerdict;
 setLocalVerdict		: setVerdictKeyword '(' singleExpression ')';
-setVerdictKeyword	: SET_VERDICT;
-getLocalVerdict		: GET_VERDICT;
+fragment setVerdictKeyword	: SET_VERDICT;
+fragment getLocalVerdict		: GET_VERDICT;
 sutStatements		: actionKeyword '(' actionText? ( stringOp actionText )* ')';
-actionKeyword		: ACTION;
-actionText		: freeText | expression;
+fragment actionKeyword		: ACTION;
+actionText		: FREE_TEXT | expression;
 returnStatement		: returnKeyword expression?;
 altConstruct		: altKeyword '{' altGuardList '}';
-altKeyword		: ALT;
+fragment altKeyword		: ALT;
 altGuardList		: ( guardStatement | elseStatement SEMICOLON? )*;
 guardStatement		: altGuardChar ( altstepInstance statementBlock? | guardOp statementBlock );
 elseStatement		: '[' elseKeyword ']' statementBlock;
@@ -1146,23 +1185,23 @@ guardOp
 			doneStatement |
 			killedStatement;
 interleavedConstruct	: interleavedKeyword '{' interleavedGuardList '}';
-interleavedKeyword	: INTERLEAVE;
+fragment interleavedKeyword	: INTERLEAVE;
 interleavedGuardList	: ( interleavedGuardElement SEMICOLON? )+;
 interleavedGuardElement	: interleavedGuard interleavedAction;
 interleavedGuard	: '[' ']' guardOp;
-interleavedAction	: statementBlock;
+fragment interleavedAction	: statementBlock;
 labelStatement		: labelKeyword labelIdentifier;
-labelKeyword		: LABEL;
-labelIdentifier		: IDENTIFIER;
+fragment labelKeyword		: LABEL;
+fragment labelIdentifier		: IDENTIFIER;
 gotoStatement		: gotoKeyword labelIdentifier;
-gotoKeyword		: GOTO;
-repeatStatement		: REPEAT;
+fragment gotoKeyword		: GOTO;
+fragment repeatStatement		: REPEAT;
 activateOp		: activateKeyword '(' altstepInstance ')';
-activateKeyword		: ACTIVATE;
+fragment activateKeyword		: ACTIVATE;
 deactivateStatement	: deactivateKeyword ( '(' componentOrDefaultReference ')' )?;
-deactivateKeyword	: DEACTIVATE;
-breakStatement		: BREAK;
-continueStatement	: CONTINUE;
+fragment deactivateKeyword	: DEACTIVATE;
+fragment breakStatement		: BREAK;
+fragment continueStatement	: CONTINUE;
 
 // $>
 
@@ -1181,10 +1220,10 @@ arrayExpression		: '{' arrayElementExpressionList? '}';
 arrayElementExpressionList	: notUsedOrExpression ( ',' notUsedOrExpression )*;
 notUsedOrExpression	: expression | notUsedSymbol;
 constantExpression	: singleConstExpression | compoundConstExpression;
-singleConstExpression	: singleExpression;
+fragment singleConstExpression	: singleExpression;
 /* STATIC SEMANTICS - singleConstExpression shall not contain variables or module parameters and shall resolve
 to a constant value at compile time */
-booleanExpression	: singleExpression;
+fragment booleanExpression	: singleExpression;
 /* STATIC SEMANTICS - booleanExpression shall resolve to a value of type boolean */
 compoundConstExpression	: fieldConstExpressionList | arrayConstExpression;
 /* STATIC SEMANTICS - Within compoundConstExpression the arrayConstExpression can be used for arrays, record,
@@ -1269,57 +1308,57 @@ of integer or float (i.e. subrange). */
 relOp			: '<' | '>' | '>=' | '<=';
 /* STATIC SEMANTICS - the precedence of the operators is defined in Table 6 */
 equalOp			: '==' | '!=';
-stringOp		: '&';
+fragment stringOp		: '&';
 /* STATIC SEMANTICS - Operands of the string operator shall be bitstring, hexstring, octetstring, (universal) 
 character string, record of, set of, or array types, or derivates of these types */
 shiftOp			: '<<' | '>>' | '<@' | '>@';
 logStatement		: logKeyword '(' logItem ( ',' logItem )* ')';
-logKeyword		: LOG;
-logItem			: freeText | templateInstance;
+fragment logKeyword		: LOG;
+logItem			: FREE_TEXT | templateInstance;
 loopConstruct
 			: forStatement |
 			whileStatement |
 			doWhileStatement;
 forStatement		: forKeyword '(' initial SEMICOLON final SEMICOLON step ')'
 			statementBlock;
-forKeyword		: FOR;
+fragment forKeyword		: FOR;
 initial			: varInstance | assignment;
-final			: booleanExpression;
-step			: assignment;
+fragment final			: booleanExpression;
+fragment step			: assignment;
 whileStatement		: whileKeyword '(' booleanExpression ')'
 			statementBlock;
-whileKeyword		: WHILE;
+fragment whileKeyword		: WHILE;
 doWhileStatement	: doKeyword statementBlock
 			whileKeyword '(' booleanExpression ')';
-doKeyword		: DO;
+fragment doKeyword		: DO;
 conditionalConstruct	: ifKeyword '(' booleanExpression ')'
 			statementBlock
 			elseIfClause* elseClause?;
-ifKeyword		: IF;
+fragment ifKeyword		: IF;
 elseIfClause		: elseKeyword ifKeyword '(' booleanExpression ')' statementBlock;
-elseKeyword		: ELSE;
+fragment elseKeyword		: ELSE;
 elseClause		: elseKeyword statementBlock;
 selectCaseConstruct	: selectKeyword '(' singleExpression ')' selectCaseBody;
-selectKeyword		: SELECT;
+fragment selectKeyword		: SELECT;
 selectCaseBody		: '{' selectCase+ '}';
 selectCase		: caseKeyword ( '(' templateInstance ( ',' templateInstance )* ')' | elseKeyword )
 			statementBlock;
-caseKeyword		: CASE;
+fragment caseKeyword		: CASE;
 
 // $>
 
 
 // $<A.1.6.9 - Miscellaneous productions
 
-dash			: MINUS;
+fragment dash			: MINUS;
 
 // $>
 
 
 WHITESPACE		: ( '\t' | ' ' | '\r' | '\n'| '\u000C' )+
-				{ $channel = HIDDEN; };
+			{ $channel = HIDDEN; };
 
 COMMENT			: '/*' ( options { greedy=false; } : . )* '*/'
-				{ $channel = HIDDEN; };
+			{ $channel = HIDDEN; };
 LINE_COMMENT		: '//' ~('\n'|'\r')* '\r'? '\n'
-				{ $channel = HIDDEN; };
+			{ $channel = HIDDEN; };

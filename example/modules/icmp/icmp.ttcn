@@ -106,7 +106,7 @@ module icmp {
       }
     }
     
-    log("Count: " & int2str(count));
+    log("Count: ", int2str(count));
     
     // destroy connections
     unmap(mtc:icmpPort, system:icmpPort);
