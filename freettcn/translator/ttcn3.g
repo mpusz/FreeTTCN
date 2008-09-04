@@ -155,38 +155,37 @@ tokens {
     COLON = ',';
     UNDERSCORE = '_';
     ASSIGNMENT_CHAR = ':=';
-    
-    /* ADDED */
-    SCOPE_OPEN = '{';
-    SCOPE_CLOSE = '}';
 }
 
 
 
-/* A.1.6.0 - TTCN-3 module*/
+// $<A.1.6.0 TTCN-3 module
 
 ttcn3Module		: ttcn3ModuleKeyword ttcn3ModuleId
-			SCOPE_OPEN
+			'{'
 			moduleDefinitionsPart?
 			moduleControlPart?
-			SCOPE_CLOSE
+			'}'
 			withStatement? SEMICOLON? EOF;
 ttcn3ModuleKeyword	: MODULE;
 ttcn3ModuleId		: moduleId;
-moduleId		: globalModuleId languageSpec?;
+moduleId			: globalModuleId languageSpec?;
 globalModuleId		: moduleIdentifier;
 moduleIdentifier	: IDENTIFIER;
 languageSpec		: languageKeyword freeText;
 languageKeyword		: LANGUAGE;
 
+// $>
 
-/* A.1.6.1 - Module definitions part */
 
-/* A.1.6.1.0 - General */
+// $<A.1.6.1 Module definitions part
+
+// $<A.1.6.1.0 General
 
 moduleDefinitionsPart	: moduleDefinitionsList;
 moduleDefinitionsList	: ( moduleDefinition SEMICOLON? )+;
-moduleDefinition	: ( typeDef |
+moduleDefinition
+			: ( typeDef |
 			constDef |
 			templateDef |
 			moduleParDef |
@@ -199,13 +198,16 @@ moduleDefinition	: ( typeDef |
 			extFunctionDef |
 			extConstDef ) withStatement?;
 
+// $>
 
-/* A.1.6.1.1 Typedef definitions */
+
+// $<A.1.6.1.1 Typedef definitions
 
 typeDef			: typeDefKeyword typeDefBody;
 typeDefBody		: structuredTypeDef | subTypeDef;
 typeDefKeyword		: TYPE;
-structuredTypeDef	: recordDef |
+structuredTypeDef
+			: recordDef |
 			unionDef |
 			setDef |
 			recordOfDef |
@@ -216,30 +218,31 @@ structuredTypeDef	: recordDef |
 recordDef		: recordKeyword structDefBody;
 recordKeyword		: RECORD;
 structDefBody		: ( ( structTypeIdentifier structDefFormalParList? ) | addressKeyword )
-			SCOPE_OPEN ( structFieldDef ( ',' structFieldDef )* )? SCOPE_CLOSE;
+			'{' ( structFieldDef ( ',' structFieldDef )* )? '}';
 structTypeIdentifier	: IDENTIFIER;
 structDefFormalParList	: '(' structDefFormalPar ( ',' structDefFormalPar )* ')';
 structDefFormalPar	: formalValuePar;
 structFieldDef		: ( type | nestedTypeDef ) structFieldIdentifier arrayDef? subTypeSpec?
 			optionalKeyword?;
-nestedTypeDef		: nestedRecordDef |
+nestedTypeDef
+			: nestedRecordDef |
 			nestedUnionDef |
 			nestedSetDef |
 			nestedRecordOfDef |
 			nestedSetOfDef |
 			nestedEnumDef;
-nestedRecordDef		: recordKeyword SCOPE_OPEN ( structFieldDef ( ',' structFieldDef )* )? SCOPE_CLOSE;
-nestedUnionDef		: unionKeyword SCOPE_OPEN unionFieldDef ( ',' unionFieldDef )* SCOPE_CLOSE;
-nestedSetDef		: setKeyword SCOPE_OPEN ( structFieldDef ( ',' structFieldDef )* )? SCOPE_CLOSE;
+nestedRecordDef		: recordKeyword '{' ( structFieldDef ( ',' structFieldDef )* )? '}';
+nestedUnionDef		: unionKeyword '{' unionFieldDef ( ',' unionFieldDef )* '}';
+nestedSetDef		: setKeyword '{' ( structFieldDef ( ',' structFieldDef )* )? '}';
 nestedRecordOfDef	: recordKeyword stringLength? ofKeyword ( type | nestedTypeDef );
 nestedSetOfDef		: setKeyword stringLength? ofKeyword ( type | nestedTypeDef );
-nestedEnumDef		: enumKeyword SCOPE_OPEN enumerationList SCOPE_CLOSE;
+nestedEnumDef		: enumKeyword '{' enumerationList '}';
 structFieldIdentifier	: IDENTIFIER;
 optionalKeyword		: OPTIONAL;
 unionDef		: unionKeyword unionDefBody;
 unionKeyword		: UNION;
 unionDefBody		: ( structTypeIdentifier structDefFormalParList? | addressKeyword )
-			SCOPE_OPEN unionFieldDef ( ',' unionFieldDef )* SCOPE_CLOSE;
+			'{' unionFieldDef ( ',' unionFieldDef )* '}';
 unionFieldDef		: ( type | nestedTypeDef ) structFieldIdentifier arrayDef? subTypeSpec?;
 setDef			: setKeyword structDefBody;
 setKeyword		: SET;
@@ -248,7 +251,7 @@ ofKeyword		: OF;
 structOfDefBody		: ( type | nestedTypeDef ) ( structTypeIdentifier | addressKeyword ) subTypeSpec?;
 setOfDef		: setKeyword stringLength? ofKeyword structOfDefBody;
 enumDef			: enumKeyword ( enumTypeIdentifier | addressKeyword )
-			SCOPE_OPEN  enumerationList SCOPE_CLOSE;
+			'{'  enumerationList '}';
 enumKeyword		: ENUMERATED;
 enumTypeIdentifier	: IDENTIFIER;
 enumerationList		: enumeration ( ',' enumeration )*;
@@ -275,7 +278,7 @@ portKeyword		: PORT;
 portTypeIdentifier	: IDENTIFIER;
 portDefAttribs		: messageAttribs | procedureAttribs | mixedAttribs;
 messageAttribs		: messageKeyword
-			SCOPE_OPEN ( messageList SEMICOLON? )+ SCOPE_CLOSE;
+			'{' ( messageList SEMICOLON? )+ '}';
 messageList		: direction allOrTypeList;
 direction		: inParKeyword | outParKeyword | inOutParKeyword;
 messageKeyword		: MESSAGE;
@@ -284,20 +287,20 @@ allOrTypeList		: allKeyword | typeList;
 allKeyword		: ALL;
 typeList		: type ( ',' type )*;
 procedureAttribs	: procedureKeyword
-			SCOPE_OPEN ( procedureList SEMICOLON? )+ SCOPE_CLOSE;
+			'{' ( procedureList SEMICOLON? )+ '}';
 procedureKeyword	: PROCEDURE;
 procedureList		: direction allOrSignatureList;
 allOrSignatureList	: allKeyword | signatureList;
 signatureList		: signature ( ',' signature )*;
 mixedAttribs		: mixedKeyword
-			SCOPE_OPEN ( mixedList SEMICOLON? )+ SCOPE_CLOSE;
+			'{' ( mixedList SEMICOLON? )+ '}';
 mixedKeyword		: MIXED;
 mixedList 		: direction procOrTypeList;
 procOrTypeList		: allKeyword | ( procOrType ( ',' procOrType )* );
 procOrType		: signature | type;
 componentDef		: componentKeyword componentTypeIdentifier
 			( extendsKeyword componentType ( ',' componentType )* )?
-			SCOPE_OPEN componentDefList? SCOPE_CLOSE;
+			'{' componentDefList? '}';
 componentKeyword	: COMPONENT;
 extendsKeyword		: EXTENDS;
 componentType		: ( globalModuleId DOT )? componentTypeIdentifier;
@@ -308,8 +311,10 @@ portInstance		: portKeyword portType portElement ( ',' portElement )*;
 portElement		: portIdentifier arrayDef?;
 portIdentifier		: IDENTIFIER;
 
+// $>
 
-/* A.1.6.1.2 - Constant definitions */
+
+// $<A.1.6.1.2 Constant definitions
 
 constDef		: constKeyword type constList;
 constList		: singleConstDef ( ',' singleConstDef )*;
@@ -317,8 +322,10 @@ singleConstDef		: constIdentifier arrayDef? ASSIGNMENT_CHAR constantExpression;
 constKeyword		: CONST;
 constIdentifier		: IDENTIFIER;
 
+// $>
 
-/* A.1.6.1.3 - Template definitions */
+
+// $<A.1.6.1.3 Template definitions
 
 templateDef		: templateKeyword baseTemplate derivedDef? ASSIGNMENT_CHAR templateBody;
 baseTemplate		: ( type | signature ) templateIdentifier ( '(' templateFormalParList ')' )?;
@@ -332,7 +339,7 @@ templateFormalPar	: formalValuePar | formalTemplatePar;
 templateBody		: ( simpleSpec | fieldSpecList | arrayValueOrAttrib ) | extraMatchingAttributes?;
 /* STATIC SEMANTICS - Within templateBody the arrayValueOrAttrib can be used for array, record, record of and set of types. */
 simpleSpec		: singleValueOrAttrib;
-fieldSpecList		: SCOPE_OPEN ( fieldSpec ( ',' fieldSpec )* )? SCOPE_CLOSE;
+fieldSpecList		: '{' ( fieldSpec ( ',' fieldSpec )* )? '}';
 fieldSpec		: fieldReference ASSIGNMENT_CHAR templateBody;
 fieldReference		: structFieldRef | arrayOrBitRef | parRef;
 /* STATIC SEMANTICS - Within fieldReference arrayOrBitRef can be used for record of and set of templates/template fields
@@ -353,11 +360,12 @@ singleValueOrAttrib	: matchingSymbol |
 			templateRefWithParList;
 /* STATIC SEMANTICS - variableIdentifier (accessed via singleExpression) may only be used in in-line template definitions
 to reference variables in the current scope. */
-arrayValueOrAttrib	: SCOPE_OPEN arrayElementSpecList SCOPE_CLOSE;
+arrayValueOrAttrib	: '{' arrayElementSpecList '}';
 arrayElementSpecList	: arrayElementSpec ( ',' arrayElementSpec )*;
 arrayElementSpec	: notUsedSymbol | permutationMatch | templateBody;
 notUsedSymbol		: dash;
-matchingSymbol		: complement |
+matchingSymbol
+			: complement |
 			anyValue |
 			anyOrOmit |
 			valueOrAttribList |
@@ -418,8 +426,10 @@ matchKeyword		: MATCH;
 valueofOp		: valueofKeyword '(' templateInstance ')';
 valueofKeyword		: VALUE_OF;
 
+// $>
 
-/* A.1.6.1.4 - Functions definitions */
+
+// $<A.1.6.1.4 Function definitions
 
 functionDef		: functionKeyword functionIdentifier
 			'(' functionFormalParList? ')' runsOnSpec? returnType?
@@ -437,7 +447,7 @@ runsOnSpec		: runsKeyword onKeyword componentType;
 runsKeyword		: RUNS;
 onKeyword		: ON;
 mtcKeyword		: MTC;
-statementBlock		: SCOPE_OPEN functionStatementOrDefList? SCOPE_CLOSE;
+statementBlock		: '{' functionStatementOrDefList? '}';
 functionStatementOrDefList	: ( functionStatementOrDef SEMICOLON? )+;
 functionStatementOrDef	: functionLocalDef |
 			functionLocalInst |
@@ -465,8 +475,10 @@ functionActualPar	: timerRef |
 /* STATIC SEMANTICS - When the corresponding formal parameter is not of template type the templateInstance production
 shall resolve to one or more singleExpressions i.e. equivalent to the expression production. */
 
+// $>
 
-/* A.1.6.1.5 - Signature definitions */
+
+// $<A.1.6.1.5 Signature definitions
 
 signatureDef		: signatureKeyword signatureIdentifier
 			'(' signatureFormalParList? ')' ( returnType | noBlockKeyword )?
@@ -481,8 +493,10 @@ exceptionTypeList	: type ( ',' type )*;
 noBlockKeyword		: NO_BLOCK;
 signature		: ( globalModuleId DOT )? signatureIdentifier;
 
+// $>
 
-/* A.1.6.1.6 - Testcase definitions */
+
+// $<A.1.6.1.6 Testcase definitions
 
 testcaseDef		: testcaseKeyword testcaseIdentifier
 			'(' testcaseFormalParList? ')' configSpec
@@ -504,12 +518,14 @@ testcaseActualPar	: templateInstance;
 /* STATIC SEMANTICS - When the corresponding formal parameter is not of template type the templateInstance
 production shall resolve to one or more singleExpressions i.e. equivalent to the expression production. */
 
+// $>
 
-/* A.1.6.1.7 - Altstep definitions */
+
+// $<A.1.6.1.7 Altstep definitions
 
 altstepDef		: altstepKeyword altstepIdentifier
 			'(' altstepFormalParList? ')' runsOnSpec?
-			SCOPE_OPEN altstepLocalDefList altGuardList SCOPE_CLOSE;
+			'{' altstepLocalDefList altGuardList '}';
 altstepKeyword		: ALTSTEP;
 altstepIdentifier	: IDENTIFIER;
 altstepFormalParList	: functionFormalParList;
@@ -518,13 +534,15 @@ altstepLocalDef		: varInstance | timerInstance | constDef | templateDef;
 altstepInstance		: altstepRef '(' functionActualParList? ')';
 altstepRef		: ( globalModuleId DOT )? altstepIdentifier;
 
+// $>
 
-/* A.1.6.1.8 - Import definitions */
 
-importDef		: importKeyword importFromSpec ( allWithExcepts | ( SCOPE_OPEN importSpec SCOPE_CLOSE ) );
+// $<A.1.6.1.8 Import definitions
+
+importDef		: importKeyword importFromSpec ( allWithExcepts | ( '{' importSpec '}' ) );
 importKeyword		: IMPORT;
 allWithExcepts		: allKeyword exceptsDef?;
-exceptsDef		: exceptKeyword SCOPE_OPEN exceptSpec SCOPE_CLOSE;
+exceptsDef		: exceptKeyword '{' exceptSpec '}';
 exceptKeyword		: EXCEPT;
 exceptSpec		: ( exceptElement SEMICOLON? )*;
 exceptElement		: exceptGroupSpec |
@@ -595,33 +613,41 @@ importModuleParSpec	: moduleParKeyword ( moduleParRefList | allModuleParWithExce
 moduleParRefList	: moduleParIdentifier ( ',' moduleParIdentifier )*;
 allModuleParWithExcept	: allKeyword ( exceptKeyword moduleParRefList )?;
 
+// $>
 
-/* A.1.6.1.9 - Group definitions */
+
+// $<A.1.6.1.9 Group definitions
 
 groupDef		: groupKeyword groupIdentifier
-			SCOPE_OPEN moduleDefinitionsPart? SCOPE_CLOSE;
+			'{' moduleDefinitionsPart? '}';
 groupKeyword		: GROUP;
 groupIdentifier		: IDENTIFIER;
 
+// $>
 
-/* A.1.6.1.10 - External function definitions */
+
+// $<A.1.6.1.10 External function definitions
 
 extFunctionDef		: extKeyword functionKeyword extFunctionIdentifier
 			'(' functionFormalParList? ')' returnType?;
 extKeyword		: EXTERNAL;
 extFunctionIdentifier	: IDENTIFIER;
 
+// $>
 
-/* A.1.6.1.11 - External constant definitions */
+
+// $<A.1.6.1.11 External constant definitions
 
 extConstDef		: extKeyword constKeyword type extConstIdentifierList;
 extConstIdentifierList	: extConstIdentifier ( ',' extConstIdentifier )*;
 extConstIdentifier	: IDENTIFIER;
 
+// $>
 
-/* A.1.6.1.12 - Module parameter definitions */
 
-moduleParDef		: moduleParKeyword ( modulePar | ( SCOPE_OPEN multitypedModuleParList SCOPE_CLOSE ) );
+// $<A.1.6.1.12 Module parameter definitions
+
+moduleParDef		: moduleParKeyword ( modulePar | ( '{' multitypedModuleParList '}' ) );
 moduleParKeyword	: MODULE_PAR;
 multitypedModuleParList	: ( modulePar SEMICOLON? )*;
 modulePar		: moduleParType moduleParList;
@@ -630,13 +656,18 @@ moduleParList		: moduleParIdentifier ( ASSIGNMENT_CHAR constantExpression )?
 			( ',' moduleParIdentifier ( ASSIGNMENT_CHAR constantExpression )? )*;
 moduleParIdentifier	: IDENTIFIER;
 
+// $>
 
-/* A.1.6.2 - Control part */
+// $>
 
-/* A.1.6.2.0 - General */
+
+
+// $<A.1.6.2 Control part
+
+// $<A.1.6.2.0 General
 
 moduleControlPart	: controlKeyword
-			SCOPE_OPEN moduleControlBody SCOPE_CLOSE
+			'{' moduleControlBody '}'
 			withStatement? SEMICOLON?;
 controlKeyword		: CONTROL;
 moduleControlBody	: controlStatementOrDefList?;
@@ -650,8 +681,10 @@ controlStatement	: timerStatements |
 			sutStatements |
 			stopKeyword;
 
+// $>
 
-/* A.1.6.2.1 - Variable instantiation */
+
+// $<A.1.6.2.1 Variable instantiation
 
 varInstance		: varKeyword ( ( type varList ) | ( templateKeyword type tempVarList ) );
 varList			: singleVarInstance ( ',' singleVarInstance )*;
@@ -664,8 +697,10 @@ singleTempVarInstance	: varIdentifier arrayDef? ( ASSIGNMENT_CHAR tempVarInitial
 tempVarInitialValue	: templateBody;
 variableRef		: ( varIdentifier | valueParIdentifier ) extendedFieldReference?;
 
+// $>
 
-/* A.1.6.2.2 - Timer instantiation */
+
+// $<A.1.6.2.2 Timer instantiation
 
 timerInstance		: timerKeyword timerList;
 timerList		: singleTimerInstance ( ',' singleTimerInstance )*;
@@ -675,8 +710,10 @@ timerIdentifier		: IDENTIFIER;
 timerValue		: expression;
 timerRef		: ( timerIdentifier | timerParIdentifier ) arrayOrBitRef;
 
+// $>
 
-/* A.1.6.2.3 - Component operations */
+
+// $<A.1.6.2.3 Component operations
 
 configurationStatements	: connectStatement |
 			mapStatement |
@@ -730,8 +767,10 @@ killTCStatement		: killKeyword | ( componentReferenceOrLiteral DOT killKeyword )
 componentOrDefaultReference	: variableRef | functionInstance;
 killKeyword		: KILL;
 
+// $>
 
-/* A.1.6.2.4 - Port operations */
+
+// $<A.1.6.2.4 Port operations
 
 port			: ( portIdentifier | portParIdentifier ) arrayOrBitRef*;
 communicationStatements	: sendStatement |
@@ -763,7 +802,7 @@ callOpKeyword		: CALL;
 callParameters		: templateInstance ( ',' callTimerValue )?;
 callTimerValue		: timerValue | nowaitKeyword;
 nowaitKeyword		: NO_WAIT;
-portCallBody		: SCOPE_OPEN callBodyStatementList SCOPE_CLOSE;
+portCallBody		: '{' callBodyStatementList '}';
 callBodyStatementList	: ( callBodyStatement SEMICOLON? )+;
 callBodyStatement	: callBodyGuard statementBlock;
 callBodyGuard		: altGuardChar callBodyOps;
@@ -836,8 +875,10 @@ portStopOp		: stopKeyword;
 stopKeyword		: STOP;
 anyKeyword		: ANY;
 
+// $>
 
-/*  A.1.6.2.5 - Timer operations */
+
+// $<A.1.6.2.5 Timer operations
 
 timerStatements		: startTimerStatement | stopTimerStatement | timeoutStatement;
 timerOps		: readTimerOp | runningTimerOp;
@@ -851,8 +892,12 @@ timeoutStatement	: timerRefOrAny DOT timeoutKeyword;
 timerRefOrAny		: timerRef | anyKeyword timerKeyword;
 timeoutKeyword		: TIMEOUT;
 
+// $>
 
-/* A.1.6.3 - Type */
+// $>
+
+
+// $<A.1.6.3 Type
 
 type			: predefinedType | referencedType;
 predefinedType		: bitstringKeyword |
@@ -891,8 +936,10 @@ arrayDef		: ( '[' arrayBounds ( '..' arrayBounds )? ']' )+;
 arrayBounds		: singleConstExpression;
 /* STATIC SEMANTICS - arrayBounds will resolve to a non negative value of integer type */
 
+// $>
 
-/* A.1.6.4 - Value */
+
+// $<A.1.6.4 Value
 
 value			: predefinedValue | referencedValue;
 predefinedValue		: bitStringValue |
@@ -957,8 +1004,10 @@ addressValue		: TTCN_NULL;
 omitValue		: omitKeyword;
 omitKeyword		: OMIT;
 
+// $>
 
-/* A.1.6.5 - Parametrization */
+
+// $<A.1.6.5 Parametrization
 
 inParKeyword		: IN;
 outParKeyword		: OUT;
@@ -973,12 +1022,14 @@ formalTemplatePar	: ( inParKeyword | outParKeyword | inOutParKeyword )?
 			templateKeyword type templateParIdentifier;
 templateParIdentifier	: IDENTIFIER;
 
+// $>
 
-/* A.1.6.6 - With statement */
+
+// $<A.1.6.6 With statement
 
 withStatement		: withKeyword withAttribList;
 withKeyword		: WITH;
-withAttribList		: SCOPE_OPEN multiWithAttrib SCOPE_CLOSE;
+withAttribList		: '{' multiWithAttrib '}';
 multiWithAttrib		: ( singleWithAttrib SEMICOLON? )*;
 singleWithAttrib	: attribKeyword overrideKeyword? attribQualifier? attribSpec;
 attribKeyword		: encodeKeyword |
@@ -1009,19 +1060,21 @@ definitionRef		: structTypeIdentifier |
 			portIdentifier |
 			moduleParIdentifier |
 			fullGroupIdentifier;
-allRef			: ( groupKeyword allKeyword ( exceptKeyword SCOPE_OPEN groupRefList SCOPE_CLOSE )? ) |
-			( typeDefKeyword allKeyword ( exceptKeyword SCOPE_OPEN typeRefList SCOPE_CLOSE )? ) |
-			( templateKeyword allKeyword ( exceptKeyword SCOPE_OPEN templateRefList SCOPE_CLOSE )? ) |
-			( constKeyword allKeyword ( exceptKeyword SCOPE_OPEN constRefList SCOPE_CLOSE )? ) |
-			( altstepKeyword allKeyword ( exceptKeyword SCOPE_OPEN altstepRefList SCOPE_CLOSE )? ) |
-			( testcaseKeyword allKeyword ( exceptKeyword SCOPE_OPEN testcaseRefList SCOPE_CLOSE )? ) |
-			( functionKeyword allKeyword ( exceptKeyword SCOPE_OPEN functionRefList SCOPE_CLOSE )? ) |
-			( signatureKeyword allKeyword ( exceptKeyword SCOPE_OPEN signatureRefList SCOPE_CLOSE )? ) |
-			( moduleParKeyword allKeyword ( exceptKeyword SCOPE_OPEN moduleParList SCOPE_CLOSE )? );
+allRef			: ( groupKeyword allKeyword ( exceptKeyword '{' groupRefList '}' )? ) |
+			( typeDefKeyword allKeyword ( exceptKeyword '{' typeRefList '}' )? ) |
+			( templateKeyword allKeyword ( exceptKeyword '{' templateRefList '}' )? ) |
+			( constKeyword allKeyword ( exceptKeyword '{' constRefList '}' )? ) |
+			( altstepKeyword allKeyword ( exceptKeyword '{' altstepRefList '}' )? ) |
+			( testcaseKeyword allKeyword ( exceptKeyword '{' testcaseRefList '}' )? ) |
+			( functionKeyword allKeyword ( exceptKeyword '{' functionRefList '}' )? ) |
+			( signatureKeyword allKeyword ( exceptKeyword '{' signatureRefList '}' )? ) |
+			( moduleParKeyword allKeyword ( exceptKeyword '{' moduleParList '}' )? );
 attribSpec		: freeText;
 
+// $>
 
-/* A.1.6.7 - Behaviour statements */
+
+// $<A.1.6.7 Behaviour statements
 
 behaviourStatements	: testcaseInstance |
 			functionInstance |
@@ -1043,7 +1096,7 @@ sutStatements		: actionKeyword '(' actionText? ( stringOp actionText )* ')';
 actionKeyword		: ACTION;
 actionText		: freeText | expression;
 returnStatement		: returnKeyword expression?;
-altConstruct		: altKeyword SCOPE_OPEN altGuardList SCOPE_CLOSE;
+altConstruct		: altKeyword '{' altGuardList '}';
 altKeyword		: ALT;
 altGuardList		: ( guardStatement | elseStatement SEMICOLON? )*;
 guardStatement		: altGuardChar ( altstepInstance statementBlock? | guardOp statementBlock );
@@ -1058,7 +1111,7 @@ guardOp			: timeoutStatement |
 			getReplyStatement |
 			doneStatement |
 			killedStatement;
-interleavedConstruct	: interleavedKeyword SCOPE_OPEN interleavedGuardList SCOPE_CLOSE;
+interleavedConstruct	: interleavedKeyword '{' interleavedGuardList '}';
 interleavedKeyword	: INTERLEAVE;
 interleavedGuardList	: ( interleavedGuardElement SEMICOLON? )+;
 interleavedGuardElement	: interleavedGuard interleavedAction;
@@ -1075,8 +1128,10 @@ activateKeyword		: ACTIVATE;
 deactivateStatement	: deactivateKeyword ( '(' componentOrDefaultReference ')' )?;
 deactivateKeyword	: DEACTIVATE;
 
+// $>
 
-/* A.1.6.8 - Basic statements */
+
+// $<A.1.6.8 Basic statements
 
 basicStatements		: assignment | logStatement | loopConstruct | conditionalConstruct |
 			selectCaseConstruct;
@@ -1084,9 +1139,9 @@ expression		: singleExpression | compoundExpression;
 compoundExpression	: fieldExpressionList | arrayExpression;
 /* STATIC  SEMANTICS - Within compoundExpression the arrayExpression can be used for arrays, record, record of
 and set of types. */
-fieldExpressionList	: SCOPE_OPEN fieldExpressionSpec ( ',' fieldExpressionSpec )* SCOPE_CLOSE;
+fieldExpressionList	: '{' fieldExpressionSpec ( ',' fieldExpressionSpec )* '}';
 fieldExpressionSpec	: fieldReference ASSIGNMENT_CHAR notUsedOrExpression;
-arrayExpression		: SCOPE_OPEN arrayElementExpressionList? SCOPE_CLOSE;
+arrayExpression		: '{' arrayElementExpressionList? '}';
 arrayElementExpressionList	: notUsedOrExpression ( ',' notUsedOrExpression )*;
 notUsedOrExpression	: expression | notUsedSymbol;
 constantExpression	: singleConstExpression | compoundConstExpression;
@@ -1098,9 +1153,9 @@ booleanExpression	: singleExpression;
 compoundConstExpression	: fieldConstExpressionList | arrayConstExpression;
 /* STATIC SEMANTICS - Within compoundConstExpression the arrayConstExpression can be used for arrays, record,
 record of and set of types. */
-fieldConstExpressionList	: SCOPE_OPEN fieldConstExpressionSpec ( ',' fieldConstExpressionSpec ) SCOPE_CLOSE;
+fieldConstExpressionList	: '{' fieldConstExpressionSpec ( ',' fieldConstExpressionSpec ) '}';
 fieldConstExpressionSpec	: fieldReference ASSIGNMENT_CHAR constantExpression;
-arrayConstExpression	: SCOPE_OPEN arrayElementConstExpressionList? SCOPE_CLOSE;
+arrayConstExpression	: '{' arrayElementConstExpressionList? '}';
 arrayElementConstExpressionList	: constantExpression ( ',' constantExpression )*;
 assignment		: variableRef ASSIGNMENT_CHAR ( expression | templateBody );
 /* STATIC SEMANTICS - The expression on the right hand side of assignment shall evaluate to an explicit
@@ -1209,15 +1264,19 @@ elseKeyword		: ELSE;
 elseClause		: elseKeyword statementBlock;
 selectCaseConstruct	: selectKeyword '(' singleExpression ')' selectCaseBody;
 selectKeyword		: SELECT;
-selectCaseBody		: SCOPE_OPEN selectCase+ SCOPE_CLOSE;
+selectCaseBody		: '{' selectCase+ '}';
 selectCase		: caseKeyword ( '(' templateInstance ( ',' templateInstance )* ')' | elseKeyword )
 			statementBlock;
 caseKeyword		: CASE;
 
+// $>
 
-/* A.1.6.9 - Miscellaneous productions */
+
+// $<A.1.6.9 - Miscellaneous productions
 
 dash			: MINUS;
+
+// $>
 
 
 WHITESPACE		: ( '\t' | ' ' | '\r' | '\n'| '\u000C' )+
