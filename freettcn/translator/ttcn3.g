@@ -284,7 +284,8 @@ enumDef			: enumKeyword ( enumTypeIdentifier | addressKeyword )
 fragment enumKeyword		: ENUMERATED;
 fragment enumTypeIdentifier	: IDENTIFIER;
 enumerationList		: enumeration ( ',' enumeration )*;
-enumeration		: enumerationIdentifier ( '(' MINUS? NUMBER ')' )?;
+enumeration		: enumerationIdentifier ( '(' MINUS? INTEGER_VALUE ')' )?;
+/* ---A--- CHANGED (NUMBER is not lexer token) ---A--- */
 fragment enumerationIdentifier	: IDENTIFIER;
 subTypeDef		: type ( subTypeIdentifier | addressKeyword ) arrayDef? subTypeSpec?;
 fragment subTypeIdentifier	: IDENTIFIER;
@@ -1300,7 +1301,7 @@ of integer or float (i.e. subrange). */
 relOp			: '<' | '>' | '>=' | '<=';
 /* STATIC SEMANTICS - the precedence of the operators is defined in Table 6 */
 equalOp			: '==' | '!=';
-fragment stringOp		: '&';
+stringOp		: '&';
 /* STATIC SEMANTICS - Operands of the string operator shall be bitstring, hexstring, octetstring, (universal) 
 character string, record of, set of, or array types, or derivates of these types */
 shiftOp			: '<<' | '>>' | '<@' | '>@';
