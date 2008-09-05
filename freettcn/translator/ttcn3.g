@@ -284,8 +284,7 @@ enumDef			: enumKeyword ( enumTypeIdentifier | addressKeyword )
 fragment enumKeyword		: ENUMERATED;
 fragment enumTypeIdentifier	: IDENTIFIER;
 enumerationList		: enumeration ( ',' enumeration )*;
-enumeration		: enumerationIdentifier ( '(' MINUS? INTEGER_VALUE ')' )?;
-/* ---A--- CHANGED (NUMBER is not lexer token) ---A--- */
+enumeration		: enumerationIdentifier ( '(' MINUS? number ')' )?;
 fragment enumerationIdentifier	: IDENTIFIER;
 subTypeDef		: type ( subTypeIdentifier | addressKeyword ) arrayDef? subTypeSpec?;
 fragment subTypeIdentifier	: IDENTIFIER;
@@ -996,7 +995,7 @@ predefinedValue
 			: bitStringValue |
 			booleanValue |
 			charStringValue |
-			INTEGER_VALUE |
+			integerValue |
 			octetStringValue |
 			hexStringValue |
 			verdictTypeValue |
@@ -1006,35 +1005,35 @@ predefinedValue
 			omitValue;
 fragment bitStringValue		: B_STRING;
 fragment booleanValue		: TRUE | FALSE;
-INTEGER_VALUE		: NUMBER;
+integerValue		: number;
 fragment octetStringValue	: O_STRING;
 fragment hexStringValue		: H_STRING;
 verdictTypeValue	: PASS | FAIL | INCONC | NONE | ERROR;
 fragment enumeratedValue		: enumerationIdentifier;
-charStringValue		: cString | QUADRUPLE;
-QUADRUPLE		    : CHAR_KEYWORD '(' GROUP ',' PLANE ',' ROW ',' CELL ')';
+charStringValue		: cString | quadruple;
+quadruple		    : CHAR_KEYWORD '(' group ',' plane ',' row ',' cell ')';
 fragment CHAR_KEYWORD	: TTCN_CHAR;
-fragment GROUP			: NUMBER;
-fragment PLANE			: NUMBER;
-fragment ROW		   	: NUMBER;
-fragment CELL			: NUMBER;
-floatValue		    : FLOAT_DOT_NOTATION | FLOAT_E_NOTATION;
-FLOAT_DOT_NOTATION	: NUMBER DOT DECIMAL_NUMBER;
-FLOAT_E_NOTATION	: NUMBER ( DOT DECIMAL_NUMBER )? EXPONENTIAL MINUS? NUMBER;
+fragment group			: number;
+fragment plane			: number;
+fragment row		   	: number;
+fragment cell			: number;
+floatValue		    : floatDotNotation | floatENotation;
+floatDotNotation	: number DOT decimalNumber;
+floatENotation	: number ( DOT decimalNumber )? EXPONENTIAL MINUS? number;
 fragment EXPONENTIAL		: 'E';
 referencedValue		: valueReference extendedFieldReference?;
 valueReference		: ( globalModuleId DOT )? ( constIdentifier | extConstIdentifier |
 			moduleParIdentifier ) |
 			valueParIdentifier |
 			varIdentifier;
-fragment NUMBER		: ( NON_ZERO_NUM NUM* ) | '0';
-fragment NON_ZERO_NUM	: '1'..'9';
-fragment DECIMAL_NUMBER	: NUM+;
-fragment NUM		: '0' | NON_ZERO_NUM;
+number		: ( NON_ZERO_NUM num* ) | '0';
+NON_ZERO_NUM	: '1'..'9';
+decimalNumber	: num+;
+fragment num		: '0' | NON_ZERO_NUM;
 B_STRING		: '\'' BIN* '\'' 'B';
 fragment BIN		: '0' | '1';
 H_STRING		: '\'' HEX* '\'' 'H';
-fragment HEX		: NUM | 'A'..'F' | 'a'..'f';
+fragment HEX		: '0'..'9' | 'A'..'F' | 'a'..'f';
 O_STRING		: '\'' OCT* '\'' 'O';
 fragment OCT		: HEX HEX;
 cString         : C_STRING | UC_STRING;
@@ -1054,7 +1053,7 @@ fragment UNIVERSAL_CHAR		: '\u0000'..'\u0021' | '\\"' | '\u0023'..'\u00FF';
 /* ---A--- ADDED (universal string support) ---A--- */
 IDENTIFIER		: ALPHA ( ALPHA_NUM | UNDERSCORE )*;
 fragment ALPHA		: UPPER_ALPHA | LOWER_ALPHA;
-fragment ALPHA_NUM	: ALPHA | NUM;
+fragment ALPHA_NUM	: ALPHA | '0'..'9';
 fragment UPPER_ALPHA	: 'A'..'Z';
 fragment LOWER_ALPHA	: 'a'..'z';
 fragment addressValue    : TTCN_NULL;

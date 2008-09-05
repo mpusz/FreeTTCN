@@ -366,7 +366,7 @@ int main(int argc, char *argv[])
     std::cerr << "The parser returned " << parser->pParser->rec->state->errorCount << " errors, tree walking aborted" << std::endl;
   
   // Must manually clean up
-  parser->free(parser);
+  //  parser->free(parser);
   tokens->free(tokens);
   lex->free(lex);
   input->close(input);
