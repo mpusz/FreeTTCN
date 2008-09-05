@@ -183,18 +183,9 @@ tokens {
 
 
 
-// @lexer::postinclude {
+@lexer::members {
 
-// bool textParsing = false;
-
-// }
-
-// @parser::postinclude {
-
-// extern bool textParsing;
-
-// }
-
+}
 
 
 // $<A.1.6.0 TTCN-3 module
@@ -1045,6 +1036,13 @@ H_STRING		: '\'' HEX* '\'' 'H';
 fragment HEX		: NUM | 'A'..'F' | 'a'..'f';
 O_STRING		: '\'' OCT* '\'' 'O';
 fragment OCT		: HEX HEX;
+fragment EXTENDED_ALPHA_NUM	: '\u0020' | '\u0021' | '\u0023'..'\u007E' | '\u00A1'..'\u00AC' | '\u00AE'..'\u00FF';
+/* ---A--- BUG (special escape needed for " sign) ---A--- */
+//fragment EXTENDED_ALPHA_NUM	: '\u0020'..'\u007E' | '\u00A1'..'\u00AC' | '\u00AE'..'\u00FF';
+/* REFERENCE - A graphical character from the BASIC LATIN or from the LATIN-1 SUPPLEMENT character sets defined in
+ISO/IEC 10646 (characters from char (0,0,0,32) to char (0,0,0,126), from char (0,0,0,161) to char (0,0,0,172) and
+from char (0,0,0,174) to char (0,0,0,255). */
+FREE_TEXT       : '"' EXTENDED_ALPHA_NUM* '"';
 C_STRING		: '"' CHAR* '"';
 //fragment CHAR		: '\u0000'..'\u007F';
 fragment CHAR		: '\u0000'..'\u0021' | '\u0023'..'\u007F';
@@ -1057,13 +1055,6 @@ fragment ALPHA		: UPPER_ALPHA | LOWER_ALPHA;
 fragment ALPHA_NUM	: ALPHA | NUM;
 fragment UPPER_ALPHA	: 'A'..'Z';
 fragment LOWER_ALPHA	: 'a'..'z';
-fragment EXTENDED_ALPHA_NUM	: '\u0020' | '\u0021' | '\u0023'..'\u007E' | '\u00A1'..'\u00AC' | '\u00AE'..'\u00FF';
-/* ---A--- BUG (special escape needed for " sign) ---A--- */
-//fragment EXTENDED_ALPHA_NUM	: '\u0020'..'\u007E' | '\u00A1'..'\u00AC' | '\u00AE'..'\u00FF';
-/* REFERENCE - A graphical character from the BASIC LATIN or from the LATIN-1 SUPPLEMENT character sets defined in
-ISO/IEC 10646 (characters from char (0,0,0,32) to char (0,0,0,126), from char (0,0,0,161) to char (0,0,0,172) and
-from char (0,0,0,174) to char (0,0,0,255). */
-FREE_TEXT       : '"' EXTENDED_ALPHA_NUM* '"';
 fragment addressValue    : TTCN_NULL;
 fragment omitValue		: omitKeyword;
 fragment omitKeyword		: OMIT;

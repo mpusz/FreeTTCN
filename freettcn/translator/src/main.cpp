@@ -22,6 +22,7 @@
 #include "ttcn3Parser.h"
 #include <iostream>
 #include <iomanip>
+//#include <algorithm>
 
 
 namespace freettcn {
@@ -326,11 +327,35 @@ int main(int argc, char *argv[])
     std::cerr << "Out of memory trying to allocate token stream" << std::endl;
     exit(ANTLR3_ERR_NOMEM);
   }
-  
+
   parser = ttcn3ParserNew(tokens);
   if(!parser) {
     std::cerr << "Out of memory trying to allocate parser" << std::endl;
     exit(ANTLR3_ERR_NOMEM);
+  }
+  
+  if(argc >= 3 && std::string(argv[2]) == "-t") {
+    pANTLR3_UINT8 *tokenNames = parser->pParser->rec->state->tokenNames;
+    if(!tokenNames) {
+      std::cerr << "Token names not initiated!!!" << std::endl;
+      exit(0);
+    }
+
+    // estimate the longest token name
+    size_t maxTokenLength = 0;
+    pANTLR3_VECTOR vector = tokens->getTokens(tokens);
+    for(unsigned i=0; i<vector->size(vector); i++) {
+      pANTLR3_COMMON_TOKEN token = (pANTLR3_COMMON_TOKEN)vector->get(vector, i);
+      maxTokenLength = std::max(maxTokenLength, std::string((char *)tokenNames[token->getType(token)]).size());
+    }
+    
+    for(unsigned i=0; i<vector->size(vector); i++) {
+      pANTLR3_COMMON_TOKEN token = (pANTLR3_COMMON_TOKEN)vector->get(vector, i);
+      std::cout << "Token[" << std::setw(3) << std::right << token->getType(token) << "] - " <<
+        std::setw(maxTokenLength) << std::left << tokenNames[token->getType(token)] << " = " <<
+        token->getText(token)->chars << std::endl;
+    }
+    return 0;
   }
   
   // Override warning messages
