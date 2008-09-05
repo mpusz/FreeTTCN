@@ -139,7 +139,7 @@ quiet_cmd_make_tags = MAKE_TAGS $(LONG_DIR_NAME)/$(2)
 
 # make antlr
 quiet_cmd_antlr = ANTLR      $<
-      cmd_antlr = $(ANTLR) -o $(GEN_DIR) $<
+      cmd_antlr = $(ANTLR) -message-format gnu -o $(GEN_DIR) $<
 
 # compile source file, create depend file *.d, insert *.o file to library <bindir>\<dirname>.a
 quiet_cmd_cc_d_a = CC_D_A     $<

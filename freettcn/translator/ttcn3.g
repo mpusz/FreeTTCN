@@ -412,7 +412,7 @@ hexStringMatch		: '\'' hexOrMatch* '\'' 'H';
 hexOrMatch		: HEX | ANY_VALUE | ANY_OR_OMIT;
 octetStringMatch	: '\'' octOrMatch* '\'' 'O';
 octOrMatch		: OCT | ANY_VALUE | ANY_OR_OMIT;
-charStringMatch		: patternKeyword C_STRING;
+charStringMatch		: patternKeyword cString;
 fragment patternKeyword		: PATTERN;
 complement		: complementKeyword valueOrAttribList; // valueOrAttribListValueList;
 /* ---A--- BUG ---A--- */
@@ -1010,7 +1010,7 @@ fragment octetStringValue	: O_STRING;
 fragment hexStringValue		: H_STRING;
 verdictTypeValue	: PASS | FAIL | INCONC | NONE | ERROR;
 fragment enumeratedValue		: enumerationIdentifier;
-charStringValue		: C_STRING | QUADRUPLE;
+charStringValue		: cString | QUADRUPLE;
 QUADRUPLE		    : CHAR_KEYWORD '(' GROUP ',' PLANE ',' ROW ',' CELL ')';
 fragment CHAR_KEYWORD	: TTCN_CHAR;
 fragment GROUP			: NUMBER;
@@ -1036,20 +1036,21 @@ H_STRING		: '\'' HEX* '\'' 'H';
 fragment HEX		: NUM | 'A'..'F' | 'a'..'f';
 O_STRING		: '\'' OCT* '\'' 'O';
 fragment OCT		: HEX HEX;
-fragment EXTENDED_ALPHA_NUM	: '\u0020' | '\u0021' | '\u0023'..'\u007E' | '\u00A1'..'\u00AC' | '\u00AE'..'\u00FF';
-/* ---A--- BUG (special escape needed for " sign) ---A--- */
-//fragment EXTENDED_ALPHA_NUM	: '\u0020'..'\u007E' | '\u00A1'..'\u00AC' | '\u00AE'..'\u00FF';
-/* REFERENCE - A graphical character from the BASIC LATIN or from the LATIN-1 SUPPLEMENT character sets defined in
-ISO/IEC 10646 (characters from char (0,0,0,32) to char (0,0,0,126), from char (0,0,0,161) to char (0,0,0,172) and
-from char (0,0,0,174) to char (0,0,0,255). */
-FREE_TEXT       : '"' EXTENDED_ALPHA_NUM* '"';
+cString         : C_STRING | UC_STRING;
 C_STRING		: '"' CHAR* '"';
-//fragment CHAR		: '\u0000'..'\u007F';
-fragment CHAR		: '\u0000'..'\u0021' | '\u0023'..'\u007F';
-/* ---A--- TODO (universal charstring) ---A--- */
+fragment CHAR		: '\u0000'..'\u0021' | '\\"' | '\u0023'..'\u007F';
 /* ---A--- BUG (special escape needed for " sign) ---A--- */
 /* REFERENCE - A character defined by the relevant CharacterString type. For charstring a character from the character
 set defined in ISO/IEC 646. For universal charstring a character from any character set defined in ISO/IEC 10646 */
+FREE_TEXT       : '"' EXTENDED_ALPHA_NUM* '"';
+fragment EXTENDED_ALPHA_NUM	: '\u0020' | '\u0021' | '\\"' | '\u0023'..'\u007E' | '\u00A1'..'\u00AC' | '\u00AE'..'\u00FF';
+/* ---A--- BUG (special escape needed for " sign) ---A--- */
+/* REFERENCE - A graphical character from the BASIC LATIN or from the LATIN-1 SUPPLEMENT character sets defined in
+ISO/IEC 10646 (characters from char (0,0,0,32) to char (0,0,0,126), from char (0,0,0,161) to char (0,0,0,172) and
+from char (0,0,0,174) to char (0,0,0,255). */
+UC_STRING		: '"' UNIVERSAL_CHAR* '"';
+fragment UNIVERSAL_CHAR		: '\u0000'..'\u0021' | '\\"' | '\u0023'..'\u00FF';
+/* ---A--- ADDED (universal string support) ---A--- */
 IDENTIFIER		: ALPHA ( ALPHA_NUM | UNDERSCORE )*;
 fragment ALPHA		: UPPER_ALPHA | LOWER_ALPHA;
 fragment ALPHA_NUM	: ALPHA | NUM;

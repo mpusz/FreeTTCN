@@ -74,7 +74,7 @@ namespace freettcn {
             if(isprint(ex->c))
               std::cerr << " near ‘" << (char)ex->c << "’";
             else
-              std::cerr << " near char(" << std::hex << std::setw(2) << (ANTLR3_UINT8)ex->c;
+              std::cerr << " near char(0x" << std::hex << std::setw(2) << (int)ex->c << std::dec << ")";
             // ANTLR3_FPRINTF(stderr, "\t%.*s\n", width > 20 ? 20 : width ,((pANTLR3_UINT8)ex->index));
           }
           else {
