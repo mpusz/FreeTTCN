@@ -26,7 +26,7 @@ include ../Makefile.defines
 #
 TRANSLATOR_DIR = translator
 LIB_DIR = lib
-BUILD_DIRS = $(TRANSLATOR_DIR) $(LIB_DIR)
+BUILD_DIRS = $(LIB_DIR) $(TRANSLATOR_DIR)
 
 
 # targets

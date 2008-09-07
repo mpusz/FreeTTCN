@@ -41,6 +41,12 @@ GEN_FILES = $(C_FILES) $(PARSER_H_FILE) $(LEXER_H_FILE) $(patsubst %.g,%.tokens,
 GEN_FILES_PATH = $(addprefix $(GEN_DIR)/, $(GEN_FILES))
 
 
+#
+# defines
+#
+INCLUDE_DIRS = -I$(GEN_DIR) -I$(SRC_DIR)
+
+
 # macros
 O_FILES = $(addprefix $(BIN_DIR)/, $(patsubst %.c,%.o,$(C_FILES)))
 DEPEND_FILES = $(patsubst %.c,%.d,$(C_FILES))

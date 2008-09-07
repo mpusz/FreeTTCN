@@ -1,50 +1,79 @@
-#ifndef IDENTIFIER_H
-#define IDENTIFIER_H
+//
+// Copyright (C) 2007 Mateusz Pusz
+//
+// This file is part of freettcn (Free TTCN) compiler.
 
-#include "node.h"
+// freettcn is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
 
-namespace TTCN3 {
+// freettcn is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with freettcn; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+/**
+ * @file   identifier.h
+ * @author Mateusz Pusz
+ * @date   
+ * 
+ * @brief  
+ * 
+ * 
+ */
+
+
+#ifndef __IDENTIFIER_H__
+#define __IDENTIFIER_H__
+
+#include "location.h"
+#include <string>
+#include <memory>
+
+
+namespace freettcn {
   
-  /**
-   * @brief TTCN-3 Identifier Node.
-   *
-   * Class contains all information about TTCN-3 Identifier
-   * (it stores names of variables, structs, functions, etc.).
-   */
-  class CIdentifier : public CNode {
-    const std::string name;
-    yytokentype type;
+  namespace translator {
     
-  public:
-    CIdentifier(CFile &f, const YYLTYPE &loc, const std::string &nameStr);
-    ~CIdentifier();
+    /**
+     * @brief TTCN-3 Identifier.
+     *
+     * Class contains all information about TTCN-3 Identifier
+     * (it stores names of variables, structs, functions, etc.).
+     */
+    class CIdentifier {
+      const CLocation _loc;                       /**< @brief Location in a file */
+      const std::string _name;                    /**< @brief Identifier name */
+      
+    public:
+      typedef std::auto_ptr<CIdentifier> CPtr;
+      
+      CIdentifier(const CLocation &loc, const char *name);
+      
+      const CLocation &Loc() const;
+      const std::string &Name() const;
+    };
     
-    const std::string &Name() const { return name; } /**< @brief Returns a name of the identifier. */
-    
-    void Type(const unsigned int t);
-    yytokentype Type() const { return type; }     /**< @brief Returns a type of the identifier. */
-    
-    void DumpTTCN3(FILE *fdout) const;
-    void DumpCPP(FILE *fdout) const;
-  };
+  } // namespace translator
+
+} // namespace freettcn
 
 
-  /**
-   * @brief TTCN-3 Named Node.
-   *
-   * Class that handles all compiler nodes that have names.
-   * It contains an identifier that is automatically inserted
-   * into current namespace.
-   */
-  class CNamedNode : public CNode {
-    CIdentifier &identifier;
-  public:
-    CNamedNode(CFile &f, const YYLTYPE &loc, CIdentifier &id);
-    ~CNamedNode();
-    
-    const std::string &Name() const { return identifier.Name(); } /**< @brief Returns a name of the identifier. */
-  };
-
+/** 
+ * @brief Returns identifier name
+ * 
+ * Method returns identifier name
+ * 
+ * @return Identifier name
+ */
+inline const std::string &freettcn::translator::CIdentifier::Name() const
+{
+  return _name;
 }
 
-#endif /* IDENTIFIER_H */
+#endif /* __IDENTIFIER_H__ */

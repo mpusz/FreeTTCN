@@ -18,7 +18,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /**
- * @file   identifier.cpp
+ * @file   location.cpp
  * @author Mateusz Pusz
  * @date   
  * 
@@ -28,31 +28,58 @@
  */
 
 
-#include "identifier.h"
+#include "location.h"
 
 
 /** 
- * @brief Class constructor
+ * @brief Class constuctor
  * 
- * CIdentifier class constructor.
+ * CLocation class constuctor.
  * 
- * @param loc Location in a file
- * @param name Identifier name
+ * @param file TTCN-3 file
+ * @param line Line number
+ * @param pos Position in a line
  */
-freettcn::translator::CIdentifier::CIdentifier(const CLocation &loc, const char *name):
-  _loc(loc), _name(name)
+freettcn::translator::CLocation::CLocation(const CFile &file, unsigned line, unsigned pos):
+  _file(file), _line(line), _pos(pos)
 {
 }
 
 
 /** 
- * @brief Returns identifier location
+ * @brief Returns TTCN-3 file
  * 
- * Method returns identifier location.
+ * Method returns TTCN-3 file.
  * 
- * @return Identifier location
+ * @return TTCN-3 file
  */
-const freettcn::translator::CLocation &freettcn::translator::CIdentifier::Loc() const
+const freettcn::translator::CFile &freettcn::translator::CLocation::File() const
 {
-  return _loc;
+  return _file;
+}
+
+
+/** 
+ * @brief Returns line number
+ * 
+ * Method returns line number.
+ * 
+ * @return Line number
+ */
+unsigned freettcn::translator::CLocation::Line() const
+{
+  return _line;
+}
+
+
+/** 
+ * @brief Returns position in a line
+ * 
+ * Method returns position in a line.
+ * 
+ * @return Position in a line
+ */
+unsigned freettcn::translator::CLocation::Pos() const
+{
+  return _pos;
 }

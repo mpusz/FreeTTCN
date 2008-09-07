@@ -18,7 +18,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /**
- * @file   identifier.cpp
+ * @file   location.h
  * @author Mateusz Pusz
  * @date   
  * 
@@ -28,31 +28,36 @@
  */
 
 
-#include "identifier.h"
+#ifndef __LOCATION_H__
+#define __LOCATION_H__
 
 
-/** 
- * @brief Class constructor
- * 
- * CIdentifier class constructor.
- * 
- * @param loc Location in a file
- * @param name Identifier name
- */
-freettcn::translator::CIdentifier::CIdentifier(const CLocation &loc, const char *name):
-  _loc(loc), _name(name)
-{
-}
+namespace freettcn {
+  
+  namespace translator {
 
+    class CFile;
+    
+    /**
+     * @brief TTCN-3 File Location
+     *
+     * Class contains all information about token location in a
+     * TTCN file.
+     */
+    class CLocation {
+      const CFile &_file;                         /**< @brief TTCN-3 file name */
+      const unsigned _line;                       /**< @brief Line number */
+      const unsigned _pos;                        /**< @brief Position in a line */
+      
+    public:
+      CLocation(const CFile &file, unsigned line, unsigned pos);
+      const CFile &File() const;
+      unsigned Line() const;
+      unsigned Pos() const;
+    };
+    
+  } // namespace translator
+  
+} // namespace freettcn
 
-/** 
- * @brief Returns identifier location
- * 
- * Method returns identifier location.
- * 
- * @return Identifier location
- */
-const freettcn::translator::CLocation &freettcn::translator::CIdentifier::Loc() const
-{
-  return _loc;
-}
+#endif /* __LOCATION_H__ */

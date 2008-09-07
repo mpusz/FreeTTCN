@@ -20,9 +20,13 @@
 
 #include "ttcn3Lexer.h"
 #include "ttcn3Parser.h"
+#include "translator.h"
+#include "logger.h"
+#include "freettcn/tools/exception.h"
 #include <iostream>
 #include <iomanip>
-//#include <algorithm>
+#include <sstream>
+#include <fstream>
 
 
 namespace freettcn {
@@ -32,25 +36,14 @@ namespace freettcn {
     static void DisplayRecognitionError(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *tokenNames)
     {
       pANTLR3_EXCEPTION ex = recognizer->state->exception;
-      std::string fileName;
       
-      // See if there is a 'filename' we can use
-      if(!ex->streamName) {
-        if(((pANTLR3_COMMON_TOKEN)ex->token)->type == ANTLR3_TOKEN_EOF)
-          fileName = "<EOF>";
-        else
-          fileName = "<UNKNOWN>";
-      }
-      else {
-        pANTLR3_STRING ftext;
-        ftext = ex->streamName->to8(ex->streamName);
-        fileName = (char *)ftext->chars;
-      }
-      
-      std::cerr << fileName << ":";
-      
-      // Next comes the line number
-      std::cerr << ex->line << ":";
+      freettcn::translator::CTranslator &translator = freettcn::translator::CTranslator::Instance();
+      unsigned line = ex->line;
+      unsigned line2;
+      unsigned pos = ex->charPositionInLine + 1;
+      unsigned pos2;
+      std::stringstream msg;
+      std::stringstream msg2;
       
       // How we determine the next piece is dependent on which thing raised the error.
       switch(recognizer->type) {
@@ -58,13 +51,10 @@ namespace freettcn {
         {
           pANTLR3_LEXER lexer = (pANTLR3_LEXER)recognizer->super;
           
-          std::cerr << ex->charPositionInLine + 1 << ":";
-          std::cerr << " error: LEXER: ";
-          
           if(ex->type == ANTLR3_NO_VIABLE_ALT_EXCEPTION)
-            std::cerr << "Cannot match to any predicted input";
+            msg << "Cannot match to any predicted input";
           else
-            std::cerr << (pANTLR3_UINT8)ex->message;
+            msg << (pANTLR3_UINT8)ex->message;
 
           ANTLR3_INT32 width;
           
@@ -72,25 +62,28 @@ namespace freettcn {
 
           if(width >= 1) {
             if(isprint(ex->c))
-              std::cerr << " near ‘" << (char)ex->c << "’";
+              msg << " near ‘" << (char)ex->c << "’";
             else
-              std::cerr << " near char(0x" << std::hex << std::setw(2) << (int)ex->c << std::dec << ")";
-            // ANTLR3_FPRINTF(stderr, "\t%.*s\n", width > 20 ? 20 : width ,((pANTLR3_UINT8)ex->index));
+              msg << " near char(0x" << std::hex << std::setw(2) << (int)ex->c << std::dec << ")";
+            msg << std::endl;
           }
           else {
-            std::cerr << " ‘<EOF>’" << std::endl;
-            std::cerr << fileName << ":" << (ANTLR3_UINT32)(lexer->rec->state->tokenStartLine) <<
-              ":" << (ANTLR3_UINT32)(lexer->rec->state->tokenStartCharPositionInLine) << ": ";
+            msg << " ‘<EOF>’" << std::endl;
+            
+            // prepare second error
+            line2 = lexer->rec->state->tokenStartLine;
+            pos2 = lexer->rec->state->tokenStartCharPositionInLine;
+            //            msg << fileName << ":" << (ANTLR3_UINT32)(lexer->rec->state->tokenStartLine) <<
+            //              ":" << (ANTLR3_UINT32)(lexer->rec->state->tokenStartCharPositionInLine) << ": ";
             width = ANTLR3_UINT32_CAST(((pANTLR3_UINT8)lexer->input->data + (lexer->input->size(lexer->input))) - (pANTLR3_UINT8)lexer->rec->state->tokenStartCharIndex);
             if(width >= 1)
-              std::cerr << "The lexer was matching from: " << std::string((char *)lexer->rec->state->tokenStartCharIndex, 0, 20) << std::endl;
+              msg2 << "The lexer was matching from: " << std::string((char *)lexer->rec->state->tokenStartCharIndex, 0, 20) << std::endl;
             else
-              std::cerr << "The lexer was matching from the end of the line" << std::endl;
+              msg2 << "The lexer was matching from the end of the line" << std::endl;
             
-            std::cerr << "NOTE: Above errors indicates a poorly specified lexer RULE or unterminated input element" << std::endl;
-            std::cerr << "      such as: \"STRING[\"]";
+            msg2 << "NOTE: Above errors indicates a poorly specified lexer RULE or unterminated input element" << std::endl;
+            msg2 << "      such as: \"STRING[\"]" << std::endl;
           }
-          std::cerr << std::endl;
         }
         break;
 
@@ -98,69 +91,44 @@ namespace freettcn {
         {
           pANTLR3_COMMON_TOKEN token = (pANTLR3_COMMON_TOKEN)ex->token;
           
-          std::cerr << ex->charPositionInLine + 1 << ":";
-          std::cerr << " error: PARSER: ";
-          
           if(ex->type == ANTLR3_NO_VIABLE_ALT_EXCEPTION)
-            std::cerr << "Cannot match ‘" << token->getText(token)->chars << "’ to any predicted input";
+            msg << "Cannot match ‘" << token->getText(token)->chars << "’ to any predicted input";
           else {
-            std::cerr << (pANTLR3_UINT8)ex->message;
-          
+            msg << (pANTLR3_UINT8)ex->message;
+            
             if(token) {
               if (token->type == ANTLR3_TOKEN_EOF)
-                std::cerr << " at ‘<EOF>’";
+                msg << " at ‘<EOF>’";
               else {
                 if(ex->type == ANTLR3_MISSING_TOKEN_EXCEPTION) {
                   if(!tokenNames)
-                    std::cerr << " [" << ex->expecting << "]";
+                    msg << " [" << ex->expecting << "]";
                   else {
                     if(ex->expecting == ANTLR3_TOKEN_EOF)
-                      std::cerr << " ‘<EOF>’";
+                      msg << " ‘<EOF>’";
                     else
-                      std::cerr << " ‘" << tokenNames[ex->expecting] << "’";
+                      msg << " ‘" << tokenNames[ex->expecting] << "’";
                   }
                 }
                 else {
-                  std::cerr << " near ‘" << token->getText(token)->chars << "’";
-                  // ANTLR3_FPRINTF(stderr, "\n    near %s\n    ", ttext == NULL ? (pANTLR3_UINT8)"<no text for the token>" : ttext->chars);
+                  msg << " near ‘" << token->getText(token)->chars << "’";
                 }
               }
             }
-
+            
             if(ex->type == ANTLR3_UNWANTED_TOKEN_EXCEPTION) {
               if(tokenNames) {
                 if(ex->expecting == ANTLR3_TOKEN_EOF)
-                  std::cerr << " (‘<EOF>’ expected)";
+                  msg << " (‘<EOF>’ expected)";
                 else
-                  std::cerr << " (‘" << tokenNames[ex->expecting] << "’ expected)";
+                  msg << " (‘" << tokenNames[ex->expecting] << "’ expected)";
               }
             }
           }
-          std::cerr << std::endl;
+          msg << std::endl;
         }
         break;
         
-// case ANTLR3_TYPE_TREE_PARSER:
-//           {
-//           pANTLR3_TREE_PARSER tparser = (pANTLR3_TREE_PARSER) (recognizer->super);
-//           pANTLR3_INT_STREAM is = tparser->ctnstream->tnstream->istream;
-//           pANTLR3_BASE_TREE baseTree = (pANTLR3_BASE_TREE)(ex->token);
-//           ttext = theBaseTree->toStringTree(theBaseTree);
-
-//           if  (theBaseTree != NULL)
-//             {
-//               pANTLR3_COMMON_TREE commonTree = (pANTLR3_COMMON_TREE)theBaseTree->super;
-
-//               if(theCommonTree != NULL)
-//                 {
-//                   theToken = (pANTLR3_COMMON_TOKEN)    theBaseTree->getToken(theBaseTree);
-//                 }
-//               ANTLR3_FPRINTF(stderr, ", at offset %d", theBaseTree->getCharPositionInLine(theBaseTree));
-//               ANTLR3_FPRINTF(stderr, ", near %s", ttext->chars);
-//             }
-//           }
-//           break;
-
       default:
         std::cerr << "DisplayRecognitionError() called by unknown parser type - provide override for this function" << std::endl;
         return;
@@ -292,8 +260,13 @@ namespace freettcn {
         // token.
         //
         ANTLR3_FPRINTF(stderr, " : syntax not recognized...\n");
+        std::cout << "Unknown exception type: " << ex->type << std::endl;
         break;
       }
+      
+      translator.Error(CLocation(translator.File(), line, pos), msg.str());
+      if(!msg2.str().empty())
+        translator.Error(CLocation(translator.File(), line2, pos2), msg2.str());
     }
 
   }  // namespace translator
@@ -303,73 +276,119 @@ namespace freettcn {
 
 int main(int argc, char *argv[])
 {
-  pANTLR3_UINT8                  fName = (pANTLR3_UINT8)argv[1];
-  pANTLR3_INPUT_STREAM           input;
-  pttcn3Lexer                    lex;
-  pANTLR3_COMMON_TOKEN_STREAM    tokens;
-  pttcn3Parser                   parser;
-
-  input = antlr3AsciiFileStreamNew(fName);
-  if(!input)
-    std::cerr << "Unable to open file " << (char *)fName << " due to malloc() failure1" << std::endl;
-
-  lex = ttcn3LexerNew(input);
-  if(!lex) {
-    std::cerr << "Unable to create the lexer due to malloc() failure1" << std::endl;
-    exit(ANTLR3_ERR_NOMEM);
-  }
-
-  // Override warning messages
-  lex->pLexer->rec->displayRecognitionError = freettcn::translator::DisplayRecognitionError;
-
-  tokens = antlr3CommonTokenStreamSourceNew(ANTLR3_SIZE_HINT, TOKENSOURCE(lex));
-  if(!tokens) {
-    std::cerr << "Out of memory trying to allocate token stream" << std::endl;
-    exit(ANTLR3_ERR_NOMEM);
-  }
-
-  parser = ttcn3ParserNew(tokens);
-  if(!parser) {
-    std::cerr << "Out of memory trying to allocate parser" << std::endl;
-    exit(ANTLR3_ERR_NOMEM);
-  }
+  try {
+    if(argc < 2) {
+      std::cerr << "Input file not specified!!!" << std::endl;
+      exit(1);
+    }
   
-  if(argc >= 3 && std::string(argv[2]) == "-t") {
-    pANTLR3_UINT8 *tokenNames = parser->pParser->rec->state->tokenNames;
-    if(!tokenNames) {
-      std::cerr << "Token names not initiated!!!" << std::endl;
-      exit(0);
+    // check if input file exist
+    std::ifstream inFile(argv[1]);
+    if(!inFile.is_open()) {
+      std::cerr << "Input file '" << argv[1] << "' not found!!!" << std::endl;
+      exit(1);
     }
+  
+    // create file name
+    std::string filePath(argv[1]);
+    size_t nameStart = filePath.find_last_of("/\\");
+    size_t extStart = filePath.find_last_of(".");
+    std::string fileName(filePath, nameStart + 1, extStart - nameStart);
+    fileName += "cpp";
 
-    // estimate the longest token name
-    size_t maxTokenLength = 0;
-    pANTLR3_VECTOR vector = tokens->getTokens(tokens);
-    for(unsigned i=0; i<vector->size(vector); i++) {
-      pANTLR3_COMMON_TOKEN token = (pANTLR3_COMMON_TOKEN)vector->get(vector, i);
-      maxTokenLength = std::max(maxTokenLength, std::string((char *)tokenNames[token->getType(token)]).size());
+    // prepare output stream
+    std::ofstream outFile(fileName.c_str());
+    if(!outFile.is_open()) {
+      std::cerr << "Cannot create output file '" << fileName << "'!!!" << std::endl;
+      exit(1);
     }
+  
+    // create logger & translator
+    freettcn::translator::CLogger logger(outFile);
+    freettcn::translator::CTranslator translator(argv[1], logger);
     
-    for(unsigned i=0; i<vector->size(vector); i++) {
-      pANTLR3_COMMON_TOKEN token = (pANTLR3_COMMON_TOKEN)vector->get(vector, i);
-      std::cout << "Token[" << std::setw(3) << std::right << token->getType(token) << "] - " <<
-        std::setw(maxTokenLength) << std::left << tokenNames[token->getType(token)] << " = " <<
-        token->getText(token)->chars << std::endl;
+    // create input stream
+    pANTLR3_UINT8 fName((pANTLR3_UINT8)argv[1]);
+    pANTLR3_INPUT_STREAM input = antlr3AsciiFileStreamNew(fName);
+    if(!input)
+      std::cerr << "Unable to open file " << (char *)fName << " due to malloc() failure1" << std::endl;
+  
+    // create lexer
+    pttcn3Lexer lexer = ttcn3LexerNew(input);
+    if(!lexer) {
+      std::cerr << "Unable to create the lexer due to malloc() failure1" << std::endl;
+      exit(ANTLR3_ERR_NOMEM);
     }
-    return 0;
+    // override warning messages for lexer
+    lexer->pLexer->rec->displayRecognitionError = freettcn::translator::DisplayRecognitionError;
+  
+    // create tokens stream from input file
+    pANTLR3_COMMON_TOKEN_STREAM tokens = antlr3CommonTokenStreamSourceNew(ANTLR3_SIZE_HINT, TOKENSOURCE(lexer));
+    if(!tokens) {
+      std::cerr << "Out of memory trying to allocate token stream" << std::endl;
+      exit(ANTLR3_ERR_NOMEM);
+    }
+
+    // create parser
+    pttcn3Parser parser = ttcn3ParserNew(tokens);
+    if(!parser) {
+      std::cerr << "Out of memory trying to allocate parser" << std::endl;
+      exit(ANTLR3_ERR_NOMEM);
+    }
+    // override warning messages for parser
+    parser->pParser->rec->displayRecognitionError = freettcn::translator::DisplayRecognitionError;
+  
+    if(argc >= 3 && std::string(argv[2]) == "-t") {
+      // print tokens stream
+      pANTLR3_UINT8 *tokenNames = parser->pParser->rec->state->tokenNames;
+      if(!tokenNames) {
+        std::cerr << "Token names not initiated!!!" << std::endl;
+        exit(0);
+      }
+
+      // estimate the longest token name
+      size_t maxTokenLength = 0;
+      pANTLR3_VECTOR vector = tokens->getTokens(tokens);
+      for(unsigned i=0; i<vector->size(vector); i++) {
+        pANTLR3_COMMON_TOKEN token = (pANTLR3_COMMON_TOKEN)vector->get(vector, i);
+        maxTokenLength = std::max(maxTokenLength, std::string((char *)tokenNames[token->getType(token)]).size());
+      }
+   
+      // print tokens
+      for(unsigned i=0; i<vector->size(vector); i++) {
+        pANTLR3_COMMON_TOKEN token = (pANTLR3_COMMON_TOKEN)vector->get(vector, i);
+        std::cout << "Token[" << std::setw(3) << std::right << token->getType(token) << "] - " <<
+          std::setw(maxTokenLength) << std::left << tokenNames[token->getType(token)] << " = " <<
+          token->getText(token)->chars << std::endl;
+      }
+      return 0;
+    }
+  
+    // parse tokes stream
+    parser->ttcn3Module(parser);
+    if(parser->pParser->rec->state->errorCount > 0)
+      std::cerr << "The parser returned " << parser->pParser->rec->state->errorCount << " errors, tree walking aborted" << std::endl;
+  
+    // must manually clean up
+    //    parser->free(parser);
+    tokens->free(tokens);
+    lexer->free(lexer);
+    input->close(input);
   }
-  
-  // Override warning messages
-  parser->pParser->rec->displayRecognitionError = freettcn::translator::DisplayRecognitionError;
-  
-  parser->ttcn3Module(parser);
-  if(parser->pParser->rec->state->errorCount > 0)
-    std::cerr << "The parser returned " << parser->pParser->rec->state->errorCount << " errors, tree walking aborted" << std::endl;
-  
-  // Must manually clean up
-  //  parser->free(parser);
-  tokens->free(tokens);
-  lex->free(lex);
-  input->close(input);
+  catch(freettcn::Exception &ex) {
+    std::cerr << "Error: Unhandled freettcn exception caught:" << std::endl;
+    std::cerr << ex.what() << std::endl;
+    return -1;
+  }
+  catch(std::exception &ex) {
+    std::cerr << "Error: Unhandled system exception caught:" << std::endl;;
+    std::cerr << ex.what() << std::endl;;
+    return -1;
+  }
+  catch(...) {
+    std::cerr << "Unknown exception caught!!!" << std::endl;
+    return -1;
+  }
   
   return 0;
 }
