@@ -42,7 +42,9 @@ namespace freettcn {
   namespace translator {
 
     class CLogger;
+    class CDumper;
     class CIdentifier;
+    class CModule;
     
     class CTranslator {
       typedef std::deque<CFile> CFileList;
@@ -58,6 +60,8 @@ namespace freettcn {
       CFileStack _filesStack;                     /**< @brief Current files on the stack */
       unsigned _line;                             /**< @brief Line in a file */
       
+      std::auto_ptr<CModule> _module;
+      
       CTranslator(const CTranslator &);           /**< @brief Disallowed */
       CTranslator &operator=(const CTranslator &); /**< @brief Disallowed */
       
@@ -65,18 +69,22 @@ namespace freettcn {
       static CTranslator &Instance();
       
       CTranslator(const std::string &inputName, CLogger &logger);
-      virtual ~CTranslator();
+      ~CTranslator();
       
-      virtual void Warning(const CLocation &loc, const std::string &msg);
-      virtual void Error(const CLocation &loc, const std::string &msg);
+      void Warning(const CLocation &loc, const std::string &msg);
+      void Error(const CLocation &loc, const std::string &msg);
+      unsigned WarningNum() const;
+      unsigned ErrorNum() const;
+
+      void Dump(CDumper &dumper) const;
       
-      void Start() const;
+      //      void Start() const;
       const CFile &File() const;
       
       void Line(unsigned line);
-      unsigned Line() const;
+      //      unsigned Line() const;
       
-      void ModuleBegin(const CIdentifier *id);
+      void ModuleBegin(const CIdentifier *id, const std::string &language);
       void ModuleEnd();
     };
     

@@ -22,6 +22,7 @@
 #include "ttcn3Parser.h"
 #include "translator.h"
 #include "logger.h"
+#include "dumper.h"
 #include "freettcn/tools/exception.h"
 #include <iostream>
 #include <iomanip>
@@ -65,10 +66,9 @@ namespace freettcn {
               msg << " near ‘" << (char)ex->c << "’";
             else
               msg << " near char(0x" << std::hex << std::setw(2) << (int)ex->c << std::dec << ")";
-            msg << std::endl;
           }
           else {
-            msg << " ‘<EOF>’" << std::endl;
+            msg << " ‘<EOF>’";
             
             // prepare second error
             line2 = lexer->rec->state->tokenStartLine;
@@ -82,7 +82,7 @@ namespace freettcn {
               msg2 << "The lexer was matching from the end of the line" << std::endl;
             
             msg2 << "NOTE: Above errors indicates a poorly specified lexer RULE or unterminated input element" << std::endl;
-            msg2 << "      such as: \"STRING[\"]" << std::endl;
+            msg2 << "      such as: \"STRING[\"]";
           }
         }
         break;
@@ -125,7 +125,6 @@ namespace freettcn {
               }
             }
           }
-          msg << std::endl;
         }
         break;
         
@@ -304,7 +303,8 @@ int main(int argc, char *argv[])
     }
   
     // create logger & translator
-    freettcn::translator::CLogger logger(outFile);
+    freettcn::translator::CLogger logger;
+    freettcn::translator::CDumper dumper(outFile);
     freettcn::translator::CTranslator translator(argv[1], logger);
     
     // create input stream
@@ -366,9 +366,16 @@ int main(int argc, char *argv[])
   
     // parse tokes stream
     parser->ttcn3Module(parser);
-    if(parser->pParser->rec->state->errorCount > 0)
-      std::cerr << "The parser returned " << parser->pParser->rec->state->errorCount << " errors, tree walking aborted" << std::endl;
-  
+
+    
+    if(translator.WarningNum() || translator.ErrorNum()) {
+      std::cerr << filePath << ": Errors: " << translator.ErrorNum() << "; Warnings: " << translator.WarningNum() << std::endl;
+      return -1;
+    }
+    
+    // dump to output file
+    translator.Dump(dumper);
+    
     // must manually clean up
     //    parser->free(parser);
     tokens->free(tokens);

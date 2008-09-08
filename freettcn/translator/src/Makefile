@@ -30,7 +30,8 @@ BIN_DIR = ../bin
 #
 # files
 #
-CPP_FILES = ../../lib/tools/exception.cpp file.cpp location.cpp identifier.cpp logger.cpp translator.cpp main.cpp
+CPP_FILES = ../../lib/tools/exception.cpp file.cpp location.cpp identifier.cpp \
+	     logger.cpp dumper.cpp module.cpp translator.cpp main.cpp
 
 
 #

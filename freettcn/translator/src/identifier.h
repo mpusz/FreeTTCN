@@ -51,8 +51,6 @@ namespace freettcn {
       const std::string _name;                    /**< @brief Identifier name */
       
     public:
-      typedef std::auto_ptr<CIdentifier> CPtr;
-      
       CIdentifier(const CLocation &loc, const char *name);
       
       const CLocation &Loc() const;

@@ -29,58 +29,62 @@
 
 
 #include "logger.h"
+#include "location.h"
+#include "file.h"
 #include "freettcn/tools/exception.h"
+#include <iostream>
 
 
-
-freettcn::translator::CLogger *freettcn::translator::CLogger::_instance = 0;
-
-freettcn::translator::CLogger &freettcn::translator::CLogger::Instance()
+freettcn::translator::CLogger::CLogger():
+  _groupUsed(false)
 {
-  if (_instance)
-    return *_instance;
-  
-  throw ENotInitialized(E_DATA, "Translator Logger instance not inited!!!");
-}
-
-
-freettcn::translator::CLogger::CLogger(std::ostream &stream):
-  _stream(stream), _indent(0)
-{
-  _instance = this;
 }
 
 
 freettcn::translator::CLogger::~CLogger()
 {
-  _instance = 0;
 }
 
 
-void freettcn::translator::CLogger::Header()
+void freettcn::translator::CLogger::Warning(const CLocation &loc, const std::string &msg)
 {
-  PrintLine("#include <freettcn/te/module.h>");
-  PrintLine("#include <freettcn/te/testComponent.h>");
-  PrintLine("#include <freettcn/te/testCase.h>");
-  PrintLine("#include <freettcn/te/behavior.h>");
-  PrintLine("#include <freettcn/te/port.h>");
-  PrintLine("#include <freettcn/te/record.h>");
-  PrintLine("#include <freettcn/te/template.h>");
-  PrintLine("#include <freettcn/te/timer.h>");
-  PrintLine("#include <freettcn/te/basicTypes.h>");
-  PrintLine("#include <freettcn/te/sourceData.h>");
-  PrintLine("");
-  PrintLine("");
-  PrintLine("#define MY_CAST         dynamic_cast");
-  PrintLine("");
-  PrintLine("namespace freettcn {");
-  IndentIncr();
+  GroupPrint();
+  std::cerr << loc.File().FullName() << ":" << loc.Line() << ":" << loc.Pos() << ": "
+            << "error: " << msg << std::endl;
 }
 
 
-void freettcn::translator::CLogger::Footer()
+void freettcn::translator::CLogger::Error(const CLocation &loc, const std::string &msg)
 {
-  IndentDecr();
-  PrintLine("");
-  PrintLine("} // namespace freettcn");
+  GroupPrint();
+  std::cerr << loc.File().FullName() << ":" << loc.Line() << ":" << loc.Pos() << ": "
+            << "error: " << msg << std::endl;
+}
+
+
+void freettcn::translator::CLogger::GroupPrint()
+{
+  if(_groupStack.size() && !_groupUsed) {
+    const TGroup &group = _groupStack.top();
+    std::cerr << group.file->FullName() << ": " << group.msg << std::endl;
+    _groupUsed = true;
+  }
+}
+
+
+void freettcn::translator::CLogger::GroupPush(const CFile &file, const std::string &msg)
+{
+  TGroup group = { &file, msg };
+  _groupStack.push(group);
+  _groupUsed = false;
+}
+
+
+void freettcn::translator::CLogger::GroupPop()
+{
+  if(!_groupStack.size())
+    throw EOperationFailed(E_DATA, "Logger group empty already!!!");
+  
+  _groupStack.pop();
+  _groupUsed = false;
 }

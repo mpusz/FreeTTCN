@@ -31,7 +31,6 @@ options
 
 tokens {
     MODULE = 'module';
-    LANGUAGE = 'language';
     TYPE = 'type';
     RECORD = 'record';
     OPTIONAL = 'optional';
@@ -183,11 +182,6 @@ tokens {
 }
 
 
-scope Symbols
-{
-    unsigned empty;
-}
-
 
 @lexer::includes
 {
@@ -202,6 +196,11 @@ using namespace freettcn::translator;
 }
 
 
+@lexer::members {
+    bool freeTextExpected = false;
+}
+
+
 @parser::includes
 {
 #include "identifier.h"
@@ -210,7 +209,7 @@ using namespace freettcn::translator;
 
 @parser::postinclude {
 #include "translator.h"
-#include "logger.h"
+#include "dumper.h"
 #include "location.h"
 
 using namespace freettcn::translator;
@@ -219,7 +218,7 @@ using namespace freettcn::translator;
 
 @parser::members {
     freettcn::translator::CTranslator *translator = 0;
-    freettcn::translator::CLogger *logger = 0;  /// @todo Logger used for deugging only
+    freettcn::translator::CDumper *dumper = 0;  /// @todo Dumper used for debugging only
 }
 
 
@@ -228,20 +227,21 @@ using namespace freettcn::translator;
 // $<A.1.6.0 TTCN-3 module
 
 ttcn3Module
+        scope { const char *language; }
         @init
         {
             // init translator
             translator = &CTranslator::Instance();
-            logger = &CLogger::Instance();
-            translator->Start();
+            dumper = &CDumper::Instance();
         }
         :
         ttcn3ModuleKeyword ttcn3ModuleId
         {
-            translator->ModuleBegin($ttcn3ModuleId.id);
+            translator->ModuleBegin($ttcn3ModuleId.id, $ttcn3Module::language ? $ttcn3Module::language : "");
         }
         '{'
-        moduleBody
+        moduleDefinitionsPart?
+        moduleControlPart?
         '}'
         withStatement? SEMICOLON? EOF
         {
@@ -252,10 +252,7 @@ ttcn3ModuleKeyword
         : MODULE;
 ttcn3ModuleId returns [ freettcn::translator::CIdentifier *id ]
         : moduleId
-        {
-            $id = $moduleId.id;
-        }
-        ;
+        { $id = $moduleId.id; };
 moduleId returns [ freettcn::translator::CIdentifier *id ]
         : globalModuleId
         {
@@ -269,14 +266,10 @@ globalModuleId
 moduleIdentifier
         : IDENTIFIER;
 languageSpec
-        : languageKeyword FREE_TEXT;
-languageKeyword
-        : LANGUAGE;
-moduleBody
-        scope Symbols;
-        : moduleDefinitionsPart?
-        moduleControlPart?;
-/* ---A--- ADDED (module scope support) ---A--- */
+        : LANGUAGE_KEYWORD txt=FREE_TEXT
+        { $ttcn3Module::language = strcmp((char *)$txt.text->chars, "<missing FREE_TEXT>") ? (char *)$txt.text->chars : ""; };
+LANGUAGE_KEYWORD
+        : 'language' { freeTextExpected = true; };
 
 // $>
 
@@ -469,7 +462,7 @@ procOrTypeList
 procOrType
         : signature | type;
 componentDef
-        scope Symbols;
+//        scope Symbols;
         : componentKeyword componentTypeIdentifier
         ( extendsKeyword componentType ( ',' componentType )* )?
         '{' componentDefList? '}'
@@ -687,7 +680,7 @@ valueofKeyword
 // $<A.1.6.1.4 Function definitions
 
 functionDef
-        scope Symbols;
+//        scope Symbols;
         : functionKeyword functionIdentifier
         '(' functionFormalParList? ')' runsOnSpec? returnType?
         statementBlock;
@@ -715,7 +708,7 @@ onKeyword
 mtcKeyword
         : MTC;
 statementBlock
-        scope Symbols;
+//        scope Symbols;
         : '{' functionStatementOrDefList? '}';
 functionStatementOrDefList
         : ( functionStatementOrDef SEMICOLON? )+;
@@ -787,7 +780,7 @@ signature
 // $<A.1.6.1.6 Testcase definitions
 
 testcaseDef
-        scope Symbols;
+//        scope Symbols;
         : testcaseKeyword testcaseIdentifier
         '(' testcaseFormalParList? ')' configSpec
         statementBlock;
@@ -826,7 +819,7 @@ production shall resolve to one or more singleExpressions i.e. equivalent to the
 // $<A.1.6.1.7 Altstep definitions
 
 altstepDef
-        scope Symbols;
+//        scope Symbols;
         : altstepKeyword altstepIdentifier
         '(' altstepFormalParList? ')' runsOnSpec?
         '{' altstepLocalDefList altGuardList '}';
@@ -1053,7 +1046,7 @@ moduleControlPart
 controlKeyword
         : CONTROL;
 moduleControlBody
-        scope Symbols;
+//        scope Symbols;
         : controlStatementOrDefList?;
 controlStatementOrDefList
         : ( controlStatementOrDef SEMICOLON? )+;
@@ -1592,7 +1585,7 @@ OCT
 cString
         : C_STRING | UC_STRING;
 C_STRING
-        : '"' CHAR* '"';
+        : { !freeTextExpected }?=> '"' CHAR* '"';
 fragment
 CHAR
         : '\u0000'..'\u0021' | '\\"' | '\u0023'..'\u007F';
@@ -1600,7 +1593,7 @@ CHAR
 /* REFERENCE - A character defined by the relevant CharacterString type. For charstring a character from the character
 set defined in ISO/IEC 646. For universal charstring a character from any character set defined in ISO/IEC 10646 */
 FREE_TEXT
-        : '"' EXTENDED_ALPHA_NUM* '"';
+        : { freeTextExpected }?=> '"' EXTENDED_ALPHA_NUM* '"' { freeTextExpected = false; };
 fragment
 EXTENDED_ALPHA_NUM
         : '\u0020' | '\u0021' | '\\"' | '\u0023'..'\u007E' | '\u00A1'..'\u00AC' | '\u00AE'..'\u00FF';
@@ -1609,7 +1602,7 @@ EXTENDED_ALPHA_NUM
 ISO/IEC 10646 (characters from char (0,0,0,32) to char (0,0,0,126), from char (0,0,0,161) to char (0,0,0,172) and
 from char (0,0,0,174) to char (0,0,0,255). */
 UC_STRING
-        : '"' UNIVERSAL_CHAR* '"';
+        : { !freeTextExpected }?=> '"' UNIVERSAL_CHAR* '"';
 fragment
 UNIVERSAL_CHAR
         : '\u0000'..'\u0021' | '\\"' | '\u0023'..'\u00FF';
@@ -1990,7 +1983,7 @@ loopConstruct
         whileStatement |
         doWhileStatement;
 forStatement
-        scope Symbols;
+//        scope Symbols;
         : forKeyword '(' initial SEMICOLON final SEMICOLON step ')'
         statementBlock;
 forKeyword

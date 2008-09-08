@@ -29,8 +29,9 @@
 
 
 #include "translator.h"
-#include "location.h"
+#include "module.h"
 #include "logger.h"
+#include "dumper.h"
 #include "freettcn/tools/exception.h"
 
 
@@ -64,23 +65,35 @@ freettcn::translator::CTranslator::~CTranslator()
 
 void freettcn::translator::CTranslator::Warning(const CLocation &loc, const std::string &msg)
 {
-  std::cerr << loc.File().FullName() << ":" << loc.Line() << ":" << loc.Pos() << ": "
-            << "error: " << msg << std::endl;
+  _logger.Warning(loc, msg);
   _warningNum++;
 }
 
 
 void freettcn::translator::CTranslator::Error(const CLocation &loc, const std::string &msg)
 {
-  std::cerr << loc.File().FullName() << ":" << loc.Line() << ":" << loc.Pos() << ": "
-            << "error: " << msg << std::endl;
+  _logger.Error(loc, msg);
   _errorNum++;
 }
 
 
-void freettcn::translator::CTranslator::Start() const
+unsigned freettcn::translator::CTranslator::WarningNum() const
 {
-  _logger.Header();
+  return _warningNum;
+}
+
+
+unsigned freettcn::translator::CTranslator::ErrorNum() const
+{
+  return _errorNum;
+}
+
+
+void freettcn::translator::CTranslator::Dump(CDumper &dumper) const
+{
+  dumper.Header();
+  _module->Dump(dumper);
+  dumper.Footer();
 }
 
 
@@ -99,29 +112,45 @@ void freettcn::translator::CTranslator::Line(unsigned line)
 }
 
 
-unsigned freettcn::translator::CTranslator::Line() const
-{
-  return _line;
-}
+// unsigned freettcn::translator::CTranslator::Line() const
+// {
+//   return _line;
+// }
 
 
-void freettcn::translator::CTranslator::ModuleBegin(const CIdentifier *id)
+void freettcn::translator::CTranslator::ModuleBegin(const CIdentifier *id, const std::string &language)
 {
+  std::auto_ptr<const CIdentifier> idPtr(id);
+  
+  _logger.GroupPush(id->Loc().File(), "In module ‘" + id->Name() + "’:");
+  
+  // check module ID 
   if(File().ModuleName().compare(id->Name()))
     Error(id->Loc(), "Module ID '" + id->Name() + "' does not match TTCN-3 file name");
-  _logger.PrintLine("");
-  _logger.PrintLine("namespace " + id->Name() + " {");
-  _logger.IndentIncr();
+  
+  // check language
+  CModule::TLanguage lang = CModule::LANGUAGE_TTCN_3_2005;
+  if(!language.empty()) {
+    if(language == "\"TTCN-3:2005\"")
+      lang = CModule::LANGUAGE_TTCN_3_2005;
+    else if(language == "\"TTCN-3:2003\"")
+      lang = CModule::LANGUAGE_TTCN_3_2003;
+    else if(language == "\"TTCN-3:2001\"")
+      lang = CModule::LANGUAGE_TTCN_3_2001;
+    else
+      Error(id->Loc(), "Unknown module language " + language + " detected (only \"TTCN-3:2005\" is supported)");
+    
+    if(lang != CModule::LANGUAGE_TTCN_3_2005)
+      Error(id->Loc(), "Unsupported module language " + language + " detected (only \"TTCN-3:2005\" is supported)");
+  }
+  
+  // create new module
+  _module = std::auto_ptr<CModule>(new CModule(idPtr.release(), lang));
 }
 
 
 void freettcn::translator::CTranslator::ModuleEnd()
 {
-  _logger.IndentDecr();
-  _logger.PrintLine("");
-  _logger.PrintLine("} // namespace ");// + std::string(name));
-  
   _filesStack.pop();
-  if(_filesStack.empty())
-    _logger.Footer();
+  _logger.GroupPop();
 }

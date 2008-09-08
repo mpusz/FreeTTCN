@@ -31,62 +31,45 @@
 #ifndef __LOGGER_H__
 #define __LOGGER_H__
 
-#include <iostream>
-#include <iomanip>
+#include <string>
+#include <stack>
+
 
 namespace freettcn {
-
+  
   namespace translator {
-
-    class CLogger {
-      static const unsigned INDENT_SIZE = 2;
-      static CLogger *_instance;
-
-      std::ostream &_stream;
-      unsigned _indent;
     
+    class CLocation;
+    class CFile;
+    
+    class CLogger {
+      struct TGroup {
+        const CFile *file;
+        std::string msg;
+      };
+      typedef std::stack<TGroup> CGroupStack;
+      
+      CGroupStack _groupStack;                    /**< @brief Stack of errors groups */
+      bool _groupUsed;                            /**< @brief Specifies if a group was printed already */
+      
       CLogger(const CLogger &);                   /**< @brief Disallowed */
       CLogger &operator=(const CLogger &);        /**< @brief Disallowed */
-
-    public:
-      static CLogger &Instance();
-    
-      CLogger(std::ostream &stream);
-      virtual ~CLogger();
-    
-      void IndentIncr();
-      void IndentDecr();
       
-      virtual void PrintLine(const std::string &line) const;
-      //      virtual void Print(const std::string &str);
-
-      virtual void Header();
-      virtual void Footer();
+      void GroupPrint();
+      
+    public:
+      CLogger();
+      virtual ~CLogger();
+      
+      virtual void Warning(const CLocation &loc, const std::string &msg);
+      virtual void Error(const CLocation &loc, const std::string &msg);
+      
+      void GroupPush(const CFile &file, const std::string &msg);
+      void GroupPop();
     };
-
+    
   } // namespace translator
-
+  
 } // namespace freettcn
-
-
-inline void freettcn::translator::CLogger::PrintLine(const std::string &line) const
-{
-  if(_indent)
-    _stream << std::setw(_indent) << " ";
-  _stream << line << std::endl;
-}
-
-
-inline void freettcn::translator::CLogger::IndentIncr()
-{
-  _indent += INDENT_SIZE;
-}
-
-
-inline void freettcn::translator::CLogger::IndentDecr()
-{
-  _indent -= INDENT_SIZE;
-}
- 
 
 #endif  // __LOGGER_H__
