@@ -15,17 +15,17 @@ module icmp {
     octetstring data optional
   }
   
-  type union ICMPDataType
-  {
-    ICMPPingDataType ping
-  }
-  
   type record ICMPMsg
   {
     integer msgType,
     integer code,
     integer crc,
     ICMPDataType data
+  }
+  
+  type union ICMPDataType
+  {
+    ICMPPingDataType ping
   }
   
   
