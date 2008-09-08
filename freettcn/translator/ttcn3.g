@@ -209,6 +209,7 @@ using namespace freettcn::translator;
 
 @parser::postinclude {
 #include "translator.h"
+#include "logger.h"
 #include "dumper.h"
 #include "location.h"
 
@@ -218,6 +219,7 @@ using namespace freettcn::translator;
 
 @parser::members {
     freettcn::translator::CTranslator *translator = 0;
+    freettcn::translator::CLogger *logger = 0;
     freettcn::translator::CDumper *dumper = 0;  /// @todo Dumper used for debugging only
 }
 
@@ -232,12 +234,15 @@ ttcn3Module
         {
             // init translator
             translator = &CTranslator::Instance();
+            logger = &translator->Logger();
             dumper = &CDumper::Instance();
         }
         :
         ttcn3ModuleKeyword ttcn3ModuleId
         {
-            translator->ModuleBegin($ttcn3ModuleId.id, $ttcn3Module::language ? $ttcn3Module::language : "");
+            CIdentifier *id = $ttcn3ModuleId.id;
+            logger->GroupPush(translator->File(), "In module '" + id->Name() + "':");
+            translator->Module(id, $ttcn3Module::language ? $ttcn3Module::language : "");
         }
         '{'
         moduleDefinitionsPart?
@@ -245,7 +250,7 @@ ttcn3Module
         '}'
         withStatement? SEMICOLON? EOF
         {
-            translator->ModuleEnd();
+            logger->GroupPop();
         }
         ;
 ttcn3ModuleKeyword
@@ -1014,20 +1019,48 @@ extConstIdentifier
 // $<A.1.6.1.12 Module parameter definitions
 
 moduleParDef
-        : moduleParKeyword ( modulePar | ( '{' multitypedModuleParList '}' ) );
+        : moduleParKeyword
+        {
+            logger->GroupPush(translator->File(), "In module definitions part:");
+        }
+        ( modulePar | ( '{' multitypedModuleParList '}' ) )
+        {
+            logger->GroupPop();
+        }
+        ;
 moduleParKeyword
         : MODULE_PAR;
 multitypedModuleParList
         : ( modulePar SEMICOLON? )*;
 modulePar
-        : moduleParType moduleParList;
+        scope { const char *parType; }
+        : moduleParType 
+        {
+            $modulePar::parType = (const char *)$moduleParType.text->chars;
+        }
+        moduleParList;
 moduleParType
         : type;
+// Module parameters shall not be of port type, default type or component type.
+// A module parameter shall only be of type address if the address type is explicitly defined within the associated
+// module.
 moduleParList
+        : moduleParIdentifierDef ( ',' moduleParIdentifierDef )*;
+moduleParIdentifierDef
         : moduleParIdentifier ( ASSIGNMENT_CHAR constantExpression )?
-        ( ',' moduleParIdentifier ( ASSIGNMENT_CHAR constantExpression )? )*;
-moduleParIdentifier
-        : IDENTIFIER;
+        {
+            translator->ModulePar($moduleParIdentifier.id, $modulePar::parType, "");
+        }
+        ;
+moduleParIdentifier returns [ freettcn::translator::CIdentifier *id ]
+        : IDENTIFIER
+        {
+            pANTLR3_COMMON_TOKEN token = LT(-1);
+            $id = new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1),
+                                  (char *)token->getText(token)->chars);
+        }
+        ;
+
 
 // $>
 

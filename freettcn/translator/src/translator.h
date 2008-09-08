@@ -71,6 +71,8 @@ namespace freettcn {
       CTranslator(const std::string &inputName, CLogger &logger);
       ~CTranslator();
       
+      CLogger &Logger() const;
+      
       void Warning(const CLocation &loc, const std::string &msg);
       void Error(const CLocation &loc, const std::string &msg);
       unsigned WarningNum() const;
@@ -78,14 +80,11 @@ namespace freettcn {
 
       void Dump(CDumper &dumper) const;
       
-      //      void Start() const;
       const CFile &File() const;
-      
       void Line(unsigned line);
-      //      unsigned Line() const;
       
-      void ModuleBegin(const CIdentifier *id, const std::string &language);
-      void ModuleEnd();
+      void Module(const CIdentifier *id, const std::string &language);
+      void ModulePar(const CIdentifier *id, const std::string &type, const std::string &value);
     };
     
   } // namespace translator

@@ -63,12 +63,12 @@ namespace freettcn {
 
           if(width >= 1) {
             if(isprint(ex->c))
-              msg << " near ‘" << (char)ex->c << "’";
+              msg << " near '" << (char)ex->c << "'";
             else
               msg << " near char(0x" << std::hex << std::setw(2) << (int)ex->c << std::dec << ")";
           }
           else {
-            msg << " ‘<EOF>’";
+            msg << " '<EOF>'";
             
             // prepare second error
             line2 = lexer->rec->state->tokenStartLine;
@@ -92,26 +92,26 @@ namespace freettcn {
           pANTLR3_COMMON_TOKEN token = (pANTLR3_COMMON_TOKEN)ex->token;
           
           if(ex->type == ANTLR3_NO_VIABLE_ALT_EXCEPTION)
-            msg << "Cannot match ‘" << token->getText(token)->chars << "’ to any predicted input";
+            msg << "Cannot match '" << token->getText(token)->chars << "' to any predicted input";
           else {
             msg << (pANTLR3_UINT8)ex->message;
             
             if(token) {
               if (token->type == ANTLR3_TOKEN_EOF)
-                msg << " at ‘<EOF>’";
+                msg << " at '<EOF>'";
               else {
                 if(ex->type == ANTLR3_MISSING_TOKEN_EXCEPTION) {
                   if(!tokenNames)
                     msg << " [" << ex->expecting << "]";
                   else {
                     if(ex->expecting == ANTLR3_TOKEN_EOF)
-                      msg << " ‘<EOF>’";
+                      msg << " '<EOF>'";
                     else
-                      msg << " ‘" << tokenNames[ex->expecting] << "’";
+                      msg << " '" << tokenNames[ex->expecting] << "'";
                   }
                 }
                 else {
-                  msg << " near ‘" << token->getText(token)->chars << "’";
+                  msg << " near '" << token->getText(token)->chars << "'";
                 }
               }
             }
@@ -119,9 +119,9 @@ namespace freettcn {
             if(ex->type == ANTLR3_UNWANTED_TOKEN_EXCEPTION) {
               if(tokenNames) {
                 if(ex->expecting == ANTLR3_TOKEN_EOF)
-                  msg << " (‘<EOF>’ expected)";
+                  msg << " ('<EOF>' expected)";
                 else
-                  msg << " (‘" << tokenNames[ex->expecting] << "’ expected)";
+                  msg << " ('" << tokenNames[ex->expecting] << "' expected)";
               }
             }
           }

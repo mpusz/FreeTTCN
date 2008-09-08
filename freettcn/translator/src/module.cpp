@@ -33,9 +33,54 @@
 #include "dumper.h"
 
 
+
+
+freettcn::translator::CModule::CDefinition::CDefinition(const CIdentifier *id, const std::string &type):
+  _id(id), _type(type)
+{
+}
+
+
+freettcn::translator::CModule::CDefinition::~CDefinition()
+{
+}
+
+        
+void freettcn::translator::CModule::CDefinition::Dump(CDumper &dumper)
+{
+}
+
+
+
+
+
 freettcn::translator::CModule::CModule(const CIdentifier *id, TLanguage language):
   _id(id), _language(language)
 {
+}
+
+
+freettcn::translator::CModule::~CModule()
+{
+  for(CDefMap::iterator it = _definitionsMap.begin(); it != _definitionsMap.end(); ++it)
+    delete it->second;
+}
+
+
+void freettcn::translator::CModule::Register(CDefinition *def)
+{
+  // add new definition
+  _definitionsMap[def->Id().Name()] = def;
+}
+
+
+const freettcn::translator::CModule::CDefinition *freettcn::translator::CModule::IdCheck(const CIdentifier &id) const
+{
+  CDefMap::const_iterator it = _definitionsMap.find(id.Name());
+  if(it == _definitionsMap.end())
+    return 0;
+  else
+    return it->second;
 }
 
 

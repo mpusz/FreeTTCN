@@ -3,6 +3,7 @@ module icmp {
   modulepar {
     boolean long := true;
     integer count;
+    //    float long := true;
   }
   
   

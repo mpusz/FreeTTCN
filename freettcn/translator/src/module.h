@@ -31,7 +31,10 @@
 #ifndef __MODULE_H__
 #define __MODULE_H__
 
+#include <map>
+#include <string>
 #include <memory>
+
 
 namespace freettcn {
 
@@ -48,18 +51,51 @@ namespace freettcn {
         LANGUAGE_TTCN_3_2005
       };
       
+      class CDefinition {
+        std::auto_ptr<const CIdentifier> _id;
+        const std::string _type;
+      public:
+        CDefinition(const CIdentifier *id, const std::string &type);
+        virtual ~CDefinition();
+        
+        virtual void Dump(CDumper &dumper);
+        
+        const CIdentifier &Id() const;
+        const std::string &Type() const;
+      };
+      
     private:
+      typedef std::map<std::string, CDefinition *> CDefMap;
+      
       std::auto_ptr<const CIdentifier> _id;
       TLanguage _language;
+      CDefMap _definitionsMap;
       
     public:
       CModule(const CIdentifier *id, TLanguage language);
+      ~CModule();
+      
+      void Register(CDefinition *def);
+      const CDefinition *IdCheck(const CIdentifier &id) const;
+      
       void Dump(CDumper &dumper);
     };
-
+    
   } // namespace translator
 
 } // namespace freettcn
+
+
+inline const freettcn::translator::CIdentifier &freettcn::translator::CModule::CDefinition::Id() const
+{
+  return *_id;
+}
+
+
+inline const std::string &freettcn::translator::CModule::CDefinition::Type() const
+{
+  return _type;
+}
 
 
 #endif  // __MODULE_H__

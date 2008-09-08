@@ -60,6 +60,13 @@ freettcn::translator::CTranslator::CTranslator(const std::string &inputName, CLo
 freettcn::translator::CTranslator::~CTranslator()
 {
   _instance = 0;
+  _filesStack.pop();
+}
+
+
+freettcn::translator::CLogger &freettcn::translator::CTranslator::Logger() const
+{
+  return _logger;
 }
 
 
@@ -112,21 +119,13 @@ void freettcn::translator::CTranslator::Line(unsigned line)
 }
 
 
-// unsigned freettcn::translator::CTranslator::Line() const
-// {
-//   return _line;
-// }
-
-
-void freettcn::translator::CTranslator::ModuleBegin(const CIdentifier *id, const std::string &language)
+void freettcn::translator::CTranslator::Module(const CIdentifier *id, const std::string &language)
 {
   std::auto_ptr<const CIdentifier> idPtr(id);
   
-  _logger.GroupPush(id->Loc().File(), "In module ‘" + id->Name() + "’:");
-  
   // check module ID 
   if(File().ModuleName().compare(id->Name()))
-    Error(id->Loc(), "Module ID '" + id->Name() + "' does not match TTCN-3 file name");
+    Error(id->Loc(), "module ID '" + id->Name() + "' does not match TTCN-3 file name");
   
   // check language
   CModule::TLanguage lang = CModule::LANGUAGE_TTCN_3_2005;
@@ -138,10 +137,10 @@ void freettcn::translator::CTranslator::ModuleBegin(const CIdentifier *id, const
     else if(language == "\"TTCN-3:2001\"")
       lang = CModule::LANGUAGE_TTCN_3_2001;
     else
-      Error(id->Loc(), "Unknown module language " + language + " detected (only \"TTCN-3:2005\" is supported)");
+      Error(id->Loc(), "unknown module language " + language + " detected (only \"TTCN-3:2005\" is supported)");
     
     if(lang != CModule::LANGUAGE_TTCN_3_2005)
-      Error(id->Loc(), "Unsupported module language " + language + " detected (only \"TTCN-3:2005\" is supported)");
+      Error(id->Loc(), "unsupported module language " + language + " detected (only \"TTCN-3:2005\" is supported)");
   }
   
   // create new module
@@ -149,8 +148,19 @@ void freettcn::translator::CTranslator::ModuleBegin(const CIdentifier *id, const
 }
 
 
-void freettcn::translator::CTranslator::ModuleEnd()
+void freettcn::translator::CTranslator::ModulePar(const CIdentifier *id, const std::string &type, const std::string &value)
 {
-  _filesStack.pop();
-  _logger.GroupPop();
+  std::auto_ptr<const CIdentifier> idPtr(id);
+  
+  /// @todo Check if ID does not name predefined function
+  
+  // check if ID already defined
+  if(const CModule::CDefinition *def = _module->IdCheck(*id)) {
+    Error(id->Loc(), "conflicting declaration '" + type + " " + id->Name() + "'");
+    Error(def->Id().Loc(), "'" + id->Name() + "' has a previous declaration as '" + def->Type() + " " +  def->Id().Name() + "'");
+  }
+  else {
+    // register new module parameter
+    _module->Register(new CModule::CDefinition(idPtr.release(), type));
+  }
 }
