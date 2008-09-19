@@ -25,6 +25,7 @@ include ../../Makefile.defines
 #
 GEN_DIR = gen
 SRC_DIR = src
+TOOLS_DIR = ../lib/include
 BUILD_DIRS = $(SRC_DIR)
 
 BIN_DIR = bin
@@ -44,7 +45,7 @@ GEN_FILES_PATH = $(addprefix $(GEN_DIR)/, $(GEN_FILES))
 #
 # defines
 #
-INCLUDE_DIRS = -I$(GEN_DIR) -I$(SRC_DIR)
+INCLUDE_DIRS = -I$(GEN_DIR) -I$(SRC_DIR) -I$(TOOLS_DIR)
 
 
 # macros

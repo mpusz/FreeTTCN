@@ -25,19 +25,20 @@ include ../../../Makefile.defines
 #
 GEN_DIR = ../gen
 BIN_DIR = ../bin
+TOOLS_DIR = ../../lib/include
 
 
 #
 # files
 #
 CPP_FILES = ../../lib/tools/exception.cpp file.cpp location.cpp identifier.cpp \
-	     logger.cpp dumper.cpp module.cpp translator.cpp main.cpp
+	     expression.cpp type.cpp logger.cpp dumper.cpp module.cpp translator.cpp main.cpp
 
 
 #
 # defines
 #
-INCLUDE_DIRS = -I. -I$(GEN_DIR)
+INCLUDE_DIRS = -I. -I$(GEN_DIR) -I$(TOOLS_DIR)
 
 
 # macros

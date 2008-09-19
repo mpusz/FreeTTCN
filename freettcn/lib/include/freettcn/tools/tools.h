@@ -35,6 +35,15 @@
 
 namespace freettcn {
 
+  struct CPtrCmp {
+    template <class T>
+    bool operator()(T v1,T v2) const
+    {
+      return *v1 < *v2;
+    }
+  };
+  
+
   // Delete pointers in an STL sequence container.
   template<class Seq> void Purge(Seq &container)
   {
@@ -43,6 +52,17 @@ namespace freettcn {
       delete *it;
     container.clear();
   }
+  
+
+  // Delete pointers in an STL map container.
+  template<class Map> void PurgeMap(Map &container)
+  {
+    typename Map::iterator it;
+    for(it=container.begin(); it!=container.end(); ++it)
+      delete it->second;
+    container.clear();
+  }
+  
   
   class CList {
   public:

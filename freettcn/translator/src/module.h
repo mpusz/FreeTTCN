@@ -31,7 +31,8 @@
 #ifndef __MODULE_H__
 #define __MODULE_H__
 
-#include <map>
+#include <stack>
+#include <deque>
 #include <string>
 #include <memory>
 
@@ -42,6 +43,9 @@ namespace freettcn {
     
     class CDumper;
     class CIdentifier;
+    class CExpression;
+    class CType;
+    class CTypeReferenced;
     
     class CModule {
     public:
@@ -52,31 +56,95 @@ namespace freettcn {
       };
       
       class CDefinition {
-        std::auto_ptr<const CIdentifier> _id;
-        const std::string _type;
+        const std::auto_ptr<const CIdentifier> _id;
+        const CType &_type;
       public:
-        CDefinition(const CIdentifier *id, const std::string &type);
+        CDefinition(const CIdentifier *id, const CType &type);
         virtual ~CDefinition();
         
         virtual void Dump(CDumper &dumper);
         
         const CIdentifier &Id() const;
-        const std::string &Type() const;
+        const CType &Type() const;
       };
       
-    private:
-      typedef std::map<std::string, CDefinition *> CDefMap;
       
-      std::auto_ptr<const CIdentifier> _id;
-      TLanguage _language;
-      CDefMap _definitionsMap;
+      class CDefinitionParameter : public CDefinition {
+        const std::auto_ptr<const CExpression> _expr;
+      public:
+        CDefinitionParameter(const CIdentifier *id, const CType &type, const CExpression *expr);
+        virtual void Dump(CDumper &dumper);
+      };
+      
+      
+      class CDefinitionConstValue : public CDefinition {
+        const std::auto_ptr<const CExpression> _expr;
+      public:
+        CDefinitionConstValue(const CIdentifier *id, const CType &type, const CExpression *expr);
+        virtual void Dump(CDumper &dumper);
+      };
+      
+      
+      class CDefinitionTypeReferenced : public CDefinition {
+        std::auto_ptr<const CTypeReferenced> _type;
+      public:
+        CDefinitionTypeReferenced(const CIdentifier *id, const CTypeReferenced *type);
+        virtual void Dump(CDumper &dumper);
+      };
+      
+      
+      class CDefinitionFormalParameter : public CDefinition {
+      public:
+        enum TDirection {
+          DIRECTION_IN,
+          DIRECTION_OUT,
+          DIRECTION_INOUT
+        };
+      private:
+        const TDirection _dir;
+      public:
+        CDefinitionFormalParameter(const CIdentifier *id, const CType &type, TDirection dir);
+        virtual void Dump(CDumper &dumper);
+      };
+      
+      
+      class CDefinitionMethod : public CDefinition {
+        typedef std::deque<const CDefinitionFormalParameter *> CParamList;
+        CParamList _params;
+      public:
+        CDefinitionMethod(const CIdentifier *id, const CType &type);
+        ~CDefinitionMethod();
+        void Register(const CDefinitionFormalParameter *par);
+      };
+      
+      
+      class CDefinitionTestcase : public CDefinitionMethod {
+      public:
+        CDefinitionTestcase(const CIdentifier *id, const CType &type);
+        virtual void Dump(CDumper &dumper);
+      };
+      
+      
+      class CDefinitionTemplate : public CDefinitionMethod {
+      public:
+        CDefinitionTemplate(const CIdentifier *id, const CType &type);
+        virtual void Dump(CDumper &dumper);
+      };
+      
+      
+    private:
+      typedef std::deque<CDefinition *> CDefList;
+      
+      const std::auto_ptr<const CIdentifier> _id;
+      const TLanguage _language;
+      CDefList _defList;
       
     public:
       CModule(const CIdentifier *id, TLanguage language);
       ~CModule();
       
       void Register(CDefinition *def);
-      const CDefinition *IdCheck(const CIdentifier &id) const;
+//       const CDefinition *Id(const CIdentifier &id) const;
       
       void Dump(CDumper &dumper);
     };
@@ -92,7 +160,7 @@ inline const freettcn::translator::CIdentifier &freettcn::translator::CModule::C
 }
 
 
-inline const std::string &freettcn::translator::CModule::CDefinition::Type() const
+inline const freettcn::translator::CType &freettcn::translator::CModule::CDefinition::Type() const
 {
   return _type;
 }

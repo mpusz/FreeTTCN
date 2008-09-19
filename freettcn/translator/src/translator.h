@@ -32,9 +32,14 @@
 #define __TRANSLATOR_H__
 
 #include "ttcn3Parser.h"
+#include "module.h"
 #include "file.h"
+#include "freettcn/tools/tools.h"
+#include <string>
 #include <deque>
-#include <stack>
+#include <list>
+#include <map>
+#include <set>
 
 
 namespace freettcn {
@@ -44,12 +49,18 @@ namespace freettcn {
     class CLogger;
     class CDumper;
     class CIdentifier;
-    class CModule;
+    class CTypeStructured;
+    class CType;
     
     class CTranslator {
+    private:
       typedef std::deque<CFile> CFileList;
       typedef std::stack<const CFile *> CFileStack;
 
+      typedef std::map<const std::string *, const CModule::CDefinition *, CPtrCmp> CScope;
+      typedef std::list<CScope> CScopeStack;
+      typedef std::set<std::string> CUnresolvedSymbols;
+      
       static CTranslator *_instance;              /**< @brief Translator instance */
       
       CLogger &_logger;                           /**< @brief Logger instance */
@@ -60,7 +71,12 @@ namespace freettcn {
       CFileStack _filesStack;                     /**< @brief Current files on the stack */
       unsigned _line;                             /**< @brief Line in a file */
       
-      std::auto_ptr<CModule> _module;
+      CScopeStack _scopes;                        /**< @brief TTCN-3 scopes stack */
+      CUnresolvedSymbols _unresolvedSymbols;      /**< @brief Unresolved symbols set */
+
+      std::auto_ptr<CModule> _module;             /**< @brief TTCN-3 module */
+      CTypeStructured *_structType;               /**< @brief Current structured type */
+      CModule::CDefinitionMethod *_method;        /**< @brief Current TTCN-3 method (testcase, template, etc.) */
       
       CTranslator(const CTranslator &);           /**< @brief Disallowed */
       CTranslator &operator=(const CTranslator &); /**< @brief Disallowed */
@@ -82,9 +98,20 @@ namespace freettcn {
       
       const CFile &File() const;
       void Line(unsigned line);
+
+      void ScopePush();
+      bool ScopeSymbol(const CModule::CDefinition &def);
+      const CModule::CDefinition *ScopeSymbol(const CIdentifier &id);
+      void ScopePop();
       
       void Module(const CIdentifier *id, const std::string &language);
-      void ModulePar(const CIdentifier *id, const std::string &type, const std::string &value);
+      void ModulePar(const CIdentifier *id, const CType *type, const CExpression *expr);
+      void ConstValue(const CIdentifier *id, const CType *type, const CExpression *expr);
+      void Struct(const CIdentifier *id, bool set);
+      void StructField(const CIdentifier *id, const CType *type, bool optional);
+      void Testcase(const CIdentifier *id);
+      void Template(const CIdentifier *id);
+      void FormalParameter(const CIdentifier *id, const CType *type, const std::string &dirStr);
     };
     
   } // namespace translator

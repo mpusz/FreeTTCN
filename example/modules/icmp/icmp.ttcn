@@ -1,11 +1,13 @@
 module icmp {
   
   modulepar {
-    boolean long := true;
-    integer count;
-    //    float long := true;
+    boolean long;
+    integer runCount := 1 + 2;
   }
   
+  const integer RETRY_NUM := 5;
+  const float MSG_TIMEOUT := 1.0, TEST_TIMEOUT := 3.0, TESTS_DELAY := 1.0;
+
   
   // ********** TYPES ***********
   
@@ -86,7 +88,7 @@ module icmp {
     map(mtc:icmpPort, system:icmpPort);
     
     // the test case behaviour
-    timer t := 1.0;
+    timer t := MSG_TIMEOUT;
     var integer count := 0;
     icmpPort.send(t_EchoRequest(count));
     t.start;
@@ -97,12 +99,12 @@ module icmp {
       [] icmpPort.receive {
         setverdict(fail);
       }
-      [count < 5] t.timeout {
+      [count < RETRY_NUM] t.timeout {
         count := count + 1;
         icmpPort.send(t_EchoRequest(count));
         repeat;
       }
-      [count == 5] t.timeout {
+      [count == RETRY_NUM] t.timeout {
         setverdict(fail);
       }
     }
@@ -122,9 +124,9 @@ module icmp {
   
   control {
     if (execute(TC_ICMPPing_1()) == pass and long) {
-      for (var integer i:=0; i<count; i:=i+1) {
-        execute(TC_ICMPPing_2(), 3.0);
-        timer t1 := 1.0;
+      for (var integer i:=0; i<runCount; i:=i+1) {
+        execute(TC_ICMPPing_2(), TEST_TIMEOUT);
+        timer t1 := TESTS_DELAY;
         t1.start;
         t1.timeout;  // pause before executing the next test case
       }

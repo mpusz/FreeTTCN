@@ -58,7 +58,7 @@ namespace freettcn {
       void IndentDecr();
       
       virtual void PrintLine(const std::string &line) const;
-      //      virtual void Print(const std::string &str);
+      virtual void Print(const std::string &str) const;
 
       virtual void Header();
       virtual void Footer();
@@ -74,6 +74,12 @@ inline void freettcn::translator::CDumper::PrintLine(const std::string &line) co
   if(_indent)
     _stream << std::setw(_indent) << " ";
   _stream << line << std::endl;
+}
+
+
+inline void freettcn::translator::CDumper::Print(const std::string &str) const
+{
+  _stream << str;
 }
 
 

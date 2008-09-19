@@ -30,12 +30,14 @@
 
 #include "module.h"
 #include "identifier.h"
+#include "expression.h"
+#include "type.h"
 #include "dumper.h"
+#include "freettcn/tools/tools.h"
 
 
 
-
-freettcn::translator::CModule::CDefinition::CDefinition(const CIdentifier *id, const std::string &type):
+freettcn::translator::CModule::CDefinition::CDefinition(const CIdentifier *id, const CType &type):
   _id(id), _type(type)
 {
 }
@@ -52,6 +54,93 @@ void freettcn::translator::CModule::CDefinition::Dump(CDumper &dumper)
 
 
 
+freettcn::translator::CModule::CDefinitionParameter::CDefinitionParameter(const CIdentifier *id, const CType &type, const CExpression *expr):
+  CDefinition(id, type), _expr(expr)
+{
+}
+
+
+void freettcn::translator::CModule::CDefinitionParameter::Dump(CDumper &dumper)
+{
+}
+
+
+
+freettcn::translator::CModule::CDefinitionConstValue::CDefinitionConstValue(const CIdentifier *id, const CType &type, const CExpression *expr):
+  CDefinition(id, type), _expr(expr)
+{
+}
+
+
+void freettcn::translator::CModule::CDefinitionConstValue::Dump(CDumper &dumper)
+{
+}
+
+
+freettcn::translator::CModule::CDefinitionTypeReferenced::CDefinitionTypeReferenced(const CIdentifier *id, const CTypeReferenced *type):
+  CDefinition(id, *type), _type(type)
+{
+}
+
+
+void freettcn::translator::CModule::CDefinitionTypeReferenced::Dump(CDumper &dumper)
+{
+}
+      
+
+freettcn::translator::CModule::CDefinitionFormalParameter::CDefinitionFormalParameter(const CIdentifier *id, const CType &type, TDirection dir):
+  CDefinition(id, type), _dir(dir)
+{
+}
+
+
+void freettcn::translator::CModule::CDefinitionFormalParameter::Dump(CDumper &dumper)
+{
+}
+
+
+
+freettcn::translator::CModule::CDefinitionMethod::CDefinitionMethod(const CIdentifier *id, const CType &type):
+  CDefinition(id, type)
+{
+}
+
+
+freettcn::translator::CModule::CDefinitionMethod::~CDefinitionMethod()
+{
+  Purge(_params);
+}
+
+
+void freettcn::translator::CModule::CDefinitionMethod::Register(const CDefinitionFormalParameter *par)
+{
+  _params.push_back(par);
+}
+
+
+
+freettcn::translator::CModule::CDefinitionTestcase::CDefinitionTestcase(const CIdentifier *id, const CType &type):
+  CDefinitionMethod(id, type)
+{
+}
+
+
+void freettcn::translator::CModule::CDefinitionTestcase::Dump(CDumper &dumper)
+{
+}
+
+
+freettcn::translator::CModule::CDefinitionTemplate::CDefinitionTemplate(const CIdentifier *id, const CType &type):
+  CDefinitionMethod(id, type)
+{
+}
+
+
+void freettcn::translator::CModule::CDefinitionTemplate::Dump(CDumper &dumper)
+{
+}
+
+
 
 
 freettcn::translator::CModule::CModule(const CIdentifier *id, TLanguage language):
@@ -62,25 +151,13 @@ freettcn::translator::CModule::CModule(const CIdentifier *id, TLanguage language
 
 freettcn::translator::CModule::~CModule()
 {
-  for(CDefMap::iterator it = _definitionsMap.begin(); it != _definitionsMap.end(); ++it)
-    delete it->second;
+  Purge(_defList);
 }
 
 
 void freettcn::translator::CModule::Register(CDefinition *def)
 {
-  // add new definition
-  _definitionsMap[def->Id().Name()] = def;
-}
-
-
-const freettcn::translator::CModule::CDefinition *freettcn::translator::CModule::IdCheck(const CIdentifier &id) const
-{
-  CDefMap::const_iterator it = _definitionsMap.find(id.Name());
-  if(it == _definitionsMap.end())
-    return 0;
-  else
-    return it->second;
+  _defList.push_back(def);
 }
 
 

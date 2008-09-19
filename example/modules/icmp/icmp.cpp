@@ -57,15 +57,6 @@ namespace freettcn {
       CICMPPingDataType(const freettcn::TE::CModule &module);
     };
     
-    /// @todo should be an union
-    class CICMPDataType : public freettcn::TE::CRecordType {
-    public:
-      enum {
-        FIELD_ping
-      };
-      CICMPDataType(const freettcn::TE::CModule &module);
-    };
-    
     class CICMPMsg : public freettcn::TE::CRecordType {
     public:
       enum {
@@ -75,6 +66,15 @@ namespace freettcn {
         FIELD_data
       };
       CICMPMsg(const freettcn::TE::CModule &module);
+    };
+    
+    /// @todo should be an union
+    class CICMPDataType : public freettcn::TE::CRecordType {
+    public:
+      enum {
+        FIELD_ping
+      };
+      CICMPDataType(const freettcn::TE::CModule &module);
     };
     
     
@@ -200,7 +200,7 @@ namespace freettcn {
       
       enum {
         PAR_long,
-        PAR_count,
+        PAR_count
       };
       
       enum {
