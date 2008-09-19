@@ -92,4 +92,4 @@ $(BIN_DIR)/%.o: $(GEN_DIR)/%.c
 
 
 # include depends files
-include $(C_FILES:.c=.d)
+-include $(C_FILES:.c=.d)
