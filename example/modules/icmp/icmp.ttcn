@@ -28,7 +28,7 @@ module icmp {
   
   type union ICMPDataType
   {
-    ICMPPingDataType1 ping
+    ICMPPingDataType ping
   }
   
   

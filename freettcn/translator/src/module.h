@@ -132,6 +132,41 @@ namespace freettcn {
       };
       
       
+//       class CPort {
+//       public:
+//         enum TType {
+//           TYPE_MESSAGE,
+//           TYPE_PROCEDURE,
+//           TYPE_MIXED
+//         };
+        
+//         class CItem {
+//         public:
+//           enum TDirection {
+//             DIR_IN,
+//             DIR_OUT,
+//             DIR_INOUT
+//           };
+          
+//         private:
+//           CType &_type;
+//           TDirection _direction;
+          
+//         public:
+//           CItem(CType &type, TDirection direction);
+// //           CType &Type() const;
+// //           TDirection Direction() const;
+//         };
+        
+//       private:
+//         typedef std::map<const std::string *, const CItem *, CPtrCmp> CItemMap;
+//         CItemMap _itemMap;
+        
+//       public:
+//         CPort(const CIdentifier *id, TType message);
+//       };
+      
+      
     private:
       typedef std::deque<CDefinition *> CDefList;
       

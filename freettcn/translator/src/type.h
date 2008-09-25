@@ -160,13 +160,13 @@ namespace freettcn {
         const bool _optional;
       public:
         CField(CType &type, const CIdentifier *id, bool optional);
-        CType &Type() const;
-        const CIdentifier &Id() const;
-        bool Optional() const;
+               CType &Type() const;
+               const CIdentifier &Id() const;
+        //        bool Optional() const;
       };
       
     private:
-      typedef std::map<const std::string *, CField *, CPtrCmp> CFieldMap;
+      typedef std::map<const std::string *, const CField *, CPtrCmp> CFieldMap;
       CFieldMap _fieldMap;
       
     public:
@@ -186,6 +186,13 @@ namespace freettcn {
       CTypeRecord(const std::string &name);
       virtual void Dump(CDumper &dumper) const;
       virtual void Register(CField *field);
+    };
+    
+    
+    class CTypeUnion : public CTypeStructured {
+    public:
+      CTypeUnion(const std::string &name);
+      virtual void Dump(CDumper &dumper) const;
     };
     
   } // namespace translator

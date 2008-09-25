@@ -115,6 +115,8 @@ namespace freettcn {
       void ConstValue(const CIdentifier *id, CType *type, const CExpression *expr);
       void Struct(const CIdentifier *id, bool set);
       void StructField(const CIdentifier *id, CType *type, bool optional);
+      void Union(const CIdentifier *id);
+      void UnionField(const CIdentifier *id, CType *type);
       void Testcase(const CIdentifier *id);
       void Template(const CIdentifier *id);
       void FormalParameter(const CIdentifier *id, CType *type, const std::string &dirStr);

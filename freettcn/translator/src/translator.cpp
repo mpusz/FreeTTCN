@@ -335,6 +335,35 @@ void freettcn::translator::CTranslator::StructField(const CIdentifier *id, CType
 }
 
 
+void freettcn::translator::CTranslator::Union(const CIdentifier *id)
+{
+  std::auto_ptr<const CIdentifier> idPtr(id);
+  _structType = 0;
+  
+  CTypeStructured *structType = new CTypeUnion(id->Name());
+  std::auto_ptr<CModule::CDefinitionTypeLocal> def(new CModule::CDefinitionTypeLocal(idPtr.release(), structType));
+  if(ScopeSymbol(*def)) {
+    // register new structured type
+    _structType = structType;
+    _module->Register(def.release());
+  }
+}
+
+
+void freettcn::translator::CTranslator::UnionField(const CIdentifier *id, CType *type)
+{
+  std::auto_ptr<const CIdentifier> idPtr(id);
+  
+  if(!_structType)
+    throw EOperationFailed(E_DATA, "Current structured type not set!!!");
+  
+  if(!type)
+    throw EOperationFailed(E_DATA, "Structured type '" + _structType->Name() + "' field '" +  id->Name() + "' type not specified!!!");
+  
+  _structType->Register(new CTypeStructured::CField(*type, idPtr.release(), true));
+}
+
+
 void freettcn::translator::CTranslator::Testcase(const CIdentifier *id)
 {
   std::auto_ptr<const CIdentifier> idPtr(id);

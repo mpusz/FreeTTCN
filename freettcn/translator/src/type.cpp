@@ -343,10 +343,10 @@ const freettcn::translator::CIdentifier &freettcn::translator::CTypeStructured::
 }
 
 
-bool freettcn::translator::CTypeStructured::CField::Optional() const
-{
-  return _optional;
-}
+// bool freettcn::translator::CTypeStructured::CField::Optional() const
+// {
+//   return _optional;
+// }
 
 
 
@@ -441,4 +441,17 @@ void freettcn::translator::CTypeRecord::Register(CField *field)
 {
   CTypeStructured::Register(field);
   _fieldList.push_back(field);
+}
+
+
+
+
+freettcn::translator::CTypeUnion::CTypeUnion(const std::string &name):
+  CTypeStructured(name)
+{
+}
+
+
+void freettcn::translator::CTypeUnion::Dump(CDumper &dumper) const
+{
 }

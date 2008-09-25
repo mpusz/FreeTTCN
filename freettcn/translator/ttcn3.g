@@ -409,10 +409,38 @@ unionDef
 unionKeyword
         : UNION;
 unionDefBody
-        : ( structTypeIdentifier structDefFormalParList? | addressKeyword )
-        '{' unionFieldDef ( ',' unionFieldDef )* '}';
+        : ( structTypeIdentifier
+              {
+                pANTLR3_COMMON_TOKEN token = LT(-1);
+                const freettcn::translator::CIdentifier *id = new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1),
+                                                                              (const char *)token->getText(token)->chars);
+                translator->Union(id);
+                logger->GroupPush(translator->File(), "In union '" + id->Name() + "':");
+              }
+            structDefFormalParList? | addressKeyword )
+        '{' unionFieldDef ( ',' unionFieldDef )* '}'
+        {
+            logger->GroupPop();
+        }
+        ;
 unionFieldDef
-        : ( type | nestedTypeDef ) structFieldIdentifier arrayDef? subTypeSpec?;
+        @init
+        { 
+            freettcn::translator::CType *fieldType = 0;
+            std::auto_ptr<const freettcn::translator::CIdentifier> id;
+        }
+        : ( type
+            {
+                fieldType = $type.value;
+            }
+            | nestedTypeDef ) structFieldIdentifier
+        {
+            pANTLR3_COMMON_TOKEN token = LT(-1);
+            id = std::auto_ptr<const freettcn::translator::CIdentifier>(new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1),
+                                                                                        (const char *)token->getText(token)->chars));
+            translator->UnionField(id.release(), fieldType);
+        }
+        arrayDef? subTypeSpec?;
 setDef
         : setKeyword structDefBody[true];
 setKeyword
