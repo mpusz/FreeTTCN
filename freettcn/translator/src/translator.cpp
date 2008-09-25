@@ -64,6 +64,7 @@ freettcn::translator::CTranslator::~CTranslator()
 {
   _instance = 0;
   _filesStack.pop();
+  PurgeMap(_referencedTypes);
 }
 
 
@@ -162,10 +163,9 @@ const freettcn::translator::CModule::CDefinition *freettcn::translator::CTransla
     if(scopeIt != stackIt->end())
       def = scopeIt->second;
   }
-  
   if(!def) {
     // symbol not defined
-    CUnresolvedSymbols::const_iterator it = _unresolvedSymbols.find(id.Name());
+    CUnresolvedSymbolsSet::const_iterator it = _unresolvedSymbols.find(id.Name());
     if(it == _unresolvedSymbols.end()) {
       // print the error only once for that symbol
       Error(id.Loc(), "'" + id.Name() + "' was not declared in this scope");
@@ -186,6 +186,43 @@ void freettcn::translator::CTranslator::ScopePop()
   if(_scopes.empty())
     throw EOperationFailed(E_DATA, "End of scopes stack!!!");
   _scopes.pop_front();
+}
+
+
+freettcn::translator::CType *freettcn::translator::CTranslator::Type(const std::string &name) const
+{
+  for(CScopeStack::const_iterator stackIt=_scopes.begin(); stackIt!=_scopes.end(); ++stackIt) {
+    CScope::const_iterator scopeIt = stackIt->find(&name);
+    if(scopeIt != stackIt->end())
+      return &scopeIt->second->Type();
+  }
+  
+  return 0;
+}
+
+
+freettcn::translator::CTypeReferenced &freettcn::translator::CTranslator::TypeReferenced(const CIdentifier *id)
+{
+  std::auto_ptr<const CIdentifier> idPtr(id);
+  
+  // check if referenced type is created already
+  CTypeReferencedMap::iterator it = _referencedTypes.find(id->Name());
+  if(it != _referencedTypes.end())
+    return *it->second;
+  
+  // look for type definition
+  CType *type = Type(id->Name());
+  if(type) {
+    // create new referenced type and insert to the map
+    CTypeReferenced *refType = new CTypeReferenced(*type);
+    _referencedTypes[id->Name()] = refType;
+    return *refType;
+  }
+  
+  // create new unresolved referenced type and insert to the map
+  CTypeReferenced *refType = new CTypeReferenced(idPtr.release());
+  _referencedTypes[id->Name()] = refType;
+  return *refType;
 }
 
 
@@ -218,7 +255,7 @@ void freettcn::translator::CTranslator::Module(const CIdentifier *id, const std:
 }
 
 
-void freettcn::translator::CTranslator::ModulePar(const CIdentifier *id, const CType *type, const CExpression *expr)
+void freettcn::translator::CTranslator::ModulePar(const CIdentifier *id, CType *type, const CExpression *expr)
 {
   std::auto_ptr<const CIdentifier> idPtr(id);
   std::auto_ptr<const CExpression> exprPtr(expr);
@@ -241,7 +278,7 @@ void freettcn::translator::CTranslator::ModulePar(const CIdentifier *id, const C
 }
 
 
-void freettcn::translator::CTranslator::ConstValue(const CIdentifier *id, const CType *type, const CExpression *expr)
+void freettcn::translator::CTranslator::ConstValue(const CIdentifier *id, CType *type, const CExpression *expr)
 {
   std::auto_ptr<const CIdentifier> idPtr(id);
   std::auto_ptr<const CExpression> exprPtr(expr);
@@ -269,8 +306,13 @@ void freettcn::translator::CTranslator::Struct(const CIdentifier *id, bool set)
   std::auto_ptr<const CIdentifier> idPtr(id);
   _structType = 0;
   
-  CTypeStructured *structType = new CTypeStructured(id->Name());
-  std::auto_ptr<CModule::CDefinitionTypeReferenced> def(new CModule::CDefinitionTypeReferenced(idPtr.release(), structType));
+  CTypeStructured *structType;
+  if(set)
+    structType = new CTypeStructured(id->Name());
+  else
+    structType = new CTypeRecord(id->Name());
+  
+  std::auto_ptr<CModule::CDefinitionTypeLocal> def(new CModule::CDefinitionTypeLocal(idPtr.release(), structType));
   if(ScopeSymbol(*def)) {
     // register new structured type
     _structType = structType;
@@ -279,7 +321,7 @@ void freettcn::translator::CTranslator::Struct(const CIdentifier *id, bool set)
 }
 
 
-void freettcn::translator::CTranslator::StructField(const CIdentifier *id, const CType *type, bool optional)
+void freettcn::translator::CTranslator::StructField(const CIdentifier *id, CType *type, bool optional)
 {
   std::auto_ptr<const CIdentifier> idPtr(id);
   
@@ -298,7 +340,7 @@ void freettcn::translator::CTranslator::Testcase(const CIdentifier *id)
   std::auto_ptr<const CIdentifier> idPtr(id);
   _method = 0;
   
-  std::auto_ptr<CModule::CDefinitionTestcase> def(new CModule::CDefinitionTestcase(idPtr.release(), CTypeInternal::Verdict()));
+  std::auto_ptr<CModule::CDefinitionTestcase> def(new CModule::CDefinitionTestcase(idPtr.release(), CTypePredefined::Verdict()));
   if(ScopeSymbol(*def)) {
     // register new testcase
     _method = def.get();
@@ -313,7 +355,7 @@ void freettcn::translator::CTranslator::Template(const CIdentifier *id)
   _method = 0;
   
   /// @todo template type
-  std::auto_ptr<CModule::CDefinitionTemplate> def(new CModule::CDefinitionTemplate(idPtr.release(), CTypeInternal::Verdict()));
+  std::auto_ptr<CModule::CDefinitionTemplate> def(new CModule::CDefinitionTemplate(idPtr.release(), CTypePredefined::Verdict()));
   if(ScopeSymbol(*def)) {
     // register new template
     _method = def.get();
@@ -322,7 +364,7 @@ void freettcn::translator::CTranslator::Template(const CIdentifier *id)
 }
 
 
-void freettcn::translator::CTranslator::FormalParameter(const CIdentifier *id, const CType *type, const std::string &dirStr)
+void freettcn::translator::CTranslator::FormalParameter(const CIdentifier *id, CType *type, const std::string &dirStr)
 {
   std::auto_ptr<const CIdentifier> idPtr(id);
   
@@ -332,6 +374,13 @@ void freettcn::translator::CTranslator::FormalParameter(const CIdentifier *id, c
   if(!_method)
     throw EOperationFailed(E_DATA, "Current method not set!!!");
 
+  if(!type->Resolved()) {
+    if(!type->Resolve()) {
+      Error(id->Loc(), "formal parameter '" + id->Name() + "' of unresolved type '" + type->Name() + "' specified");
+      return;
+    }
+  }
+  
   CModule::CDefinitionFormalParameter::TDirection dir = CModule::CDefinitionFormalParameter::DIRECTION_INOUT;
   if(dirStr == "in")
     dir = CModule::CDefinitionFormalParameter::DIRECTION_IN;

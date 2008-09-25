@@ -37,7 +37,7 @@
 
 
 
-freettcn::translator::CModule::CDefinition::CDefinition(const CIdentifier *id, const CType &type):
+freettcn::translator::CModule::CDefinition::CDefinition(const CIdentifier *id, CType &type):
   _id(id), _type(type)
 {
 }
@@ -48,59 +48,59 @@ freettcn::translator::CModule::CDefinition::~CDefinition()
 }
 
         
-void freettcn::translator::CModule::CDefinition::Dump(CDumper &dumper)
+void freettcn::translator::CModule::CDefinition::Dump(CDumper &dumper) const
 {
 }
 
 
 
-freettcn::translator::CModule::CDefinitionParameter::CDefinitionParameter(const CIdentifier *id, const CType &type, const CExpression *expr):
+freettcn::translator::CModule::CDefinitionParameter::CDefinitionParameter(const CIdentifier *id, CType &type, const CExpression *expr):
   CDefinition(id, type), _expr(expr)
 {
 }
 
 
-void freettcn::translator::CModule::CDefinitionParameter::Dump(CDumper &dumper)
+void freettcn::translator::CModule::CDefinitionParameter::Dump(CDumper &dumper) const
 {
 }
 
 
 
-freettcn::translator::CModule::CDefinitionConstValue::CDefinitionConstValue(const CIdentifier *id, const CType &type, const CExpression *expr):
+freettcn::translator::CModule::CDefinitionConstValue::CDefinitionConstValue(const CIdentifier *id, CType &type, const CExpression *expr):
   CDefinition(id, type), _expr(expr)
 {
 }
 
 
-void freettcn::translator::CModule::CDefinitionConstValue::Dump(CDumper &dumper)
+void freettcn::translator::CModule::CDefinitionConstValue::Dump(CDumper &dumper) const
 {
 }
 
 
-freettcn::translator::CModule::CDefinitionTypeReferenced::CDefinitionTypeReferenced(const CIdentifier *id, const CTypeReferenced *type):
+freettcn::translator::CModule::CDefinitionTypeLocal::CDefinitionTypeLocal(const CIdentifier *id, CTypeLocal *type):
   CDefinition(id, *type), _type(type)
 {
 }
 
 
-void freettcn::translator::CModule::CDefinitionTypeReferenced::Dump(CDumper &dumper)
+void freettcn::translator::CModule::CDefinitionTypeLocal::Dump(CDumper &dumper) const
 {
 }
       
 
-freettcn::translator::CModule::CDefinitionFormalParameter::CDefinitionFormalParameter(const CIdentifier *id, const CType &type, TDirection dir):
+freettcn::translator::CModule::CDefinitionFormalParameter::CDefinitionFormalParameter(const CIdentifier *id, CType &type, TDirection dir):
   CDefinition(id, type), _dir(dir)
 {
 }
 
 
-void freettcn::translator::CModule::CDefinitionFormalParameter::Dump(CDumper &dumper)
+void freettcn::translator::CModule::CDefinitionFormalParameter::Dump(CDumper &dumper) const
 {
 }
 
 
 
-freettcn::translator::CModule::CDefinitionMethod::CDefinitionMethod(const CIdentifier *id, const CType &type):
+freettcn::translator::CModule::CDefinitionMethod::CDefinitionMethod(const CIdentifier *id, CType &type):
   CDefinition(id, type)
 {
 }
@@ -119,24 +119,24 @@ void freettcn::translator::CModule::CDefinitionMethod::Register(const CDefinitio
 
 
 
-freettcn::translator::CModule::CDefinitionTestcase::CDefinitionTestcase(const CIdentifier *id, const CType &type):
+freettcn::translator::CModule::CDefinitionTestcase::CDefinitionTestcase(const CIdentifier *id, CType &type):
   CDefinitionMethod(id, type)
 {
 }
 
 
-void freettcn::translator::CModule::CDefinitionTestcase::Dump(CDumper &dumper)
+void freettcn::translator::CModule::CDefinitionTestcase::Dump(CDumper &dumper) const
 {
 }
 
 
-freettcn::translator::CModule::CDefinitionTemplate::CDefinitionTemplate(const CIdentifier *id, const CType &type):
+freettcn::translator::CModule::CDefinitionTemplate::CDefinitionTemplate(const CIdentifier *id, CType &type):
   CDefinitionMethod(id, type)
 {
 }
 
 
-void freettcn::translator::CModule::CDefinitionTemplate::Dump(CDumper &dumper)
+void freettcn::translator::CModule::CDefinitionTemplate::Dump(CDumper &dumper) const
 {
 }
 
@@ -161,7 +161,7 @@ void freettcn::translator::CModule::Register(CDefinition *def)
 }
 
 
-void freettcn::translator::CModule::Dump(CDumper &dumper)
+void freettcn::translator::CModule::Dump(CDumper &dumper) const
 {
   dumper.PrintLine("");
   dumper.PrintLine("namespace " + _id->Name() + " {");

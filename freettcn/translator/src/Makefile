@@ -58,7 +58,7 @@ GEN_O_FILES = $(addprefix $(BIN_DIR)/, $(patsubst %.c,%.o,$(GEN_FILES)))
 
 
 # targets
-.PHONY: all clean distclean tags 
+.PHONY: all clean distclean tags classes
 
 all: $(O_FILES)
 	@$(call cmd,cmd_translator_link)
@@ -73,6 +73,8 @@ distclean: clean
 tags:
 	@$(call cmd,cmd_tags_cpp)
 
+classes:
+	$(Q)$(EBROWSE) -s *.h *.cpp
 
 # rules
 $(BIN_DIR)/%.o: %.cpp

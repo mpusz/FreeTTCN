@@ -357,7 +357,7 @@ structDefFormalPar
 structFieldDef
         @init
         { 
-            const freettcn::translator::CType *fieldType = 0;
+            freettcn::translator::CType *fieldType = 0;
             std::auto_ptr<const freettcn::translator::CIdentifier> id;
             bool optional = false;
         }
@@ -547,9 +547,9 @@ portIdentifier
 
 constDef
         : constKeyword t = type constList[$t.value];
-constList[const freettcn::translator::CType *type]
+constList[freettcn::translator::CType *type]
         : singleConstDef[type] ( ',' singleConstDef[type] )*;
-singleConstDef[const freettcn::translator::CType *type]
+singleConstDef[freettcn::translator::CType *type]
         : constIdentifier arrayDef? ASSIGNMENT_CHAR e = constantExpression
         {
             translator->ConstValue($constIdentifier.id, $type, $e.expr);
@@ -1143,7 +1143,7 @@ multitypedModuleParList
         : ( modulePar SEMICOLON? )*;
 modulePar
         : m = moduleParType moduleParList[$m.parType];
-moduleParType returns [const freettcn::translator::CType *parType]
+moduleParType returns [freettcn::translator::CType *parType]
         @init
         { $parType = 0; }
         : t = type
@@ -1151,9 +1151,9 @@ moduleParType returns [const freettcn::translator::CType *parType]
 // Module parameters shall not be of port type, default type or component type.
 // A module parameter shall only be of type address if the address type is explicitly defined within the associated
 // module.
-moduleParList[const freettcn::translator::CType *type]
+moduleParList[freettcn::translator::CType *type]
         : moduleParIdentifierDef[ $type ] ( ',' moduleParIdentifierDef[ $type ] )*;
-moduleParIdentifierDef[ const freettcn::translator::CType *type ]
+moduleParIdentifierDef[ freettcn::translator::CType *type ]
         : moduleParIdentifier ( ASSIGNMENT_CHAR e = constantExpression )?
         {
             if($e.text && !$e.expr)
@@ -1583,41 +1583,41 @@ timeoutKeyword
 
 // $<A.1.6.3 Type
 
-type returns [ const freettcn::translator::CType *value ]
+type returns [ freettcn::translator::CType *value ]
         @init
         { $value = 0; }
-        : t = predefinedType
-        { $value = $t.value; }
-        |  t = referencedType
-        { $value = $t.value; }
+        : predefinedType
+        { $value = $predefinedType.value; }
+        |  referencedType
+        { $value = $referencedType.value; }
         ;
-predefinedType returns [ const freettcn::translator::CType *value ]
+predefinedType returns [ freettcn::translator::CTypePredefined *value ]
         @init
         { $value = 0; }
         : bitstringKeyword
-        { $value = &CTypeInternal::Bitstring(); }
+        { $value = &CTypePredefined::Bitstring(); }
         | booleanKeyword
-        { $value = &CTypeInternal::Boolean(); }
+        { $value = &CTypePredefined::Boolean(); }
         | charStringKeyword
-        { $value = &CTypeInternal::Charstring(); }
+        { $value = &CTypePredefined::Charstring(); }
         | universalCharString
-        { $value = &CTypeInternal::UniversalCharstring(); }
+        { $value = &CTypePredefined::UniversalCharstring(); }
         | integerKeyword
-        { $value = &CTypeInternal::Integer(); }
+        { $value = &CTypePredefined::Integer(); }
         | octetStringKeyword
-        { $value = &CTypeInternal::Octetstring(); }
+        { $value = &CTypePredefined::Octetstring(); }
         | hexStringKeyword
-        { $value = &CTypeInternal::Hexstring(); }
+        { $value = &CTypePredefined::Hexstring(); }
         | verdictTypeKeyword
-        { $value = &CTypeInternal::Verdict(); }
+        { $value = &CTypePredefined::Verdict(); }
         | floatKeyword
-        { $value = &CTypeInternal::Float(); }
+        { $value = &CTypePredefined::Float(); }
         | addressKeyword
-        { $value = &CTypeInternal::Address(); }
+        { $value = &CTypePredefined::Address(); }
         | defaultKeyword
-        { $value = &CTypeInternal::Default(); }
+        { $value = &CTypePredefined::Default(); }
         | anyTypeKeyword
-        { $value = &CTypeInternal::AnyType(); }
+        { $value = &CTypePredefined::AnyType(); }
         ;
 bitstringKeyword
         : BIT_STRING;
@@ -1645,37 +1645,37 @@ universalCharString
         : universalKeyword charStringKeyword;
 universalKeyword
         : UNIVERSAL;
-referencedType returns [ const freettcn::translator::CType *value ]
+referencedType returns [ freettcn::translator::CTypeReferenced *value ]
         @init
         { $value = 0; }
         : ( globalModuleId DOT )? typeReference extendedFieldReference?
         {
-            $value = $typeReference.def ? &$typeReference.def->Type() : 0;
+            $value = $typeReference.value;
         }
         ;
-typeReference returns [const freettcn::translator::CModule::CDefinition *def]
+typeReference returns [ freettcn::translator::CTypeReferenced *value ]
         @init
-        { $def = 0; }
+        { $value = 0; }
         : ( structTypeIdentifier
             {
                 pANTLR3_COMMON_TOKEN token = LT(-1);
-                $def = translator->ScopeSymbol(CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1), (const char *)token->getText(token)->chars));
+                $value = &translator->TypeReferenced(new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1), (const char *)token->getText(token)->chars));
             }
             typeActualParList?)
         | enumTypeIdentifier
         {
             pANTLR3_COMMON_TOKEN token = LT(-1);
-            $def = translator->ScopeSymbol(CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1), (const char *)token->getText(token)->chars));
+            $value = &translator->TypeReferenced(new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1), (const char *)token->getText(token)->chars));
         }
         | subTypeIdentifier
         {
             pANTLR3_COMMON_TOKEN token = LT(-1);
-            $def = translator->ScopeSymbol(CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1), (const char *)token->getText(token)->chars));
+            $value = &translator->TypeReferenced(new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1), (const char *)token->getText(token)->chars));
         }
         | componentTypeIdentifier
         {
             pANTLR3_COMMON_TOKEN token = LT(-1);
-            $def = translator->ScopeSymbol(CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1), (const char *)token->getText(token)->chars));
+            $value = &translator->TypeReferenced(new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1), (const char *)token->getText(token)->chars));
         };
 /* ---A--- BUG ---A--- */
 typeActualParList
@@ -1706,27 +1706,27 @@ predefinedValue returns [ freettcn::translator::CExpression *expr ]
         @init
         { $expr = 0; }
         : bitStringValue
-        { $expr = new CExpressionValue(CTypeInternal::Bitstring(), (const char *)$bitStringValue.text->chars); }
+        { $expr = new CExpressionValue(CTypePredefined::Bitstring(), (const char *)$bitStringValue.text->chars); }
         | booleanValue
-        { $expr = new CExpressionValue(CTypeInternal::Boolean(), (const char *)$booleanValue.text->chars); }
+        { $expr = new CExpressionValue(CTypePredefined::Boolean(), (const char *)$booleanValue.text->chars); }
         | charStringValue
-        { $expr = new CExpressionValue(CTypeInternal::Charstring(), (const char *)$charStringValue.text->chars); }
+        { $expr = new CExpressionValue(CTypePredefined::Charstring(), (const char *)$charStringValue.text->chars); }
         | integerValue
-        { $expr = new CExpressionValue(CTypeInternal::Integer(), (const char *)$integerValue.text->chars); }
+        { $expr = new CExpressionValue(CTypePredefined::Integer(), (const char *)$integerValue.text->chars); }
         | octetStringValue
-        { $expr = new CExpressionValue(CTypeInternal::Octetstring(), (const char *)$octetStringValue.text->chars); }
+        { $expr = new CExpressionValue(CTypePredefined::Octetstring(), (const char *)$octetStringValue.text->chars); }
         | hexStringValue
-        { $expr = new CExpressionValue(CTypeInternal::Hexstring(), (const char *)$hexStringValue.text->chars); }
+        { $expr = new CExpressionValue(CTypePredefined::Hexstring(), (const char *)$hexStringValue.text->chars); }
         | verdictTypeValue
-        { $expr = new CExpressionValue(CTypeInternal::Verdict(), (const char *)$verdictTypeValue.text->chars); }
+        { $expr = new CExpressionValue(CTypePredefined::Verdict(), (const char *)$verdictTypeValue.text->chars); }
         | enumeratedValue
         { $expr = $enumeratedValue.def ? new CExpressionDef(*$enumeratedValue.def) : 0; }
         | floatValue
-        { $expr = new CExpressionValue(CTypeInternal::Float(), (const char *)$floatValue.text->chars); }
+        { $expr = new CExpressionValue(CTypePredefined::Float(), (const char *)$floatValue.text->chars); }
         | addressValue
-        { $expr = new CExpressionValue(CTypeInternal::Address(), (const char *)$addressValue.text->chars); }
+        { $expr = new CExpressionValue(CTypePredefined::Address(), (const char *)$addressValue.text->chars); }
         | omitValue
-//        { $expr = new CExpressionValue(CTypeInternal::_, $v.text->chars); }
+//        { $expr = new CExpressionValue(CTypePredefined::_, $v.text->chars); }
         ;
 bitStringValue
         : B_STRING;

@@ -126,7 +126,7 @@ const freettcn::translator::CType &freettcn::translator::CExpressionPair::Type()
   case OPERATION_MORE:
   case OPERATION_NOT_LESS:
   case OPERATION_NOT_MORE:
-    return CTypeInternal::Boolean();
+    return CTypePredefined::Boolean();
     
   case OPERATION_SHIFT_LEFT:
   case OPERATION_SHIFT_RIGHT:

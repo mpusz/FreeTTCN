@@ -45,7 +45,7 @@ namespace freettcn {
     class CIdentifier;
     class CExpression;
     class CType;
-    class CTypeReferenced;
+    class CTypeLocal;
     
     class CModule {
     public:
@@ -57,43 +57,43 @@ namespace freettcn {
       
       class CDefinition {
         const std::auto_ptr<const CIdentifier> _id;
-        const CType &_type;
+        CType &_type;
       public:
-        CDefinition(const CIdentifier *id, const CType &type);
+        CDefinition(const CIdentifier *id, CType &type);
         virtual ~CDefinition();
         
-        virtual void Dump(CDumper &dumper);
+        virtual void Dump(CDumper &dumper) const;
         
         const CIdentifier &Id() const;
-        const CType &Type() const;
+        CType &Type() const;
       };
       
       
-      class CDefinitionParameter : public CDefinition {
+      class CDefinitionParameter : public CModule::CDefinition {
         const std::auto_ptr<const CExpression> _expr;
       public:
-        CDefinitionParameter(const CIdentifier *id, const CType &type, const CExpression *expr);
-        virtual void Dump(CDumper &dumper);
+        CDefinitionParameter(const CIdentifier *id, CType &type, const CExpression *expr);
+        virtual void Dump(CDumper &dumper) const;
       };
       
       
-      class CDefinitionConstValue : public CDefinition {
+      class CDefinitionConstValue : public CModule::CDefinition {
         const std::auto_ptr<const CExpression> _expr;
       public:
-        CDefinitionConstValue(const CIdentifier *id, const CType &type, const CExpression *expr);
-        virtual void Dump(CDumper &dumper);
+        CDefinitionConstValue(const CIdentifier *id, CType &type, const CExpression *expr);
+        virtual void Dump(CDumper &dumper) const;
       };
       
       
-      class CDefinitionTypeReferenced : public CDefinition {
-        std::auto_ptr<const CTypeReferenced> _type;
+      class CDefinitionTypeLocal : public CModule::CDefinition {
+        std::auto_ptr<CTypeLocal> _type;
       public:
-        CDefinitionTypeReferenced(const CIdentifier *id, const CTypeReferenced *type);
-        virtual void Dump(CDumper &dumper);
+        CDefinitionTypeLocal(const CIdentifier *id, CTypeLocal *type);
+        virtual void Dump(CDumper &dumper) const;
       };
       
       
-      class CDefinitionFormalParameter : public CDefinition {
+      class CDefinitionFormalParameter : public CModule::CDefinition {
       public:
         enum TDirection {
           DIRECTION_IN,
@@ -103,32 +103,32 @@ namespace freettcn {
       private:
         const TDirection _dir;
       public:
-        CDefinitionFormalParameter(const CIdentifier *id, const CType &type, TDirection dir);
-        virtual void Dump(CDumper &dumper);
+        CDefinitionFormalParameter(const CIdentifier *id, CType &type, TDirection dir);
+        virtual void Dump(CDumper &dumper) const;
       };
       
       
-      class CDefinitionMethod : public CDefinition {
+      class CDefinitionMethod : public CModule::CDefinition {
         typedef std::deque<const CDefinitionFormalParameter *> CParamList;
         CParamList _params;
       public:
-        CDefinitionMethod(const CIdentifier *id, const CType &type);
+        CDefinitionMethod(const CIdentifier *id, CType &type);
         ~CDefinitionMethod();
         void Register(const CDefinitionFormalParameter *par);
       };
       
       
-      class CDefinitionTestcase : public CDefinitionMethod {
+      class CDefinitionTestcase : public CModule::CDefinitionMethod {
       public:
-        CDefinitionTestcase(const CIdentifier *id, const CType &type);
-        virtual void Dump(CDumper &dumper);
+        CDefinitionTestcase(const CIdentifier *id, CType &type);
+        virtual void Dump(CDumper &dumper) const;
       };
       
       
-      class CDefinitionTemplate : public CDefinitionMethod {
+      class CDefinitionTemplate : public CModule::CDefinitionMethod {
       public:
-        CDefinitionTemplate(const CIdentifier *id, const CType &type);
-        virtual void Dump(CDumper &dumper);
+        CDefinitionTemplate(const CIdentifier *id, CType &type);
+        virtual void Dump(CDumper &dumper) const;
       };
       
       
@@ -146,7 +146,7 @@ namespace freettcn {
       void Register(CDefinition *def);
 //       const CDefinition *Id(const CIdentifier &id) const;
       
-      void Dump(CDumper &dumper);
+      void Dump(CDumper &dumper) const;
     };
     
   } // namespace translator
@@ -160,7 +160,7 @@ inline const freettcn::translator::CIdentifier &freettcn::translator::CModule::C
 }
 
 
-inline const freettcn::translator::CType &freettcn::translator::CModule::CDefinition::Type() const
+inline freettcn::translator::CType &freettcn::translator::CModule::CDefinition::Type() const
 {
   return _type;
 }

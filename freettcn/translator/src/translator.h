@@ -49,8 +49,9 @@ namespace freettcn {
     class CLogger;
     class CDumper;
     class CIdentifier;
-    class CTypeStructured;
     class CType;
+    class CTypeReferenced;
+    class CTypeStructured;
     
     class CTranslator {
     private:
@@ -59,7 +60,8 @@ namespace freettcn {
 
       typedef std::map<const std::string *, const CModule::CDefinition *, CPtrCmp> CScope;
       typedef std::list<CScope> CScopeStack;
-      typedef std::set<std::string> CUnresolvedSymbols;
+      typedef std::set<std::string> CUnresolvedSymbolsSet;
+      typedef std::map<std::string, CTypeReferenced *> CTypeReferencedMap;
       
       static CTranslator *_instance;              /**< @brief Translator instance */
       
@@ -72,8 +74,9 @@ namespace freettcn {
       unsigned _line;                             /**< @brief Line in a file */
       
       CScopeStack _scopes;                        /**< @brief TTCN-3 scopes stack */
-      CUnresolvedSymbols _unresolvedSymbols;      /**< @brief Unresolved symbols set */
-
+      CUnresolvedSymbolsSet _unresolvedSymbols;   /**< @brief Unresolved symbols set */
+      CTypeReferencedMap _referencedTypes;        /**< @brief Referenced types map that speeds up resolving process */
+      
       std::auto_ptr<CModule> _module;             /**< @brief TTCN-3 module */
       CTypeStructured *_structType;               /**< @brief Current structured type */
       CModule::CDefinitionMethod *_method;        /**< @brief Current TTCN-3 method (testcase, template, etc.) */
@@ -104,14 +107,17 @@ namespace freettcn {
       const CModule::CDefinition *ScopeSymbol(const CIdentifier &id);
       void ScopePop();
       
+      CType *Type(const std::string &name) const;
+      CTypeReferenced &TypeReferenced(const CIdentifier *id);
+      
       void Module(const CIdentifier *id, const std::string &language);
-      void ModulePar(const CIdentifier *id, const CType *type, const CExpression *expr);
-      void ConstValue(const CIdentifier *id, const CType *type, const CExpression *expr);
+      void ModulePar(const CIdentifier *id, CType *type, const CExpression *expr);
+      void ConstValue(const CIdentifier *id, CType *type, const CExpression *expr);
       void Struct(const CIdentifier *id, bool set);
-      void StructField(const CIdentifier *id, const CType *type, bool optional);
+      void StructField(const CIdentifier *id, CType *type, bool optional);
       void Testcase(const CIdentifier *id);
       void Template(const CIdentifier *id);
-      void FormalParameter(const CIdentifier *id, const CType *type, const std::string &dirStr);
+      void FormalParameter(const CIdentifier *id, CType *type, const std::string &dirStr);
     };
     
   } // namespace translator
