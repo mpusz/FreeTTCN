@@ -340,7 +340,7 @@ structDefBody[bool set]
                 const freettcn::translator::CIdentifier *id = new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1),
                                                                               (const char *)token->getText(token)->chars);
                 translator->Struct(id, $set);
-                logger->GroupPush(translator->File(), set ? "In set '" : "In record '" + id->Name() + "':");
+                logger->GroupPush(translator->File(), (set ? "In set '" : "In record '") + id->Name() + "':");
               }
               structDefFormalParList? ) | addressKeyword )
         '{' ( structFieldDef ( ',' structFieldDef )* )? '}'
@@ -493,29 +493,70 @@ portType
 portDef
         : portKeyword portDefBody;
 portDefBody
-        : portTypeIdentifier portDefAttribs;
+        @init
+        { 
+            freettcn::translator::CType *fieldType = 0;
+            const freettcn::translator::CIdentifier *id = 0;
+        }
+        : portTypeIdentifier
+        {
+            pANTLR3_COMMON_TOKEN token = LT(-1);
+            id = new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1),
+                                 (const char *)token->getText(token)->chars);
+            logger->GroupPush(translator->File(), "In port '" + id->Name() + "':");
+        }
+        portDefAttribs[ id ]
+        {
+            logger->GroupPop();
+        }
+        ;
 portKeyword
         : PORT;
 portTypeIdentifier
         : IDENTIFIER;
-portDefAttribs
-        : messageAttribs | procedureAttribs | mixedAttribs;
-messageAttribs
+portDefAttribs [ const freettcn::translator::CIdentifier *id ]
+        : messageAttribs[ id ] | procedureAttribs | mixedAttribs;
+messageAttribs [ const freettcn::translator::CIdentifier *id ]
         : messageKeyword
+        {
+            translator->Port(id, freettcn::translator::CTypePort::MODE_MESSAGE);
+        }
         '{' ( messageList SEMICOLON? )+ '}';
 messageList
-        : direction allOrTypeList;
-direction
-        : inParKeyword | outParKeyword | inOutParKeyword;
+        : direction allOrTypeList[ $direction.dir ];
+direction returns [ const char *dir ]
+        : inParKeyword
+        { dir = (const char *)$inParKeyword.text->chars; }
+        | outParKeyword
+        { dir = (const char *)$outParKeyword.text->chars; }
+        | inOutParKeyword
+        { dir = (const char *)$inOutParKeyword.text->chars; }
+        ;
 messageKeyword
         : MESSAGE;
-allOrTypeList
-        : allKeyword | typeList;
+allOrTypeList [ const char *dir ]
+        : allKeyword
+        {
+            pANTLR3_COMMON_TOKEN token = LT(-1);
+            translator->PortItem(CLocation(translator->File(), token->line, token->charPosition + 1), 0, dir);
+        }
+        | typeList[ dir ];
 /* NOTE: The use of allKeyword in port definitions is deprecated */
 allKeyword
         : ALL;
-typeList
-        : type ( ',' type )*;
+typeList [ const char *dir ]
+        : t1 = type
+        {
+            pANTLR3_COMMON_TOKEN token = LT(-1);
+            translator->PortItem(CLocation(translator->File(), token->line, token->charPosition + 1), $t1.value, dir);
+            
+        }
+        ( ',' t2 = type
+            {
+                pANTLR3_COMMON_TOKEN token = LT(-1);
+                translator->PortItem(CLocation(translator->File(), token->line, token->charPosition + 1), $t2.value, dir);
+            }
+        )*;
 procedureAttribs
         : procedureKeyword
         '{' ( procedureList SEMICOLON? )+ '}';
@@ -614,7 +655,7 @@ baseTemplate
             const freettcn::translator::CIdentifier *id = new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1),
                                                                           (const char *)token->getText(token)->chars);
             translator->Template(id);
-            logger->GroupPush(translator->File(), "In testcase  '" + id->Name() + "':");
+            logger->GroupPush(translator->File(), "In template '" + id->Name() + "':");
             translator->ScopePush();
         }
         ( '(' templateFormalParList ')' )?;
@@ -898,7 +939,7 @@ testcaseDef
             id = new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1),
                                  (const char *)token->getText(token)->chars);
             translator->Testcase(id);
-            logger->GroupPush(translator->File(), "In testcase  '" + id->Name() + "':");
+            logger->GroupPush(translator->File(), "In testcase '" + id->Name() + "':");
             translator->ScopePush();
         }
         '(' testcaseFormalParList? ')' configSpec

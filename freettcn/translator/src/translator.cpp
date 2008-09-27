@@ -74,13 +74,6 @@ freettcn::translator::CLogger &freettcn::translator::CTranslator::Logger() const
 }
 
 
-void freettcn::translator::CTranslator::Warning(const CLocation &loc, const std::string &msg)
-{
-  _logger.Warning(loc, msg);
-  _warningNum++;
-}
-
-
 void freettcn::translator::CTranslator::Error(const CLocation &loc, const std::string &msg)
 {
   _logger.Error(loc, msg);
@@ -88,15 +81,28 @@ void freettcn::translator::CTranslator::Error(const CLocation &loc, const std::s
 }
 
 
-unsigned freettcn::translator::CTranslator::WarningNum() const
+void freettcn::translator::CTranslator::Warning(const CLocation &loc, const std::string &msg)
 {
-  return _warningNum;
+  _logger.Warning(loc, msg);
+  _warningNum++;
+}
+
+
+void freettcn::translator::CTranslator::Note(const CLocation &loc, const std::string &msg)
+{
+  _logger.Note(loc, msg);
 }
 
 
 unsigned freettcn::translator::CTranslator::ErrorNum() const
 {
   return _errorNum;
+}
+
+
+unsigned freettcn::translator::CTranslator::WarningNum() const
+{
+  return _warningNum;
 }
 
 
@@ -207,8 +213,10 @@ freettcn::translator::CTypeReferenced &freettcn::translator::CTranslator::TypeRe
   
   // check if referenced type is created already
   CTypeReferencedMap::iterator it = _referencedTypes.find(id->Name());
-  if(it != _referencedTypes.end())
+  if(it != _referencedTypes.end()) {
+    /// @todo check if type can be resolved now
     return *it->second;
+  }
   
   // look for type definition
   CType *type = Type(id->Name());
@@ -263,6 +271,11 @@ void freettcn::translator::CTranslator::ModulePar(const CIdentifier *id, CType *
   if(!type)
     throw EOperationFailed(E_DATA, "Module Parameter type not specified!!!");
   
+  if(!(type->Kind() & CType::KIND_TYPE)) {
+    Error(id->Loc(), "module parameter '" + id->Name() + "' type cannot be of '" + CType::KindToString(type->Kind()) + "' type");
+    return;
+  }
+  
   // check if constant expression
   if(expr && !expr->Constant())
     Error(id->Loc(), "module parameter '" + id->Name() + "' should resolve to a constant value");
@@ -285,6 +298,11 @@ void freettcn::translator::CTranslator::ConstValue(const CIdentifier *id, CType 
   
   if(!type)
     throw EOperationFailed(E_DATA, "Const value type not specified!!!");
+  
+  if(!(type->Kind() & CType::KIND_TYPE)) {
+    Error(id->Loc(), "const value '" + id->Name() + "' type cannot be of '" + CType::KindToString(type->Kind()) + "' type");
+    return;
+  }
   
   // check if constant expression
   if(expr && !expr->Constant())
@@ -331,6 +349,11 @@ void freettcn::translator::CTranslator::StructField(const CIdentifier *id, CType
   if(!type)
     throw EOperationFailed(E_DATA, "Structured type '" + _structType->Name() + "' field '" +  id->Name() + "' type not specified!!!");
   
+  if(!(type->Kind() & CType::KIND_TYPE) && type->Kind() != CType::KIND_UNRESOLVED) {
+    Error(id->Loc(), "structured type '" + _structType->Name() + "' field cannot be of '" + CType::KindToString(type->Kind()) + "' type");
+    return;
+  }
+
   _structType->Register(new CTypeStructured::CField(*type, idPtr.release(), optional));
 }
 
@@ -358,9 +381,55 @@ void freettcn::translator::CTranslator::UnionField(const CIdentifier *id, CType 
     throw EOperationFailed(E_DATA, "Current structured type not set!!!");
   
   if(!type)
-    throw EOperationFailed(E_DATA, "Structured type '" + _structType->Name() + "' field '" +  id->Name() + "' type not specified!!!");
+    throw EOperationFailed(E_DATA, "Union '" + _structType->Name() + "' field '" +  id->Name() + "' type not specified!!!");
   
+  if(!(type->Kind() & CType::KIND_TYPE) && type->Kind() != CType::KIND_UNRESOLVED) {
+    Error(id->Loc(), "union '" + _structType->Name() + "' field cannot be of '" + CType::KindToString(type->Kind()) + "' type");
+    return;
+  }
+
   _structType->Register(new CTypeStructured::CField(*type, idPtr.release(), true));
+}
+
+
+void freettcn::translator::CTranslator::Port(const CIdentifier *id, CTypePort::TMode mode)
+{
+  std::auto_ptr<const CIdentifier> idPtr(id);
+  _portType = 0;
+  
+  CTypePort *portType = new CTypePort(id->Name(), mode);
+  std::auto_ptr<CModule::CDefinitionTypeLocal> def(new CModule::CDefinitionTypeLocal(idPtr.release(), portType));
+  if(ScopeSymbol(*def)) {
+    // register new port type
+    _portType = portType;
+    _module->Register(def.release());
+  }
+}
+
+
+void freettcn::translator::CTranslator::PortItem(const CLocation &loc, CType *type, const std::string &dirStr)
+{
+  if(!_portType)
+    throw EOperationFailed(E_DATA, "Port type not set!!!");
+  
+  CTypePort::TDirection dir = CTypePort::DIRECTION_INOUT;
+  if(dirStr == "in")
+    dir = CTypePort::DIRECTION_IN;
+  else if(dirStr == "out")
+    dir = CTypePort::DIRECTION_OUT;
+  
+  CTypePort::CItem *item = 0;
+  if(type){
+    if(!(type->Kind() & CType::KIND_TYPE) && type->Kind() != CType::KIND_UNRESOLVED) {
+      Error(loc, "port '" + _portType->Name() + "' item cannot be of '" + CType::KindToString(type->Kind()) + "' type");
+      return;
+    }
+    item = new CTypePort::CItem(loc, *type);
+  }
+  else
+    item = new CTypePort::CItem(loc);
+  
+  _portType->Register(item, dir);
 }
 
 
@@ -404,10 +473,15 @@ void freettcn::translator::CTranslator::FormalParameter(const CIdentifier *id, C
     throw EOperationFailed(E_DATA, "Current method not set!!!");
 
   if(!type->Resolved()) {
-    if(!type->Resolve()) {
+    if(!type->Resolve(CType::KIND_TYPE, "formal parameter '" + id->Name() + "'")) {
       Error(id->Loc(), "formal parameter '" + id->Name() + "' of unresolved type '" + type->Name() + "' specified");
       return;
     }
+  }
+
+  if(!(type->Kind() & CType::KIND_TYPE)) {
+    Error(id->Loc(), "formal parameter '" + id->Name() + "' cannot be of '" + CType::KindToString(type->Kind()) + "' type");
+    return;
   }
   
   CModule::CDefinitionFormalParameter::TDirection dir = CModule::CDefinitionFormalParameter::DIRECTION_INOUT;

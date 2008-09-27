@@ -61,8 +61,9 @@ namespace freettcn {
       CLogger();
       virtual ~CLogger();
       
-      virtual void Warning(const CLocation &loc, const std::string &msg);
       virtual void Error(const CLocation &loc, const std::string &msg);
+      virtual void Warning(const CLocation &loc, const std::string &msg);
+      virtual void Note(const CLocation &loc, const std::string &msg);
       
       void GroupPush(const CFile &file, const std::string &msg);
       void GroupPop();

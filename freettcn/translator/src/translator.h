@@ -79,6 +79,7 @@ namespace freettcn {
       
       std::auto_ptr<CModule> _module;             /**< @brief TTCN-3 module */
       CTypeStructured *_structType;               /**< @brief Current structured type */
+      CTypePort *_portType;                       /**< @brief Current port type */
       CModule::CDefinitionMethod *_method;        /**< @brief Current TTCN-3 method (testcase, template, etc.) */
       
       CTranslator(const CTranslator &);           /**< @brief Disallowed */
@@ -92,10 +93,11 @@ namespace freettcn {
       
       CLogger &Logger() const;
       
-      void Warning(const CLocation &loc, const std::string &msg);
       void Error(const CLocation &loc, const std::string &msg);
-      unsigned WarningNum() const;
+      void Warning(const CLocation &loc, const std::string &msg);
+      void Note(const CLocation &loc, const std::string &msg);
       unsigned ErrorNum() const;
+      unsigned WarningNum() const;
 
       void Dump(CDumper &dumper) const;
       
@@ -117,6 +119,8 @@ namespace freettcn {
       void StructField(const CIdentifier *id, CType *type, bool optional);
       void Union(const CIdentifier *id);
       void UnionField(const CIdentifier *id, CType *type);
+      void Port(const CIdentifier *id, CTypePort::TMode mode);
+      void PortItem(const CLocation &loc, CType *type, const std::string &dirStr);
       void Testcase(const CIdentifier *id);
       void Template(const CIdentifier *id);
       void FormalParameter(const CIdentifier *id, CType *type, const std::string &dirStr);

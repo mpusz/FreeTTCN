@@ -45,6 +45,7 @@ namespace freettcn {
       unsigned pos2;
       std::stringstream msg;
       std::stringstream msg2;
+      std::string note;
       
       // How we determine the next piece is dependent on which thing raised the error.
       switch(recognizer->type) {
@@ -81,8 +82,7 @@ namespace freettcn {
             else
               msg2 << "The lexer was matching from the end of the line" << std::endl;
             
-            msg2 << "NOTE: Above errors indicates a poorly specified lexer RULE or unterminated input element" << std::endl;
-            msg2 << "      such as: \"STRING[\"]";
+            note = "Above errors indicates a poorly specified lexer RULE or unterminated input element such as: \"STRING[\"]";
           }
         }
         break;
@@ -266,6 +266,8 @@ namespace freettcn {
       translator.Error(CLocation(translator.File(), line, pos), msg.str());
       if(!msg2.str().empty())
         translator.Error(CLocation(translator.File(), line2, pos2), msg2.str());
+      if(!note.empty())
+        translator.Note(CLocation(translator.File(), line2, pos2), note);
     }
 
   }  // namespace translator

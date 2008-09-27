@@ -31,6 +31,7 @@
 #ifndef __TYPE_H__
 #define __TYPE_H__
 
+#include "location.h"
 #include "freettcn/tools/tools.h"
 #include <string>
 #include <map>
@@ -45,15 +46,33 @@ namespace freettcn {
     class CDumper;
 
     class CType {
+    public:
+      enum TKind {
+        KIND_UNRESOLVED         = 0x0000,
+        KIND_TYPE_PREDEFINED    = 0x0001 << 0,
+        KIND_TYPE_RECORD        = 0x0001 << 1,
+        KIND_TYPE_SET           = 0x0001 << 2,
+        KIND_TYPE_UNION         = 0x0001 << 3,
+        KIND_TYPE               = 0x000F,
+        KIND_PORT               = 0x0001 << 4,
+        KIND_COMPONENT          = 0x0001 << 5,
+        KIND_ANY                = 0xFFFF
+      };
+      
+    private:
       CType(const CType &);                       /**< @brief Disallowed */
       CType &operator=(const CType &);            /**< @brief Disallowed */
+      
     public:
+      static std::string KindToString(TKind kind);
+      
       CType();
       virtual ~CType() = 0;
+      virtual TKind Kind() const = 0;
       virtual const std::string &Name() const = 0;
       virtual void Dump(CDumper &dumper) const = 0;
       virtual bool Resolved() const = 0;
-      virtual bool Resolve() = 0;
+      virtual bool Resolve(TKind kind, const std::string &ownerInstanceStr) = 0;
       virtual bool Match(const CType &type) const;
     };
     
@@ -109,9 +128,10 @@ namespace freettcn {
       CTypePredefined(TType type);
 
       virtual const std::string &Name() const;
+      virtual TKind Kind() const;
       virtual void Dump(CDumper &dumper) const;
       virtual bool Resolved() const;
-      virtual bool Resolve();
+      virtual bool Resolve(TKind kind, const std::string &ownerInstanceStr);
       
       //      bool ValueVerify(const char *value);
       //      const CTypePredefined &Add(const CTypePredefined &type);
@@ -124,10 +144,12 @@ namespace freettcn {
         const std::auto_ptr<const CIdentifier> _id;
       public:
         CTypeUnresolved(const CIdentifier *id);
+        virtual TKind Kind() const;
         virtual const std::string &Name() const;
         virtual void Dump(CDumper &dumper) const;
         virtual bool Resolved() const;
-        virtual bool Resolve();
+        virtual bool Resolve(TKind kind, const std::string &ownerInstanceStr);
+        const CIdentifier &Id() const;
       };
       
       CType *_type;
@@ -137,10 +159,11 @@ namespace freettcn {
       CTypeReferenced(CType &type);
       CTypeReferenced(const CIdentifier *id);
       ~CTypeReferenced();
+      virtual TKind Kind() const;
       virtual const std::string &Name() const;
       virtual void Dump(CDumper &dumper) const;
       virtual bool Resolved() const;
-      virtual bool Resolve();
+      virtual bool Resolve(TKind kind, const std::string &ownerInstanceStr);
     };
     
     
@@ -160,8 +183,8 @@ namespace freettcn {
         const bool _optional;
       public:
         CField(CType &type, const CIdentifier *id, bool optional);
-               CType &Type() const;
-               const CIdentifier &Id() const;
+        CType &Type() const;
+        const CIdentifier &Id() const;
         //        bool Optional() const;
       };
       
@@ -172,10 +195,11 @@ namespace freettcn {
     public:
       CTypeStructured(const std::string &name);
       ~CTypeStructured();
+      virtual TKind Kind() const;
       virtual void Dump(CDumper &dumper) const;
       virtual void Register(CField *field);
       virtual bool Resolved() const;
-      virtual bool Resolve();
+      virtual bool Resolve(TKind kind, const std::string &ownerInstanceStr);
     };
     
     
@@ -184,6 +208,7 @@ namespace freettcn {
       CFieldList _fieldList;
     public:
       CTypeRecord(const std::string &name);
+      virtual TKind Kind() const;
       virtual void Dump(CDumper &dumper) const;
       virtual void Register(CField *field);
     };
@@ -192,7 +217,55 @@ namespace freettcn {
     class CTypeUnion : public CTypeStructured {
     public:
       CTypeUnion(const std::string &name);
+      virtual TKind Kind() const;
       virtual void Dump(CDumper &dumper) const;
+    };
+    
+    
+    class CTypePort : public CTypeLocal {
+    public:
+      enum TMode {
+        MODE_MESSAGE,
+        MODE_PROCEDURE,
+        MODE_MIXED
+      };
+      
+      enum TDirection {
+        DIRECTION_IN,
+        DIRECTION_OUT,
+        DIRECTION_INOUT
+      };
+      
+      class CItem {
+      private:
+        const CLocation _loc;                     /**< @brief Location in a file */
+        CType *_type;                             /**< @brief Item type or 0 if 'all' */
+        
+      public:
+        CItem(const CLocation &loc, CType &type);
+        CItem(const CLocation &loc);
+        const CLocation &Loc() const;
+        bool All() const;
+        CType &Type() const;
+      };
+      
+    private:
+      typedef std::map<const std::string, const CItem *> CItemMap;
+      typedef std::deque<const CItem *> CItemList;
+      const TMode _mode;
+      CItemList _itemList;
+      CItemMap _inItemMap;
+      CItemMap _outItemMap;
+      
+    public:
+      CTypePort(const std::string &name, TMode mode);
+      ~CTypePort();
+      virtual TKind Kind() const;
+      virtual TMode Mode() const;
+      virtual void Dump(CDumper &dumper) const;
+      virtual void Register(CItem *item, TDirection dir);
+      virtual bool Resolved() const;
+      virtual bool Resolve(TKind kind, const std::string &ownerInstanceStr);
     };
     
   } // namespace translator

@@ -46,7 +46,7 @@ freettcn::translator::CLogger::~CLogger()
 }
 
 
-void freettcn::translator::CLogger::Warning(const CLocation &loc, const std::string &msg)
+void freettcn::translator::CLogger::Error(const CLocation &loc, const std::string &msg)
 {
   GroupPrint();
   std::cerr << loc.File().FullName() << ":" << loc.Line() << ":" << loc.Pos() << ": "
@@ -54,11 +54,19 @@ void freettcn::translator::CLogger::Warning(const CLocation &loc, const std::str
 }
 
 
-void freettcn::translator::CLogger::Error(const CLocation &loc, const std::string &msg)
+void freettcn::translator::CLogger::Warning(const CLocation &loc, const std::string &msg)
 {
   GroupPrint();
   std::cerr << loc.File().FullName() << ":" << loc.Line() << ":" << loc.Pos() << ": "
-            << "error: " << msg << std::endl;
+            << "warning: " << msg << std::endl;
+}
+
+
+void freettcn::translator::CLogger::Note(const CLocation &loc, const std::string &msg)
+{
+  GroupPrint();
+  std::cerr << loc.File().FullName() << ":" << loc.Line() << ":" << loc.Pos() << ": "
+            << "note: " << msg << std::endl;
 }
 
 
