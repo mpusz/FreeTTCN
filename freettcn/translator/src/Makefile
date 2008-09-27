@@ -68,7 +68,7 @@ clean:
 	$(Q)$(RM) -f $(BIN_DIR)/$(TRANSLATOR_NAME)
 
 distclean: clean
-	$(Q)$(RM) -f *~
+	$(Q)$(RM) -f *~ TAGS BROWSE
 
 tags:
 	@$(call cmd,cmd_tags_cpp)

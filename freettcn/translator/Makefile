@@ -27,6 +27,7 @@ GEN_DIR = gen
 SRC_DIR = src
 TOOLS_DIR = ../lib/include
 BUILD_DIRS = $(SRC_DIR)
+DOC_DIR = doc
 
 BIN_DIR = bin
 
@@ -54,7 +55,7 @@ DEPEND_FILES = $(patsubst %.c,%.d,$(C_FILES))
 
 
 # targets
-.PHONY: all install clean distclean tags
+.PHONY: all install clean distclean tags doc
 
 all: $(BIN_DIR)/$(TRANSLATOR_NAME)
 
@@ -74,11 +75,15 @@ distclean: clean
 	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_distclean,$(dir)))
 	$(Q)$(RM) -f $(BIN_DIR)/*~
 	$(Q)$(RM) -f $(GEN_DIR)/*~
+	$(Q)$(RM) -rf $(DOC_DIR)/html
 
 tags:
 	@$(call cmd,cmd_tags_h)
 	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_tags,$(dir)))
 
+doc:
+	$(Q)$(SED) -i -e 's/\(PROJECT_NUMBER.*=\).*/\1 $(VERSION)/' doc/Doxyfile
+	$(Q)$(DOXYGEN) $(DOC_DIR)/Doxyfile
 
 
 # rules

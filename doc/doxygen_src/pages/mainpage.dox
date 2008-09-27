@@ -1,0 +1,34 @@
+/**
+ * @mainpage The FreeTTCN project documentation
+ * @author Mateusz Pusz
+ *
+ * @section intro_sec Introduction
+ * TTCN-3 (Testing and Test Control Notation version 3) is a flexible and
+ * powerful programming language created for specifying and running tests.
+ * It is universal, platform independent and well defined by ETSI
+ * standards. Standards not only describe the interface and behavior of
+ * TTCN-3 language but also defines an interface of compiled TTCN-3 module
+ * for C/C++ and Java environments.
+ *
+ * The problem is that currently there is no free compiler for TTCN-3 language.
+ * The reason of this project is to try provide free compiler for it.
+ * 
+ * @section Abbreviations:
+ *
+ * @b MTC   - Main Test Component @n
+ * @b PA    - Platform Adapter @n
+ * @b SA    - SUT Adapter @n
+ * @b SUT   - System Under Test @n
+ * @b TC    - Test Control @n
+ * @b TCI   - TTCN-3 Control Interface @n
+ * @b TE    - TTCN-3 Executable @n
+ * @b TM    - Test Management @n
+ * @b TRI   - TTCN-3 Runtime Interface @n
+ * @b TSI   - Test System Interface @n
+ * @b TTCN  - Testing and Test Control Notation
+ * 
+ * @section install_sec Installation
+ * @subsection step1 Step 1: Opening the box
+ * 
+ * etc...
+ */

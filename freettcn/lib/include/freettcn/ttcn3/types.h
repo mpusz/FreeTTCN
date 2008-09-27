@@ -34,26 +34,6 @@
 #define __TYPES_H__
 
 /**
- * @mainpage The FreeTTCN API documentation
- *
- * Abbreviations:
- *
- * @b MTC   - Main Test Component @n
- * @b PA    - Platform Adapter @n
- * @b SA    - SUT Adapter @n
- * @b SUT   - System Under Test @n
- * @b TC    - Test Control @n
- * @b TCI   - TTCN-3 Control Interface @n
- * @b TE    - TTCN-3 Executable @n
- * @b TM    - Test Management @n
- * @b TRI   - TTCN-3 Runtime Interface @n
- * @b TSI   - Test System Interface @n
- * @b TTCN  - Testing and Test Control Notation
- * 
- */
-
-
-/**
  * @defgroup TTCN3InterfaceTypes TTCN-3 interface types
  * @{
  */
