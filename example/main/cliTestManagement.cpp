@@ -27,6 +27,7 @@ extern "C" {
 #include <iostream>
 #include <iomanip>
 #include <cstdlib>
+#include <cstdio>
 
 
 freettcn::example::CCLITestManagement::CCLITestManagement(CMainLoop &mainLoop):

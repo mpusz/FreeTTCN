@@ -32,6 +32,7 @@
 #include "freettcn/tools/exception.h"
 #include <sstream>
 #include <cstdlib>
+#include <cstdio>
 
 
 freettcn::TE::COctetstringType::COctetstringType():

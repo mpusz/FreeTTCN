@@ -34,6 +34,7 @@
 #include <freettcn/tools/timeStampMgrSeconds.h>
 #include <iostream>
 #include <getopt.h>
+#include <cstdio>
 
 
 using namespace std;

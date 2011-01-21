@@ -41,6 +41,7 @@ extern "C" {
 #include <iomanip>
 #include <cmath>
 #include <cstring>
+#include <cstdio>
 
 
 using namespace std;

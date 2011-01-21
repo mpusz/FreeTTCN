@@ -29,6 +29,7 @@
 #include "freettcn/tools/timeStampMgrSeconds.h"
 #include "freettcn/tools/exception.h"
 #include <cmath>
+#include <cstdio>
 #include <sys/time.h>
 
 
