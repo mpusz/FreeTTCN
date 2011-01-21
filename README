@@ -36,7 +36,16 @@ Chapter I - Basic information
 
 
 
-Chapter II - Compilation and instalation
+Chapter II - Dependencies
+-------------------------
+
+1. ANTLR C Runtime Distribution
+ 
+  Download ANTLR C Runtime Distribution from http://www.antlr.org/download/C,
+  compile and install.
+
+
+Chapter III - Compilation and instalation
 ----------------------------------------
 
 'freettcn' project compilation and instalation needs following steps:
@@ -49,7 +58,7 @@ Chapter II - Compilation and instalation
 
 
 
-Chapter III - TODO
+Chapter IV - TODO
 ------------------
 
 4 - 8.2.4 Flow graph representation of functions
