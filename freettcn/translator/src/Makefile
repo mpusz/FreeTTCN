@@ -17,33 +17,34 @@
 # along with this example; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-include ../../../Makefile.defines
+include Makefile.defines
 
 
 #
 # directories
 #
-GEN_DIR = ../gen
-BIN_DIR = ../bin
-TOOLS_DIR = ../../lib/include
+GEN_DIR   = $(LONG_DIR_NAME)/../gen
+BIN_DIR   = $(LONG_DIR_NAME)/../bin
+TOOLS_DIR = $(LONG_DIR_NAME)/../../lib/include
 
 
 #
 # files
 #
-CPP_FILES = ../../lib/tools/exception.cpp file.cpp location.cpp identifier.cpp \
-	     expression.cpp type.cpp logger.cpp dumper.cpp module.cpp translator.cpp main.cpp
+CPP_FILES = exception.cpp file.cpp location.cpp identifier.cpp expression.cpp \
+	type.cpp logger.cpp dumper.cpp module.cpp translator.cpp main.cpp
 
 
 #
 # defines
 #
-INCLUDE_DIRS = -I. -I$(GEN_DIR) -I$(TOOLS_DIR)
+INCLUDE_DIRS = -I$(LONG_DIR_NAME) -I$(GEN_DIR) -I$(TOOLS_DIR)
+
 
 
 # macros
 O_FILES = $(addprefix $(BIN_DIR)/, $(patsubst %.cpp,%.o,$(CPP_FILES)))
-DEPEND_FILES = $(patsubst %.cpp,%.d,$(CPP_FILES))
+DEPEND_FILES = $(addprefix $(BIN_DIR)/, $(patsubst %.cpp,%.d,$(CPP_FILES)))
 
 
 # files
@@ -77,9 +78,9 @@ classes:
 	$(Q)$(EBROWSE) -s *.h *.cpp
 
 # rules
-$(BIN_DIR)/%.o: %.cpp
+$(BIN_DIR)/%.o: $(LONG_DIR_NAME)/%.cpp
 	@$(call cmd,cmd_cc_d_o)
 
 
 # include depends files
--include $(CPP_FILES:.cpp=.d)
+-include $(addprefix $(BIN_DIR)/,$(CPP_FILES:.cpp=.d))

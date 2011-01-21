@@ -17,11 +17,12 @@
 # along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-include ../../../Makefile.defines
+include Makefile.defines
 
 
 # defines
-BIN_DIR = ../bin
+BIN_DIR = $(LONG_DIR_NAME)/../bin
+
 CPPFLAGS += -fPIC
 
 # files
@@ -33,4 +34,4 @@ CPP_FILES = teLogMask.cpp sourceData.cpp modulesContainer.cpp \
 	te.cpp idObject.cpp initObject.cpp module.cpp testCase.cpp testComponent.cpp behavior.cpp timer.cpp port.cpp template.cpp
 
 
-include ../../../Makefile.rules
+include Makefile.rules

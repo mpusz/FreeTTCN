@@ -18,23 +18,23 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-include ../../Makefile.defines
+include Makefile.defines
 
 
 #
 # directories
 #
-TE_DIR = te
-TOOLS_DIR = tools
-BUILD_DIRS = $(TOOLS_DIR) $(TE_DIR) 
+TE_DIR     = $(LONG_DIR_NAME)/te
+TOOLS_DIR  = $(LONG_DIR_NAME)/tools
+BIN_DIR    = $(LONG_DIR_NAME)/bin
 
-BIN_DIR = bin
+BUILD_DIRS = $(TOOLS_DIR) $(TE_DIR) 
 
 
 # libraries
 LIB_FILE_NAME = $(LIB_NAME)
 LIB_FULL_NAME = $(LIB_FILE_NAME).so.$(VERSION)
-INCLUDE_LIBS = $(addsuffix .a, $(addprefix lib, $(BUILD_DIRS)))
+INCLUDE_LIBS = $(addsuffix .a, $(addprefix lib, $(notdir $(BUILD_DIRS))))
 
 
 # targets
@@ -48,7 +48,7 @@ install:
 	@$(call cmd,cmd_lib_install)
 	@$(call cmd,cmd_h_install)
 	$(Q)$(INSTALL) -d $(H_INSTALL_DIR)/$(PROJECT_NAME)/ttcn3
-	$(Q)$(INSTALL) -p -m 644 $(LOCAL_FREETTCN_H_DIR)/ttcn3/*.h $(H_INSTALL_DIR)/$(PROJECT_NAME)/ttcn3
+	$(Q)$(INSTALL) -p -m 644 $(LONG_DIR_NAME)/$(LOCAL_FREETTCN_H_DIR)/ttcn3/*.h $(H_INSTALL_DIR)/$(PROJECT_NAME)/ttcn3
 
 clean:
 	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_clean,$(dir)))

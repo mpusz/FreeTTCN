@@ -17,17 +17,17 @@
 # along with this example; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-include ../Makefile.defines
+include Makefile.defines
 
 
 #
 # directories
 #
-MODULES_DIR = modules
-MAIN_DIR = main
-BUILD_DIRS = $(MODULES_DIR) $(MAIN_DIR)
+MODULES_DIR = $(LONG_DIR_NAME)/modules
+MAIN_DIR    = $(LONG_DIR_NAME)/main
+BIN_DIR     = $(LONG_DIR_NAME)/bin
 
-BIN_DIR = bin
+BUILD_DIRS = $(MODULES_DIR) $(MAIN_DIR)
 
 
 # targets

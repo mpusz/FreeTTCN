@@ -17,13 +17,13 @@
 # along with this example; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-include ../../Makefile.defines
+include Makefile.defines
 
 
 #
 # directories
 #
-BUILD_DIRS = $(MODULES)
+BUILD_DIRS = $(addprefix $(LONG_DIR_NAME)/, $(MODULES))
 
 
 # targets

@@ -17,10 +17,10 @@
 # along with this example; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-include ../../../Makefile.defines
+include Makefile.defines
 
 
-BIN_DIR = ../../bin
+BIN_DIR = $(LONG_DIR_NAME)/../../bin
 
 
 # files
@@ -29,9 +29,9 @@ CPP_FILES = icmp.cpp icmp_cd.cpp
 
 # macros
 O_FILES = $(addprefix $(BIN_DIR)/, $(patsubst %.cpp,%.o,$(CPP_FILES)))
-DEPEND_FILES = $(patsubst %.cpp,%.d,$(CPP_FILES))
+DEPEND_FILES = $(addprefix $(BIN_DIR)/, $(patsubst %.cpp,%.d,$(CPP_FILES)))
 
-INCLUDE_DIRS = -Iinclude
+INCLUDE_DIRS = -I$(LONG_DIR_NAME)/include
 
 
 # targets
@@ -51,7 +51,7 @@ tags:
 
 
 # rules
-$(BIN_DIR)/%.o: %.cpp
+$(BIN_DIR)/%.o: $(LONG_DIR_NAME)/%.cpp
 	@$(call cmd,cmd_cc_d_o)
 
 %.cpp: %.ttcn
@@ -59,4 +59,4 @@ $(BIN_DIR)/%.o: %.cpp
 
 
 # include depends files
--include $(CPP_FILES:.cpp=.d)
+-include $(addprefix $(BIN_DIR)/,$(CPP_FILES:.cpp=.d))

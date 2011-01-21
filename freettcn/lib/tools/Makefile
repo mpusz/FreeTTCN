@@ -17,15 +17,16 @@
 # along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-include ../../../Makefile.defines
+include Makefile.defines
 
 
 # defines
-BIN_DIR = ../bin
+BIN_DIR = $(LONG_DIR_NAME)/../bin
+
 CPPFLAGS += -fPIC
 
 # files
 CPP_FILES = exception.cpp tools.cpp ttcnWrappers.cpp timeStampMgr.cpp timeStampMgrSeconds.cpp entity.cpp logMask.cpp
 
 
-include ../../../Makefile.rules
+include Makefile.rules

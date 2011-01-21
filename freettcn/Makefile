@@ -18,14 +18,15 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-include ../Makefile.defines
+include Makefile.defines
 
 
 #
 # directories
 #
-TRANSLATOR_DIR = translator
-LIB_DIR = lib
+TRANSLATOR_DIR = $(LONG_DIR_NAME)/translator
+LIB_DIR        = $(LONG_DIR_NAME)/lib
+
 BUILD_DIRS = $(LIB_DIR) $(TRANSLATOR_DIR)
 
 

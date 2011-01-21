@@ -19,15 +19,16 @@
 
 
 # paths
+DIR_NAME = $(notdir $(LONG_DIR_NAME))
 LIB_PATH = $(BIN_DIR)/lib$(DIR_NAME).a
 
 # defines
-INCLUDE_DIRS = -I../include
+INCLUDE_DIRS = -I$(LONG_DIR_NAME)/../include
 
 # macros
-O_FILES = $(addprefix $(BIN_DIR)/, $(patsubst %.cpp,%.o,$(CPP_FILES)))
-DEPEND_FILES = $(patsubst %.cpp,%.d,$(CPP_FILES))
-LIB_PARTS = $(foreach file, $(CPP_FILES), $(LIB_PATH)($(patsubst %.cpp,%.o,$(file))))
+O_FILES = $(addprefix $(BIN_DIR), $(patsubst %.cpp,%.o,$(CPP_FILES)))
+DEPEND_FILES = $(addprefix $(BIN_DIR)/, $(patsubst %.cpp,%.d,$(CPP_FILES)))
+LIB_PARTS = $(foreach file, $(CPP_FILES), $(LIB_PATH)($(addprefix $(BIN_DIR)/, $(patsubst %.cpp,%.o,$(file)))))
 
 
 # targets
@@ -48,9 +49,9 @@ tags:
 # rules
 $(LIB_PATH): $(LIB_PARTS)
 
-(%.o): %.cpp
+($(BIN_DIR)/%.o): $(LONG_DIR_NAME)/%.cpp
 	@$(call cmd,cmd_cc_d_a)
 
 
 # include depends files
--include $(CPP_FILES:.cpp=.d)
+-include $(addprefix $(BIN_DIR)/,$(CPP_FILES:.cpp=.d))

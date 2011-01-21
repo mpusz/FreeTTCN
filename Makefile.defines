@@ -45,9 +45,9 @@ CPP = g++ -g -Wall
 AR = ar -c
 CD = cd
 CP = cp
+MKDIR = mkdir -p
 # LD = ld
-ANTLR = java -cp /downloads/APLIKACJE/Linux/ANTLR/antlr-3.1/lib/antlr-3.1.jar org.antlr.Tool
-#ANTLR = java -cp /downloads/APLIKACJE/Linux/ANTLR/antlr-2008-09-03.12/lib/antlr-2008-09-03.12.jar org.antlr.Tool
+ANTLR = java -cp /home/mpusz/Pobrane/ANTLR/antlr-3.3-complete.jar org.antlr.Tool
 RM = rm
 LN = ln
 SED = sed
@@ -69,9 +69,9 @@ LIB_INSTALL_DIR = /usr/local/lib
 H_INSTALL_DIR = /usr/local/include
 LOCAL_FREETTCN_H_DIR = include/$(PROJECT_NAME)
 
-# ifndef $(TOP_DIR)
-# TOP_DIR = .
-# endif
+ifndef $(TOP_DIR)
+TOP_DIR = .
+endif
 
 ifndef $(LONG_DIR_NAME)
 LONG_DIR_NAME = .
@@ -115,46 +115,48 @@ cmd = $(subst ;;,;,$(if $($(quiet)$(1)),$(ECHO) "$($(quiet)$(1))" &&) $($(1));)
 
 # temporary commands used below
 tmp_cmd_d    = $(CP) $*.d_ $*.d && \
-               $(SED) -e 's/\#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' -e '/^$$/ d' -e 's/$$/ :/' < $*.d_ >> $*.d && \
-	       $(RM) -f $*.d_
+               $(SED) -e 's/\#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' -e '/^$$/ d' -e 's/$$/ :/' < $*.d_ >> $*.d # && \
+#	       $(RM) -f $*.d_
 
 # start compilation
-quiet_cmd_make = MAKE $(LONG_DIR_NAME)/$(2)
-      cmd_make = $(MAKE) -C $(2) DIR_NAME=$(2) LONG_DIR_NAME=$(LONG_DIR_NAME)/$(2) all
+quiet_cmd_make = MAKE $(2)
+      cmd_make = $(MAKE) -f $(2)/Makefile LONG_DIR_NAME=$(2) all
 
 # start instalation
-quiet_cmd_make_install = MAKE_INSTALL $(LONG_DIR_NAME)/$(2)
-      cmd_make_install = $(MAKE) -C $(2) DIR_NAME=$(2) LONG_DIR_NAME=$(LONG_DIR_NAME)/$(2) install
+quiet_cmd_make_install = MAKE_INSTALL $(2)
+      cmd_make_install = $(MAKE) -f $(2)/Makefile LONG_DIR_NAME=$(2) install
 
 # make clean
-quiet_cmd_make_clean = MAKE_CLEAN $(LONG_DIR_NAME)/$(2)
-      cmd_make_clean = $(MAKE) -C $(2) DIR_NAME=$(2) LONG_DIR_NAME=$(LONG_DIR_NAME)/$(2) clean
+quiet_cmd_make_clean = MAKE_CLEAN $(2)
+      cmd_make_clean = $(MAKE) -f $(2)/Makefile LONG_DIR_NAME=$(2) clean
 
 # make distclean
-quiet_cmd_make_distclean = MAKE_DIST_CLEAN $(LONG_DIR_NAME)/$(2)
-      cmd_make_distclean = $(MAKE) -C $(2) DIR_NAME=$(2) LONG_DIR_NAME=$(LONG_DIR_NAME)/$(2) distclean
+quiet_cmd_make_distclean = MAKE_DIST_CLEAN $(2)
+      cmd_make_distclean = $(MAKE) -f $(2)/Makefile LONG_DIR_NAME=$(2) distclean
 
 # make tags
-quiet_cmd_make_tags = MAKE_TAGS $(LONG_DIR_NAME)/$(2)
-      cmd_make_tags = $(MAKE) -C $(2) DIR_NAME=$(2) LONG_DIR_NAME=$(LONG_DIR_NAME)/$(2) TAG_DIR=$(TAG_DIR) tags
+quiet_cmd_make_tags = MAKE_TAGS $(2)
+      cmd_make_tags = $(MAKE) -f $(2)/Makefile LONG_DIR_NAME=$(2) TAG_DIR=$(TAG_DIR) tags
 
 # make antlr
 quiet_cmd_antlr = ANTLR      $<
-      cmd_antlr = $(ANTLR) -message-format gnu -o $(GEN_DIR) $<
+      cmd_antlr = $(ANTLR) -message-format gnu -fo $(GEN_DIR) $<
 
 # compile source file, create depend file *.d, insert *.o file to library <bindir>\<dirname>.a
 quiet_cmd_cc_d_a = CC_D_A     $<
-      cmd_cc_d_a = $(CPP) $(CPPFLAGS) -MD -MF $*.d_ $(INCLUDE_DIRS) -c $< -o $(@D)/$% && \
-	           $(AR) -rs $@ $(@D)/$% && \
-                   $(RM) -f $(@D)/$% && \
-                   $(SED) -i 's,^\(.*\.o\):,$(LIB_PATH)(\1):,' $*.d_ && \
-                   $(tmp_cmd_d)
+      cmd_cc_d_a = $(MKDIR) $(@D) && \
+	           $(CPP) $(CPPFLAGS) -MD -MF $(@D)/$*.d $(INCLUDE_DIRS) -c $< -o $(@D)/$(%F) && \
+	           $(AR) -rs $@ $(@D)/$(%F) && \
+                   $(RM) -f $(@D)/$(%F) && \
+                   $(SED) -ri 's,^(.*\.o):,$(LIB_PATH)(\1):,' $(@D)/$*.d # && \
+#                   $(tmp_cmd_d)
 
 # compile source file, create depend file *.d
 quiet_cmd_cc_d_o = CC_D_O     $<
-      cmd_cc_d_o = $(CPP) -MD -MF $*.d_ $(INCLUDE_DIRS) -c $< -o $@ && \
-                   $(SED) -i 's,^\(.*\.o\):,\1:,' $*.d_ && \
-                   $(tmp_cmd_d)
+      cmd_cc_d_o = $(MKDIR) $(dir $@) && \
+	           $(CPP) -MD -MF $(dir $@)$*.d $(INCLUDE_DIRS) -c $< -o $@ # && \
+#                   $(SED) -r 's,^(.*\.o):,\\\1:,' $(dir $@)$*.d > $(dir $@)$*.d_ # && \
+#                   $(tmp_cmd_d)
 
 # translate source TTCN module file to *.cpp
 quiet_cmd_ttcn_cc = TTCN_CC    $<

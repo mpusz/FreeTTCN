@@ -18,18 +18,19 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-include ../../Makefile.defines
+include Makefile.defines
 
 #
 # directories
 #
-GEN_DIR = gen
-SRC_DIR = src
-TOOLS_DIR = ../lib/include
-BUILD_DIRS = $(SRC_DIR)
-DOC_DIR = doc
+GEN_DIR   = $(LONG_DIR_NAME)/gen
+SRC_DIR   = $(LONG_DIR_NAME)/src
+TOOLS_DIR = $(LONG_DIR_NAME)/../lib/include
+DOC_DIR   = $(LONG_DIR_NAME)/doc
+BIN_DIR   = $(LONG_DIR_NAME)/bin
 
-BIN_DIR = bin
+BUILD_DIRS = $(SRC_DIR)
+
 
 
 # files
@@ -40,7 +41,6 @@ LEXER_C_FILE := $(patsubst %.g,%Lexer.c,$(GRAMMAR_FILE))
 LEXER_H_FILE := $(patsubst %.g,%Lexer.h,$(GRAMMAR_FILE))
 C_FILES = $(PARSER_C_FILE) $(LEXER_C_FILE)
 GEN_FILES = $(C_FILES) $(PARSER_H_FILE) $(LEXER_H_FILE) $(patsubst %.g,%.tokens,$(GRAMMAR_FILE))
-GEN_FILES_PATH = $(addprefix $(GEN_DIR)/, $(GEN_FILES))
 
 
 #
@@ -51,7 +51,8 @@ INCLUDE_DIRS = -I$(GEN_DIR) -I$(SRC_DIR) -I$(TOOLS_DIR)
 
 # macros
 O_FILES = $(addprefix $(BIN_DIR)/, $(patsubst %.c,%.o,$(C_FILES)))
-DEPEND_FILES = $(patsubst %.c,%.d,$(C_FILES))
+DEPEND_FILES = $(addprefix $(BIN_DIR)/, $(patsubst %.c,%.d,$(C_FILES)))
+GEN_FILES_PATH = $(addprefix $(GEN_DIR)/, $(GEN_FILES))
 
 
 # targets
@@ -59,9 +60,10 @@ DEPEND_FILES = $(patsubst %.c,%.d,$(C_FILES))
 
 all: $(BIN_DIR)/$(TRANSLATOR_NAME)
 
-generate: $(GEN_DIR)/$(PARSER_C_FILE)
+generate: $(GEN_FILES_PATH)
 
 compile: $(O_FILES)
+	@$(LN) -sf ../../lib/tools/exception.cpp $(SRC_DIR)/exception.cpp
 	@$(call cmd,cmd_make,$(SRC_DIR))
 
 install:
@@ -69,7 +71,7 @@ install:
 
 clean:
 	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_clean,$(dir)))
-	$(Q)$(RM) -f $(O_FILES) $(DEPEND_FILES) $(GEN_FILES_PATH)
+	$(Q)$(RM) -f $(O_FILES) $(DEPEND_FILES) $(GEN_FILES_PATH) $(SRC_DIR)/exception.cpp
 
 distclean: clean
 	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_distclean,$(dir)))
@@ -89,7 +91,8 @@ doc:
 # rules
 $(BIN_DIR)/$(TRANSLATOR_NAME): generate compile
 
-$(GEN_DIR)/$(PARSER_C_FILE): $(GEN_DIR)/%Parser.c: %.g
+$(GEN_FILES_PATH): $(LONG_DIR_NAME)/$(GRAMMAR_FILE)
+#$(GEN_DIR)/$(PARSER_C_FILE): $(GEN_DIR)/%Parser.c: $(LONG_DIR_NAME)/%.g
 	@$(call cmd,cmd_antlr)
 
 $(BIN_DIR)/%.o: $(GEN_DIR)/%.c
@@ -97,4 +100,4 @@ $(BIN_DIR)/%.o: $(GEN_DIR)/%.c
 
 
 # include depends files
--include $(C_FILES:.c=.d)
+-include $(addprefix $(BIN_DIR)/,$(C_FILES:.c=.d))

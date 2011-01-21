@@ -18,27 +18,28 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-include ../Makefile.defines
+include Makefile.defines
 
 
 #
 # directories
 #
-TOOLS_DIR = tools
-PA_DIR = pa
-SA_DIR = sa
-CD_DIR = cd
-CH_DIR = ch
-TM_DIR = tm
-TL_DIR = tl
+TOOLS_DIR = $(LONG_DIR_NAME)/tools
+PA_DIR    = $(LONG_DIR_NAME)/pa
+SA_DIR    = $(LONG_DIR_NAME)/sa
+CD_DIR    = $(LONG_DIR_NAME)/cd
+CH_DIR    = $(LONG_DIR_NAME)/ch
+TM_DIR    = $(LONG_DIR_NAME)/tm
+TL_DIR    = $(LONG_DIR_NAME)/tl
+BIN_DIR   = $(LONG_DIR_NAME)/bin
+
 BUILD_DIRS = $(TOOLS_DIR) $(TM_DIR) $(PA_DIR) $(SA_DIR) $(CD_DIR) $(CH_DIR) $(TL_DIR)
 
-BIN_DIR = bin
 
 # libraries
 LIB_FILE_NAME = $(LIB_ENV_NAME)
 LIB_FULL_NAME = $(LIB_FILE_NAME).so.$(VERSION)
-INCLUDE_LIBS = $(addsuffix .a, $(addprefix lib, $(BUILD_DIRS)))
+INCLUDE_LIBS = $(addsuffix .a, $(addprefix lib, $(notdir $(BUILD_DIRS))))
 
 
 # targets

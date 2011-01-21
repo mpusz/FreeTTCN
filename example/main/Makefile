@@ -17,19 +17,18 @@
 # along with this example; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-include ../../Makefile.defines
+include Makefile.defines
 
+# defines
+BIN_DIR      = $(LONG_DIR_NAME)/../bin
+INCLUDE_DIRS = -I$(LONG_DIR_NAME)/include `pkg-config --cflags glib-2.0`
 
 # files
 CPP_FILES = cliTestManagement.cpp glibMainLoop.cpp glibPlatformAdaptor.cpp main.cpp
 
-# defines
-BIN_DIR = ../bin
-INCLUDE_DIRS = -Iinclude `pkg-config --cflags glib-2.0`
-
 # macros
 O_FILES = $(addprefix $(BIN_DIR)/, $(patsubst %.cpp,%.o,$(CPP_FILES)))
-DEPEND_FILES = $(patsubst %.cpp,%.d,$(CPP_FILES))
+DEPEND_FILES = $(addprefix $(BIN_DIR)/, $(patsubst %.cpp,%.d,$(CPP_FILES)))
 
 # modules
 MODULES_O_FILES = $(addprefix $(BIN_DIR)/, $(foreach mod,$(MODULES),$(mod).o $(mod)_cd.o))
@@ -54,8 +53,8 @@ tags:
 
 
 # rules
-$(BIN_DIR)/%.o: %.cpp
+$(BIN_DIR)/%.o: $(LONG_DIR_NAME)/%.cpp
 	@$(call cmd,cmd_cc_d_o)
 
 # include depends files
--include $(CPP_FILES:.cpp=.d)
+-include $(addprefix $(BIN_DIR)/,$(CPP_FILES:.cpp=.d))

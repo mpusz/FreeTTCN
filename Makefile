@@ -39,9 +39,9 @@ help:
 	@$(ECHO) ""
 	@$(ECHO) " - make distclean              (optional)'"
 	@$(ECHO) " - make freettcn"
-	@$(ECHO) " - su -c 'make freettcn_install'"
+	@$(ECHO) " - sudo make freettcn_install"
 	@$(ECHO) " - make env                    (optional)"
-	@$(ECHO) " - su -c 'make env_install'    (optional)"
+	@$(ECHO) " - sudo make env_install       (optional)"
 	@$(ECHO) " - make example                (optional)"
 	@$(ECHO) ""
 
