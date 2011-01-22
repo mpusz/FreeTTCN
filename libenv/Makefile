@@ -42,6 +42,10 @@ LIB_FULL_NAME = $(LIB_FILE_NAME).so.$(VERSION)
 INCLUDE_LIBS = $(addsuffix .a, $(addprefix lib, $(notdir $(BUILD_DIRS))))
 
 
+# macros
+HEADER_FILES = $(LONG_DIR_NAME)/$(LOCAL_FREETTCN_H_DIR)/*/*.h
+
+
 # targets
 .PHONY: all install clean distclean tags
 

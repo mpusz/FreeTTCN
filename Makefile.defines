@@ -54,7 +54,7 @@ SED = sed
 ECHO = echo
 TOUCH = touch
 TAGS = etags --declarations #--members
-EBROWSE = ebrowse
+EBROWSE = ebrowse -s
 INSTALL = install
 LDCONFIG = ldconfig
 DOXYGEN = doxygen
@@ -202,8 +202,12 @@ quiet_cmd_dist = MAKE_DIST
 
 # tags for *.cpp files
 quiet_cmd_tags_cpp = TAGS_CPP
-      cmd_tags_cpp = $(TAGS) --append --output=$(TAG_DIR)/TAGS $(CPP_FILES)
+      cmd_tags_cpp = $(TAGS) --append --output=$(TAG_DIR)/TAGS $(addprefix $(LONG_DIR_NAME)/, $(CPP_FILES))
 
 # tags for *.h files
 quiet_cmd_tags_h = TAGS_H
-      cmd_tags_h = $(TAGS) --append --output=$(TAG_DIR)/TAGS $(LOCAL_FREETTCN_H_DIR)/*/*.h
+      cmd_tags_h = $(TAGS) --append --output=$(TAG_DIR)/TAGS $(HEADER_FILES)
+
+# EBROWSE
+quiet_cmd_ebrowse = EBROWSE
+      cmd_ebrowse = $(EBROWSE) `find . -name *\\\.[ch] -or -name *\\\.cpp`

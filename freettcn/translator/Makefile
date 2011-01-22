@@ -56,14 +56,13 @@ GEN_FILES_PATH = $(addprefix $(GEN_DIR)/, $(GEN_FILES))
 
 
 # targets
-.PHONY: all install clean distclean tags doc
+.PHONY: all install clean distclean tags doc linktools
 
 all: $(BIN_DIR)/$(TRANSLATOR_NAME)
 
 generate: $(GEN_FILES_PATH)
 
-compile: $(O_FILES)
-	@$(LN) -sf ../../lib/tools/exception.cpp $(SRC_DIR)/exception.cpp
+compile: $(O_FILES) linktools
 	@$(call cmd,cmd_make,$(SRC_DIR))
 
 install:
@@ -79,14 +78,15 @@ distclean: clean
 	$(Q)$(RM) -f $(GEN_DIR)/*~
 	$(Q)$(RM) -rf $(DOC_DIR)/html
 
-tags:
-	@$(call cmd,cmd_tags_h)
+tags: linktools
 	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_tags,$(dir)))
 
 doc:
 	$(Q)$(SED) -i -e 's/\(PROJECT_NUMBER.*=\).*/\1 $(VERSION)/' doc/Doxyfile
 	$(Q)$(DOXYGEN) $(DOC_DIR)/Doxyfile
 
+linktools:
+	@$(LN) -sf ../../lib/tools/exception.cpp $(SRC_DIR)/exception.cpp
 
 # rules
 $(BIN_DIR)/$(TRANSLATOR_NAME): generate compile

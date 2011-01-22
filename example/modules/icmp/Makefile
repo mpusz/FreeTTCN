@@ -30,6 +30,7 @@ CPP_FILES = icmp.cpp icmp_cd.cpp
 # macros
 O_FILES = $(addprefix $(BIN_DIR)/, $(patsubst %.cpp,%.o,$(CPP_FILES)))
 DEPEND_FILES = $(addprefix $(BIN_DIR)/, $(patsubst %.cpp,%.d,$(CPP_FILES)))
+HEADER_FILES = $(LONG_DIR_NAME)/include/*.h
 
 INCLUDE_DIRS = -I$(LONG_DIR_NAME)/include
 
@@ -46,8 +47,8 @@ distclean: clean
 	$(Q)$(RM) -f *~ include/*~
 
 tags:
+	@$(call cmd,cmd_tags_h)
 	@$(call cmd,cmd_tags_cpp)
-	@$(TAGS) --append --output=$(TAG_DIR)/TAGS include/*.h
 
 
 # rules

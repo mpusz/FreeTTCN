@@ -29,6 +29,7 @@ CPP_FILES = cliTestManagement.cpp glibMainLoop.cpp glibPlatformAdaptor.cpp main.
 # macros
 O_FILES = $(addprefix $(BIN_DIR)/, $(patsubst %.cpp,%.o,$(CPP_FILES)))
 DEPEND_FILES = $(addprefix $(BIN_DIR)/, $(patsubst %.cpp,%.d,$(CPP_FILES)))
+HEADER_FILES = $(LONG_DIR_NAME)/include/*.h
 
 # modules
 MODULES_O_FILES = $(addprefix $(BIN_DIR)/, $(foreach mod,$(MODULES),$(mod).o $(mod)_cd.o))
@@ -49,6 +50,7 @@ distclean: clean
 	$(Q)$(RM) -f *~ include/*~
 
 tags:
+	@$(call cmd,cmd_tags_h)
 	@$(call cmd,cmd_tags_cpp)
 
 

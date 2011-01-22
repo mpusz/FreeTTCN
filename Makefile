@@ -86,6 +86,7 @@ all: freettcn freettcn_install env env_install example
 tags:
 	$(Q)$(RM) -f TAGS
 	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_tags,$(dir)))
+	@$(call cmd,cmd_ebrowse)
 
 classes:
 	$(Q)$(EBROWSE) -s freettcn/lib/include/freettcn/*/*.h freettcn/lib/*/*.cpp libenv/include/freettcn/*/*.h example/*/*.cpp #libenv/*/*.cpp

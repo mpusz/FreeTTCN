@@ -74,9 +74,6 @@ distclean: clean
 tags:
 	@$(call cmd,cmd_tags_cpp)
 
-classes:
-	$(Q)$(EBROWSE) -s *.h *.cpp
-
 # rules
 $(BIN_DIR)/%.o: $(LONG_DIR_NAME)/%.cpp
 	@$(call cmd,cmd_cc_d_o)
