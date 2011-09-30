@@ -41,7 +41,7 @@ MODULES = icmp
 # tools
 #
 MAKE = make
-CPP = g++ -g -Wall
+CPP = g++ -g -Wall -std=c++0x
 AR = ar -c
 CD = cd
 CP = cp
