@@ -191,8 +191,8 @@ quiet_cmd_lib_install = INSTALL $(LIB_FULL_NAME)
 
 # header install
 quiet_cmd_h_install = INSTALL_H
-      cmd_h_install = $(INSTALL) -d $(addprefix $(H_INSTALL_DIR)/$(PROJECT_NAME)/, $(BUILD_DIRS)) && \
-                      $(foreach dir, $(BUILD_DIRS), $(INSTALL) -p -m 644 $(LOCAL_FREETTCN_H_DIR)/$(dir)/*.h $(H_INSTALL_DIR)/$(PROJECT_NAME)/$(dir);)
+      cmd_h_install = $(INSTALL) -d $(addprefix $(H_INSTALL_DIR)/$(PROJECT_NAME)/, $(notdir $(BUILD_DIRS))) && \
+                      $(foreach dir, $(notdir $(BUILD_DIRS)), $(INSTALL) -p -m 644 $(LONG_DIR_NAME)/$(LOCAL_FREETTCN_H_DIR)/$(dir)/*.h $(H_INSTALL_DIR)/$(PROJECT_NAME)/$(dir);)
 
 # make distribution
 quiet_cmd_dist = MAKE_DIST
