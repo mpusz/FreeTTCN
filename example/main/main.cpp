@@ -20,6 +20,7 @@
 
 #include "glibMainLoop.h"
 #include "glibPlatformAdaptor.h"
+
 #include "../modules/icmp/include/icmp_cd.h"
 
 #include <freettcn/tl/tl.h>
@@ -32,13 +33,25 @@
 #include <freettcn/te/module.h>
 #include <freettcn/te/modulesContainer.h>
 #include <freettcn/tools/timeStampMgrSeconds.h>
+
 #include <iostream>
 #include <getopt.h>
 #include <cstdio>
 
 
+namespace freettcn {
 
-void Usage()
+  namespace example {
+
+    void Usage();
+    void Start(CCLITestManagement &tm, const std::string &testCase);
+
+  } // namespace example
+
+} // namespace freettcn
+
+
+void freettcn::example::Usage()
 {
   using namespace std;
   cout << "Usage:" << endl;
@@ -70,34 +83,34 @@ void Usage()
 }
 
 
-void Start(freettcn::example::CCLITestManagement &tm, const std::string &testCase)
+void freettcn::example::Start(CCLITestManagement &tm, const std::string &testCase)
 {
   // set module parameters
   tm.ParametersSet();
   
   // init timestamping
-  freettcn::CTimeStampMgrSeconds ts(4);
+  CTimeStampMgrSeconds ts(4);
   
   // init logger
-  freettcn::TL::CLogger logger(ts);
+  TL::CLogger logger(ts);
     
   // get TE
-  freettcn::TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
+  TE::CTTCNExecutable &te = freettcn::TE::CTTCNExecutable::Instance();
     
   // initiate all entities
-  freettcn::CH::CComponentHandler ch;
-  freettcn::CD::CCodingDecoding cd;
-  freettcn::example::CGlibPlatformAdaptor pa;
-  freettcn::SA::CSUTAdaptor sa;
-  freettcn::TL::CTestLogging tl(logger);
+  CH::CComponentHandler ch;
+  CD::CCodingDecoding cd;
+  CGlibPlatformAdaptor pa;
+  SA::CSUTAdaptor sa;
+  TL::CTestLogging tl(logger);
     
   // create log masks for all entities
-  freettcn::TE::CLogMask teLogMask(true);
-  freettcn::TM::CLogMask tmLogMask(true);
-  freettcn::CH::CLogMask chLogMask(true);
-  freettcn::CD::CLogMask cdLogMask(true);
-  freettcn::PA::CLogMask paLogMask(true);
-  freettcn::SA::CLogMask saLogMask(true);
+  TE::CLogMask teLogMask(true);
+  TM::CLogMask tmLogMask(true);
+  CH::CLogMask chLogMask(true);
+  CD::CLogMask cdLogMask(true);
+  PA::CLogMask paLogMask(true);
+  SA::CLogMask saLogMask(true);
     
   // set logging in all entities
   te.LogEnable(ts, teLogMask);
@@ -108,7 +121,7 @@ void Start(freettcn::example::CCLITestManagement &tm, const std::string &testCas
   sa.LogEnable(ts, saLogMask);
   
   // register module specific codecs
-  freettcn::icmp::CCodec *icmpCodec = new freettcn::icmp::CCodec;
+  icmp::CCodec *icmpCodec = new freettcn::icmp::CCodec;
   cd.Register(icmpCodec);
   
   // run
@@ -122,9 +135,9 @@ void Start(freettcn::example::CCLITestManagement &tm, const std::string &testCas
       tm.TestCaseStart(testCase, parameterlist);
       //      tm.TestCaseStop();
     }
-    catch(freettcn::Exception &) {
-      std::cout << "Error: Could not init test case '" << testCase << "'" << std::endl;
-      exit(0);
+    catch(Exception &) {
+      std::cerr << "Error: Could not init test case '" << testCase << "'" << std::endl;
+      exit(EXIT_SUCCESS);
     }
   }
   else {
@@ -190,33 +203,33 @@ int main (int argc, char **argv)
     }
   }
   if (optind < argc) {
-    std::cout << "Error: Non-option ARGV-elements: ";
+    std::cerr << "Error: Non-option ARGV-elements: ";
     while (optind < argc)
-      std::cout << argv[optind++] << " ";
-    std::cout << std::endl;
+      std::cerr << argv[optind++] << " ";
+    std::cerr << std::endl;
     
-    exit(0);
+    exit(EXIT_SUCCESS);
   }
   
   if (help) {
-    Usage();
-    exit(0);
+    freettcn::example::Usage();
+    exit(EXIT_SUCCESS);
   }
   
   if (list && module == "") {
     // list modules
     freettcn::TE::CModulesContainer &modules = freettcn::TE::CModulesContainer::Instance();
     const freettcn::TE::CModulesContainer::CModuleList &list = modules.List();
+
+    for(auto &m : list)
+      std::cout << " - " << m->Id().moduleName << std::endl;
     
-    for(freettcn::TE::CModulesContainer::CModuleList::const_iterator it=list.begin(); it != list.end(); ++it)
-      std::cout << " - " << (*it)->Id().moduleName << std::endl;
-    
-    exit(0);
+    exit(EXIT_SUCCESS);
   }
   
   if (module == "") {
-    std::cout << "Error: Module name not given" << std::endl;
-    exit(0);
+    std::cerr << "Error: Module name not given" << std::endl;
+    exit(EXIT_SUCCESS);
   }
   
   // init test management
@@ -228,14 +241,14 @@ int main (int argc, char **argv)
     tm.Init(module.c_str());
   }
   catch(freettcn::Exception &) {
-    std::cout << "Error: Could not init module '" << module << "'" << std::endl;
-    exit(0);
+    std::cerr << "Error: Could not init module '" << module << "'" << std::endl;
+    exit(EXIT_SUCCESS);
   }
   
   if (list) {
     // list test cases
     tm.TestCasesPrint();
-    exit(0);
+    exit(EXIT_SUCCESS);
   }
 
   if (info) {
@@ -248,21 +261,23 @@ int main (int argc, char **argv)
         tm.TestCasesInfoPrint(testCase);
       }
       catch(freettcn::Exception &) {
-        std::cout << "Error: Could not init test case '" << testCase << "'" << std::endl;
+        std::cerr << "Error: Could not init test case '" << testCase << "'" << std::endl;
       }      
     }
     
-    exit(0);
+    exit(EXIT_SUCCESS);
   }
   
   try {
     // start TTCN module
-    Start(tm, testCase);
+    freettcn::example::Start(tm, testCase);
   }
   catch(freettcn::Exception &ex) {
-    std::cout << "Error: Unhandled freettcn library exception: " << ex.what() << " caught!!!" << std::endl;
+    std::cerr << "Error: Unhandled freettcn library exception: " << ex.what() << " caught!!!" << std::endl;
   }
   catch(std::exception &ex) {
-    std::cout << "Error: Unhandled system exception: " << ex.what() << " caught!!!" << std::endl;
+    std::cerr << "Error: Unhandled system exception: " << ex.what() << " caught!!!" << std::endl;
   }
+  
+  exit(EXIT_SUCCESS);
 }
