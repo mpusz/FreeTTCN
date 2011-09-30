@@ -96,7 +96,7 @@ void freettcn::TE::CTTCNExecutable::RootModule(String moduleId)
     // init module
     _rootModule->Init();
   }
-  catch(freettcn::ENotFound) {
+  catch(freettcn::ENotFound &) {
     std::string str;
     str = "TTCN Module '";
     str += moduleId;

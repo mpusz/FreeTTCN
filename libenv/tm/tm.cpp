@@ -256,7 +256,7 @@ void freettcn::TM::CTestManagement::Abort()
       else
         ControlStop();
     }
-  } catch(EOperationFailed) {
+  } catch(EOperationFailed &) {
     std::cout << "ERROR: " << __FUNCTION__ << " problem!!!" << std::endl;
   }
 }

@@ -122,7 +122,7 @@ void Start(freettcn::example::CCLITestManagement &tm, const std::string &testCas
       tm.TestCaseStart(testCase, parameterlist);
       //      tm.TestCaseStop();
     }
-    catch(freettcn::Exception) {
+    catch(freettcn::Exception &) {
       std::cout << "Error: Could not init test case '" << testCase << "'" << std::endl;
       exit(0);
     }
@@ -227,7 +227,7 @@ int main (int argc, char **argv)
     // init module
     tm.Init(module.c_str());
   }
-  catch(freettcn::Exception) {
+  catch(freettcn::Exception &) {
     std::cout << "Error: Could not init module '" << module << "'" << std::endl;
     exit(0);
   }
@@ -247,7 +247,7 @@ int main (int argc, char **argv)
       try {
         tm.TestCasesInfoPrint(testCase);
       }
-      catch(freettcn::Exception) {
+      catch(freettcn::Exception &) {
         std::cout << "Error: Could not init test case '" << testCase << "'" << std::endl;
       }      
     }
@@ -262,7 +262,7 @@ int main (int argc, char **argv)
   catch(freettcn::Exception &ex) {
     std::cout << "Error: Unhandled freettcn library exception: " << ex.what() << " caught!!!" << std::endl;
   }
-  catch(exception &ex) {
+  catch(std::exception &ex) {
     std::cout << "Error: Unhandled system exception: " << ex.what() << " caught!!!" << std::endl;
   }
 }

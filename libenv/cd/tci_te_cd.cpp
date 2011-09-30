@@ -76,7 +76,7 @@ BinaryString tciEncode(Value value)
 //       tciAppendRecOfFieldValue(recordOfValue, integer.TciValueCreate());
 //     }
 //   }
-//   catch(freettcn::CBuffer::EBufferTooShort) {
+//   catch(freettcn::CBuffer::EBufferTooShort &) {
 //     // error
 //   }
 // //   tliDecode(String am,

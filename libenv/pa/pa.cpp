@@ -135,7 +135,7 @@ TriStatus freettcn::PA::CPlatformAdaptor::TimerStop(const TriTimerId *timerId)
 
     return TRI_OK;
   }
-  catch(freettcn::Exception) {
+  catch(freettcn::Exception &) {
     return TRI_ERROR;
   }
 }
@@ -160,7 +160,7 @@ TriStatus freettcn::PA::CPlatformAdaptor::TimerRead(const TriTimerId* timerId, T
     
     return TRI_OK;
   }
-  catch(freettcn::Exception) {
+  catch(freettcn::Exception &) {
     return TRI_ERROR;
   }
 }
@@ -183,7 +183,7 @@ TriStatus freettcn::PA::CPlatformAdaptor::TimerRunning(const TriTimerId* timerId
       tliTRunning(0, TimeStampMgr().Get(), 0, 0, comp, *timerId, *running ? runningT : expiredT);
     }
   }
-  catch(freettcn::Exception) {
+  catch(freettcn::Exception &) {
     return TRI_ERROR;
   }
   

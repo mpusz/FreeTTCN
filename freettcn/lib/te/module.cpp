@@ -418,7 +418,7 @@ freettcn::TE::CTestComponentType::CInstanceLocal &freettcn::TE::CModule::TestCom
     freettcn::TE::CIdObject &object = CIdObject::Get(component.compInst);
     return dynamic_cast<freettcn::TE::CTestComponentType::CInstanceLocal &>(object);
   }
-  catch(Exception) {
+  catch(Exception &) {
     throw;
   }
   catch(std::exception &ex) {
@@ -665,13 +665,13 @@ void freettcn::TE::CModule::Connect(const TriPortId &fromPort, const TriPortId &
     TestComponent(fromPort.compInst).Port(fromPort.portName, fromPort.portIndex).Connect(toPort);
     count++;
   }
-  catch(ENotFound) {
+  catch(ENotFound &) {
   }
   try {
     TestComponent(toPort.compInst).Port(toPort.portName, toPort.portIndex).Connect(fromPort);
     count++;
   }
-  catch(ENotFound) {
+  catch(ENotFound &) {
   }
   if (count < 1)
     throw ENotFound(E_DATA, "Ports to connect not found!!!");
@@ -685,13 +685,13 @@ void freettcn::TE::CModule::Disconnect(const TriPortId &fromPort, const TriPortI
     TestComponent(fromPort.compInst).Port(fromPort.portName, fromPort.portIndex).Disconnect(toPort);
     count++;
   }
-  catch(ENotFound) {
+  catch(ENotFound &) {
   }
   try {
     TestComponent(toPort.compInst).Port(toPort.portName, toPort.portIndex).Disconnect(fromPort);
     count++;
   }
-  catch(ENotFound) {
+  catch(ENotFound &) {
   }
   if (count < 1)
     throw ENotFound(E_DATA, "Ports to disconnect not found!!!");
@@ -704,13 +704,13 @@ void freettcn::TE::CModule::Map(const TriPortId &fromPort, const TriPortId &toPo
     TestComponent(fromPort.compInst).Port(fromPort.portName, fromPort.portIndex).Map(toPort);
     count++;
   }
-  catch(ENotFound) {
+  catch(ENotFound &) {
   }
   try {
     TestComponent(toPort.compInst).Port(toPort.portName, toPort.portIndex).Map(fromPort);
     count++;
   }
-  catch(ENotFound) {
+  catch(ENotFound &) {
   }
   if (count < 1)
     throw ENotFound(E_DATA, "Ports to map not found!!!");
@@ -726,13 +726,13 @@ void freettcn::TE::CModule::Unmap(const TriPortId &fromPort, const TriPortId &to
     TestComponent(fromPort.compInst).Port(fromPort.portName, fromPort.portIndex).Unmap(toPort);
     count++;
   }
-  catch(ENotFound) {
+  catch(ENotFound &) {
   }
   try {
     TestComponent(toPort.compInst).Port(toPort.portName, toPort.portIndex).Unmap(fromPort);
     count++;
   }
-  catch(ENotFound) {
+  catch(ENotFound &) {
   }
   if (count < 1)
     throw ENotFound(E_DATA, "Ports to unmap not found!!!");

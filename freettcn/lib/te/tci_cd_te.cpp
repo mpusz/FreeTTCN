@@ -88,7 +88,7 @@ Type tciGetTypeForName(String typeName)
       
       return const_cast<void *>(static_cast<const void *>(&type));
     }
-    catch(freettcn::ENotFound) {
+    catch(freettcn::ENotFound &) {
       delete moduleId;
     }
   }

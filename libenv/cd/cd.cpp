@@ -159,7 +159,7 @@ const Value &freettcn::CD::CCodingDecoding::Decode(const BinaryString &message, 
 //       return 0;
 //     }
 //   }
-//   catch(freettcn::CD::EDecodeFailure) {
+//   catch(freettcn::CD::EDecodeFailure &) {
 // //   tliDecode(String am,
 // //             int ts,
 // //             String src,
@@ -172,7 +172,7 @@ const Value &freettcn::CD::CCodingDecoding::Decode(const BinaryString &message, 
     
 //     return 0;
 //   }
-//   catch(freettcn::EOperationFailed) {
+//   catch(freettcn::EOperationFailed &) {
 // //   tliDecode(String am,
 // //             int ts,
 // //             String src,
