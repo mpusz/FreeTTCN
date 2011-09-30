@@ -44,8 +44,6 @@ extern "C" {
 #include <cstdio>
 
 
-using namespace std;
-
 
 freettcn::TL::CLogger::CData::CData(int ts, const char *src, int line, const char *am, freettcn::CEntity::TType entity, unsigned short logIdx, const char *title):
   _ts(ts), _src(src ? src : ""), _line(line), _am(am ? am : ""), _entity(entity), _logIdx(logIdx), _title(title)
@@ -135,6 +133,8 @@ freettcn::CTimeStampMgr &freettcn::TL::CLogger::TimeStampMgr() const
 
 void freettcn::TL::CLogger::Push(const freettcn::TL::CLogger::CData *data)
 {
+  using namespace std;
+
   const unsigned short width = 15;
   const char *entityStr[] = {
     "TE",

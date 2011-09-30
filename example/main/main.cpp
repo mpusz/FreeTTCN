@@ -37,37 +37,36 @@
 #include <cstdio>
 
 
-using namespace std;
-
 
 void Usage()
 {
-  std::cout << "Usage:" << std::endl;
-  std::cout << " -m, --module      Select module" << std::endl;
-  std::cout << " -t, --testcase    Select testcase of specified module" << std::endl;
-  std::cout << " -l, --list        List modules/testcases" << std::endl;
-  std::cout << " -i, --info        Print module/testcase information" << std::endl;
-  std::cout << " -h, --help        Print that usage" << std::endl;
-  std::cout << "" << std::endl;
-  std::cout << "" << std::endl;
-  std::cout << "Examples:" << std::endl;
-  std::cout << " - list modules:" << std::endl;
-  std::cout << "    ./ttcn_example -l" << std::endl;
-  std::cout << "" << std::endl;
-  std::cout << " - print specified module information:" << std::endl;
-  std::cout << "    ./ttcn_example -m <module_name> -i" << std::endl;
-  std::cout << "" << std::endl;
-  std::cout << " - run control part of specified module:" << std::endl;
-  std::cout << "    ./ttcn_example -m <module_name>" << std::endl;
-  std::cout << "" << std::endl;
-  std::cout << " - list test cases of specified module:" << std::endl;
-  std::cout << "    ./ttcn_example -m <module_name> -l" << std::endl;
-  std::cout << "" << std::endl;
-  std::cout << " - print specified test case information:" << std::endl;
-  std::cout << "    ./ttcn_example -m <module_name> -t <testcase_id> -i" << std::endl;
-  std::cout << "" << std::endl;
-  std::cout << " - run specified test case:" << std::endl;
-  std::cout << "    ./ttcn_example -m <module_name> -t <testcase_id>" << std::endl;
+  using namespace std;
+  cout << "Usage:" << endl;
+  cout << " -m, --module      Select module" << endl;
+  cout << " -t, --testcase    Select testcase of specified module" << endl;
+  cout << " -l, --list        List modules/testcases" << endl;
+  cout << " -i, --info        Print module/testcase information" << endl;
+  cout << " -h, --help        Print that usage" << endl;
+  cout << endl;
+  cout << endl;
+  cout << "Examples:" << endl;
+  cout << " - list modules:" << endl;
+  cout << "    ./ttcn_example -l" << endl;
+  cout << endl;
+  cout << " - print specified module information:" << endl;
+  cout << "    ./ttcn_example -m <module_name> -i" << endl;
+  cout << endl;
+  cout << " - run control part of specified module:" << endl;
+  cout << "    ./ttcn_example -m <module_name>" << endl;
+  cout << endl;
+  cout << " - list test cases of specified module:" << endl;
+  cout << "    ./ttcn_example -m <module_name> -l" << endl;
+  cout << endl;
+  cout << " - print specified test case information:" << endl;
+  cout << "    ./ttcn_example -m <module_name> -t <testcase_id> -i" << endl;
+  cout << endl;
+  cout << " - run specified test case:" << endl;
+  cout << "    ./ttcn_example -m <module_name> -t <testcase_id>" << endl;
 }
 
 
