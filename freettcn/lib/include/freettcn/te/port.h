@@ -96,10 +96,10 @@ namespace freettcn {
         STOPPED
       };
       
-      class CMessage {
-        const TriComponentId &sender;
-        const CType::CInstance &value;
-      };
+      // class CMessage {
+      //   const TriComponentId &sender;
+      //   const CType::CInstance &value;
+      // };
       
     private:
       typedef std::list<const TriPortId *> CConnectionList;

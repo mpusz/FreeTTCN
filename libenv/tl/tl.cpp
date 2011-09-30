@@ -149,7 +149,7 @@ void freettcn::TL::CLogger::Push(const freettcn::TL::CLogger::CData *data)
   
   ostring.setf(ios::left, ios::adjustfield);
   ostring << "[" << TimeStampMgr().String(data->TimeStamp()) << "][" << entityStr[data->Entity()] << "] " << data->Title() << ":" << endl;
-  if (data->Source() != "") {
+  if (!data->Source().empty()) {
     ostring << "  - " << setw(width) << "Source" << ": " << data->Source() << ":" << data->SourceLine() << endl;
   }
   for(unsigned short i=0; i<data->LineNum(); i++)
@@ -231,7 +231,7 @@ const char *freettcn::TL::CTestLogging::TriComponentId2String(const TriComponent
   char str1[256];
   char str2[256];
   
-  if (strcmp(comp.compName, ""))
+  if (comp.compName[0])
     sprintf(str2, " '%s'", comp.compName);
   else
     str2[0] = 0;
