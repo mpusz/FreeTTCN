@@ -46,7 +46,7 @@ extern "C" {
 
 
 freettcn::TL::CLogger::CData::CData(int ts, const char *src, int line, const char *am, freettcn::CEntity::TType entity, unsigned short logIdx, const char *title):
-  _ts(ts), _src(src ? src : ""), _line(line), _am(am ? am : ""), _entity(entity), _logIdx(logIdx), _title(title)
+  _ts(ts), _src(src ? src : nullptr), _line(line), _am(am ? am : nullptr), _entity(entity), _logIdx(logIdx), _title(title)
 {
 }
 
@@ -220,7 +220,7 @@ const char *freettcn::TL::CTestLogging::InstanceId2String(const BinaryString &in
   
   if (inst.bits)
     for(int i=0; i<inst.bits / 8; i++)
-      sprintf(str, "%s%s%02x", str, i ? "" : "0x", static_cast<unsigned short>(inst.data[i]));
+      sprintf(str, "%s%s%02x", str, i ? nullptr : "0x", static_cast<unsigned short>(inst.data[i]));
   
   return str;
 }

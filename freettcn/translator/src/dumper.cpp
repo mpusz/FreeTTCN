@@ -69,10 +69,10 @@ void freettcn::translator::CDumper::Header()
   PrintLine("#include <freettcn/te/timer.h>");
   PrintLine("#include <freettcn/te/basicTypes.h>");
   PrintLine("#include <freettcn/te/sourceData.h>");
-  PrintLine("");
-  PrintLine("");
+  PrintLine(nullptr);
+  PrintLine(nullptr);
   PrintLine("#define MY_CAST         dynamic_cast");
-  PrintLine("");
+  PrintLine(nullptr);
   PrintLine("namespace freettcn {");
   IndentIncr();
 }
@@ -81,6 +81,6 @@ void freettcn::translator::CDumper::Header()
 void freettcn::translator::CDumper::Footer()
 {
   IndentDecr();
-  PrintLine("");
+  PrintLine(nullptr);
   PrintLine("} // namespace freettcn");
 }

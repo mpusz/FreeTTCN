@@ -33,7 +33,7 @@
 
 
 freettcn::TE::CBooleanType::CBooleanType() :
-  CType(0, "boolean", TCI_BOOLEAN_TYPE, "", "", "")
+  CType(0, "boolean", TCI_BOOLEAN_TYPE, nullptr, nullptr, nullptr)
 {
 }
 

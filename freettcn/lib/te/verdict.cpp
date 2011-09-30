@@ -33,7 +33,7 @@
 
 
 freettcn::TE::CVerdictType::CVerdictType():
-  CType(0, "verdicttype", TCI_VERDICT_TYPE, "", "", "")
+  CType(0, "verdicttype", TCI_VERDICT_TYPE, nullptr, nullptr, nullptr)
 {
 }
 

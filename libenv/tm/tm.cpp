@@ -288,9 +288,9 @@ void freettcn::TM::CTestManagement::TestCaseStarted(const TciTestCaseIdType &tes
   
   if (Logging() && LogMask().Get(freettcn::CLogMask::CMD_TM_TC_STARTED)) {
     TriComponentId comp = { { 0 } };
-    comp.compName = "";
-    comp.compType.moduleName = "";
-    comp.compType.objectName = "";
+    comp.compName = nullptr;
+    comp.compType.moduleName = nullptr;
+    comp.compType.objectName = nullptr;
 
     TciParameterListType parList(parameterList);
     tliTcStarted(0, TimeStampMgr().Get(), 0, 0, comp, testCaseId, parList, timer);
@@ -303,9 +303,9 @@ void freettcn::TM::CTestManagement::TestCaseTerminated(const VerdictValue &verdi
   if (_tc) {
     if (Logging() && LogMask().Get(freettcn::CLogMask::CMD_TM_TC_TERMINATED)) {
       TriComponentId comp = { { 0 } };
-      comp.compName = "";
-      comp.compType.moduleName = "";
-      comp.compType.objectName = "";
+      comp.compName = nullptr;
+      comp.compType.moduleName = nullptr;
+      comp.compType.objectName = nullptr;
 
       TciParameterListType parList(parameterList);
       tliTcTerminated(0, TimeStampMgr().Get(), 0, 0, comp, _tc->Id(), parList, verdict);

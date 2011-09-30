@@ -143,7 +143,7 @@ TriComponentId freettcn::TE::CModule::ModuleComponentId() const
   id.compInst.data = 0;
   id.compInst.bits = 0;
   id.compInst.aux = 0;
-  id.compName = "";
+  id.compName = nullptr;
   id.compType = Id();
   
   return id;

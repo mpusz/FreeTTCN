@@ -230,7 +230,7 @@ namespace freettcn {
               // TODO: This doesn;t look right - should be asking if the bit is set!!
               //
               if  (tokenNames[bit]) {
-                ANTLR3_FPRINTF(stderr, "%s%s", count > 0 ? ", " : "", tokenNames[bit]); 
+                ANTLR3_FPRINTF(stderr, "%s%s", count > 0 ? ", " : nullptr, tokenNames[bit]); 
                 count++;
               }
             }

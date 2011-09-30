@@ -35,7 +35,7 @@
 
 
 freettcn::TE::CIntegerType::CIntegerType() :
-  CType(0, "integer", TCI_INTEGER_TYPE, "", "", "")
+  CType(0, "integer", TCI_INTEGER_TYPE, nullptr, nullptr, nullptr)
 {
 }
 

@@ -163,14 +163,14 @@ void freettcn::translator::CModule::Register(CDefinition *def)
 
 void freettcn::translator::CModule::Dump(CDumper &dumper) const
 {
-  dumper.PrintLine("");
+  dumper.PrintLine(nullptr);
   dumper.PrintLine("namespace " + _id->Name() + " {");
   dumper.IndentIncr();
   
   
   
   dumper.IndentDecr();
-  dumper.PrintLine("");
+  dumper.PrintLine(nullptr);
   dumper.PrintLine("} // namespace " + _id->Name());
 }
 

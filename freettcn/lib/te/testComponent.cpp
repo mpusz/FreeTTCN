@@ -696,7 +696,7 @@ freettcn::TE::CTimer &freettcn::TE::CTestComponentType::CInstanceLocal::CScope::
 /* ************************* T E S T   C O M P O N E N T   T Y P E ********************** */
 
 freettcn::TE::CTestComponentType::CTestComponentType(const freettcn::TE::CModule *module, const char *name) :
-  freettcn::TE::CType(module, name, TCI_COMPONENT_TYPE, "", "", "")
+  freettcn::TE::CType(module, name, TCI_COMPONENT_TYPE, nullptr, nullptr, nullptr)
 {
   _portList.length = 0;
   _portList.portIdList = 0;

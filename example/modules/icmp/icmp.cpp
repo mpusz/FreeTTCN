@@ -260,7 +260,7 @@ namespace freettcn {
     // ************************* T Y P E S *****************************
     
     CICMPPingDataType::CICMPPingDataType(const freettcn::TE::CModule &module):
-      freettcn::TE::CRecordType(module, "ICMPPingDataType", "", "", "")
+      freettcn::TE::CRecordType(module, "ICMPPingDataType", nullptr, nullptr, nullptr)
     {
       Register(freettcn::TE::CBasicTypes::Integer(), "id");
       Register(freettcn::TE::CBasicTypes::Integer(), "seqNumber");
@@ -270,14 +270,14 @@ namespace freettcn {
     
     /// @todo should be of union type
     CICMPDataType::CICMPDataType(const freettcn::TE::CModule &module):
-      freettcn::TE::CRecordType(module, "ICMPDataType", "", "", "")
+      freettcn::TE::CRecordType(module, "ICMPDataType", nullptr, nullptr, nullptr)
     {
       Register(module.TypeGet(CModule::TYPE_ICMPPingDataType), "ping");
       Init();
     }
     
     CICMPMsg::CICMPMsg(const freettcn::TE::CModule &module):
-      freettcn::TE::CRecordType(module, "ICMPMsg", "", "", "")
+      freettcn::TE::CRecordType(module, "ICMPMsg", nullptr, nullptr, nullptr)
     {
       Register(freettcn::TE::CBasicTypes::Integer(), "msgType");
       Register(freettcn::TE::CBasicTypes::Integer(), "code");

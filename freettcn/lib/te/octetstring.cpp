@@ -36,7 +36,7 @@
 
 
 freettcn::TE::COctetstringType::COctetstringType():
-  CType(0, "octetstring", TCI_OCTETSTRING_TYPE, "", "", "")
+  CType(0, "octetstring", TCI_OCTETSTRING_TYPE, nullptr, nullptr, nullptr)
 {
 }
 
