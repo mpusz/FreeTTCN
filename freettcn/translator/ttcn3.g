@@ -353,7 +353,7 @@ structDefFormalPar
 structFieldDef
         @init
         { 
-            std::shared_ptr<freettcn::translator::CType> fieldType = 0;
+            std::shared_ptr<freettcn::translator::CType> fieldType;
             std::shared_ptr<const CIdentifier> id;
             bool optional = false;
         }
@@ -422,7 +422,7 @@ unionDefBody
 unionFieldDef
         @init
         { 
-            std::shared_ptr<freettcn::translator::CType> fieldType = 0;
+            std::shared_ptr<freettcn::translator::CType> fieldType;
             std::shared_ptr<const CIdentifier> id;
         }
         : ( type
@@ -491,7 +491,7 @@ portDef
 portDefBody
         @init
         { 
-            std::shared_ptr<freettcn::translator::CType> fieldType = 0;
+            std::shared_ptr<freettcn::translator::CType> fieldType;
             std::shared_ptr<const CIdentifier> id;
         }
         : portTypeIdentifier
@@ -521,6 +521,8 @@ messageAttribs [ std::shared_ptr<const freettcn::translator::CIdentifier> id ]
 messageList
         : direction allOrTypeList[ $direction.dir ];
 direction returns [ const char *dir ]
+        @init
+        { dir = nullptr; }
         : inParKeyword
         { dir = (const char *)$inParKeyword.text->chars; }
         | outParKeyword
@@ -963,7 +965,7 @@ systemKeyword
         : SYSTEM;
 testcaseInstance returns [const freettcn::translator::CModule::CDefinition *def]
         @init
-        { $def = 0; }
+        { $def = nullptr; }
         : executeKeyword '(' testcaseRef '(' testcaseActualParList? ')'
         ( ',' timerValue )? ')'
         {
@@ -974,7 +976,7 @@ executeKeyword
         : EXECUTE;
 testcaseRef returns [const freettcn::translator::CModule::CDefinition *def]
         @init
-        { $def = 0; }
+        { $def = nullptr; }
         : ( globalModuleId DOT )? testcaseIdentifier
         {
             pANTLR3_COMMON_TOKEN token = LT(-1);
@@ -1207,8 +1209,6 @@ multitypedModuleParList
 modulePar
         : m = moduleParType moduleParList[$m.parType];
 moduleParType returns [std::shared_ptr<freettcn::translator::CType> parType]
-        @init
-        { $parType = 0; }
         : t = type
         { $parType = $t.value; };
 // Module parameters shall not be of port type, default type or component type.
@@ -1645,16 +1645,12 @@ timeoutKeyword
 // $<A.1.6.3 Type
 
 type returns [ std::shared_ptr<freettcn::translator::CType> value ]
-        @init
-        { $value = 0; }
         : predefinedType
         { $value = $predefinedType.value; }
         |  referencedType
         { $value = $referencedType.value; }
         ;
 predefinedType returns [ std::shared_ptr<freettcn::translator::CTypePredefined> value ]
-        @init
-        { $value = 0; }
         : bitstringKeyword
         { $value = CTypePredefined::Bitstring(); }
         | booleanKeyword
@@ -1707,16 +1703,12 @@ universalCharString
 universalKeyword
         : UNIVERSAL;
 referencedType returns [ std::shared_ptr<freettcn::translator::CTypeReferenced> value ]
-        @init
-        { $value = 0; }
         : ( globalModuleId DOT )? typeReference extendedFieldReference?
         {
             $value = $typeReference.value;
         }
         ;
 typeReference returns [ std::shared_ptr<freettcn::translator::CTypeReferenced> value ]
-        @init
-        { $value = 0; }
         : ( structTypeIdentifier
             {
                 pANTLR3_COMMON_TOKEN token = LT(-1);
@@ -1799,7 +1791,7 @@ verdictTypeValue
         : PASS | FAIL | INCONC | NONE | ERROR;
 enumeratedValue returns [ const freettcn::translator::CModule::CDefinition *def ]
         @init
-        { $def = 0; }
+        { $def = nullptr; }
         : enumerationIdentifier
         {
             pANTLR3_COMMON_TOKEN token = LT(-1);
@@ -1832,13 +1824,13 @@ EXPONENTIAL
         : 'E';
 referencedValue returns [ const freettcn::translator::CModule::CDefinition *def ]
         @init
-        { $def = 0; }
+        { $def = nullptr; }
         : valueReference extendedFieldReference?
         /// @todo add support for field reference
         { $def = $valueReference.def; };
 valueReference returns [ const freettcn::translator::CModule::CDefinition *def ]
         @init
-        { $def = 0; }
+        { $def = nullptr; }
         : ( ( globalModuleId DOT )? ( constIdentifier | extConstIdentifier | moduleParIdentifier ) )
         {
             /// @todo add support for module selection
@@ -2351,7 +2343,7 @@ extendedFieldReference
 in which the extendedFieldReference is used is anytype. */
 opCall returns [const freettcn::translator::CModule::CDefinition *def]
         @init
-        { $def = 0; }
+        { $def = nullptr; }
         : configurationOps
         | verdictOps
         | timerOps
