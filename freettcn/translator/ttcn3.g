@@ -55,7 +55,7 @@ tokens {
     SUPERSET = 'superset';
     PERMUTATION = 'permutation';
     IF_PRESENT = 'ifpresent';
-    INFINITY = 'infinity';
+    TTCN_INFINITY = 'infinity';
     MATCH = 'match';
     VALUE_OF = 'valueof';
     FUNCTION = 'function';
@@ -784,7 +784,7 @@ upperBound
 or float. In case lowerBound or upperBound evaluates to types charstring or universal charstring, only
 singleConstExpression may be present and the string length shall be 1 */
 infinityKeyword
-        : INFINITY;
+        : TTCN_INFINITY;
 templateInstance
         : inLineTemplate;
 templateRefWithParList
