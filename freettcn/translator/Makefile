@@ -31,8 +31,6 @@ BIN_DIR   = $(LONG_DIR_NAME)/bin
 
 BUILD_DIRS = $(SRC_DIR)
 
-
-
 # files
 GRAMMAR_FILE = ttcn3.g
 PARSER_C_FILE := $(patsubst %.g,%Parser.c,$(GRAMMAR_FILE))
@@ -46,6 +44,7 @@ GEN_FILES = $(C_FILES) $(PARSER_H_FILE) $(LEXER_H_FILE) $(patsubst %.g,%.tokens,
 #
 # defines
 #
+CPP += -Wno-unused-variable -Wno-unused-but-set-variable
 INCLUDE_DIRS = -I$(GEN_DIR) -I$(SRC_DIR) -I$(TOOLS_DIR)
 
 
