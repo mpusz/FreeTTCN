@@ -93,7 +93,7 @@ const freettcn::CD::CCodec &freettcn::CD::CCodingDecoding::Codec(const Value &va
 
 
 
-const Value &freettcn::CD::CCodingDecoding::Decode(const BinaryString &message, const Type &decHypothesis) const
+const Value freettcn::CD::CCodingDecoding::Decode(const BinaryString &message, const Type &decHypothesis) const
 {
 //   if (tciGetTypeClass(decHypothesis) == TCI_ANYTYPE_TYPE) {
 // //   tliDecode(String am,

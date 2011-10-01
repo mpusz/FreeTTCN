@@ -122,7 +122,7 @@ void freettcn::TM::CTestManagement::CModuleParameter::ValueSet(const Value &valu
   _value = value;
 }
 
-const Value &freettcn::TM::CTestManagement::CModuleParameter::ValueGet() const
+const Value freettcn::TM::CTestManagement::CModuleParameter::ValueGet() const
 {
   if (!_value) {
     if (tciNotPresent(_defaultValue))
@@ -262,7 +262,7 @@ void freettcn::TM::CTestManagement::Abort()
 }
 
 
-const Value &freettcn::TM::CTestManagement::ModuleParameterGet(const TciModuleParameterIdType &parameterId) const
+const Value freettcn::TM::CTestManagement::ModuleParameterGet(const TciModuleParameterIdType &parameterId) const
 {
   for(CModuleParList::const_iterator it = _modParList.begin(); it != _modParList.end(); ++it) {
     if ((*it)->Name() == parameterId)

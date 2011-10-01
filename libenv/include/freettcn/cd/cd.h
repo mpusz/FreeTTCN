@@ -73,7 +73,7 @@ namespace freettcn {
       
       void Register(const CCodec *codec);
       
-      const Value &Decode(const BinaryString &message, const Type &decHypothesis) const;
+      const Value Decode(const BinaryString &message, const Type &decHypothesis) const;
       BinaryString Encode(const Value &value) const;
     };
     

@@ -90,7 +90,7 @@ namespace freettcn {
         std::string Name() const;
         const Value &DefaultValue() const;
         void ValueSet(const Value &value);
-        const Value &ValueGet() const;
+        const Value ValueGet() const;
       };
       
       typedef std::vector<CTestCase *> CTCList;
@@ -128,7 +128,7 @@ namespace freettcn {
       virtual void Error(String message);
       void Abort();
       
-      virtual const Value &ModuleParameterGet(const TciModuleParameterIdType &parameterId) const;
+      virtual const Value ModuleParameterGet(const TciModuleParameterIdType &parameterId) const;
       
       virtual void TestCaseStart(const std::string &testCaseId, const TciParameterListType &parameterlist);
       virtual void TestCaseStarted(const TciTestCaseIdType &testCaseId, const TciParameterListType &parameterList, double timer);
