@@ -39,6 +39,7 @@ extern "C" {
 #include <freettcn/te/testComponent.h>
 #include <vector>
 #include <list>
+#include <memory>
 
 
 namespace freettcn {
@@ -67,7 +68,7 @@ namespace freettcn {
       
     private:
       // types
-      typedef std::vector<const CType *> CTypeArray;
+      typedef std::vector<std::shared_ptr<const CType>> CTypeArray;
       typedef std::vector<CParameter *> CParameterArray;
       typedef std::list<const CBehavior *> CBehaviorList;
       typedef std::vector<CTestCase *> CTestCaseArray;
@@ -113,7 +114,7 @@ namespace freettcn {
       const CBehavior &Behavior(const TciBehaviourIdType &behavior) const;
       
     protected:
-      void Register(const CType *type);
+      void Register(std::shared_ptr<const CType> type);
       void Register(CParameter *parameter);
       void Register(CTestCase *testCase);
       void Register(CPortType *portType);

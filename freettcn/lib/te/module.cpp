@@ -152,7 +152,6 @@ TriComponentId freettcn::TE::CModule::ModuleComponentId() const
 
 void freettcn::TE::CModule::Cleanup()
 {
-  Purge(_typeArray);
   Purge(_parameterArray);
   Purge(_allEntityStates);
   Purge(_behaviorList);
@@ -197,7 +196,7 @@ void freettcn::TE::CModule::Reset()
 }
 
 
-void freettcn::TE::CModule::Register(const CType *type)
+void freettcn::TE::CModule::Register(std::shared_ptr<const CType> type)
 {
   _typeArray.push_back(type);
 }

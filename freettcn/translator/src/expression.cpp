@@ -42,7 +42,7 @@ freettcn::translator::CExpression::~CExpression()
 
 
 
-freettcn::translator::CExpressionValue::CExpressionValue(const CType &type, const char *value):
+freettcn::translator::CExpressionValue::CExpressionValue(std::shared_ptr<const CType> type, const char *value):
   _type(type), _value(value)
 {
   if(!value)
@@ -63,7 +63,7 @@ freettcn::translator::CExpressionDef::CExpressionDef(const CModule::CDefinition 
 }
 
 
-const freettcn::translator::CType &freettcn::translator::CExpressionDef::Type() const
+std::shared_ptr<const freettcn::translator::CType> freettcn::translator::CExpressionDef::Type() const
 {
   return _def.Type();
 }
@@ -84,7 +84,7 @@ void freettcn::translator::CExpressionDef::Dump(CDumper &dumper) const
 
 
 
-freettcn::translator::CExpressionSingle::CExpressionSingle(TOperation operation, const CExpression *expr):
+freettcn::translator::CExpressionSingle::CExpressionSingle(TOperation operation, std::shared_ptr<const CExpression> expr):
   _operation(operation), _expr(expr)
 {
   if(operation == OPERATION_NOT_SET)
@@ -102,7 +102,7 @@ void freettcn::translator::CExpressionSingle::Dump(CDumper &dumper) const
 
 
 
-freettcn::translator::CExpressionPair::CExpressionPair(TOperation operation, const CExpression *expr1, const CExpression *expr2):
+freettcn::translator::CExpressionPair::CExpressionPair(TOperation operation, std::shared_ptr<const CExpression> expr1, std::shared_ptr<const CExpression> expr2):
   _operation(operation), _expr1(expr1), _expr2(expr2)
 {
   if(operation == OPERATION_NOT_SET)
@@ -114,7 +114,7 @@ freettcn::translator::CExpressionPair::CExpressionPair(TOperation operation, con
 }
 
 
-const freettcn::translator::CType &freettcn::translator::CExpressionPair::Type() const
+std::shared_ptr<const freettcn::translator::CType> freettcn::translator::CExpressionPair::Type() const
 {
   switch(_operation) {
   case OPERATION_OR:

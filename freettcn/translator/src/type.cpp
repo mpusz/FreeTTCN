@@ -78,90 +78,91 @@ bool freettcn::translator::CType::Match(const CType &type) const
 }
 
 
+freettcn::translator::CTypePredefined::CTypeArray freettcn::translator::CTypePredefined::_array = {
+  std::shared_ptr<CTypePredefined>(new CTypePredefined(TYPE_BITSTING)),
+  std::shared_ptr<CTypePredefined>(new CTypePredefined(TYPE_BOOLEAN)),
+  std::shared_ptr<CTypePredefined>(new CTypePredefined(TYPE_CHARSTRING)),
+  std::shared_ptr<CTypePredefined>(new CTypePredefined(TYPE_UNIVERSAL_CHARSTRING)),
+  std::shared_ptr<CTypePredefined>(new CTypePredefined(TYPE_INTEGER)),
+  std::shared_ptr<CTypePredefined>(new CTypePredefined(TYPE_OCTETSTRING)),
+  std::shared_ptr<CTypePredefined>(new CTypePredefined(TYPE_HEXSTRING)),
+  std::shared_ptr<CTypePredefined>(new CTypePredefined(TYPE_VERDICT)),
+  std::shared_ptr<CTypePredefined>(new CTypePredefined(TYPE_FLOAT)),
+  std::shared_ptr<CTypePredefined>(new CTypePredefined(TYPE_ADDRESS)),
+  std::shared_ptr<CTypePredefined>(new CTypePredefined(TYPE_DEFAULT)),
+  std::shared_ptr<CTypePredefined>(new CTypePredefined(TYPE_ANY_TYPE))
+};
 
-freettcn::translator::CTypePredefined freettcn::translator::CTypePredefined::_bitstring(freettcn::translator::CTypePredefined::TYPE_BITSTING);
-freettcn::translator::CTypePredefined freettcn::translator::CTypePredefined::_boolean(freettcn::translator::CTypePredefined::TYPE_BOOLEAN);
-freettcn::translator::CTypePredefined freettcn::translator::CTypePredefined::_charstring(freettcn::translator::CTypePredefined::TYPE_CHARSTRING);
-freettcn::translator::CTypePredefined freettcn::translator::CTypePredefined::_universalCharstring(freettcn::translator::CTypePredefined::TYPE_UNIVERSAL_CHARSTRING);
-freettcn::translator::CTypePredefined freettcn::translator::CTypePredefined::_integer(freettcn::translator::CTypePredefined::TYPE_INTEGER);
-freettcn::translator::CTypePredefined freettcn::translator::CTypePredefined::_octetstring(freettcn::translator::CTypePredefined::TYPE_OCTETSTRING);
-freettcn::translator::CTypePredefined freettcn::translator::CTypePredefined::_hexstring(freettcn::translator::CTypePredefined::TYPE_HEXSTRING);
-freettcn::translator::CTypePredefined freettcn::translator::CTypePredefined::_verdict(freettcn::translator::CTypePredefined::TYPE_VERDICT);
-freettcn::translator::CTypePredefined freettcn::translator::CTypePredefined::_float(freettcn::translator::CTypePredefined::TYPE_FLOAT);
-freettcn::translator::CTypePredefined freettcn::translator::CTypePredefined::_address(freettcn::translator::CTypePredefined::TYPE_ADDRESS);
-freettcn::translator::CTypePredefined freettcn::translator::CTypePredefined::_default(freettcn::translator::CTypePredefined::TYPE_DEFAULT);
-freettcn::translator::CTypePredefined freettcn::translator::CTypePredefined::_anyType(freettcn::translator::CTypePredefined::TYPE_ANY_TYPE);
 
-
-freettcn::translator::CTypePredefined &freettcn::translator::CTypePredefined::Bitstring()
+std::shared_ptr<freettcn::translator::CTypePredefined> freettcn::translator::CTypePredefined::Bitstring()
 {
-  return _bitstring;
+  return _array[TYPE_BITSTING];
 }
 
 
-freettcn::translator::CTypePredefined &freettcn::translator::CTypePredefined::Boolean()
+std::shared_ptr<freettcn::translator::CTypePredefined> freettcn::translator::CTypePredefined::Boolean()
 {
-  return _boolean;
+  return _array[TYPE_BOOLEAN];
 }
 
 
-freettcn::translator::CTypePredefined &freettcn::translator::CTypePredefined::Charstring()
+std::shared_ptr<freettcn::translator::CTypePredefined> freettcn::translator::CTypePredefined::Charstring()
 {
-  return _charstring;
+  return _array[TYPE_CHARSTRING];
 }
 
 
-freettcn::translator::CTypePredefined &freettcn::translator::CTypePredefined::UniversalCharstring()
+std::shared_ptr<freettcn::translator::CTypePredefined> freettcn::translator::CTypePredefined::UniversalCharstring()
 {
-  return _universalCharstring;
+  return _array[TYPE_UNIVERSAL_CHARSTRING];
 }
 
 
-freettcn::translator::CTypePredefined &freettcn::translator::CTypePredefined::Integer()
+std::shared_ptr<freettcn::translator::CTypePredefined> freettcn::translator::CTypePredefined::Integer()
 {
-  return _integer;
+  return _array[TYPE_INTEGER];
 }
 
 
-freettcn::translator::CTypePredefined &freettcn::translator::CTypePredefined::Octetstring()
+std::shared_ptr<freettcn::translator::CTypePredefined> freettcn::translator::CTypePredefined::Octetstring()
 {
-  return _octetstring;
+  return _array[TYPE_OCTETSTRING];
 }
 
 
-freettcn::translator::CTypePredefined &freettcn::translator::CTypePredefined::Hexstring()
+std::shared_ptr<freettcn::translator::CTypePredefined> freettcn::translator::CTypePredefined::Hexstring()
 {
-  return _hexstring;
+  return _array[TYPE_HEXSTRING];
 }
 
 
-freettcn::translator::CTypePredefined &freettcn::translator::CTypePredefined::Verdict()
+std::shared_ptr<freettcn::translator::CTypePredefined> freettcn::translator::CTypePredefined::Verdict()
 {
-  return _verdict;
+  return _array[TYPE_VERDICT];
 }
 
 
-freettcn::translator::CTypePredefined &freettcn::translator::CTypePredefined::Float()
+std::shared_ptr<freettcn::translator::CTypePredefined> freettcn::translator::CTypePredefined::Float()
 {
-  return _float;
+  return _array[TYPE_FLOAT];
 }
 
 
-freettcn::translator::CTypePredefined &freettcn::translator::CTypePredefined::Address()
+std::shared_ptr<freettcn::translator::CTypePredefined> freettcn::translator::CTypePredefined::Address()
 {
-  return _address;
+  return _array[TYPE_ADDRESS];
 }
 
 
-freettcn::translator::CTypePredefined &freettcn::translator::CTypePredefined::Default()
+std::shared_ptr<freettcn::translator::CTypePredefined> freettcn::translator::CTypePredefined::Default()
 {
-  return _default;
+  return _array[TYPE_DEFAULT];
 }
 
 
-freettcn::translator::CTypePredefined &freettcn::translator::CTypePredefined::AnyType()
+std::shared_ptr<freettcn::translator::CTypePredefined> freettcn::translator::CTypePredefined::AnyType()
 {
-  return _anyType;
+  return _array[TYPE_ANY_TYPE];
 }
 
 
@@ -250,7 +251,7 @@ bool freettcn::translator::CTypePredefined::Resolve(TKind kind, const std::strin
 
 
 
-freettcn::translator::CTypeReferenced::CTypeUnresolved::CTypeUnresolved(const CIdentifier *id):
+freettcn::translator::CTypeReferenced::CTypeUnresolved::CTypeUnresolved(std::shared_ptr<const CIdentifier> id):
   _id(id)
 {
 }
@@ -294,13 +295,13 @@ const freettcn::translator::CIdentifier &freettcn::translator::CTypeReferenced::
 
 
 
-freettcn::translator::CTypeReferenced::CTypeReferenced(CType &type):
-  _type(&type), _typeUnresolved(false)
+freettcn::translator::CTypeReferenced::CTypeReferenced(std::shared_ptr<CType> type):
+  _type(type), _typeUnresolved(false)
 {
 }
 
 
-freettcn::translator::CTypeReferenced::CTypeReferenced(const CIdentifier *id):
+freettcn::translator::CTypeReferenced::CTypeReferenced(std::shared_ptr<const CIdentifier> id):
   _type(new CTypeUnresolved(id)), _typeUnresolved(true)
 {
 }
@@ -308,8 +309,6 @@ freettcn::translator::CTypeReferenced::CTypeReferenced(const CIdentifier *id):
 
 freettcn::translator::CTypeReferenced::~CTypeReferenced()
 {
-  if(_typeUnresolved)
-    delete _type;
 }
 
 
@@ -342,7 +341,7 @@ bool freettcn::translator::CTypeReferenced::Resolve(TKind kind, const std::strin
   if(_typeUnresolved) {
     // try to resolve
     CTranslator &translator = CTranslator::Instance();
-    CType *type = translator.Type(_type->Name());
+    std::shared_ptr<CType> type = translator.Type(_type->Name());
     if(type) {
       // check kind
       if(!(type->Kind() & kind)) {
@@ -353,7 +352,6 @@ bool freettcn::translator::CTypeReferenced::Resolve(TKind kind, const std::strin
       }
       
       // assign resolved type
-      delete _type;
       _type = type;
       _typeUnresolved = false;
       
@@ -383,7 +381,7 @@ const std::string &freettcn::translator::CTypeLocal::Name() const
 
 
 
-freettcn::translator::CTypeStructured::CField::CField(CType &type, const CIdentifier *id, bool optional):
+freettcn::translator::CTypeStructured::CField::CField(std::shared_ptr<CType> type, std::shared_ptr<const CIdentifier> id, bool optional):
   _type(type), _id(id), _optional(optional)
 {
 }
@@ -391,7 +389,7 @@ freettcn::translator::CTypeStructured::CField::CField(CType &type, const CIdenti
 
 freettcn::translator::CType &freettcn::translator::CTypeStructured::CField::Type() const
 {
-  return _type;
+  return *_type;
 }
 
 
@@ -416,7 +414,6 @@ freettcn::translator::CTypeStructured::CTypeStructured(const std::string &name):
 
 freettcn::translator::CTypeStructured::~CTypeStructured()
 {
-  PurgeMap(_fieldMap);
 }
 
 
@@ -431,12 +428,11 @@ void freettcn::translator::CTypeStructured::Dump(CDumper &dumper) const
 }
 
 
-void freettcn::translator::CTypeStructured::Register(CField *field)
+void freettcn::translator::CTypeStructured::Register(std::shared_ptr<CField> field)
 {
   if(!field)
     throw ENotInitialized(E_DATA, "Structured type field not provided!!!");
   
-  std::auto_ptr<CField> fieldPtr(field);
   CTranslator &translator = CTranslator::Instance();
   
   // check if recursion not defined
@@ -456,7 +452,7 @@ void freettcn::translator::CTypeStructured::Register(CField *field)
   }
   
   // add new field
-  _fieldMap[&field->Id().Name()] = fieldPtr.release();
+  _fieldMap[&field->Id().Name()] = field;
 }
 
 
@@ -507,7 +503,7 @@ void freettcn::translator::CTypeRecord::Dump(CDumper &dumper) const
 }
 
 
-void freettcn::translator::CTypeRecord::Register(CField *field)
+void freettcn::translator::CTypeRecord::Register(std::shared_ptr<CField> field)
 {
   CTypeStructured::Register(field);
   _fieldList.push_back(field);
@@ -575,7 +571,6 @@ freettcn::translator::CTypePort::CTypePort(const std::string &name, TMode mode):
 
 freettcn::translator::CTypePort::~CTypePort()
 {
-  Purge(_itemList);
 }
 
 
@@ -596,12 +591,11 @@ void freettcn::translator::CTypePort::Dump(CDumper &dumper) const
 }
 
 
-void freettcn::translator::CTypePort::Register(CItem *item, TDirection dir)
+void freettcn::translator::CTypePort::Register(std::shared_ptr<CItem> item, TDirection dir)
 {
   if(!item)
     throw ENotInitialized(E_DATA, "Port item not provided!!!");
   
-  std::auto_ptr<CItem> itemPtr(item);
   std::string name = item->All() ? "all" : item->Type().Name();
   
   CTranslator &translator = CTranslator::Instance();
@@ -674,10 +668,10 @@ void freettcn::translator::CTypePort::Register(CItem *item, TDirection dir)
 
   // add new item
   if(dir == DIRECTION_IN || (dir == DIRECTION_INOUT && inIt == _inItemMap.end()))
-    _inItemMap[name] = itemPtr.get();
+    _inItemMap[name] = item;
   if(dir == DIRECTION_OUT || (dir == DIRECTION_INOUT && outIt == _outItemMap.end()))
-    _outItemMap[name] = itemPtr.get();
-  _itemList.push_back(itemPtr.release());
+    _outItemMap[name] = item;
+  _itemList.push_back(item);
 }
 
 

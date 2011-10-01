@@ -56,39 +56,39 @@ namespace freettcn {
       };
       
       class CDefinition {
-        const std::auto_ptr<const CIdentifier> _id;
-        CType &_type;
+        std::shared_ptr<const CIdentifier> _id;
+        std::shared_ptr<CType> _type;
       public:
-        CDefinition(const CIdentifier *id, CType &type);
+        CDefinition(std::shared_ptr<const CIdentifier> id, std::shared_ptr<CType> type);
         virtual ~CDefinition();
         
         virtual void Dump(CDumper &dumper) const;
         
         const CIdentifier &Id() const;
-        CType &Type() const;
+        std::shared_ptr<CType> Type() const;
       };
       
       
       class CDefinitionParameter : public CModule::CDefinition {
-        const std::auto_ptr<const CExpression> _expr;
+        std::shared_ptr<const CExpression> _expr;
       public:
-        CDefinitionParameter(const CIdentifier *id, CType &type, const CExpression *expr);
+        CDefinitionParameter(std::shared_ptr<const CIdentifier> id, std::shared_ptr<CType> type, std::shared_ptr<const CExpression> expr);
         virtual void Dump(CDumper &dumper) const;
       };
       
       
       class CDefinitionConstValue : public CModule::CDefinition {
-        const std::auto_ptr<const CExpression> _expr;
+        std::shared_ptr<const CExpression> _expr;
       public:
-        CDefinitionConstValue(const CIdentifier *id, CType &type, const CExpression *expr);
+        CDefinitionConstValue(std::shared_ptr<const CIdentifier> id, std::shared_ptr<CType> type, std::shared_ptr<const CExpression> expr);
         virtual void Dump(CDumper &dumper) const;
       };
       
       
       class CDefinitionTypeLocal : public CModule::CDefinition {
-        std::auto_ptr<CTypeLocal> _type;
+        std::shared_ptr<CTypeLocal> _type;
       public:
-        CDefinitionTypeLocal(const CIdentifier *id, CTypeLocal *type);
+        CDefinitionTypeLocal(std::shared_ptr<const CIdentifier> id, std::shared_ptr<CTypeLocal> type);
         virtual void Dump(CDumper &dumper) const;
       };
       
@@ -103,47 +103,47 @@ namespace freettcn {
       private:
         const TDirection _dir;
       public:
-        CDefinitionFormalParameter(const CIdentifier *id, CType &type, TDirection dir);
+        CDefinitionFormalParameter(std::shared_ptr<const CIdentifier> id, std::shared_ptr<CType> type, TDirection dir);
         virtual void Dump(CDumper &dumper) const;
       };
       
       
       class CDefinitionMethod : public CModule::CDefinition {
-        typedef std::deque<const CDefinitionFormalParameter *> CParamList;
+        typedef std::deque<std::shared_ptr<const CDefinitionFormalParameter>> CParamList;
         CParamList _params;
       public:
-        CDefinitionMethod(const CIdentifier *id, CType &type);
+        CDefinitionMethod(std::shared_ptr<const CIdentifier> id, std::shared_ptr<CType> type);
         ~CDefinitionMethod();
-        void Register(const CDefinitionFormalParameter *par);
+        void Register(std::shared_ptr<const CDefinitionFormalParameter> par);
       };
       
       
       class CDefinitionTestcase : public CModule::CDefinitionMethod {
       public:
-        CDefinitionTestcase(const CIdentifier *id, CType &type);
+        CDefinitionTestcase(std::shared_ptr<const CIdentifier> id, std::shared_ptr<CType> type);
         virtual void Dump(CDumper &dumper) const;
       };
       
       
       class CDefinitionTemplate : public CModule::CDefinitionMethod {
       public:
-        CDefinitionTemplate(const CIdentifier *id, CType &type);
+        CDefinitionTemplate(std::shared_ptr<const CIdentifier> id, std::shared_ptr<CType> type);
         virtual void Dump(CDumper &dumper) const;
       };
       
       
     private:
-      typedef std::deque<CDefinition *> CDefList;
+      typedef std::deque<std::shared_ptr<CDefinition>> CDefList;
       
-      const std::auto_ptr<const CIdentifier> _id;
+      std::shared_ptr<const CIdentifier> _id;
       const TLanguage _language;
       CDefList _defList;
       
     public:
-      CModule(const CIdentifier *id, TLanguage language);
+      CModule(std::shared_ptr<const CIdentifier> id, TLanguage language);
       ~CModule();
       
-      void Register(CDefinition *def);
+      void Register(std::shared_ptr<CDefinition> def);
 //       const CDefinition *Id(const CIdentifier &id) const;
       
       void Dump(CDumper &dumper) const;
@@ -160,7 +160,7 @@ inline const freettcn::translator::CIdentifier &freettcn::translator::CModule::C
 }
 
 
-inline freettcn::translator::CType &freettcn::translator::CModule::CDefinition::Type() const
+inline std::shared_ptr<freettcn::translator::CType> freettcn::translator::CModule::CDefinition::Type() const
 {
   return _type;
 }

@@ -242,7 +242,7 @@ ttcn3Module
         :
         ttcn3ModuleKeyword ttcn3ModuleId
         {
-            const CIdentifier *id = $ttcn3ModuleId.id;
+            std::shared_ptr<const CIdentifier> id($ttcn3ModuleId.id);
             logger->GroupPush(translator->File(), "In module '" + id->Name() + "':");
             translator->Module(id, $ttcn3Module::language ? $ttcn3Module::language : "");
         }
@@ -259,19 +259,15 @@ ttcn3Module
         ;
 ttcn3ModuleKeyword
         : MODULE;
-ttcn3ModuleId returns [ const freettcn::translator::CIdentifier *id ]
-        @init
-        { $id = 0; }
+ttcn3ModuleId returns [ std::shared_ptr<const freettcn::translator::CIdentifier> id ]
         : moduleId
         { $id = $moduleId.id; };
-moduleId returns [ const freettcn::translator::CIdentifier *id ]
-        @init
-        { $id = 0; }
+moduleId returns [ std::shared_ptr<const freettcn::translator::CIdentifier> id ]
         : globalModuleId
         {
             pANTLR3_COMMON_TOKEN token = LT(-1);
-            $id = new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1),
-                                  (const char *)token->getText(token)->chars);
+            $id.reset(new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1),
+                                      (const char *)token->getText(token)->chars));
         }
         languageSpec?;
 globalModuleId
@@ -337,8 +333,8 @@ structDefBody[bool set]
         : ( ( structTypeIdentifier
               {
                 pANTLR3_COMMON_TOKEN token = LT(-1);
-                const freettcn::translator::CIdentifier *id = new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1),
-                                                                              (const char *)token->getText(token)->chars);
+                std::shared_ptr<const CIdentifier> id(new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1),
+                                                                                (const char *)token->getText(token)->chars));
                 translator->Struct(id, $set);
                 logger->GroupPush(translator->File(), (set ? "In set '" : "In record '") + id->Name() + "':");
               }
@@ -357,8 +353,8 @@ structDefFormalPar
 structFieldDef
         @init
         { 
-            freettcn::translator::CType *fieldType = 0;
-            std::auto_ptr<const freettcn::translator::CIdentifier> id;
+            std::shared_ptr<freettcn::translator::CType> fieldType = 0;
+            std::shared_ptr<const CIdentifier> id;
             bool optional = false;
         }
         : ( type
@@ -368,8 +364,8 @@ structFieldDef
             | nestedTypeDef ) structFieldIdentifier
         {
             pANTLR3_COMMON_TOKEN token = LT(-1);
-            id = std::auto_ptr<const freettcn::translator::CIdentifier>(new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1),
-                                                                                        (const char *)token->getText(token)->chars));
+            id.reset(new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1),
+                                     (const char *)token->getText(token)->chars));
         }
         arrayDef? subTypeSpec?
         ( optionalKeyword 
@@ -378,7 +374,7 @@ structFieldDef
             }
         )?
         {
-            translator->StructField(id.release(), fieldType, optional);
+            translator->StructField(id, fieldType, optional);
         }
         ;
 nestedTypeDef
@@ -412,8 +408,8 @@ unionDefBody
         : ( structTypeIdentifier
               {
                 pANTLR3_COMMON_TOKEN token = LT(-1);
-                const freettcn::translator::CIdentifier *id = new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1),
-                                                                              (const char *)token->getText(token)->chars);
+                std::shared_ptr<const CIdentifier> id(new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1),
+                                                                              (const char *)token->getText(token)->chars));
                 translator->Union(id);
                 logger->GroupPush(translator->File(), "In union '" + id->Name() + "':");
               }
@@ -426,8 +422,8 @@ unionDefBody
 unionFieldDef
         @init
         { 
-            freettcn::translator::CType *fieldType = 0;
-            std::auto_ptr<const freettcn::translator::CIdentifier> id;
+            std::shared_ptr<freettcn::translator::CType> fieldType = 0;
+            std::shared_ptr<const CIdentifier> id;
         }
         : ( type
             {
@@ -436,9 +432,9 @@ unionFieldDef
             | nestedTypeDef ) structFieldIdentifier
         {
             pANTLR3_COMMON_TOKEN token = LT(-1);
-            id = std::auto_ptr<const freettcn::translator::CIdentifier>(new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1),
-                                                                                        (const char *)token->getText(token)->chars));
-            translator->UnionField(id.release(), fieldType);
+            id.reset(new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1),
+                                     (const char *)token->getText(token)->chars));
+            translator->UnionField(id, fieldType);
         }
         arrayDef? subTypeSpec?;
 setDef
@@ -495,14 +491,14 @@ portDef
 portDefBody
         @init
         { 
-            freettcn::translator::CType *fieldType = 0;
-            const freettcn::translator::CIdentifier *id = 0;
+            std::shared_ptr<freettcn::translator::CType> fieldType = 0;
+            std::shared_ptr<const CIdentifier> id;
         }
         : portTypeIdentifier
         {
             pANTLR3_COMMON_TOKEN token = LT(-1);
-            id = new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1),
-                                 (const char *)token->getText(token)->chars);
+            id.reset(new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1),
+                                     (const char *)token->getText(token)->chars));
             logger->GroupPush(translator->File(), "In port '" + id->Name() + "':");
         }
         portDefAttribs[ id ]
@@ -514,9 +510,9 @@ portKeyword
         : PORT;
 portTypeIdentifier
         : IDENTIFIER;
-portDefAttribs [ const freettcn::translator::CIdentifier *id ]
+portDefAttribs [ std::shared_ptr<const freettcn::translator::CIdentifier> id ]
         : messageAttribs[ id ] | procedureAttribs | mixedAttribs;
-messageAttribs [ const freettcn::translator::CIdentifier *id ]
+messageAttribs [ std::shared_ptr<const freettcn::translator::CIdentifier> id ]
         : messageKeyword
         {
             translator->Port(id, freettcn::translator::CTypePort::MODE_MESSAGE);
@@ -616,23 +612,21 @@ portIdentifier
 
 constDef
         : constKeyword t = type constList[$t.value];
-constList[freettcn::translator::CType *type]
+constList[std::shared_ptr<freettcn::translator::CType> type]
         : singleConstDef[type] ( ',' singleConstDef[type] )*;
-singleConstDef[freettcn::translator::CType *type]
+singleConstDef[std::shared_ptr<freettcn::translator::CType> type]
         : constIdentifier arrayDef? ASSIGNMENT_CHAR e = constantExpression
         {
             translator->ConstValue($constIdentifier.id, $type, $e.expr);
         };
 constKeyword
         : CONST;
-constIdentifier returns [const freettcn::translator::CIdentifier *id]
-        @init
-        { $id = 0; }
+constIdentifier returns [std::shared_ptr<const freettcn::translator::CIdentifier> id]
         : IDENTIFIER
         {
             pANTLR3_COMMON_TOKEN token = LT(-1);
-            $id = new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1),
-                                  (const char *)token->getText(token)->chars);
+            $id.reset(new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1),
+                                      (const char *)token->getText(token)->chars));
         }
         ;
 
@@ -652,8 +646,8 @@ baseTemplate
         : ( type | signature ) templateIdentifier
         {
             pANTLR3_COMMON_TOKEN token = LT(-1);
-            const freettcn::translator::CIdentifier *id = new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1),
-                                                                          (const char *)token->getText(token)->chars);
+            std::shared_ptr<const CIdentifier> id(new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1),
+                                                                  (const char *)token->getText(token)->chars));
             translator->Template(id);
             logger->GroupPush(translator->File(), "In template '" + id->Name() + "':");
             translator->ScopePush();
@@ -932,12 +926,12 @@ signature
 
 testcaseDef
         @init
-        { freettcn::translator::CIdentifier *id = 0; }
+        { std::shared_ptr<const CIdentifier> id; }
         : testcaseKeyword testcaseIdentifier
         {
             pANTLR3_COMMON_TOKEN token = LT(-1);
-            id = new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1),
-                                 (const char *)token->getText(token)->chars);
+            id.reset(new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1),
+                                     (const char *)token->getText(token)->chars));
             translator->Testcase(id);
             logger->GroupPush(translator->File(), "In testcase '" + id->Name() + "':");
             translator->ScopePush();
@@ -1212,7 +1206,7 @@ multitypedModuleParList
         : ( modulePar SEMICOLON? )*;
 modulePar
         : m = moduleParType moduleParList[$m.parType];
-moduleParType returns [freettcn::translator::CType *parType]
+moduleParType returns [std::shared_ptr<freettcn::translator::CType> parType]
         @init
         { $parType = 0; }
         : t = type
@@ -1220,23 +1214,21 @@ moduleParType returns [freettcn::translator::CType *parType]
 // Module parameters shall not be of port type, default type or component type.
 // A module parameter shall only be of type address if the address type is explicitly defined within the associated
 // module.
-moduleParList[freettcn::translator::CType *type]
+moduleParList[std::shared_ptr<freettcn::translator::CType> type]
         : moduleParIdentifierDef[ $type ] ( ',' moduleParIdentifierDef[ $type ] )*;
-moduleParIdentifierDef[ freettcn::translator::CType *type ]
+moduleParIdentifierDef[ std::shared_ptr<freettcn::translator::CType> type ]
         : moduleParIdentifier ( ASSIGNMENT_CHAR e = constantExpression )?
         {
             if($e.text && !$e.expr)
                 translator->Error($moduleParIdentifier.id->Loc(), "module parameter '" + $moduleParIdentifier.id->Name() + "' should resolve to a constant value");
             translator->ModulePar($moduleParIdentifier.id, $type, $e.text ? $e.expr : 0);
         };
-moduleParIdentifier returns [ const freettcn::translator::CIdentifier *id ]
-        @init
-        { $id = 0; }
+moduleParIdentifier returns [ std::shared_ptr<const freettcn::translator::CIdentifier> id ]
         : IDENTIFIER
         {
             pANTLR3_COMMON_TOKEN token = LT(-1);
-            $id = new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1),
-                                  (const char *)token->getText(token)->chars);
+            $id.reset(new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1),
+                                      (const char *)token->getText(token)->chars));
         }
         ;
 
@@ -1652,7 +1644,7 @@ timeoutKeyword
 
 // $<A.1.6.3 Type
 
-type returns [ freettcn::translator::CType *value ]
+type returns [ std::shared_ptr<freettcn::translator::CType> value ]
         @init
         { $value = 0; }
         : predefinedType
@@ -1660,33 +1652,33 @@ type returns [ freettcn::translator::CType *value ]
         |  referencedType
         { $value = $referencedType.value; }
         ;
-predefinedType returns [ freettcn::translator::CTypePredefined *value ]
+predefinedType returns [ std::shared_ptr<freettcn::translator::CTypePredefined> value ]
         @init
         { $value = 0; }
         : bitstringKeyword
-        { $value = &CTypePredefined::Bitstring(); }
+        { $value = CTypePredefined::Bitstring(); }
         | booleanKeyword
-        { $value = &CTypePredefined::Boolean(); }
+        { $value = CTypePredefined::Boolean(); }
         | charStringKeyword
-        { $value = &CTypePredefined::Charstring(); }
+        { $value = CTypePredefined::Charstring(); }
         | universalCharString
-        { $value = &CTypePredefined::UniversalCharstring(); }
+        { $value = CTypePredefined::UniversalCharstring(); }
         | integerKeyword
-        { $value = &CTypePredefined::Integer(); }
+        { $value = CTypePredefined::Integer(); }
         | octetStringKeyword
-        { $value = &CTypePredefined::Octetstring(); }
+        { $value = CTypePredefined::Octetstring(); }
         | hexStringKeyword
-        { $value = &CTypePredefined::Hexstring(); }
+        { $value = CTypePredefined::Hexstring(); }
         | verdictTypeKeyword
-        { $value = &CTypePredefined::Verdict(); }
+        { $value = CTypePredefined::Verdict(); }
         | floatKeyword
-        { $value = &CTypePredefined::Float(); }
+        { $value = CTypePredefined::Float(); }
         | addressKeyword
-        { $value = &CTypePredefined::Address(); }
+        { $value = CTypePredefined::Address(); }
         | defaultKeyword
-        { $value = &CTypePredefined::Default(); }
+        { $value = CTypePredefined::Default(); }
         | anyTypeKeyword
-        { $value = &CTypePredefined::AnyType(); }
+        { $value = CTypePredefined::AnyType(); }
         ;
 bitstringKeyword
         : BIT_STRING;
@@ -1714,7 +1706,7 @@ universalCharString
         : universalKeyword charStringKeyword;
 universalKeyword
         : UNIVERSAL;
-referencedType returns [ freettcn::translator::CTypeReferenced *value ]
+referencedType returns [ std::shared_ptr<freettcn::translator::CTypeReferenced> value ]
         @init
         { $value = 0; }
         : ( globalModuleId DOT )? typeReference extendedFieldReference?
@@ -1722,29 +1714,29 @@ referencedType returns [ freettcn::translator::CTypeReferenced *value ]
             $value = $typeReference.value;
         }
         ;
-typeReference returns [ freettcn::translator::CTypeReferenced *value ]
+typeReference returns [ std::shared_ptr<freettcn::translator::CTypeReferenced> value ]
         @init
         { $value = 0; }
         : ( structTypeIdentifier
             {
                 pANTLR3_COMMON_TOKEN token = LT(-1);
-                $value = &translator->TypeReferenced(new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1), (const char *)token->getText(token)->chars));
+                $value = translator->TypeReferenced(std::shared_ptr<const CIdentifier>(new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1), (const char *)token->getText(token)->chars)));
             }
             typeActualParList?)
         | enumTypeIdentifier
         {
             pANTLR3_COMMON_TOKEN token = LT(-1);
-            $value = &translator->TypeReferenced(new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1), (const char *)token->getText(token)->chars));
+            $value = translator->TypeReferenced(std::shared_ptr<const CIdentifier>(new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1), (const char *)token->getText(token)->chars)));
         }
         | subTypeIdentifier
         {
             pANTLR3_COMMON_TOKEN token = LT(-1);
-            $value = &translator->TypeReferenced(new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1), (const char *)token->getText(token)->chars));
+            $value = translator->TypeReferenced(std::shared_ptr<const CIdentifier>(new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1), (const char *)token->getText(token)->chars)));
         }
         | componentTypeIdentifier
         {
             pANTLR3_COMMON_TOKEN token = LT(-1);
-            $value = &translator->TypeReferenced(new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1), (const char *)token->getText(token)->chars));
+            $value = translator->TypeReferenced(std::shared_ptr<const CIdentifier>(new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1), (const char *)token->getText(token)->chars)));
         };
 /* ---A--- BUG ---A--- */
 typeActualParList
@@ -1762,38 +1754,34 @@ arrayBounds
 
 // $<A.1.6.4 Value
 
-value returns [ freettcn::translator::CExpression *expr ]
-        @init
-        { $expr = 0; }
+value returns [ std::shared_ptr<freettcn::translator::CExpression> expr ]
         : predefinedValue
         { $expr = $predefinedValue.expr; }
         | referencedValue
-        { $expr = $referencedValue.def ? new CExpressionDef(*$referencedValue.def) : 0; }
+        { if($referencedValue.def) $expr.reset(new CExpressionDef(*$referencedValue.def)); }
         ;
-predefinedValue returns [ freettcn::translator::CExpression *expr ]
+predefinedValue returns [ std::shared_ptr<freettcn::translator::CExpression> expr ]
         options { k = 2; } // integerValue and floatValue collide
-        @init
-        { $expr = 0; }
         : bitStringValue
-        { $expr = new CExpressionValue(CTypePredefined::Bitstring(), (const char *)$bitStringValue.text->chars); }
+        { $expr.reset(new CExpressionValue(CTypePredefined::Bitstring(), (const char *)$bitStringValue.text->chars)); }
         | booleanValue
-        { $expr = new CExpressionValue(CTypePredefined::Boolean(), (const char *)$booleanValue.text->chars); }
+        { $expr.reset(new CExpressionValue(CTypePredefined::Boolean(), (const char *)$booleanValue.text->chars)); }
         | charStringValue
-        { $expr = new CExpressionValue(CTypePredefined::Charstring(), (const char *)$charStringValue.text->chars); }
+        { $expr.reset(new CExpressionValue(CTypePredefined::Charstring(), (const char *)$charStringValue.text->chars)); }
         | integerValue
-        { $expr = new CExpressionValue(CTypePredefined::Integer(), (const char *)$integerValue.text->chars); }
+        { $expr.reset(new CExpressionValue(CTypePredefined::Integer(), (const char *)$integerValue.text->chars)); }
         | octetStringValue
-        { $expr = new CExpressionValue(CTypePredefined::Octetstring(), (const char *)$octetStringValue.text->chars); }
+        { $expr.reset(new CExpressionValue(CTypePredefined::Octetstring(), (const char *)$octetStringValue.text->chars)); }
         | hexStringValue
-        { $expr = new CExpressionValue(CTypePredefined::Hexstring(), (const char *)$hexStringValue.text->chars); }
+        { $expr.reset(new CExpressionValue(CTypePredefined::Hexstring(), (const char *)$hexStringValue.text->chars)); }
         | verdictTypeValue
-        { $expr = new CExpressionValue(CTypePredefined::Verdict(), (const char *)$verdictTypeValue.text->chars); }
+        { $expr.reset(new CExpressionValue(CTypePredefined::Verdict(), (const char *)$verdictTypeValue.text->chars)); }
         | enumeratedValue
-        { $expr = $enumeratedValue.def ? new CExpressionDef(*$enumeratedValue.def) : 0; }
+        { if($enumeratedValue.def) $expr.reset(new CExpressionDef(*$enumeratedValue.def)); }
         | floatValue
-        { $expr = new CExpressionValue(CTypePredefined::Float(), (const char *)$floatValue.text->chars); }
+        { $expr.reset(new CExpressionValue(CTypePredefined::Float(), (const char *)$floatValue.text->chars)); }
         | addressValue
-        { $expr = new CExpressionValue(CTypePredefined::Address(), (const char *)$addressValue.text->chars); }
+        { $expr.reset(new CExpressionValue(CTypePredefined::Address(), (const char *)$addressValue.text->chars)); }
         | omitValue
 //        { $expr = new CExpressionValue(CTypePredefined::_, $v.text->chars); }
         ;
@@ -1961,8 +1949,8 @@ formalValuePar
           )? type valueParIdentifier
         {
             pANTLR3_COMMON_TOKEN token = LT(-1);
-            const freettcn::translator::CIdentifier *id = new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1),
-                                                                          (const char *)token->getText(token)->chars);
+            std::shared_ptr<const CIdentifier> id(new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1),
+                                                                  (const char *)token->getText(token)->chars));
             translator->FormalParameter(id, $type.value, dir);
         }
         ;
@@ -1989,8 +1977,8 @@ formalTemplatePar
         ( templateKeyword | restrictedTemplate ) type templateParIdentifier
         {
             pANTLR3_COMMON_TOKEN token = LT(-1);
-            const freettcn::translator::CIdentifier *id = new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1),
-                                                                          (const char *)token->getText(token)->chars);
+            std::shared_ptr<const CIdentifier> id(new CIdentifier(CLocation(translator->File(), token->line, token->charPosition + 1),
+                                                                  (const char *)token->getText(token)->chars));
             translator->FormalParameter(id, $type.value, dir);
         }
         ;
@@ -2187,32 +2175,24 @@ arrayElementExpressionList
         : notUsedOrExpression ( ',' notUsedOrExpression )*;
 notUsedOrExpression
         : expression | notUsedSymbol;
-constantExpression returns [ const freettcn::translator::CExpression *expr ]
-        @init
-        { $expr = 0; }
+constantExpression returns [ std::shared_ptr<const freettcn::translator::CExpression> expr ]
         : e = singleConstExpression
         { $expr = $e.expr; }
         | e = compoundConstExpression
         { $expr = $e.expr; }
         ;
-singleConstExpression returns [ const freettcn::translator::CExpression *expr ]
-        @init
-        { $expr = 0; }
+singleConstExpression returns [ std::shared_ptr<const freettcn::translator::CExpression> expr ]
         : e = singleExpression
         {
             if($e.expr->Constant())
                 $expr = $e.expr;
-            else
-                delete $e.expr;
         };
 /* STATIC SEMANTICS - singleConstExpression shall not contain variables or module parameters and shall resolve
 to a constant value at compile time */
 booleanExpression
         : singleExpression;
 /* STATIC SEMANTICS - booleanExpression shall resolve to a value of type boolean */
-compoundConstExpression returns [ const freettcn::translator::CExpression *expr ]
-        @init
-        { $expr = 0; }
+compoundConstExpression returns [ std::shared_ptr<const freettcn::translator::CExpression> expr ]
         : fieldConstExpressionList | arrayConstExpression;
 /* STATIC SEMANTICS - Within compoundConstExpression the arrayConstExpression can be used for arrays, record,
 record of and set of types. */
@@ -2230,155 +2210,139 @@ assignment
 value of a type compatible with the type of the left hand side for value variables and shall evaluate to
 an explicit value, template (literal or a template instance) or a matching mechanism compatible with the
 type of the left hand side for template variables. */
-singleExpression returns [ const freettcn::translator::CExpression *expr ]
-        @init
-        { $expr = 0; }
+singleExpression returns [ std::shared_ptr<const freettcn::translator::CExpression> expr ]
         : e = xorExpression
         { $expr = $e.expr; }
         ( OR e = xorExpression
-            { $expr = new CExpressionPair(CExpressionPair::OPERATION_OR, $expr, $e.expr); }
+            { $expr.reset(new CExpressionPair(CExpressionPair::OPERATION_OR, $expr, $e.expr)); }
         )*;
 /* STATIC SEMANTICS - If more than one xorExpression exists, then the xorExpressions shall evaluate to
 specific values of compatible types. */
-xorExpression returns [ const freettcn::translator::CExpression *expr ]
-        @init
-        { $expr = 0; }
+xorExpression returns [ std::shared_ptr<const freettcn::translator::CExpression> expr ]
         : e = andExpression
         { $expr = $e.expr; }
         ( XOR e = andExpression
-            { $expr = new CExpressionPair(CExpressionPair::OPERATION_XOR, $expr, $e.expr); }
+            { $expr.reset(new CExpressionPair(CExpressionPair::OPERATION_XOR, $expr, $e.expr)); }
         )*;
 /* STATIC SEMANTICS - If more than one andExpression exists, then the andExpressions shall evaluate to
 specific values of compatible types. */
-andExpression returns [ const freettcn::translator::CExpression *expr ]
-        @init
-        { $expr = 0; }
+andExpression returns [ std::shared_ptr<const freettcn::translator::CExpression> expr ]
         : e = notExpression
         { $expr = $e.expr; }
         ( AND e = notExpression
-            { $expr = new CExpressionPair(CExpressionPair::OPERATION_AND, $expr, $e.expr); }
+            { $expr.reset(new CExpressionPair(CExpressionPair::OPERATION_AND, $expr, $e.expr)); }
         )*;
 /* STATIC SEMANTICS - If more than one notExpression exists, then the notExpressions shall evaluate to
 specific values of compatible types. */
-notExpression returns [ const freettcn::translator::CExpression *expr ]
-        @init
-        { $expr = 0; }
+notExpression returns [ std::shared_ptr<const freettcn::translator::CExpression> expr ]
         : NOT? e = equalExpression
-        { $expr = $NOT.text ? new CExpressionSingle(CExpressionSingle::OPERATION_NOT, $e.expr) : $e.expr; };
+        {
+            if($NOT.text) 
+                $expr.reset(new CExpressionSingle(CExpressionSingle::OPERATION_NOT, $e.expr));
+            else
+                $expr = $e.expr;
+        };
 /* STATIC SEMANTICS - Operands of the not operator shall be of type boolean or derivates of type boolean. */
-equalExpression returns [ const freettcn::translator::CExpression *expr ]
-        @init
-        { $expr = 0; }
+equalExpression returns [ std::shared_ptr<const freettcn::translator::CExpression> expr ]
         : e = relExpression
         { $expr = $e.expr; }
         ( equalOp e = relExpression
-            { $expr = new CExpressionPair(static_cast<CExpressionPair::TOperation>($equalOp.operation), $expr, $e.expr); }
+            { $expr.reset(new CExpressionPair(static_cast<CExpressionPair::TOperation>($equalOp.operation), $expr, $e.expr)); }
         )*;
 /* STATIC SEMANTICS - If more than one relExpression exists, then the relExpressions shall evaluate to
 specific values of compatible types. */
-relExpression returns [ const freettcn::translator::CExpression *expr ]
-        @init
-        { $expr = 0; }
+relExpression returns [ std::shared_ptr<const freettcn::translator::CExpression> expr ]
         : e = shiftExpression
         { $expr = $e.expr; }
         ( relOp e = shiftExpression
-            { $expr = new CExpressionPair(static_cast<CExpressionPair::TOperation>($relOp.operation), $expr, $e.expr); }
+            { $expr.reset(new CExpressionPair(static_cast<CExpressionPair::TOperation>($relOp.operation), $expr, $e.expr)); }
         )?;
 /* STATIC SEMANTICS - If both shiftExpressions exist, then each shiftExpression shall evaluate to a specific
 integer, enumerated or float value or derivates of these types. */
-shiftExpression returns [ const freettcn::translator::CExpression *expr ]
-        @init
-        { $expr = 0; }
+shiftExpression returns [ std::shared_ptr<const freettcn::translator::CExpression> expr ]
         : e = bitOrExpression
         { $expr = $e.expr; }
         ( shiftOp e = bitOrExpression
-            { $expr = new CExpressionPair(static_cast<CExpressionPair::TOperation>($shiftOp.operation), $expr, $e.expr); }
+            { $expr.reset(new CExpressionPair(static_cast<CExpressionPair::TOperation>($shiftOp.operation), $expr, $e.expr)); }
         )*;
 /* STATIC SEMANTICS - Each result shall resolve to a specific value. If more than one result exists the right-hand
 operand shall be of type integer or derivates and if the shift op is '<<' or '>>' then the left-hand operand shall
 resolve to either bitstring, hexstring or octetstring type or derivates of these types. If the shift op is
 '<@' or '@>' then the left-handoperand shall be of type bitstring, hexstring, octetstring, charstring, universal
 charstriing, record of, set of, o array, or derivatives of these types. */
-bitOrExpression returns [ const freettcn::translator::CExpression *expr ]
-        @init
-        { $expr = 0; }
+bitOrExpression returns [ std::shared_ptr<const freettcn::translator::CExpression> expr ]
         : e = bitXorExpression
         { $expr = $e.expr; }
         ( OR4B e = bitXorExpression
-            { $expr = new CExpressionPair(CExpressionPair::OPERATION_BIT_OR, $expr, $e.expr); }
+            { $expr.reset(new CExpressionPair(CExpressionPair::OPERATION_BIT_OR, $expr, $e.expr)); }
         )*;
 /* STATIC SEMANTICS - If more than one bitXorExpression exists, then the bitXorExpressions shall evaluate to
 specific values of compatible types. */
-bitXorExpression returns [ const freettcn::translator::CExpression *expr ]
-        @init
-        { $expr = 0; }
+bitXorExpression returns [ std::shared_ptr<const freettcn::translator::CExpression> expr ]
         : e = bitAndExpression
         { $expr = $e.expr; }
         ( XOR4B e = bitAndExpression
-            { $expr = new CExpressionPair(CExpressionPair::OPERATION_BIT_XOR, $expr, $e.expr); }
+            { $expr.reset(new CExpressionPair(CExpressionPair::OPERATION_BIT_XOR, $expr, $e.expr)); }
         )*;
 /* STATIC SEMANTICS - If more than one bitAndExpression exists, then the bitAndExpressions shall evaluate to
 specific values of compatible types. */
-bitAndExpression returns [ const freettcn::translator::CExpression *expr ]
-        @init
-        { $expr = 0; }
+bitAndExpression returns [ std::shared_ptr<const freettcn::translator::CExpression> expr ]
         : e = bitNotExpression
         { $expr = $e.expr; }
         (AND4B e = bitNotExpression
-            { $expr = new CExpressionPair(CExpressionPair::OPERATION_BIT_AND, $expr, $e.expr); }
+            { $expr.reset(new CExpressionPair(CExpressionPair::OPERATION_BIT_AND, $expr, $e.expr)); }
         )*;
 /* STATIC SEMANTICS - If more than one bitNotExpression exists, then the bitNotExpressions shall evaluate to
 specific values of compatible types. */
-bitNotExpression returns [ const freettcn::translator::CExpression *expr ]
-        @init
-        { $expr = 0; }
+bitNotExpression returns [ std::shared_ptr<const freettcn::translator::CExpression> expr ]
         : NOT4B? e = addExpression
-        { $expr = $NOT4B.text ? new CExpressionSingle(CExpressionSingle::OPERATION_BIT_NOT, $e.expr) : $e.expr; };
+        { 
+            if($NOT4B.text)
+                $expr.reset(new CExpressionSingle(CExpressionSingle::OPERATION_BIT_NOT, $e.expr));
+            else
+                $expr = $e.expr;
+        };
 /* STATIC SEMANTICS - If the not4b operator exist, the operand shall be of type bitstring, octetstring or
 hexstring or derivates of these types. */
-addExpression returns [ const freettcn::translator::CExpression *expr ]
-        @init
-        { $expr = 0; }
+addExpression returns [ std::shared_ptr<const freettcn::translator::CExpression> expr ]
         : e = mulExpression
         { $expr = $e.expr; }
         ( addOp e = mulExpression
-            { $expr = new CExpressionPair(static_cast<CExpressionPair::TOperation>($addOp.operation), $expr, $e.expr); }
+            { $expr.reset(new CExpressionPair(static_cast<CExpressionPair::TOperation>($addOp.operation), $expr, $e.expr)); }
         )*;
 /* STATIC SEMANTICS - Each mulExpression shall resolve to a specific value. If more than one mulExpression
 exists and the addOp resolves to stringOp then the mulExpressions shall be valid operands for stringOp. If
 more than one mulExpression exists and the addOp does not resolve to stringOp then the mulExpression shall
 both resolve to type integer or float or derivatives of these types. */
-mulExpression returns [ const freettcn::translator::CExpression *expr ]
-        @init
-        { $expr = 0; }
+mulExpression returns [ std::shared_ptr<const freettcn::translator::CExpression> expr ]
         : e = unaryExpression
         { $expr = $e.expr; }
         ( multiplyOp e = unaryExpression
-            { $expr = new CExpressionPair(static_cast<CExpressionPair::TOperation>($multiplyOp.operation), $expr, $e.expr); }
+            { $expr.reset(new CExpressionPair(static_cast<CExpressionPair::TOperation>($multiplyOp.operation), $expr, $e.expr)); }
         )*;
 /* STATIC SEMANTICS - Each unaryExpression shall resolve to a specific value. If more than one unaryExpression
 exists then the unaryExpressions shall resolve to type integer or float or derivatives of these types. */
-unaryExpression returns [ const freettcn::translator::CExpression *expr ]
+unaryExpression returns [ std::shared_ptr<const freettcn::translator::CExpression> expr ]
         @init
-        {
-            $expr = 0;
-            int operation = 0;
-        }
+        { int operation = 0; }
         : ( unaryOp
             { operation = $unaryOp.operation; }
         )? e = primary
-        { $expr = operation ? new CExpressionSingle(static_cast<CExpressionSingle::TOperation>(operation), $e.expr) : $e.expr; };
+        {
+            if(operation)
+                $expr.reset(new CExpressionSingle(static_cast<CExpressionSingle::TOperation>(operation), $e.expr));
+            else
+                $expr = $e.expr;
+        };
 /* STATIC SEMANTICS - primary shall resolve to a specific value of type integer or float or derivatives of
 these types. */
-primary returns [ const freettcn::translator::CExpression *expr ]
-        @init
-        { $expr = 0; }
+primary returns [ std::shared_ptr<const freettcn::translator::CExpression> expr ]
         : opCall
-        { $expr = $opCall.def ? new CExpressionDef(*$opCall.def) : 0; }
+        { if($opCall.def) $expr.reset(new CExpressionDef(*$opCall.def)); }
         | value
         { $expr = $value.expr; }
         | '(' singleExpression ')'
-        { $expr = new CExpressionSingle(CExpressionSingle::OPERATION_BRACES, $singleExpression.expr); }
+        { $expr.reset(new CExpressionSingle(CExpressionSingle::OPERATION_BRACES, $singleExpression.expr)); }
         ;
 extendedFieldReference
         : ( ( DOT ( structFieldIdentifier | typeDefIdentifier ) )

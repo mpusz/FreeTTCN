@@ -48,18 +48,18 @@ namespace freettcn {
     public:
       virtual ~CExpression() = 0;
       
-      virtual const CType &Type() const = 0;
+      virtual std::shared_ptr<const CType> Type() const = 0;
       virtual bool Constant() const = 0;
       virtual void Dump(CDumper &dumper) const = 0;
     };
     
     
     class CExpressionValue : public CExpression {
-      const CType &_type;
+      std::shared_ptr<const CType> _type;
       const std::string _value;
     public:
-      CExpressionValue(const CType &type, const char *value);
-      virtual const CType &Type() const { return _type; }
+      CExpressionValue(std::shared_ptr<const CType> type, const char *value);
+      virtual std::shared_ptr<const CType> Type() const { return _type; }
       virtual bool Constant() const { return true; }
       virtual void Dump(CDumper &dumper) const;
     };
@@ -69,7 +69,7 @@ namespace freettcn {
       const CModule::CDefinition &_def;
     public:
       CExpressionDef(const CModule::CDefinition &def);
-      virtual const CType &Type() const;
+      virtual std::shared_ptr<const CType> Type() const;
       virtual bool Constant() const;
       virtual void Dump(CDumper &dumper) const;
     };
@@ -87,10 +87,10 @@ namespace freettcn {
       };
     private:
       const TOperation _operation;
-      const std::auto_ptr<const CExpression> _expr;
+      const std::shared_ptr<const CExpression> _expr;
     public:
-      CExpressionSingle(TOperation operation, const CExpression *expr);
-      virtual const CType &Type() const { return _expr->Type(); }
+      CExpressionSingle(TOperation operation, std::shared_ptr<const CExpression> expr);
+      virtual std::shared_ptr<const CType> Type() const { return _expr->Type(); }
       virtual bool Constant() const { return _expr->Constant(); }
       virtual void Dump(CDumper &dumper) const;
     };
@@ -126,11 +126,11 @@ namespace freettcn {
       };
     private:
       const TOperation _operation;
-      const std::auto_ptr<const CExpression> _expr1;
-      const std::auto_ptr<const CExpression> _expr2;
+      const std::shared_ptr<const CExpression> _expr1;
+      const std::shared_ptr<const CExpression> _expr2;
     public:
-      CExpressionPair(TOperation operation, const CExpression *expr1, const CExpression *expr2);
-      virtual const CType &Type() const;
+      CExpressionPair(TOperation operation, std::shared_ptr<const CExpression> expr1, std::shared_ptr<const CExpression> expr2);
+      virtual std::shared_ptr<const CType> Type() const;
       virtual bool Constant() const { return _expr1->Constant() && _expr2->Constant(); }
       virtual void Dump(CDumper &dumper) const;
     };

@@ -34,6 +34,7 @@
 #include "location.h"
 #include "freettcn/tools/tools.h"
 #include <string>
+#include <array>
 #include <map>
 #include <memory>
 
@@ -95,35 +96,25 @@ namespace freettcn {
       };
       
     private:
-      static CTypePredefined _bitstring;
-      static CTypePredefined _boolean;
-      static CTypePredefined _charstring;
-      static CTypePredefined _universalCharstring;
-      static CTypePredefined _integer;
-      static CTypePredefined _octetstring;
-      static CTypePredefined _hexstring;
-      static CTypePredefined _verdict;
-      static CTypePredefined _float;
-      static CTypePredefined _address;
-      static CTypePredefined _default;
-      static CTypePredefined _anyType;
-      
+      typedef std::array<std::shared_ptr<CTypePredefined>, 12> CTypeArray;
+      static CTypeArray _array;
+
       const TType _type;
       std::string _name;
       
     public:
-      static CTypePredefined &Bitstring();
-      static CTypePredefined &Boolean();
-      static CTypePredefined &Charstring();
-      static CTypePredefined &UniversalCharstring();
-      static CTypePredefined &Integer();
-      static CTypePredefined &Octetstring();
-      static CTypePredefined &Hexstring();
-      static CTypePredefined &Verdict();
-      static CTypePredefined &Float();
-      static CTypePredefined &Address();
-      static CTypePredefined &Default();
-      static CTypePredefined &AnyType();
+      static std::shared_ptr<CTypePredefined> Bitstring();
+      static std::shared_ptr<CTypePredefined> Boolean();
+      static std::shared_ptr<CTypePredefined> Charstring();
+      static std::shared_ptr<CTypePredefined> UniversalCharstring();
+      static std::shared_ptr<CTypePredefined> Integer();
+      static std::shared_ptr<CTypePredefined> Octetstring();
+      static std::shared_ptr<CTypePredefined> Hexstring();
+      static std::shared_ptr<CTypePredefined> Verdict();
+      static std::shared_ptr<CTypePredefined> Float();
+      static std::shared_ptr<CTypePredefined> Address();
+      static std::shared_ptr<CTypePredefined> Default();
+      static std::shared_ptr<CTypePredefined> AnyType();
       
       CTypePredefined(TType type);
 
@@ -141,9 +132,9 @@ namespace freettcn {
     class CTypeReferenced : public CType {
       
       class CTypeUnresolved : public CType {
-        const std::auto_ptr<const CIdentifier> _id;
+        const std::shared_ptr<const CIdentifier> _id;
       public:
-        CTypeUnresolved(const CIdentifier *id);
+        CTypeUnresolved(std::shared_ptr<const CIdentifier> id);
         virtual TKind Kind() const;
         virtual const std::string &Name() const;
         virtual void Dump(CDumper &dumper) const;
@@ -152,13 +143,13 @@ namespace freettcn {
         const CIdentifier &Id() const;
       };
       
-      CType *_type;
+      std::shared_ptr<CType> _type;
       bool _typeUnresolved;
       
     public:
-      CTypeReferenced(CType &type);
-      CTypeReferenced(const CIdentifier *id);
       ~CTypeReferenced();
+      CTypeReferenced(std::shared_ptr<CType> type);
+      CTypeReferenced(std::shared_ptr<const CIdentifier> id);
       virtual TKind Kind() const;
       virtual const std::string &Name() const;
       virtual void Dump(CDumper &dumper) const;
@@ -178,18 +169,18 @@ namespace freettcn {
     class CTypeStructured : public CTypeLocal {
     public:
       class CField {
-        CType &_type;
-        const std::auto_ptr<const CIdentifier> _id;
+        std::shared_ptr<CType> _type;
+        const std::shared_ptr<const CIdentifier> _id;
         const bool _optional;
       public:
-        CField(CType &type, const CIdentifier *id, bool optional);
+        CField(std::shared_ptr<CType> type, std::shared_ptr<const CIdentifier> id, bool optional);
         CType &Type() const;
         const CIdentifier &Id() const;
         //        bool Optional() const;
       };
       
     private:
-      typedef std::map<const std::string *, const CField *, CPtrCmp> CFieldMap;
+      typedef std::map<const std::string *, std::shared_ptr<const CField>, CPtrCmp> CFieldMap;
       CFieldMap _fieldMap;
       
     public:
@@ -197,20 +188,20 @@ namespace freettcn {
       ~CTypeStructured();
       virtual TKind Kind() const;
       virtual void Dump(CDumper &dumper) const;
-      virtual void Register(CField *field);
+      virtual void Register(std::shared_ptr<CField> field);
       virtual bool Resolved() const;
       virtual bool Resolve(TKind kind, const std::string &ownerInstanceStr);
     };
     
     
     class CTypeRecord : public CTypeStructured {
-      typedef std::deque<const CField *> CFieldList;
+      typedef std::deque<std::shared_ptr<const CField>> CFieldList;
       CFieldList _fieldList;
     public:
       CTypeRecord(const std::string &name);
       virtual TKind Kind() const;
       virtual void Dump(CDumper &dumper) const;
-      virtual void Register(CField *field);
+      virtual void Register(std::shared_ptr<CField> field);
     };
     
     
@@ -250,8 +241,8 @@ namespace freettcn {
       };
       
     private:
-      typedef std::map<const std::string, const CItem *> CItemMap;
-      typedef std::deque<const CItem *> CItemList;
+      typedef std::map<const std::string, std::shared_ptr<const CItem>> CItemMap;
+      typedef std::deque<std::shared_ptr<const CItem>> CItemList;
       const TMode _mode;
       CItemList _itemList;
       CItemMap _inItemMap;
@@ -263,7 +254,7 @@ namespace freettcn {
       virtual TKind Kind() const;
       virtual TMode Mode() const;
       virtual void Dump(CDumper &dumper) const;
-      virtual void Register(CItem *item, TDirection dir);
+      virtual void Register(std::shared_ptr<CItem> item, TDirection dir);
       virtual bool Resolved() const;
       virtual bool Resolve(TKind kind, const std::string &ownerInstanceStr);
     };

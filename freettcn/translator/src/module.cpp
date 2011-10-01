@@ -37,8 +37,8 @@
 
 
 
-freettcn::translator::CModule::CDefinition::CDefinition(const CIdentifier *id, CType &type):
-  _id(id), _type(type)
+freettcn::translator::CModule::CDefinition::CDefinition(std::shared_ptr<const CIdentifier> id, std::shared_ptr<CType> type):
+  _id(move(id)), _type(type)
 {
 }
 
@@ -54,7 +54,7 @@ void freettcn::translator::CModule::CDefinition::Dump(CDumper &dumper) const
 
 
 
-freettcn::translator::CModule::CDefinitionParameter::CDefinitionParameter(const CIdentifier *id, CType &type, const CExpression *expr):
+freettcn::translator::CModule::CDefinitionParameter::CDefinitionParameter(std::shared_ptr<const CIdentifier> id, std::shared_ptr<CType> type, std::shared_ptr<const CExpression> expr):
   CDefinition(id, type), _expr(expr)
 {
 }
@@ -66,7 +66,7 @@ void freettcn::translator::CModule::CDefinitionParameter::Dump(CDumper &dumper) 
 
 
 
-freettcn::translator::CModule::CDefinitionConstValue::CDefinitionConstValue(const CIdentifier *id, CType &type, const CExpression *expr):
+freettcn::translator::CModule::CDefinitionConstValue::CDefinitionConstValue(std::shared_ptr<const CIdentifier> id, std::shared_ptr<CType> type, std::shared_ptr<const CExpression> expr):
   CDefinition(id, type), _expr(expr)
 {
 }
@@ -77,8 +77,8 @@ void freettcn::translator::CModule::CDefinitionConstValue::Dump(CDumper &dumper)
 }
 
 
-freettcn::translator::CModule::CDefinitionTypeLocal::CDefinitionTypeLocal(const CIdentifier *id, CTypeLocal *type):
-  CDefinition(id, *type), _type(type)
+freettcn::translator::CModule::CDefinitionTypeLocal::CDefinitionTypeLocal(std::shared_ptr<const CIdentifier> id, std::shared_ptr<CTypeLocal> type):
+  CDefinition(id, type), _type(type)
 {
 }
 
@@ -88,7 +88,7 @@ void freettcn::translator::CModule::CDefinitionTypeLocal::Dump(CDumper &dumper) 
 }
       
 
-freettcn::translator::CModule::CDefinitionFormalParameter::CDefinitionFormalParameter(const CIdentifier *id, CType &type, TDirection dir):
+freettcn::translator::CModule::CDefinitionFormalParameter::CDefinitionFormalParameter(std::shared_ptr<const CIdentifier> id, std::shared_ptr<CType> type, TDirection dir):
   CDefinition(id, type), _dir(dir)
 {
 }
@@ -100,7 +100,7 @@ void freettcn::translator::CModule::CDefinitionFormalParameter::Dump(CDumper &du
 
 
 
-freettcn::translator::CModule::CDefinitionMethod::CDefinitionMethod(const CIdentifier *id, CType &type):
+freettcn::translator::CModule::CDefinitionMethod::CDefinitionMethod(std::shared_ptr<const CIdentifier> id, std::shared_ptr<CType> type):
   CDefinition(id, type)
 {
 }
@@ -108,18 +108,17 @@ freettcn::translator::CModule::CDefinitionMethod::CDefinitionMethod(const CIdent
 
 freettcn::translator::CModule::CDefinitionMethod::~CDefinitionMethod()
 {
-  Purge(_params);
 }
 
 
-void freettcn::translator::CModule::CDefinitionMethod::Register(const CDefinitionFormalParameter *par)
+void freettcn::translator::CModule::CDefinitionMethod::Register(std::shared_ptr<const CDefinitionFormalParameter> par)
 {
   _params.push_back(par);
 }
 
 
 
-freettcn::translator::CModule::CDefinitionTestcase::CDefinitionTestcase(const CIdentifier *id, CType &type):
+freettcn::translator::CModule::CDefinitionTestcase::CDefinitionTestcase(std::shared_ptr<const CIdentifier> id, std::shared_ptr<CType> type):
   CDefinitionMethod(id, type)
 {
 }
@@ -130,7 +129,7 @@ void freettcn::translator::CModule::CDefinitionTestcase::Dump(CDumper &dumper) c
 }
 
 
-freettcn::translator::CModule::CDefinitionTemplate::CDefinitionTemplate(const CIdentifier *id, CType &type):
+freettcn::translator::CModule::CDefinitionTemplate::CDefinitionTemplate(std::shared_ptr<const CIdentifier> id, std::shared_ptr<CType> type):
   CDefinitionMethod(id, type)
 {
 }
@@ -143,7 +142,7 @@ void freettcn::translator::CModule::CDefinitionTemplate::Dump(CDumper &dumper) c
 
 
 
-freettcn::translator::CModule::CModule(const CIdentifier *id, TLanguage language):
+freettcn::translator::CModule::CModule(std::shared_ptr<const CIdentifier> id, TLanguage language):
   _id(id), _language(language)
 {
 }
@@ -151,11 +150,10 @@ freettcn::translator::CModule::CModule(const CIdentifier *id, TLanguage language
 
 freettcn::translator::CModule::~CModule()
 {
-  Purge(_defList);
 }
 
 
-void freettcn::translator::CModule::Register(CDefinition *def)
+void freettcn::translator::CModule::Register(std::shared_ptr<CDefinition> def)
 {
   _defList.push_back(def);
 }

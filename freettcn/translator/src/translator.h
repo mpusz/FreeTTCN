@@ -61,7 +61,7 @@ namespace freettcn {
       typedef std::map<const std::string *, const CModule::CDefinition *, CPtrCmp> CScope;
       typedef std::list<CScope> CScopeStack;
       typedef std::set<std::string> CUnresolvedSymbolsSet;
-      typedef std::map<std::string, CTypeReferenced *> CTypeReferencedMap;
+      typedef std::map<std::string, std::shared_ptr<CTypeReferenced>> CTypeReferencedMap;
       
       static CTranslator *_instance;              /**< @brief Translator instance */
       
@@ -77,10 +77,10 @@ namespace freettcn {
       CUnresolvedSymbolsSet _unresolvedSymbols;   /**< @brief Unresolved symbols set */
       CTypeReferencedMap _referencedTypes;        /**< @brief Referenced types map that speeds up resolving process */
       
-      std::auto_ptr<CModule> _module;             /**< @brief TTCN-3 module */
-      CTypeStructured *_structType;               /**< @brief Current structured type */
-      CTypePort *_portType;                       /**< @brief Current port type */
-      CModule::CDefinitionMethod *_method;        /**< @brief Current TTCN-3 method (testcase, template, etc.) */
+      std::shared_ptr<CModule> _module;           /**< @brief TTCN-3 module */
+      std::shared_ptr<CTypeStructured> _structType; /**< @brief Current structured type */
+      std::shared_ptr<CTypePort> _portType;       /**< @brief Current port type */
+      std::shared_ptr<CModule::CDefinitionMethod> _method;        /**< @brief Current TTCN-3 method (testcase, template, etc.) */
       
       CTranslator(const CTranslator &);           /**< @brief Disallowed */
       CTranslator &operator=(const CTranslator &); /**< @brief Disallowed */
@@ -109,21 +109,21 @@ namespace freettcn {
       const CModule::CDefinition *ScopeSymbol(const CIdentifier &id);
       void ScopePop();
       
-      CType *Type(const std::string &name) const;
-      CTypeReferenced &TypeReferenced(const CIdentifier *id);
+      std::shared_ptr<CType> Type(const std::string &name) const;
+      std::shared_ptr<CTypeReferenced> TypeReferenced(std::shared_ptr<const CIdentifier> id);
       
-      void Module(const CIdentifier *id, const std::string &language);
-      void ModulePar(const CIdentifier *id, CType *type, const CExpression *expr);
-      void ConstValue(const CIdentifier *id, CType *type, const CExpression *expr);
-      void Struct(const CIdentifier *id, bool set);
-      void StructField(const CIdentifier *id, CType *type, bool optional);
-      void Union(const CIdentifier *id);
-      void UnionField(const CIdentifier *id, CType *type);
-      void Port(const CIdentifier *id, CTypePort::TMode mode);
-      void PortItem(const CLocation &loc, CType *type, const std::string &dirStr);
-      void Testcase(const CIdentifier *id);
-      void Template(const CIdentifier *id);
-      void FormalParameter(const CIdentifier *id, CType *type, const std::string &dirStr);
+      void Module(std::shared_ptr<const CIdentifier> id, const std::string &language);
+      void ModulePar(std::shared_ptr<const CIdentifier> id, std::shared_ptr<CType> type, std::shared_ptr<const CExpression> expr);
+      void ConstValue(std::shared_ptr<const CIdentifier> id, std::shared_ptr<CType> type, std::shared_ptr<const CExpression> expr);
+      void Struct(std::shared_ptr<const CIdentifier> id, bool set);
+      void StructField(std::shared_ptr<const CIdentifier> id, std::shared_ptr<CType> type, bool optional);
+      void Union(std::shared_ptr<const CIdentifier> id);
+      void UnionField(std::shared_ptr<const CIdentifier> id, std::shared_ptr<CType> type);
+      void Port(std::shared_ptr<const CIdentifier> id, CTypePort::TMode mode);
+      void PortItem(const CLocation &loc, std::shared_ptr<CType> type, const std::string &dirStr);
+      void Testcase(std::shared_ptr<const CIdentifier> id);
+      void Template(std::shared_ptr<const CIdentifier> id);
+      void FormalParameter(std::shared_ptr<const CIdentifier> id, std::shared_ptr<CType> type, const std::string &dirStr);
     };
     
   } // namespace translator

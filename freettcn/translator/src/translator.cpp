@@ -50,8 +50,7 @@ freettcn::translator::CTranslator &freettcn::translator::CTranslator::Instance()
 
 
 freettcn::translator::CTranslator::CTranslator(const std::string &inputName, CLogger &logger):
-  _logger(logger), _errorNum(0), _warningNum(0), _line(1),
-  _structType(0), _method(0)
+  _logger(logger), _errorNum(0), _warningNum(0), _line(1)
 {
   _instance = this;
   
@@ -64,7 +63,6 @@ freettcn::translator::CTranslator::~CTranslator()
 {
   _instance = 0;
   _filesStack.pop();
-  PurgeMap(_referencedTypes);
 }
 
 
@@ -148,8 +146,8 @@ bool freettcn::translator::CTranslator::ScopeSymbol(const CModule::CDefinition &
       localDef = scopeIt->second;
   }
   if(localDef) {
-    Error(def.Id().Loc(), "conflicting declaration '" + def.Type().Name() + " " + def.Id().Name() + "'");
-    Error(localDef->Id().Loc(), "'" + def.Id().Name() + "' has a previous declaration as '" + localDef->Type().Name() + " " +  localDef->Id().Name() + "'");
+    Error(def.Id().Loc(), "conflicting declaration '" + def.Type()->Name() + " " + def.Id().Name() + "'");
+    Error(localDef->Id().Loc(), "'" + def.Id().Name() + "' has a previous declaration as '" + localDef->Type()->Name() + " " +  localDef->Id().Name() + "'");
     return false;
   }
   else {
@@ -195,49 +193,45 @@ void freettcn::translator::CTranslator::ScopePop()
 }
 
 
-freettcn::translator::CType *freettcn::translator::CTranslator::Type(const std::string &name) const
+std::shared_ptr<freettcn::translator::CType> freettcn::translator::CTranslator::Type(const std::string &name) const
 {
   for(CScopeStack::const_iterator stackIt=_scopes.begin(); stackIt!=_scopes.end(); ++stackIt) {
     CScope::const_iterator scopeIt = stackIt->find(&name);
     if(scopeIt != stackIt->end())
-      return &scopeIt->second->Type();
+      return scopeIt->second->Type();
   }
   
   return 0;
 }
 
 
-freettcn::translator::CTypeReferenced &freettcn::translator::CTranslator::TypeReferenced(const CIdentifier *id)
+std::shared_ptr<freettcn::translator::CTypeReferenced> freettcn::translator::CTranslator::TypeReferenced(std::shared_ptr<const CIdentifier> id)
 {
-  std::auto_ptr<const CIdentifier> idPtr(id);
-  
   // check if referenced type is created already
   CTypeReferencedMap::iterator it = _referencedTypes.find(id->Name());
   if(it != _referencedTypes.end()) {
     /// @todo check if type can be resolved now
-    return *it->second;
+    return it->second;
   }
   
   // look for type definition
-  CType *type = Type(id->Name());
+  std::shared_ptr<CType> type = Type(id->Name());
   if(type) {
     // create new referenced type and insert to the map
-    CTypeReferenced *refType = new CTypeReferenced(*type);
+    std::shared_ptr<CTypeReferenced> refType(new CTypeReferenced(type));
     _referencedTypes[id->Name()] = refType;
-    return *refType;
+    return refType;
   }
   
   // create new unresolved referenced type and insert to the map
-  CTypeReferenced *refType = new CTypeReferenced(idPtr.release());
+  std::shared_ptr<CTypeReferenced> refType(new CTypeReferenced(id));
   _referencedTypes[id->Name()] = refType;
-  return *refType;
+  return refType;
 }
 
 
-void freettcn::translator::CTranslator::Module(const CIdentifier *id, const std::string &language)
+void freettcn::translator::CTranslator::Module(std::shared_ptr<const CIdentifier> id, const std::string &language)
 {
-  std::auto_ptr<const CIdentifier> idPtr(id);
-  
   // check module ID 
   if(File().ModuleName().compare(id->Name()))
     Error(id->Loc(), "module ID '" + id->Name() + "' does not match TTCN-3 file name");
@@ -259,15 +253,12 @@ void freettcn::translator::CTranslator::Module(const CIdentifier *id, const std:
   }
   
   // create new module
-  _module = std::auto_ptr<CModule>(new CModule(idPtr.release(), lang));
+  _module = std::shared_ptr<CModule>(new CModule(id, lang));
 }
 
 
-void freettcn::translator::CTranslator::ModulePar(const CIdentifier *id, CType *type, const CExpression *expr)
+void freettcn::translator::CTranslator::ModulePar(std::shared_ptr<const CIdentifier> id, std::shared_ptr<CType> type, std::shared_ptr<const CExpression> expr)
 {
-  std::auto_ptr<const CIdentifier> idPtr(id);
-  std::auto_ptr<const CExpression> exprPtr(expr);
-  
   if(!type)
     throw EOperationFailed(E_DATA, "Module Parameter type not specified!!!");
   
@@ -281,21 +272,18 @@ void freettcn::translator::CTranslator::ModulePar(const CIdentifier *id, CType *
     Error(id->Loc(), "module parameter '" + id->Name() + "' should resolve to a constant value");
   
   // check if types match
-  if(expr && !type->Match(expr->Type()))
+  if(expr && !type->Match(*expr->Type()))
     Error(id->Loc(), "expression of module parameter '" + id->Name() + "' does not match parameter type '" + type->Name() + "'");
   
-  std::auto_ptr<CModule::CDefinitionParameter> def(new CModule::CDefinitionParameter(idPtr.release(), *type, exprPtr.release()));
+  std::shared_ptr<CModule::CDefinitionParameter> def(new CModule::CDefinitionParameter(id, type, expr));
   if(ScopeSymbol(*def))
     // register new module parameter
-    _module->Register(def.release());
+    _module->Register(def);
 }
 
 
-void freettcn::translator::CTranslator::ConstValue(const CIdentifier *id, CType *type, const CExpression *expr)
+void freettcn::translator::CTranslator::ConstValue(std::shared_ptr<const CIdentifier> id, std::shared_ptr<CType> type, std::shared_ptr<const CExpression> expr)
 {
-  std::auto_ptr<const CIdentifier> idPtr(id);
-  std::auto_ptr<const CExpression> exprPtr(expr);
-  
   if(!type)
     throw EOperationFailed(E_DATA, "Const value type not specified!!!");
   
@@ -309,40 +297,37 @@ void freettcn::translator::CTranslator::ConstValue(const CIdentifier *id, CType 
     Error(id->Loc(), "const value '" + id->Name() + "' should resolve to a constant value");
   
   // check if types match
-  if(expr && !type->Match(expr->Type()))
+  if(expr && !type->Match(*expr->Type()))
     Error(id->Loc(), "expression of const value '" + id->Name() + "' does not match const type '" + type->Name() + "'");
   
-  std::auto_ptr<CModule::CDefinitionConstValue> def(new CModule::CDefinitionConstValue(idPtr.release(), *type, exprPtr.release()));
+  std::shared_ptr<CModule::CDefinitionConstValue> def(new CModule::CDefinitionConstValue(id, type, expr));
   if(ScopeSymbol(*def))
     // register new const value
-    _module->Register(def.release());
+    _module->Register(def);
 }
 
 
-void freettcn::translator::CTranslator::Struct(const CIdentifier *id, bool set)
+void freettcn::translator::CTranslator::Struct(std::shared_ptr<const CIdentifier> id, bool set)
 {
-  std::auto_ptr<const CIdentifier> idPtr(id);
-  _structType = 0;
+  _structType.reset();
   
-  CTypeStructured *structType;
+  std::shared_ptr<CTypeStructured> structType;
   if(set)
-    structType = new CTypeStructured(id->Name());
+    structType.reset(new CTypeStructured(id->Name()));
   else
-    structType = new CTypeRecord(id->Name());
+    structType.reset(new CTypeRecord(id->Name()));
   
-  std::auto_ptr<CModule::CDefinitionTypeLocal> def(new CModule::CDefinitionTypeLocal(idPtr.release(), structType));
+  std::shared_ptr<CModule::CDefinitionTypeLocal> def(new CModule::CDefinitionTypeLocal(id, structType));
   if(ScopeSymbol(*def)) {
     // register new structured type
     _structType = structType;
-    _module->Register(def.release());
+    _module->Register(def);
   }
 }
 
 
-void freettcn::translator::CTranslator::StructField(const CIdentifier *id, CType *type, bool optional)
+void freettcn::translator::CTranslator::StructField(std::shared_ptr<const CIdentifier> id, std::shared_ptr<CType> type, bool optional)
 {
-  std::auto_ptr<const CIdentifier> idPtr(id);
-  
   if(!_structType)
     throw EOperationFailed(E_DATA, "Current structured type not set!!!");
   
@@ -354,29 +339,26 @@ void freettcn::translator::CTranslator::StructField(const CIdentifier *id, CType
     return;
   }
 
-  _structType->Register(new CTypeStructured::CField(*type, idPtr.release(), optional));
+  _structType->Register(std::shared_ptr<CTypeStructured::CField>(new CTypeStructured::CField(type, id, optional)));
 }
 
 
-void freettcn::translator::CTranslator::Union(const CIdentifier *id)
+void freettcn::translator::CTranslator::Union(std::shared_ptr<const CIdentifier> id)
 {
-  std::auto_ptr<const CIdentifier> idPtr(id);
-  _structType = 0;
+  _structType.reset();
   
-  CTypeStructured *structType = new CTypeUnion(id->Name());
-  std::auto_ptr<CModule::CDefinitionTypeLocal> def(new CModule::CDefinitionTypeLocal(idPtr.release(), structType));
+  std::shared_ptr<CTypeStructured> structType(new CTypeUnion(id->Name()));
+  std::shared_ptr<CModule::CDefinitionTypeLocal> def(new CModule::CDefinitionTypeLocal(id, structType));
   if(ScopeSymbol(*def)) {
     // register new structured type
     _structType = structType;
-    _module->Register(def.release());
+    _module->Register(def);
   }
 }
 
 
-void freettcn::translator::CTranslator::UnionField(const CIdentifier *id, CType *type)
+void freettcn::translator::CTranslator::UnionField(std::shared_ptr<const CIdentifier> id, std::shared_ptr<CType> type)
 {
-  std::auto_ptr<const CIdentifier> idPtr(id);
-  
   if(!_structType)
     throw EOperationFailed(E_DATA, "Current structured type not set!!!");
   
@@ -388,26 +370,25 @@ void freettcn::translator::CTranslator::UnionField(const CIdentifier *id, CType 
     return;
   }
 
-  _structType->Register(new CTypeStructured::CField(*type, idPtr.release(), true));
+  _structType->Register(std::shared_ptr<CTypeStructured::CField>(new CTypeStructured::CField(type, id, true)));
 }
 
 
-void freettcn::translator::CTranslator::Port(const CIdentifier *id, CTypePort::TMode mode)
+void freettcn::translator::CTranslator::Port(std::shared_ptr<const CIdentifier> id, CTypePort::TMode mode)
 {
-  std::auto_ptr<const CIdentifier> idPtr(id);
-  _portType = 0;
+  _portType.reset();
   
-  CTypePort *portType = new CTypePort(id->Name(), mode);
-  std::auto_ptr<CModule::CDefinitionTypeLocal> def(new CModule::CDefinitionTypeLocal(idPtr.release(), portType));
+  std::shared_ptr<CTypePort> portType(new CTypePort(id->Name(), mode));
+  std::shared_ptr<CModule::CDefinitionTypeLocal> def(new CModule::CDefinitionTypeLocal(id, portType));
   if(ScopeSymbol(*def)) {
     // register new port type
     _portType = portType;
-    _module->Register(def.release());
+    _module->Register(def);
   }
 }
 
 
-void freettcn::translator::CTranslator::PortItem(const CLocation &loc, CType *type, const std::string &dirStr)
+void freettcn::translator::CTranslator::PortItem(const CLocation &loc, std::shared_ptr<CType> type, const std::string &dirStr)
 {
   if(!_portType)
     throw EOperationFailed(E_DATA, "Port type not set!!!");
@@ -418,54 +399,50 @@ void freettcn::translator::CTranslator::PortItem(const CLocation &loc, CType *ty
   else if(dirStr == "out")
     dir = CTypePort::DIRECTION_OUT;
   
-  CTypePort::CItem *item = 0;
+  std::shared_ptr<CTypePort::CItem> item;
   if(type){
     if(!(type->Kind() & CType::KIND_TYPE) && type->Kind() != CType::KIND_UNRESOLVED) {
       Error(loc, "port '" + _portType->Name() + "' item cannot be of '" + CType::KindToString(type->Kind()) + "' type");
       return;
     }
-    item = new CTypePort::CItem(loc, *type);
+    item.reset(new CTypePort::CItem(loc, *type));
   }
   else
-    item = new CTypePort::CItem(loc);
+    item.reset(new CTypePort::CItem(loc));
   
   _portType->Register(item, dir);
 }
 
 
-void freettcn::translator::CTranslator::Testcase(const CIdentifier *id)
+void freettcn::translator::CTranslator::Testcase(std::shared_ptr<const CIdentifier> id)
 {
-  std::auto_ptr<const CIdentifier> idPtr(id);
-  _method = 0;
+  _method.reset();
   
-  std::auto_ptr<CModule::CDefinitionTestcase> def(new CModule::CDefinitionTestcase(idPtr.release(), CTypePredefined::Verdict()));
+  std::shared_ptr<CModule::CDefinitionTestcase> def(new CModule::CDefinitionTestcase(id, CTypePredefined::Verdict()));
   if(ScopeSymbol(*def)) {
     // register new testcase
-    _method = def.get();
-    _module->Register(def.release());
+    _method = def;
+    _module->Register(def);
   }
 }
 
 
-void freettcn::translator::CTranslator::Template(const CIdentifier *id)
+void freettcn::translator::CTranslator::Template(std::shared_ptr<const CIdentifier> id)
 {
-  std::auto_ptr<const CIdentifier> idPtr(id);
-  _method = 0;
+  _method.reset();
   
   /// @todo template type
-  std::auto_ptr<CModule::CDefinitionTemplate> def(new CModule::CDefinitionTemplate(idPtr.release(), CTypePredefined::Verdict()));
+  std::shared_ptr<CModule::CDefinitionTemplate> def(new CModule::CDefinitionTemplate(id, CTypePredefined::Verdict()));
   if(ScopeSymbol(*def)) {
     // register new template
-    _method = def.get();
-    _module->Register(def.release());
+    _method = def;
+    _module->Register(def);
   }
 }
 
 
-void freettcn::translator::CTranslator::FormalParameter(const CIdentifier *id, CType *type, const std::string &dirStr)
+void freettcn::translator::CTranslator::FormalParameter(std::shared_ptr<const CIdentifier> id, std::shared_ptr<CType> type, const std::string &dirStr)
 {
-  std::auto_ptr<const CIdentifier> idPtr(id);
-  
   if(!type)
     throw EOperationFailed(E_DATA, "Formal Parameter type not specified!!!");
   
@@ -490,9 +467,9 @@ void freettcn::translator::CTranslator::FormalParameter(const CIdentifier *id, C
   else if(dirStr == "out")
     dir = CModule::CDefinitionFormalParameter::DIRECTION_OUT;
   
-  std::auto_ptr<CModule::CDefinitionFormalParameter> def(new CModule::CDefinitionFormalParameter(idPtr.release(), *type, dir));
+  std::shared_ptr<CModule::CDefinitionFormalParameter> def(new CModule::CDefinitionFormalParameter(id, type, dir));
   if(ScopeSymbol(*def)) {
     // register new module parameter in a method
-    _method->Register(def.release());
+    _method->Register(def);
   }
 }
