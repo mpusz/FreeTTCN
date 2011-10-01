@@ -37,6 +37,7 @@ extern "C" {
 }
 #include <freettcn/tools/entity.h>
 
+#include <string>
 
 namespace freettcn {
 
@@ -53,6 +54,9 @@ namespace freettcn {
       virtual ~CTTCNExecutable();
       CTTCNExecutable& operator=(CTTCNExecutable&);  // Disallowed
       CTTCNExecutable(const CTTCNExecutable&);       // Disallowed
+      
+      void TciError(const std::string &str) const;
+
     protected:
       CModule &RootModule() const;
       

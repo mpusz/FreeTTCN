@@ -65,6 +65,12 @@ freettcn::TE::CTTCNExecutable::~CTTCNExecutable()
 }
 
 
+void freettcn::TE::CTTCNExecutable::TciError(const std::string &str) const
+{
+  tciError(const_cast<char *>(str.c_str()));
+}
+
+
 freettcn::TE::CModule &freettcn::TE::CTTCNExecutable::RootModule() const
 {
   if (_rootModule)
@@ -86,7 +92,7 @@ void freettcn::TE::CTTCNExecutable::RootModule(String moduleId)
     
     // check if TTCN Executable is running test case or control part
     if (_rootModule && _rootModule->Running()) {
-      tciError("Cannot set TTCN Root Module while tests are running");
+      TciError("Cannot set TTCN Root Module while tests are running");
       return;
     }
     
@@ -101,7 +107,7 @@ void freettcn::TE::CTTCNExecutable::RootModule(String moduleId)
     str = "TTCN Module '";
     str += moduleId;
     str += "' not found";
-    tciError(const_cast<char *>(str.c_str()));
+    TciError(str);
     return;
   }
 }
@@ -120,7 +126,7 @@ TciModuleParameterListType freettcn::TE::CTTCNExecutable::ModuleParametersGet(co
     str += module.Id().moduleName;
     
     // send an error
-    tciError(const_cast<char *>(str.c_str()));
+    TciError(str);
     
     // return dummy data
     TciModuleParameterListType modParList;
@@ -153,7 +159,7 @@ TciParameterTypeListType freettcn::TE::CTTCNExecutable::TestCaseParametersGet(co
     str += module.Id().moduleName;
     
     // send an error
-    tciError(const_cast<char *>(str.c_str()));
+    TciError(str);
     
     // return dummy data
     TciParameterTypeListType tcParams;
@@ -180,7 +186,7 @@ TriPortIdList freettcn::TE::CTTCNExecutable::TestCaseTSIGet(const TciTestCaseIdT
     str += module.Id().moduleName;
     
     // send an error
-    tciError(const_cast<char *>(str.c_str()));
+    TciError(str);
     
     // return dummy data
     TriPortIdList portList;
@@ -207,7 +213,7 @@ void freettcn::TE::CTTCNExecutable::TestCaseStart(const TciTestCaseIdType &testC
     str += module.Id().moduleName;
     
     // send an error
-    tciError(const_cast<char *>(str.c_str()));
+    TciError(str);
     return;
   }
   
