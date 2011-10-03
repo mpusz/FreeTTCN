@@ -105,9 +105,6 @@ namespace freettcn {
       CModuleParList _modParList;
       CTCList _tcList;
       
-      CTestManagement& operator=(CTestManagement&);  // Disallowed
-      CTestManagement(const CTestManagement&);       // Disallowed
-      
       void Clear();
       
     protected:

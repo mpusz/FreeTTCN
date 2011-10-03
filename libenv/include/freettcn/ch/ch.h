@@ -51,9 +51,6 @@ namespace freettcn {
     class CComponentHandler : public freettcn::CEntity {
       static CComponentHandler *_instance;
 
-      CComponentHandler& operator=(CComponentHandler&);  // Disallowed
-      CComponentHandler(const CComponentHandler&);       // Disallowed
-      
     protected:
       virtual void ConnectedMsgEnqueue(const TriPortId &sender, const TriComponentId &receiver, const Value &rcvdMessage);
       

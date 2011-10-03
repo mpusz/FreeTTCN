@@ -31,6 +31,7 @@
 #ifndef __MODULESCONTAINER_H__
 #define __MODULESCONTAINER_H__
 
+#include <freettcn/tools/nonCopyable.h>
 #include <freettcn/tools/exception.h>
 #include <vector>
 
@@ -44,7 +45,7 @@ namespace freettcn {
     /**
      * Singleton design pattern
      */
-    class CModulesContainer {
+    class CModulesContainer : CNonCopyable {
     public:
       typedef std::vector<CModule *> CModuleList;
       
@@ -52,8 +53,6 @@ namespace freettcn {
       CModuleList _modList;
       
       CModulesContainer();
-      CModulesContainer &operator=(CModulesContainer &);  // Disallowed
-      CModulesContainer(const CModulesContainer &);       // Disallowed
     public:
       static CModulesContainer &Instance();
       

@@ -60,9 +60,6 @@ namespace freettcn {
       
       CCodecList _codecList;
       
-      CCodingDecoding& operator=(CCodingDecoding&);  // Disallowed
-      CCodingDecoding(const CCodingDecoding&);       // Disallowed
-      
       virtual const CCodec &Codec(const Value &value, unsigned int &valueId) const;
       
     public:

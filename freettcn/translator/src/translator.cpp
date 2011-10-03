@@ -53,16 +53,13 @@ freettcn::translator::CTranslator::CTranslator(const std::string &inputName, CLo
   _logger(logger), _errorNum(0), _warningNum(0), _line(1)
 {
   _instance = this;
-  
-  _files.push_back(CFile(inputName));
-  _filesStack.push(&(*_files.rbegin()));
+  _filesStack.push(std::shared_ptr<const CFile>(new CFile(inputName)));
 }
 
 
 freettcn::translator::CTranslator::~CTranslator()
 {
   _instance = 0;
-  _filesStack.pop();
 }
 
 

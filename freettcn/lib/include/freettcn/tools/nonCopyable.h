@@ -17,41 +17,23 @@
 // along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/**
- * @file   initObject.h
- * @author Mateusz Pusz
- * @date   Wed Apr 25 11:13:10 2007
- * 
- * @brief  
- * 
- * 
- */
-
-#ifndef __INITOBJECT_H__
-#define __INITOBJECT_H__
-
-#include <freettcn/tools/nonCopyable.h>
+#ifndef __NONCOPYABLE_H__
+#define __NONCOPYABLE_H__
 
 namespace freettcn {
-
-  namespace TE {
-    
-    class CInitObject : CNonCopyable {
-      bool _inited;
-      virtual void Initialize() = 0;
-      
-    protected:
-      bool Inited() const;
-      
-    public:
-      CInitObject();
-      virtual ~CInitObject();
-      void Init();
-    };
-    
-  } // namespace TE
   
-} // namespace freettcn
+  /**
+   * @brief TTCN-3 base class for exceptions hierarchy.
+   *
+   * Class is a base for exceptions thrown by the TTCN-3 compiler.
+   */
+  class CNonCopyable {
+  public:
+    CNonCopyable() = default;
+    CNonCopyable(const CNonCopyable &) = delete;            /**< @brief Disallowed */
+    CNonCopyable &operator=(const CNonCopyable &) = delete; /**< @brief Disallowed */
+  };
 
+}
 
-#endif /* __INITOBJECT_H__ */
+#endif /* __NONCOPYABLE_H__ */

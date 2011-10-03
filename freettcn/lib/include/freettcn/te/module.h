@@ -107,9 +107,6 @@ namespace freettcn {
       mutable TciModuleParameterType *__modParList;
       mutable TciTestCaseIdType *__testCaseIdList;
       
-      CModule& operator=(CModule&);  // Disallowed
-      CModule(const CModule&);       // Disallowed
-      
       CTestComponentType::CInstanceLocal &TestComponent(const TriComponentId &component) const;
       const CBehavior &Behavior(const TciBehaviourIdType &behavior) const;
       

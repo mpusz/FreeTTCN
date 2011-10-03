@@ -31,6 +31,7 @@
 #ifndef __EXPRESSION_H__
 #define __EXPRESSION_H__
 
+#include "freettcn/tools/nonCopyable.h"
 #include "module.h"
 #include <string>
 #include <memory>
@@ -44,7 +45,7 @@ namespace freettcn {
     class CType;
     class CIdentifier;
     
-    class CExpression {
+    class CExpression : CNonCopyable {
     public:
       virtual ~CExpression() = 0;
       

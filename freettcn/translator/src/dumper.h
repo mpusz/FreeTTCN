@@ -31,6 +31,7 @@
 #ifndef __DUMPER_H__
 #define __DUMPER_H__
 
+#include "freettcn/tools/nonCopyable.h"
 #include <iostream>
 #include <iomanip>
 
@@ -38,20 +39,17 @@ namespace freettcn {
 
   namespace translator {
     
-    class CDumper {
+    class CDumper : CNonCopyable {
       static const unsigned INDENT_SIZE = 2;
       static CDumper *_instance;
 
       std::ostream &_stream;
       unsigned _indent;
     
-      CDumper(const CDumper &);                   /**< @brief Disallowed */
-      CDumper &operator=(const CDumper &);        /**< @brief Disallowed */
-
     public:
       static CDumper &Instance();
       
-      CDumper(std::ostream &stream);
+      explicit CDumper(std::ostream &stream);
       virtual ~CDumper();
       
       void IndentIncr();

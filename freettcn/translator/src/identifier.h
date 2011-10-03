@@ -31,6 +31,7 @@
 #ifndef __IDENTIFIER_H__
 #define __IDENTIFIER_H__
 
+#include "freettcn/tools/nonCopyable.h"
 #include "location.h"
 #include <string>
 #include <memory>
@@ -46,7 +47,7 @@ namespace freettcn {
      * Class contains all information about TTCN-3 Identifier
      * (it stores names of variables, structs, functions, etc.).
      */
-    class CIdentifier {
+    class CIdentifier : CNonCopyable {
       const CLocation _loc;                       /**< @brief Location in a file */
       const std::string _name;                    /**< @brief Identifier name */
       

@@ -52,8 +52,6 @@ namespace freettcn {
       
       CTTCNExecutable();
       virtual ~CTTCNExecutable();
-      CTTCNExecutable& operator=(CTTCNExecutable&);  // Disallowed
-      CTTCNExecutable(const CTTCNExecutable&);       // Disallowed
       
       void TciError(const std::string &str) const;
 

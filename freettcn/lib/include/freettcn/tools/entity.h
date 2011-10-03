@@ -29,6 +29,7 @@
 #ifndef __ENTITY_H__
 #define __ENTITY_H__
 
+#include <freettcn/tools/nonCopyable.h>
 
 namespace freettcn {
   
@@ -49,7 +50,7 @@ namespace freettcn {
    * That class is responsible for collecting, interpreting and printing
    * timestamps.
    */
-  class CEntity {
+  class CEntity : CNonCopyable {
   public:
     /**
      * @brief TTCN-3 entity type

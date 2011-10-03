@@ -31,6 +31,7 @@
 #ifndef __MODULE_H__
 #define __MODULE_H__
 
+#include "freettcn/tools/nonCopyable.h"
 #include <stack>
 #include <deque>
 #include <string>
@@ -47,7 +48,7 @@ namespace freettcn {
     class CType;
     class CTypeLocal;
     
-    class CModule {
+    class CModule : CNonCopyable {
     public:
       enum TLanguage {
         LANGUAGE_TTCN_3_2001,
@@ -55,7 +56,7 @@ namespace freettcn {
         LANGUAGE_TTCN_3_2005
       };
       
-      class CDefinition {
+      class CDefinition : CNonCopyable {
         std::shared_ptr<const CIdentifier> _id;
         std::shared_ptr<CType> _type;
       public:

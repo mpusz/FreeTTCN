@@ -31,6 +31,7 @@
 #ifndef __TYPE_H__
 #define __TYPE_H__
 
+#include "freettcn/tools/nonCopyable.h"
 #include "location.h"
 #include "freettcn/tools/tools.h"
 #include <string>
@@ -46,7 +47,7 @@ namespace freettcn {
     class CIdentifier;
     class CDumper;
 
-    class CType {
+    class CType : CNonCopyable {
     public:
       enum TKind {
         KIND_UNRESOLVED         = 0x0000,
@@ -59,10 +60,6 @@ namespace freettcn {
         KIND_COMPONENT          = 0x0001 << 5,
         KIND_ANY                = 0xFFFF
       };
-      
-    private:
-      CType(const CType &);                       /**< @brief Disallowed */
-      CType &operator=(const CType &);            /**< @brief Disallowed */
       
     public:
       static std::string KindToString(TKind kind);
@@ -168,7 +165,7 @@ namespace freettcn {
     
     class CTypeStructured : public CTypeLocal {
     public:
-      class CField {
+      class CField : freettcn::CNonCopyable {
         std::shared_ptr<CType> _type;
         const std::shared_ptr<const CIdentifier> _id;
         const bool _optional;
@@ -227,8 +224,7 @@ namespace freettcn {
         DIRECTION_INOUT
       };
       
-      class CItem {
-      private:
+      class CItem : freettcn::CNonCopyable {
         const CLocation _loc;                     /**< @brief Location in a file */
         CType *_type;                             /**< @brief Item type or 0 if 'all' */
         

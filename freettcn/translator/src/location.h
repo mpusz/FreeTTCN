@@ -51,6 +51,8 @@ namespace freettcn {
       
     public:
       CLocation(const CFile &file, unsigned line, unsigned pos);
+      CLocation(const CLocation &) = default;
+      CLocation &operator=(const CLocation &) = default;
       const CFile &File() const;
       unsigned Line() const;
       unsigned Pos() const;

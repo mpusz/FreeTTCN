@@ -45,9 +45,9 @@ namespace freettcn {
     
   namespace TL {
 
-    class CLogger {
+    class CLogger : CNonCopyable {
     public:
-      class CData {
+      class CData : freettcn::CNonCopyable {
         struct TLineData {
           std::string _title;
           std::string _value;
@@ -94,14 +94,11 @@ namespace freettcn {
     };
     
     
-    class CTestLogging {
+    class CTestLogging : CNonCopyable {
       static CTestLogging *_instance;
       
       CLogger &_logger;
 
-      CTestLogging& operator=(CTestLogging&);  // Disallowed
-      CTestLogging(const CTestLogging&);       // Disallowed
-      
     protected:
       CLogger &Logger() const;
       

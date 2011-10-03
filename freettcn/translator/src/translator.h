@@ -31,12 +31,12 @@
 #ifndef __TRANSLATOR_H__
 #define __TRANSLATOR_H__
 
+#include "freettcn/tools/nonCopyable.h"
 #include "ttcn3Parser.h"
 #include "module.h"
 #include "file.h"
 #include "freettcn/tools/tools.h"
 #include <string>
-#include <deque>
 #include <list>
 #include <map>
 #include <set>
@@ -53,11 +53,10 @@ namespace freettcn {
     class CTypeReferenced;
     class CTypeStructured;
     
-    class CTranslator {
+    class CTranslator : CNonCopyable {
     private:
-      typedef std::deque<CFile> CFileList;
-      typedef std::stack<const CFile *> CFileStack;
-
+      typedef std::stack<std::shared_ptr<const CFile>> CFileStack;
+      
       typedef std::map<const std::string *, const CModule::CDefinition *, CPtrCmp> CScope;
       typedef std::list<CScope> CScopeStack;
       typedef std::set<std::string> CUnresolvedSymbolsSet;
@@ -69,7 +68,6 @@ namespace freettcn {
       unsigned _errorNum;                         /**< @brief The number of errors */
       unsigned _warningNum;                       /**< @brief The number of warning */
       
-      CFileList _files;                           /**< @brief All parsed files */
       CFileStack _filesStack;                     /**< @brief Current files on the stack */
       unsigned _line;                             /**< @brief Line in a file */
       
@@ -81,9 +79,6 @@ namespace freettcn {
       std::shared_ptr<CTypeStructured> _structType; /**< @brief Current structured type */
       std::shared_ptr<CTypePort> _portType;       /**< @brief Current port type */
       std::shared_ptr<CModule::CDefinitionMethod> _method;        /**< @brief Current TTCN-3 method (testcase, template, etc.) */
-      
-      CTranslator(const CTranslator &);           /**< @brief Disallowed */
-      CTranslator &operator=(const CTranslator &); /**< @brief Disallowed */
       
     public:
       static CTranslator &Instance();

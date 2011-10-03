@@ -54,10 +54,6 @@ namespace freettcn {
       CTimer &TimerGet(const TriTimerId &timerId) const;
       virtual CTimer *TimerCreate(const TriTimerId &timerId) const = 0;
       
-    protected:
-      CPlatformAdaptor& operator=(CPlatformAdaptor&);  // Disallowed
-      CPlatformAdaptor(const CPlatformAdaptor&);       // Disallowed
-      
     public:
       static CPlatformAdaptor &Instance();
       

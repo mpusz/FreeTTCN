@@ -31,6 +31,7 @@
 #ifndef __LOGGER_H__
 #define __LOGGER_H__
 
+#include "freettcn/tools/nonCopyable.h"
 #include <string>
 #include <stack>
 
@@ -42,7 +43,7 @@ namespace freettcn {
     class CLocation;
     class CFile;
     
-    class CLogger {
+    class CLogger : CNonCopyable {
       struct TGroup {
         const CFile *file;
         std::string msg;
@@ -51,9 +52,6 @@ namespace freettcn {
       
       CGroupStack _groupStack;                    /**< @brief Stack of errors groups */
       bool _groupUsed;                            /**< @brief Specifies if a group was printed already */
-      
-      CLogger(const CLogger &);                   /**< @brief Disallowed */
-      CLogger &operator=(const CLogger &);        /**< @brief Disallowed */
       
       void GroupPrint();
       

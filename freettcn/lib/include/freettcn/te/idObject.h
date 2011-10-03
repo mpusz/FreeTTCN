@@ -33,6 +33,7 @@
 extern "C" {
 #include <freettcn/ttcn3/tri.h>
 }
+#include <freettcn/tools/nonCopyable.h>
 #include <freettcn/tools/exception.h>
 #include <vector>
 
@@ -41,11 +42,11 @@ namespace freettcn {
   
   namespace TE {
     
-    class CIdObject {
+    class CIdObject : CNonCopyable {
       /**
        * Singleton design pattern
        */
-      class CIdManager {
+      class CIdManager : freettcn::CNonCopyable {
         struct TData {
           bool valid;
           CIdObject *ptr;
@@ -53,9 +54,6 @@ namespace freettcn {
         typedef std::vector<TData> CIdArray;
         
         CIdArray _idArray;
-        
-        CIdManager &operator=(CIdManager &);  // Disallowed
-        CIdManager(const CIdManager &);       // Disallowed
         
         unsigned int Id2Index(const BinaryString &id) const;
         

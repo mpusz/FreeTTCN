@@ -31,8 +31,8 @@
 #ifndef __FILE_H__
 #define __FILE_H__
 
+#include "freettcn/tools/nonCopyable.h"
 #include <string>
-
 
 namespace freettcn {
   
@@ -44,14 +44,14 @@ namespace freettcn {
      * Class contains all information about the file in which TTCN-3 module is
      * located.
      */
-    class CFile {
+    class CFile : CNonCopyable {
       const std::string _fullName;                /**< @brief File name with path included */
       std::string _path;                          /**< @brief File path */
       std::string _moduleName;                    /**< @brief Module name (file name without expression) */
       std::string _extension;                     /**< @brief Extension */
     
     public:
-      CFile(const std::string &fileName);
+      explicit CFile(const std::string &fileName);
       
       const std::string &FullName() const;
       const std::string &Path() const;
