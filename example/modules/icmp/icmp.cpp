@@ -499,16 +499,16 @@ namespace freettcn {
     void CModule::Initialize()
     {
       // register module types (without components)
-      Register(new CICMPPingDataType(*this));
-      Register(new CICMPDataType(*this));
-      Register(new CICMPMsg(*this));
+      Register(std::shared_ptr<const TE::CType>(new CICMPPingDataType(*this)));
+      Register(std::shared_ptr<const TE::CType>(new CICMPDataType(*this)));
+      Register(std::shared_ptr<const TE::CType>(new CICMPMsg(*this)));
       
       // register port types
       Register(new CICMPPortType(*this));
       
       // register module components
-      Register(new CICMPComponentType(*this));
-      Register(new CIPStackType(*this));
+      Register(std::shared_ptr<const TE::CType>(new CICMPComponentType(*this)));
+      Register(std::shared_ptr<const TE::CType>(new CIPStackType(*this)));
       
       // register module parameters
       Register(new CParameter("long", new freettcn::TE::CBooleanType::CInstance(freettcn::TE::CBasicTypes::Boolean(), true)));
