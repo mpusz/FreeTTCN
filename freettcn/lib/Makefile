@@ -49,10 +49,10 @@ all:
 	@$(call cmd,cmd_lib_link)
 
 install:
-	@$(call cmd,cmd_lib_install)
-	@$(call cmd,cmd_h_install)
 	$(Q)$(INSTALL) -d $(H_INSTALL_DIR)/$(PROJECT_NAME)/ttcn3
 	$(Q)$(INSTALL) -p -m 644 $(LONG_DIR_NAME)/$(LOCAL_FREETTCN_H_DIR)/ttcn3/*.h $(H_INSTALL_DIR)/$(PROJECT_NAME)/ttcn3
+	@$(call cmd,cmd_h_install)
+	@$(call cmd,cmd_lib_install)
 
 clean:
 	@$(foreach dir, $(BUILD_DIRS), $(call cmd,cmd_make_clean,$(dir)))
