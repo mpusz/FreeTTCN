@@ -42,6 +42,10 @@ MODULES = icmp
 #
 MAKE = make
 CPP = g++ -g -Wall -std=c++0x
+
+# TODO: Remove it when GCC will start supporting override keyword
+CPP += -Doverride=
+
 AR = ar -c
 CD = cd
 CP = cp
