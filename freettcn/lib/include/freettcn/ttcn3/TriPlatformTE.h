@@ -18,37 +18,32 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /**
- * @file   types.h
+ * @file   TriPlatformTE.h
  * @author Mateusz Pusz
- * @date   Mon Jan 29 08:54:53 2007
+ * @date   Mon Jan 29 11:31:15 2007
  * 
- * @brief  TTCN-3 Executable basic types
+ * @brief  TTCN-3 Executable TRI communication interface operations TE=>SA
  *
  * @remarks This file implements interfaces specified in the ETSI standards:
  *  - ES 201 873-5: "Methods for Testing and Specification (MTS); The Testing and Test Control Notation version 3; Part 5: TTCN-3 Runtime Interface (TRI)"
- *  - ES 201 873-6: "Methods for Testing and Specification (MTS); The Testing and Test Control Notation version 3; Part 6: TTCN-3 Control Interface (TCI)"
- *
+ * 
  */
 
-#ifndef __TYPES_H__
-#define __TYPES_H__
+#ifndef __TRI_PLATFORM_TE_H__
+#define __TRI_PLATFORM_TE_H__
 
+#include <freettcn/ttcn3/tri.h>
 
-/**
- * @defgroup TTCN3InterfaceTypes TTCN-3 interface types
- * @{
- */
-typedef bool Tboolean;
-typedef long int Tinteger;
-typedef unsigned long int Tsize;
-typedef unsigned long int Tindex;
-typedef double Tfloat;
-typedef std::string Tstring;
-typedef std::wstring TuniversalString;
-typedef unsigned char Tbit;
+namespace ORG_ETSI_TTCN3_TRI {
 
-typedef unsigned char Tbyte;
-/// @} TTCN3InterfaceTypes
+  class TriPlatformTE {
+  public:
+    //Destructor.
+    virtual ~TriPlatformTE();
+    //Notfiy the timeout of the timer.
+    virtual void triTimeout(const TriTimerId *timerId) = 0;
+  };
+  
+} // namespace ORG_ETSI_TTCN3_TRI
 
-
-#endif /* __TYPES_H__ */
+#endif /* __TRI_PLATFORM_TE_H__ */

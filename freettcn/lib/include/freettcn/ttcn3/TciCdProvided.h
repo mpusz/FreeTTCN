@@ -18,37 +18,34 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /**
- * @file   types.h
+ * @file   TciCdProvided.h
  * @author Mateusz Pusz
- * @date   Mon Jan 29 08:54:53 2007
+ * @date   Fri Feb  2 08:50:45 2007
  * 
- * @brief  TTCN-3 Executable basic types
+ * @brief  TTCN-3 Executable TCI types
  *
  * @remarks This file implements interfaces specified in the ETSI standards:
- *  - ES 201 873-5: "Methods for Testing and Specification (MTS); The Testing and Test Control Notation version 3; Part 5: TTCN-3 Runtime Interface (TRI)"
  *  - ES 201 873-6: "Methods for Testing and Specification (MTS); The Testing and Test Control Notation version 3; Part 6: TTCN-3 Control Interface (TCI)"
- *
+ * 
  */
 
-#ifndef __TYPES_H__
-#define __TYPES_H__
+#ifndef __TCI_CD_PROVIDED_H__
+#define __TCI_CD_PROVIDED_H__
 
+#include <freettcn/ttcn3/tci.h>
 
-/**
- * @defgroup TTCN3InterfaceTypes TTCN-3 interface types
- * @{
- */
-typedef bool Tboolean;
-typedef long int Tinteger;
-typedef unsigned long int Tsize;
-typedef unsigned long int Tindex;
-typedef double Tfloat;
-typedef std::string Tstring;
-typedef std::wstring TuniversalString;
-typedef unsigned char Tbit;
+namespace ORG_ETSI_TTCN3_TCI {
+  
+  class TciCdProvided {
+  public:
+    //Destructor
+    virtual ~TciCdProvided();
+    //This operation is called whenever the TE has to decode and encode value
+    virtual TciValue *decode(const TriMessage *p_message, const TciType *p_decodingHypothesis) = 0;
+    //This operation is called whenever the TE has to encode a Value
+    virtual TriMessage *encode(const TciValue *p_value) = 0;
+  };
+  
+} // namespace ORG_ETSI_TTCN3_TCI
 
-typedef unsigned char Tbyte;
-/// @} TTCN3InterfaceTypes
-
-
-#endif /* __TYPES_H__ */
+#endif /* __TCI_CD_PROVIDED_H__ */
