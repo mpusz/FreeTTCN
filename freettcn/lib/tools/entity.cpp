@@ -34,7 +34,7 @@
  * @brief CEntity class constructor
  */
 freettcn::CEntity::CEntity():
-  _logging(false), _ts(0), _logMask(0)
+  _logging(false)
 {
 }
 
@@ -105,10 +105,10 @@ bool freettcn::CEntity::Logging() const
  * @param ts Timestamps manager class
  * @param logMask Logging mask definition
  */
-void freettcn::CEntity::LogEnable(freettcn::CTimeStampMgr &ts, freettcn::CLogMask &logMask)
+void freettcn::CEntity::LogEnable(std::shared_ptr<CTimeStampMgr> ts, std::shared_ptr<CLogMask> logMask)
 {
-  _ts = &ts;
-  _logMask = &logMask;
+  _ts = ts;
+  _logMask = logMask;
   _logging = true;
 }
 
@@ -120,7 +120,7 @@ void freettcn::CEntity::LogEnable(freettcn::CTimeStampMgr &ts, freettcn::CLogMas
  */
 void freettcn::CEntity::LogDisable()
 {
-  _ts = 0;
-  _logMask = 0;
+  _ts.reset();
+  _logMask.reset();
   _logging = false;
 }

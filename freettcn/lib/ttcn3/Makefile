@@ -26,7 +26,7 @@ BIN_DIR = $(LONG_DIR_NAME)/../bin
 CPPFLAGS += -fPIC
 
 # files
-CPP_FILES = exception.cpp tools.cpp timeStampMgr.cpp timeStampMgrSeconds.cpp entity.cpp logMask.cpp
-
+CPP_FILES = type.cpp integer.cpp boolean.cpp verdict.cpp octetstring.cpp \
+	record.cpp
 
 include Makefile.rules

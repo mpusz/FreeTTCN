@@ -17,19 +17,33 @@
 // along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef __NONCOPYABLE_H__
-#define __NONCOPYABLE_H__
+/**
+ * @file   TriPlatformTE.h
+ * @author Mateusz Pusz
+ * @date   Mon Jan 29 11:31:15 2007
+ * 
+ * @brief  TTCN-3 Executable TRI communication interface operations TE=>SA
+ *
+ * @remarks This file implements interfaces specified in the ETSI standards:
+ *  - ES 201 873-5: "Methods for Testing and Specification (MTS); The Testing and Test Control Notation version 3; Part 5: TTCN-3 Runtime Interface (TRI)"
+ * 
+ */
 
-#include <freettcn/tools/nonAssignable.h>
+#ifndef __TRI_PLATFORM_TE_H__
+#define __TRI_PLATFORM_TE_H__
 
-namespace freettcn {
-  
-  class CNonCopyable : CNonAssignable {
+#include <freettcn/etsi/tri.h>
+
+namespace ORG_ETSI_TTCN3_TRI {
+
+  class TriPlatformTE {
   public:
-    CNonCopyable() = default;
-    CNonCopyable(const CNonCopyable &) = delete;            /**< @brief Disallowed */
+    //Destructor.
+    virtual ~TriPlatformTE();
+    //Notfiy the timeout of the timer.
+    virtual void triTimeout(const TriTimerId *timerId) = 0;
   };
   
-}
+} // namespace ORG_ETSI_TTCN3_TRI
 
-#endif /* __NONCOPYABLE_H__ */
+#endif /* __TRI_PLATFORM_TE_H__ */

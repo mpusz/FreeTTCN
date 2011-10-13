@@ -17,19 +17,23 @@
 // along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef __NONCOPYABLE_H__
-#define __NONCOPYABLE_H__
 
-#include <freettcn/tools/nonAssignable.h>
+/**
+ * @file   integer.cpp
+ * @author Mateusz Pusz
+ * @date   Mon May 14 21:37:54 2007
+ * 
+ * @brief  
+ * 
+ * 
+ */
 
-namespace freettcn {
-  
-  class CNonCopyable : CNonAssignable {
-  public:
-    CNonCopyable() = default;
-    CNonCopyable(const CNonCopyable &) = delete;            /**< @brief Disallowed */
-  };
-  
+#include "freettcn/ttcn3/integer.h"
+#include "freettcn/ttcn3/moduleId.h"
+
+
+/// @todo verify if encoding can be set for built-in types
+freettcn::ttcn3::CTypeInteger::CTypeInteger():
+  CType(CModuleId::BuiltIn(), "integer", TCI_INTEGER, "", "", CExtension())
+{
 }
-
-#endif /* __NONCOPYABLE_H__ */

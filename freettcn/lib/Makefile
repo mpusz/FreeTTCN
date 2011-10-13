@@ -24,11 +24,12 @@ include Makefile.defines
 #
 # directories
 #
+TTCN3_DIR  = $(LONG_DIR_NAME)/ttcn3
 TE_DIR     = $(LONG_DIR_NAME)/te
 TOOLS_DIR  = $(LONG_DIR_NAME)/tools
 BIN_DIR    = $(LONG_DIR_NAME)/bin
 
-BUILD_DIRS = $(TOOLS_DIR) $(TE_DIR) 
+BUILD_DIRS = $(TOOLS_DIR) $(TTCN3_DIR) $(TE_DIR) 
 
 
 # libraries
@@ -50,7 +51,7 @@ all:
 
 install:
 	$(Q)$(INSTALL) -d $(H_INSTALL_DIR)/$(PROJECT_NAME)/ttcn3
-	$(Q)$(INSTALL) -p -m 644 $(LONG_DIR_NAME)/$(LOCAL_FREETTCN_H_DIR)/ttcn3/*.h $(H_INSTALL_DIR)/$(PROJECT_NAME)/ttcn3
+	$(Q)$(INSTALL) -p -m 644 $(LONG_DIR_NAME)/$(LOCAL_FREETTCN_H_DIR)/etsi/*.h $(H_INSTALL_DIR)/$(PROJECT_NAME)/etsi
 	@$(call cmd,cmd_h_install)
 	@$(call cmd,cmd_lib_install)
 

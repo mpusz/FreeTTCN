@@ -17,19 +17,23 @@
 // along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef __NONCOPYABLE_H__
-#define __NONCOPYABLE_H__
 
-#include <freettcn/tools/nonAssignable.h>
+/**
+ * @file   boolean.cpp
+ * @author Mateusz Pusz
+ * @date   Fri May  4 09:24:05 2007
+ * 
+ * @brief  
+ * 
+ * 
+ */
 
-namespace freettcn {
-  
-  class CNonCopyable : CNonAssignable {
-  public:
-    CNonCopyable() = default;
-    CNonCopyable(const CNonCopyable &) = delete;            /**< @brief Disallowed */
-  };
-  
+#include "freettcn/ttcn3/boolean.h"
+#include "freettcn/ttcn3/moduleId.h"
+
+
+/// @todo verify if encoding can be set for built-in types
+freettcn::ttcn3::CTypeBoolean::CTypeBoolean():
+  CType(CModuleId::BuiltIn(), "boolean", TCI_BOOLEAN, "", "", CExtension())
+{
 }
-
-#endif /* __NONCOPYABLE_H__ */

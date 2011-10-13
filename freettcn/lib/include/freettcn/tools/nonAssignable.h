@@ -17,19 +17,16 @@
 // along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef __NONCOPYABLE_H__
-#define __NONCOPYABLE_H__
-
-#include <freettcn/tools/nonAssignable.h>
+#ifndef __NONASSIGNABLE_H__
+#define __NONASSIGNABLE_H__
 
 namespace freettcn {
   
-  class CNonCopyable : CNonAssignable {
+  class CNonAssignable {
   public:
-    CNonCopyable() = default;
-    CNonCopyable(const CNonCopyable &) = delete;            /**< @brief Disallowed */
+    CNonAssignable &operator=(const CNonAssignable &) = delete; /**< @brief Disallowed */
   };
   
 }
 
-#endif /* __NONCOPYABLE_H__ */
+#endif /* __NONASSIGNABLE_H__ */

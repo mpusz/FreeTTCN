@@ -17,19 +17,23 @@
 // along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef __NONCOPYABLE_H__
-#define __NONCOPYABLE_H__
 
-#include <freettcn/tools/nonAssignable.h>
+/**
+ * @file   verdict.cpp
+ * @author Mateusz Pusz
+ * @date   Sun May 13 19:37:56 2007
+ * 
+ * @brief  
+ * 
+ * 
+ */
 
-namespace freettcn {
-  
-  class CNonCopyable : CNonAssignable {
-  public:
-    CNonCopyable() = default;
-    CNonCopyable(const CNonCopyable &) = delete;            /**< @brief Disallowed */
-  };
-  
+#include "freettcn/ttcn3/verdict.h"
+#include "freettcn/ttcn3/moduleId.h"
+
+
+/// @todo verify if encoding can be set for built-in types
+freettcn::ttcn3::CTypeVerdict::CTypeVerdict():
+  CType(CModuleId::BuiltIn(), "verdicttype", TCI_VERDICT, "", "", CExtension())
+{
 }
-
-#endif /* __NONCOPYABLE_H__ */
