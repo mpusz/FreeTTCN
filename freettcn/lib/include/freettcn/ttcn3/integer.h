@@ -30,7 +30,7 @@
 #ifndef __INTEGER_H__
 #define __INTEGER_H__
 
-#include <freettcn/ttcn3/type.h>
+#include <freettcn/ttcn3/tciType.h>
 
 namespace freettcn {
   

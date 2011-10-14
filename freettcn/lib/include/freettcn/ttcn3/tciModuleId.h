@@ -19,7 +19,7 @@
 
 
 /**
- * @file   moduleParameterId.h
+ * @file   tciModuleId.h
  * @author Mateusz Pusz
  * @date   Tue Apr 24 21:05:33 2007
  * 
@@ -28,8 +28,8 @@
  * 
  */
 
-#ifndef __MODULE_PARAMETER_ID_H__
-#define __MODULE_PARAMETER_ID_H__
+#ifndef __TCI_MODULE_ID_H__
+#define __TCI_MODULE_ID_H__
 
 #include <freettcn/etsi/tci.h>
 #include <freettcn/tools/nonAssignable.h>
@@ -42,21 +42,27 @@ namespace freettcn {
     
     using namespace ORG_ETSI_TTCN3_TCI;
 
-    class CModuleParameterId : CNonAssignable, public ORG_ETSI_TTCN3_TCI::TciModuleParameterId {
+    class CTciModuleId : CNonAssignable, public ORG_ETSI_TTCN3_TCI::TciModuleId {
+      static CTciModuleId _builtIn;
+      std::shared_ptr<const Tstring> _name;
     public:
-      CModuleParameterId() = default;
-      CModuleParameterId(const CModuleParameterId &) = default;
-      CModuleParameterId(CModuleParameterId &&) = default;
-      ~CModuleParameterId() = default;
-      TciModuleParameterId *clone() const override;
+      static const CTciModuleId &BuiltIn() { return _builtIn; }
       
-      Tboolean operator==(const TciModuleParameterId &mparId) const override;
-      Tboolean operator<(const TciModuleParameterId &mparId) const override;
+      CTciModuleId(const Tstring &name): _name(new Tstring(name)) {}
+      CTciModuleId(const CTciModuleId &) = default;
+      CTciModuleId(CTciModuleId &&) = default;
+      ~CTciModuleId() = default;
+      TciModuleId *clone() const override                { return new CTciModuleId(*this); }
+      
+      const Tstring &getObjectName() const override      { return *_name; }
+      void setObjectName(const Tstring &p_name) override { _name.reset(new Tstring(p_name)); }
+      
+      Tboolean operator==(const TciModuleId &mid) const override { return *_name == mid.getObjectName(); }
+      Tboolean operator<(const TciModuleId &mid) const override  { return *_name < mid.getObjectName(); }
     };
-
+        
   } // namespace ttcn3
   
 } // namespace freettcn
 
-
-#endif /* __MODULE_PARAMETER_ID_H__ */
+#endif /* __TCI_MODULE_ID_H__ */

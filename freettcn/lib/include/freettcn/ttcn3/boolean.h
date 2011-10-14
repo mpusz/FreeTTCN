@@ -30,7 +30,7 @@
 #ifndef __BOOLEAN_H__
 #define __BOOLEAN_H__
 
-#include <freettcn/ttcn3/type.h>
+#include <freettcn/ttcn3/tciType.h>
 
 namespace freettcn {
 

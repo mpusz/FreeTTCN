@@ -65,13 +65,19 @@ namespace ORG_ETSI_TTCN3_TRI {
     virtual ~TriComponentId();
     virtual const QualifiedName &getComponentTypeName() const = 0;
     virtual void setComponentTypeName(const QualifiedName &tName) = 0;
-    virtual Tstring &getComponentName() const = 0;
+    /// @todo const missing in spec
+    virtual const Tstring &getComponentName() const = 0;
     virtual void setComponentName(const Tstring &sName) = 0;
     virtual const Tinteger &getComponentId() const = 0;
     virtual void setComponentId(const Tinteger &id) = 0;
+    /// @todo why is that here?
     virtual Tstring toString() const = 0;
     virtual Tboolean operator==(const TriComponentId &cmp) const = 0;
+#ifdef TTCN_LIST_IFACE_FIXED
+    virtual TriComponentId *clone() const = 0;
+#else
     virtual TriComponentId *cloneComponentId() const = 0;
+#endif
     virtual Tboolean operator<(const TriComponentId &cmp) const = 0;
   };
 
@@ -87,12 +93,28 @@ namespace ORG_ETSI_TTCN3_TRI {
   public:
     virtual ~TriComponentIdList();
     virtual Tsize size() const = 0;
+#ifdef TTCN_LIST_IFACE_FIXED
+    virtual Tboolean empty() const = 0;
+#else
     virtual Tboolean isEmpty() const = 0;
+#endif
+#ifdef TTCN_LIST_IFACE_FIXED
+    virtual const TriComponentId *get(Tsize index) const = 0;
+#else
     virtual const TriComponentId &get(Tsize index) const = 0;
+#endif
     virtual void clear() = 0;
+#ifdef TTCN_LIST_IFACE_FIXED
+    virtual void push_back(const TriComponentId &comp) = 0;
+#else
     virtual void add(const TriComponentId &comp) = 0;
+#endif
     virtual Tboolean operator==(const TriComponentIdList &cmpl) const = 0;
+#ifdef TTCN_LIST_IFACE_FIXED
+    virtual TriComponentIdList *clone() const = 0;
+#else
     virtual TriComponentIdList *cloneComponentIdList() const = 0;
+#endif
     virtual Tboolean operator<(const TriComponentIdList &cmpl) const = 0;
   };
 
@@ -122,7 +144,11 @@ namespace ORG_ETSI_TTCN3_TRI {
     virtual void setPortType(const QualifiedName &pType) = 0;
     virtual Tboolean isArray() const = 0;
     virtual Tboolean operator==(const TriPortId &prt) const = 0;
+#ifdef TTCN_LIST_IFACE_FIXED
+    virtual TriPortId *clone() const = 0;
+#else
     virtual TriPortId *clonePortId() const = 0;
+#endif
     virtual Tboolean operator<(const TriPortId &prt) const = 0;
   };
 
@@ -138,12 +164,28 @@ namespace ORG_ETSI_TTCN3_TRI {
   public:
     virtual ~TriPortIdList();
     virtual Tsize size() const = 0;
+#ifdef TTCN_LIST_IFACE_FIXED
+    virtual bool empty() const = 0;
+#else
     virtual bool isEmpty() const = 0;
+#endif
+#ifdef TTCN_LIST_IFACE_FIXED
+    virtual const TriPortId *get(Tsize index) const = 0;
+#else
     virtual const TriPortId &get(Tsize index) const = 0;
+#endif
     virtual void clear() = 0;
+#ifdef TTCN_LIST_IFACE_FIXED
+    virtual void push_back(const TriPortId &elem) = 0;
+#else
     virtual void add(const TriPortId &elem) = 0;
+#endif
     virtual Tboolean operator==(const TriPortIdList &prtl) const = 0;
+#ifdef TTCN_LIST_IFACE_FIXED
+    virtual TriPortIdList *clone() const = 0;
+#else
     virtual TriPortIdList *clonePortIdList() const = 0;
+#endif
     virtual Tboolean operator<(const TriPortIdList &prtl) const = 0;
   };
 
@@ -167,9 +209,14 @@ namespace ORG_ETSI_TTCN3_TRI {
     virtual const Tbyte *getData() const = 0;
     virtual void setData(const Tbyte *str, Tsize bitLen) = 0;
     virtual Tsize getBitsDataLen() const = 0;
+    /// @todo why is that here?
     virtual Tstring toString() const = 0;
     virtual Tboolean operator==(const TriMessage &msg) const = 0;
+#ifdef TTCN_LIST_IFACE_FIXED
+    virtual TriMessage *clone() const = 0;
+#else
     virtual TriMessage *cloneMessage() const = 0;
+#endif
     virtual Tboolean operator<(const TriMessage &msg) const = 0;
   };
   
@@ -186,7 +233,11 @@ namespace ORG_ETSI_TTCN3_TRI {
     virtual void setEncodedData(const Tbyte *str, Tsize bitLen) = 0;
     virtual Tsize getBitsDataLen()const = 0;
     virtual Tboolean operator==(const TriAddress &add) const = 0;
+#ifdef TTCN_LIST_IFACE_FIXED
+    virtual TriAddress *clone() const = 0;
+#else
     virtual TriAddress *cloneAddress() const = 0;
+#endif
     virtual Tboolean operator<(const TriAddress &add) const = 0;
   };
 
@@ -202,12 +253,28 @@ namespace ORG_ETSI_TTCN3_TRI {
   public:
     virtual ~TriAddressList();
     virtual Tsize size() const = 0;
+#ifdef TTCN_LIST_IFACE_FIXED
+    virtual Tboolean empty() const = 0;
+#else
     virtual Tboolean isEmpty() const = 0;
+#endif
+#ifdef TTCN_LIST_IFACE_FIXED
+    virtual const TriAddress *get(Tsize index) const = 0;
+#else
     virtual const TriAddress &get(Tsize index) const = 0;
+#endif
     virtual void clear() = 0;
+#ifdef TTCN_LIST_IFACE_FIXED
+    virtual void push_back(const TriAddress &elem) = 0;
+#else
     virtual void add(const TriAddress &elem) = 0;
+#endif
     virtual Tboolean operator==(const TriAddressList &addl) const = 0;
+#ifdef TTCN_LIST_IFACE_FIXED
+    virtual TriAddressList *clone() const = 0;
+#else
     virtual TriAddressList *cloneAddressList() const = 0;
+#endif
     virtual Tboolean operator<(const TriAddressList &addl) const = 0;
   };
 
@@ -217,11 +284,26 @@ namespace ORG_ETSI_TTCN3_TRI {
    * specified in the TTCN-3 ATS. This abstract type is used in procedure based TRI
    * communication operations.
    */
+#ifdef TTCN_ID_IFACE_FIXED_1
+  class TriSignatureId : public QualifiedName {
+#elif TTCN_ID_IFACE_FIXED_2
+  class TriSignatureId {
+#else
   class TriSignatureId : QualifiedName {
+#endif
   public:
     virtual ~TriSignatureId();
     virtual Tboolean operator==(const TriSignatureId &sid) const = 0;
+#ifdef TTCN_ID_IFACE_FIXED_1
+    // nothing here
+#elif defined(TTCN_ID_IFACE_FIXED_2) || defined(TTCN_LIST_IFACE_FIXED)
+    virtual TriSignatureId *clone() const = 0;
+#ifdef TTCN_ID_IFACE_FIXED_2
+    virtual const QualifiedName &getName() const = 0;
+#endif
+#else
     virtual TriSignatureId *cloneSignatureId() const = 0;
+#endif
     virtual Tboolean operator<(const TriSignatureId &sid) const = 0;
   };
   
@@ -257,7 +339,11 @@ namespace ORG_ETSI_TTCN3_TRI {
     virtual void setEncodedParameter(const Tbyte *str, Tsize bitLen) = 0;
     virtual Tsize getBitsDataLen() const = 0;
     virtual Tboolean operator==(const TriParameter &par) const = 0;
+#ifdef TTCN_LIST_IFACE_FIXED
+    virtual TriParameter *clone() const = 0;
+#else
     virtual TriParameter *cloneParameter() const = 0;
+#endif
     virtual Tboolean operator<(const TriParameter &par) const = 0;
   };
 
@@ -274,12 +360,28 @@ namespace ORG_ETSI_TTCN3_TRI {
   public:
     virtual ~TriParameterList();
     virtual Tsize size() const = 0;
+#ifdef TTCN_LIST_IFACE_FIXED
+    virtual Tboolean empty() const = 0;
+#else
     virtual Tboolean isEmpty() const = 0;
+#endif
+#ifdef TTCN_LIST_IFACE_FIXED
+    virtual const TriParameter *get(Tsize index) const = 0;
+#else
     virtual const TriParameter &get(Tsize index) const = 0;
+#endif
     virtual void clear() = 0;
+#ifdef TTCN_LIST_IFACE_FIXED
+    virtual void push_back(const TriParameter &parameter) = 0;
+#else
     virtual void add(const TriParameter &parameter) = 0;
+#endif
     virtual Tboolean operator==(const TriParameterList &pml) const = 0;
+#ifdef TTCN_LIST_IFACE_FIXED
+    virtual TriParameterList *clone() const = 0;
+#else
     virtual TriParameterList *cloneParameterList() const = 0;
+#endif
     virtual Tboolean operator<(const TriParameterList &pml) const = 0;
   };
   
@@ -295,9 +397,14 @@ namespace ORG_ETSI_TTCN3_TRI {
     virtual const Tbyte *getData() const = 0;
     virtual void setData(const Tbyte *str, Tsize bitLen) = 0;
     virtual Tsize getBitsDataLen() const = 0;
+    /// @todo why is that here?
     virtual Tstring toString() const = 0;
     virtual Tboolean operator==(const TriException &exc) const = 0;
+#ifdef TTCN_LIST_IFACE_FIXED
+    virtual TriException *clone() const = 0;
+#else
     virtual TriException *cloneException() const = 0;
+#endif
     virtual Tboolean operator<(const TriException &exc) const = 0;
   };
 
@@ -323,9 +430,14 @@ namespace ORG_ETSI_TTCN3_TRI {
     virtual ~TriTimerId();
     virtual const Tstring &getTimerName() const = 0;
     virtual void setTimerName(const Tstring &tName) = 0;
+    /// @todo what is that???
     virtual const Tinteger getTId() const = 0;
     virtual Tboolean operator==(const TriTimerId &tmid) const = 0;
+#ifdef TTCN_LIST_IFACE_FIXED
+    virtual TriTimerId *clone() const = 0;
+#else
     virtual TriTimerId *cloneTimerId() const = 0;
+#endif
     virtual Tboolean operator<(const TriTimerId &tmid) const = 0;
   };
   
@@ -340,7 +452,11 @@ namespace ORG_ETSI_TTCN3_TRI {
     virtual Tfloat getDuration() const = 0;
     virtual void setDuration(Tfloat duration) = 0;
     virtual Tboolean operator==(const TriTimerDuration &timd) const = 0;
+#ifdef TTCN_LIST_IFACE_FIXED
+    virtual TriTimerDuration *clone() const = 0;
+#else
     virtual TriTimerDuration *cloneTimerDuration() const = 0;
+#endif
     virtual Tboolean operator<(const TriTimerDuration &timd) const = 0;
   };
   
@@ -358,11 +474,26 @@ namespace ORG_ETSI_TTCN3_TRI {
    * A value of type TriTestCaseId is the name of a test case as specified in the
    * TTCN-3 ATS.
    */
+#ifdef TTCN_ID_IFACE_FIXED_1
+  class TriTestCaseId : public QualifiedName {
+#elif TTCN_ID_IFACE_FIXED_2
+  class TriTestCaseId {
+#else
   class TriTestCaseId : QualifiedName {
+#endif
   public:
     virtual ~TriTestCaseId();
     virtual Tboolean operator==(const TriTestCaseId &tcid) const = 0;
+#ifdef TTCN_ID_IFACE_FIXED_1
+    // nothing here
+#elif defined(TTCN_ID_IFACE_FIXED_2) || defined(TTCN_LIST_IFACE_FIXED)
+    virtual TriTestCaseId *clone() const = 0;
+#ifdef TTCN_ID_IFACE_FIXED_2
+    virtual const QualifiedName &getName() const = 0;
+#endif
+#else
     virtual TriTestCaseId *cloneTestCaseId() const = 0;
+#endif
     virtual Tboolean operator<(const TriTestCaseId &tcid) const = 0;
   };
   
@@ -371,11 +502,26 @@ namespace ORG_ETSI_TTCN3_TRI {
    * A value of type TriFunctionId is the name of an external function as
    * specified in the TTCN-3 ATS.
    */
+#ifdef TTCN_ID_IFACE_FIXED_1
+  class TriFunctionId : public QualifiedName {
+#elif TTCN_ID_IFACE_FIXED_2
+  class TriFunctionId {
+#else
   class TriFunctionId : QualifiedName {
+#endif
   public:
     virtual ~TriFunctionId();
     virtual Tboolean operator==(const TriFunctionId &fid) const = 0;
+#ifdef TTCN_ID_IFACE_FIXED_1
+    // nothing here
+#elif defined(TTCN_ID_IFACE_FIXED_2) || defined(TTCN_LIST_IFACE_FIXED)
+    virtual TriFunctionId *clone() const = 0;
+#ifdef TTCN_ID_IFACE_FIXED_2
+    virtual const QualifiedName &getName() const = 0;
+#endif
+#else
     virtual TriFunctionId *cloneFunctionId() const = 0;
+#endif
     virtual Tboolean operator<(const TriFunctionId &fid) const = 0;
   };
 

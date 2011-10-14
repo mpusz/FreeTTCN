@@ -30,7 +30,7 @@
 #ifndef __RECORD_H__
 #define __RECORD_H__
 
-#include <freettcn/ttcn3/type.h>
+#include <freettcn/ttcn3/tciType.h>
 #include <freettcn/tools/tools.h>
 #include <map>
 
@@ -93,7 +93,7 @@ namespace freettcn {
       CFieldNames _fieldNames;
       
     protected:
-      void Register(CType &fieldType, const Tstring &fieldName, bool optional = false);
+      void Add(CType &fieldType, const Tstring &fieldName, bool optional = false);
       
     public:
       CTypeRecord(const TciModuleId  &moduleId,

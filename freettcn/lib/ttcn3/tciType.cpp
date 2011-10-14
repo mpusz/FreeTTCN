@@ -19,7 +19,7 @@
 
 
 /**
- * @file   type.cpp
+ * @file   tciType.cpp
  * @author Mateusz Pusz
  * @date   Wed Apr 25 11:08:14 2007
  * 
@@ -29,7 +29,7 @@
  */
 
 
-#include "freettcn/ttcn3/type.h"
+#include "freettcn/ttcn3/tciType.h"
 //#include "freettcn/te/module.h"
 
 
@@ -160,5 +160,5 @@ Tboolean freettcn::ttcn3::CType::operator<(const TciType &typ) const
 
 Tstring freettcn::ttcn3::QualifiedName(const ORG_ETSI_TTCN3_TCI::TciType &type)
 {
-  return type.getDefiningModule().getObjectName() + "::" + type.getName();
+  return type.getDefiningModule().getObjectName() + "." + type.getName();
 }

@@ -18,7 +18,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /**
- * @file   type.h
+ * @file   tciType.h
  * @author Mateusz Pusz
  * @date   Tue Apr 24 21:05:51 2007
  * 
@@ -27,8 +27,8 @@
  * 
  */
 
-#ifndef __TYPE_H__
-#define __TYPE_H__
+#ifndef __TCI_TYPE_H__
+#define __TCI_TYPE_H__
 
 #include <freettcn/etsi/tci.h>
 #include <freettcn/tools/nonCopyable.h>
@@ -40,9 +40,9 @@ namespace freettcn {
     
     using namespace ORG_ETSI_TTCN3_TCI;
     
-    class CTciType : CNonCopyable, public ORG_ETSI_TTCN3_TCI::TciType  {
+    class CType : CNonCopyable, public ORG_ETSI_TTCN3_TCI::TciType  {
     public:
-      class CTciValue : freettcn::CNonAssignable, public virtual ORG_ETSI_TTCN3_TCI::TciValue {
+      class CValue : freettcn::CNonAssignable, public virtual ORG_ETSI_TTCN3_TCI::TciValue {
       private:
         const TciType &_type;
         std::unique_ptr<Tstring> _encoding;
@@ -112,4 +112,4 @@ namespace freettcn {
 } // namespace freettcn
 
 
-#endif /* __TYPE_H__ */
+#endif /* __TCI_TYPE_H__ */

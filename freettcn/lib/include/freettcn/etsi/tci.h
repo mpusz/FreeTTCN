@@ -85,7 +85,11 @@ namespace ORG_ETSI_TTCN3_TCI {
     virtual ~TciModuleIdList();
     virtual Tsize size() const = 0;
     virtual Tboolean empty() const = 0;
+#ifdef TTCN_LIST_IFACE_FIXED
+    virtual const TciModuleId *get(Tindex p_index) const = 0;
+#else
     virtual const TciModuleId *get(Tsize p_index) const = 0;
+#endif
     virtual void clear() = 0;
     virtual void push_back(const TciModuleId &comp) = 0;
     virtual Tboolean operator==(const TciModuleIdList &midList) const = 0;
@@ -98,11 +102,22 @@ namespace ORG_ETSI_TTCN3_TCI {
    * as specified in the TTCN-3 ATS. This abstract type is used for module
    * parameter handling.
    */
+#ifdef TTCN_ID_IFACE_FIXED_1
+  class TciModuleParameterId : public ORG_ETSI_TTCN3_TRI::QualifiedName {
+#elif TTCN_ID_IFACE_FIXED_2
+  class TciModuleParameterId {
+#else
   class TciModuleParameterId : ORG_ETSI_TTCN3_TRI::QualifiedName {
+#endif
   public:
     virtual ~TciModuleParameterId();
     virtual Tboolean operator==(const TciModuleParameterId &mparId) const = 0;
+#ifdef TTCN_ID_IFACE_FIXED_1
+    // nothing here
+#elif TTCN_ID_IFACE_FIXED_2
     virtual TciModuleParameterId *clone() const = 0;
+    virtual const ORG_ETSI_TTCN3_TRI::QualifiedName &getName() const = 0;
+#endif
     virtual Tboolean operator<(const TciModuleParameterId &mparId) const = 0;
   };
 
@@ -229,11 +244,22 @@ namespace ORG_ETSI_TTCN3_TCI {
    * A value of type TciBehaviourIdType identifies a TTCN-3 behaviour
    * functions.
    */
+#ifdef TTCN_ID_IFACE_FIXED_1
+  class TciBehaviourId : public ORG_ETSI_TTCN3_TRI::QualifiedName {
+#elif TTCN_ID_IFACE_FIXED_2
+  class TciBehaviourId {
+#else
   class TciBehaviourId : ORG_ETSI_TTCN3_TRI::QualifiedName {
+#endif
   public:
     virtual ~TciBehaviourId();
     virtual Tboolean operator==(const TciBehaviourId &bid) const = 0;
+#ifdef TTCN_ID_IFACE_FIXED_1
+    // nothing here
+#elif TTCN_ID_IFACE_FIXED_2
     virtual TciBehaviourId *clone() const = 0;
+    virtual const ORG_ETSI_TTCN3_TRI::QualifiedName &getName() const = 0;
+#endif
     virtual Tboolean operator<(const TciBehaviourId &bid) const = 0;
   };
 
@@ -241,7 +267,11 @@ namespace ORG_ETSI_TTCN3_TCI {
    * A value of TciTestCaseIdType is the qualified name of a TTCN-3 testcase as
    * specified in the TTCN-3 ATS. This abstract type is used for testcase handling.
    */
+#if defined(TTCN_ID_IFACE_FIXED_1) || defined(TTCN_ID_IFACE_FIXED_2)
+  class TciTestCaseId : public TciBehaviourId {
+#else
   class TciTestCaseId : TciBehaviourId {
+#endif
   public:
     virtual ~TciTestCaseId();
     virtual Tboolean operator==(const TciTestCaseId &tcid) const = 0;
@@ -363,9 +393,17 @@ namespace ORG_ETSI_TTCN3_TCI {
     virtual ~TciValueDifferenceList();
     virtual Tsize size() const = 0;
     virtual Tboolean empty() const = 0;
+#ifdef TTCN_LIST_IFACE_FIXED
+    virtual const TciValueDifference *get(Tindex p_index) const = 0;
+#else
     virtual const TciValueDifference *get(Tinteger p_position) const = 0;
+#endif
     virtual void clear() = 0;
+#ifdef TTCN_LIST_IFACE_FIXED
+    virtual void push_back(const TciValueDifference &comp) = 0;
+#else
     virtual void add(const TciValueDifference &comp) = 0;
+#endif
     virtual Tboolean operator==(const TciValueDifferenceList &vdList) const = 0;
     virtual TciValueDifferenceList *clone() const = 0;
     virtual Tboolean operator<(const TciValueDifferenceList &vdList) const = 0;
@@ -620,7 +658,11 @@ namespace ORG_ETSI_TTCN3_TCI {
     virtual const TciValue &getAddress() const = 0;
     virtual void setAddress(const TciValue &T) = 0;
     virtual Tboolean operator==(const AddressValue &addr) const = 0;
+#ifdef TTCN_LIST_IFACE_FIXED
+    virtual AddressValue *clone() const = 0;
+#else
     virtual AddressValue *cloneAddressValue() const = 0;
+#endif
     virtual Tboolean operator<(const AddressValue &addr) const = 0;
   };
 
@@ -647,7 +689,11 @@ namespace ORG_ETSI_TTCN3_TCI {
     virtual Tboolean empty() const = 0;
     virtual const TciValue *get(Tindex index) const = 0;
     virtual void clear() = 0;
+#ifdef TTCN_LIST_IFACE_FIXED
+    virtual void push_back(const TciValue &comp) = 0;
+#else
     virtual void add(const TciValue &comp) = 0;
+#endif
     virtual Tboolean operator==(const TciValueList &valList) const = 0;
     virtual TciValueList *clone() const = 0;
     virtual Tboolean operator<(const TciValueList &valList) const = 0;

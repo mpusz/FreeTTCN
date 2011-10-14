@@ -19,7 +19,7 @@
 
 
 /**
- * @file   moduleParameter.h
+ * @file   tciModuleParameter.h
  * @author Mateusz Pusz
  * @date   Tue Apr 24 21:05:33 2007
  * 
@@ -28,8 +28,8 @@
  * 
  */
 
-#ifndef __MODULE_PARAMETER_H__
-#define __MODULE_PARAMETER_H__
+#ifndef __TCI_MODULE_PARAMETER_H__
+#define __TCI_MODULE_PARAMETER_H__
 
 #include <freettcn/etsi/tci.h>
 #include <freettcn/tools/nonAssignable.h>
@@ -42,20 +42,20 @@ namespace freettcn {
     
     using namespace ORG_ETSI_TTCN3_TCI;
 
-    class CModuleParameter : CNonAssignable, public ORG_ETSI_TTCN3_TCI::TciModuleParameter {
+    class CTciModuleParameter : CNonAssignable, public ORG_ETSI_TTCN3_TCI::TciModuleParameter {
       std::shared_ptr<const TciModuleParameterId> _id;
       std::shared_ptr<const TciValue> _defaultValue;
       // std::shared_ptr<const TciValue> _value;
       
     public:
-      CModuleParameter(const TciModuleParameterId &id, const TciValue &defaultValue): _id(id.clone()), _defaultValue(defaultValue.clone()) {} //, _value(_defaultValue) {}
-      CModuleParameter(const CModuleParameter &) = default;
-      CModuleParameter(CModuleParameter &&) = default;
-      ~CModuleParameter() = default;
-      TciModuleParameter *clone() const override                           { return new CParameter(*this); }
+      CTciModuleParameter(const TciModuleParameterId &id, const TciValue &defaultValue): _id(id.clone()), _defaultValue(defaultValue.clone()) {} //, _value(_defaultValue) {}
+      CTciModuleParameter(const CTciModuleParameter &) = default;
+      CTciModuleParameter(CTciModuleParameter &&) = default;
+      ~CTciModuleParameter() = default;
+      TciModuleParameter *clone() const override                           { return new CTciModuleParameter(*this); }
       
       const TciValue &getDefaultValue() const override                     { return *_defaultValue; }
-      const Tstring &getModuleParameterName() const override               { return _id->getObjectName(); }
+      const Tstring &getModuleParameterName() const override               { return _id->getName().getObjectName(); }
       const TciModuleParameterId &getTciModuleParameterId() const override { return *_id; }
       
       Tboolean operator==(const TciModuleParameter &mpar) const override   { return *_id == mpar.getTciModuleParameterId(); }
@@ -70,4 +70,4 @@ namespace freettcn {
 } // namespace freettcn
 
 
-#endif /* __MODULE_PARAMETER_H__ */
+#endif /* __TCI_MODULE_PARAMETER_H__ */

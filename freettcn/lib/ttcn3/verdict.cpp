@@ -29,11 +29,11 @@
  */
 
 #include "freettcn/ttcn3/verdict.h"
-#include "freettcn/ttcn3/moduleId.h"
+#include "freettcn/ttcn3/tciModuleId.h"
 
 
 /// @todo verify if encoding can be set for built-in types
 freettcn::ttcn3::CTypeVerdict::CTypeVerdict():
-  CType(CModuleId::BuiltIn(), "verdicttype", TCI_VERDICT, "", "", CExtension())
+  CType(CTciModuleId::BuiltIn(), "verdicttype", TCI_VERDICT, "", "", CExtension())
 {
 }

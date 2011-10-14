@@ -29,11 +29,11 @@
  */
 
 #include "freettcn/ttcn3/boolean.h"
-#include "freettcn/ttcn3/moduleId.h"
+#include "freettcn/ttcn3/tciModuleId.h"
 
 
 /// @todo verify if encoding can be set for built-in types
 freettcn::ttcn3::CTypeBoolean::CTypeBoolean():
-  CType(CModuleId::BuiltIn(), "boolean", TCI_BOOLEAN, "", "", CExtension())
+  CType(CTciModuleId::BuiltIn(), "boolean", TCI_BOOLEAN, "", "", CExtension())
 {
 }

@@ -26,7 +26,9 @@ BIN_DIR = $(LONG_DIR_NAME)/../bin
 CPPFLAGS += -fPIC
 
 # files
-CPP_FILES = type.cpp integer.cpp boolean.cpp verdict.cpp octetstring.cpp \
-	record.cpp
+CPP_FILES = tciType.cpp integer.cpp boolean.cpp verdict.cpp octetstring.cpp \
+	record.cpp \
+	tciModuleId.cpp tciModuleParameter.cpp tciParameter.cpp tciParameterType.cpp \
+	triComponentId.cpp triPortId.cpp triTimerDuration.cpp triTimerId.cpp
 
 include Makefile.rules

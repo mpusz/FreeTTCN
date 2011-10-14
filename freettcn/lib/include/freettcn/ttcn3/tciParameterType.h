@@ -19,7 +19,7 @@
 
 
 /**
- * @file   parameterType.h
+ * @file   tciParameterType.h
  * @author Mateusz Pusz
  * @date   Tue Apr 24 21:05:33 2007
  * 
@@ -28,8 +28,8 @@
  * 
  */
 
-#ifndef __PARAMETER_TYPE_H__
-#define __PARAMETER_TYPE_H__
+#ifndef __TCI_PARAMETER_TYPE_H__
+#define __TCI_PARAMETER_TYPE_H__
 
 #include <freettcn/etsi/tci.h>
 #include <freettcn/tools/nonAssignable.h>
@@ -40,22 +40,23 @@ namespace freettcn {
 
   namespace ttcn3 {
     
-    class CParameterType : CNonAssignable, public ORG_ETSI_TTCN3_TCI::TciParameterType {
+    using namespace ORG_ETSI_TTCN3_TCI;
+
+    class CTciParameterType : CNonAssignable, public ORG_ETSI_TTCN3_TCI::TciParameterType {
       std::shared_ptr<const TciType> _type;
       TciParameterPassingMode _passingMode;
-      
     public:
-      CParameterType(const TciType &type, TciParameterPassingMode passingMode): _type(type.clone()), _passingMode(passingMode) {}
-      CParameterType(const CParameterType &) = default;
-      CParameterType(CParameterType &&) = default;
-      ~CParameterType() = default;
-      TciParameterType *clone() const override                                    { return new CParameterType(*this); }
+      CTciParameterType(const TciType &type, TciParameterPassingMode passingMode): _type(type.clone()), _passingMode(passingMode) {}
+      CTciParameterType(const CTciParameterType &) = default;
+      CTciParameterType(CTciParameterType &&) = default;
+      ~CTciParameterType() = default;
+      TciParameterType *clone() const override                                    { return new CTciParameterType(*this); }
       
-      const TciType &getType() const override                                     { return _type; }
+      const TciType &getType() const override                                     { return *_type; }
       const TciParameterPassingMode &getParameterPassingMode() const override     { return _passingMode; }
       
-      Tboolean operator==(const TciParameterType &parType) const override         { return _passingMode == parType.getParameterPassingMode() && _type == parType.getType(); }
-      Tboolean operator<(const TciParameterType &parType) const override          { return _passingMode < parType.getParameterPassingMode() && _type < parType.getType(); }
+      Tboolean operator==(const TciParameterType &parType) const override         { return _passingMode == parType.getParameterPassingMode() && *_type == parType.getType(); }
+      Tboolean operator<(const TciParameterType &parType) const override          { return _passingMode < parType.getParameterPassingMode() && *_type < parType.getType(); }
     };
 
   } // namespace ttcn3
@@ -63,4 +64,4 @@ namespace freettcn {
 } // namespace freettcn
 
 
-#endif /* __PARAMETER_TYPE_H__ */
+#endif /* __TCI_PARAMETER_TYPE_H__ */

@@ -19,21 +19,15 @@
 
 
 /**
- * @file   integer.cpp
+ * @file   triComponentId.cpp
  * @author Mateusz Pusz
- * @date   Mon May 14 21:37:54 2007
+ * @date   Sun May 13 19:37:56 2007
  * 
  * @brief  
  * 
  * 
  */
 
-#include "freettcn/ttcn3/integer.h"
-#include "freettcn/ttcn3/tciModuleId.h"
+#include "freettcn/ttcn3/triComponentId.h"
 
-
-/// @todo verify if encoding can be set for built-in types
-freettcn::ttcn3::CTypeInteger::CTypeInteger():
-  CType(CTciModuleId::BuiltIn(), "integer", TCI_INTEGER, "", "", CExtension())
-{
-}
+Tinteger freettcn::ttcn3::CTriComponentId::_nextId = 0;

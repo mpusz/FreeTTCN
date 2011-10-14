@@ -117,7 +117,7 @@ freettcn::ttcn3::CTypeRecord::CTypeRecord(const TciModuleId  &moduleId,
 }
 
 
-void freettcn::ttcn3::CTypeRecord::Register(CType &fieldType, const Tstring &fieldName, bool optional /* = false */)
+void freettcn::ttcn3::CTypeRecord::Add(CType &fieldType, const Tstring &fieldName, bool optional /* = false */)
 {
   _fieldDataArray.push_back(CFieldData(fieldType, fieldName, optional));
   _fieldNames.push_back(&_fieldDataArray.back().Name());

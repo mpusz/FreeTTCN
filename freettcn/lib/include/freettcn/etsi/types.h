@@ -59,15 +59,31 @@ namespace ORG_ETSI_TTCN3_TRI {
 
   class QualifiedName {
   public:
+#if defined(TTCN_ID_IFACE_FIXED_1) || defined(TTCN_ID_IFACE_FIXED_2)
+    virtual ~QualifiedName();
+    virtual const Tstring &getModuleName() const = 0;
+    virtual void setModuleName(const Tstring &mName) = 0;
+    virtual const Tstring &getObjectName() const = 0;
+    virtual void setObjectName(const Tstring &oName) = 0;
+    /// @todo why is that here?
+    virtual Tstring toString() const = 0;
+    // equals renamed
+    virtual Tboolean operator==(const QualifiedName &qn) const = 0;
+    // clone renamed
+    virtual QualifiedName *clone() const = 0;
+    virtual Tboolean operator<(const QualifiedName &qn) const = 0;
+#else
     ~QualifiedName();
     const Tstring &getModuleName() const;
     void setModuleName(const Tstring &mName);
     const Tstring &getObjectName() const;
     void setObjectName(const Tstring &oName);
+    /// @todo why is that here?
     Tstring toString() const;
     Tboolean equals(const QualifiedName &qn) const;
     QualifiedName *cloneQualifiedName() const;
     Tboolean operator<(const QualifiedName &qn) const;
+#endif
   };
 
 } // namespace ORG_ETSI_TTCN3_TRI

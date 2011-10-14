@@ -29,7 +29,7 @@
  */
 
 #include "freettcn/ttcn3/octetstring.h"
-#include "freettcn/ttcn3/moduleId.h"
+#include "freettcn/ttcn3/tciModuleId.h"
 #include "freettcn/tools/exception.h"
 
 
@@ -65,6 +65,6 @@ void freettcn::ttcn3::CTypeOctetstring::CValue::setString(const Tstring &p_osVal
 
 /// @todo verify if encoding can be set for built-in types
 freettcn::ttcn3::CTypeOctetstring::CTypeOctetstring():
-  CType(CModuleId::BuiltIn(), "octetstring", TCI_OCTETSTRING, "", "", CExtension())
+  CType(CTciModuleId::BuiltIn(), "octetstring", TCI_OCTETSTRING, "", "", CExtension())
 {
 }

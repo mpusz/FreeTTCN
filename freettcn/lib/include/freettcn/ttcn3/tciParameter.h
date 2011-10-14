@@ -19,7 +19,7 @@
 
 
 /**
- * @file   parameter.h
+ * @file   tciParameter.h
  * @author Mateusz Pusz
  * @date   Tue Apr 24 21:05:33 2007
  * 
@@ -28,8 +28,8 @@
  * 
  */
 
-#ifndef __PARAMETER_H__
-#define __PARAMETER_H__
+#ifndef __TCI_PARAMETER_H__
+#define __TCI_PARAMETER_H__
 
 #include <freettcn/etsi/tci.h>
 #include <freettcn/tools/nonAssignable.h>
@@ -40,28 +40,30 @@ namespace freettcn {
 
   namespace ttcn3 {
     
-    class CParameter : CNonAssignable, public ORG_ETSI_TTCN3_TCI::TciParameter {
+    using namespace ORG_ETSI_TTCN3_TCI;
+
+    class CTciParameter : CNonAssignable, public ORG_ETSI_TTCN3_TCI::TciParameter {
       std::shared_ptr<const Tstring> _name;
       TciParameterPassingMode _passingMode;
       std::shared_ptr<const TciValue> _value;
       
     public:
-      CParameter(const Tstring &name, TciParameterPassingMode passingMode, const TciValue &value):
+      CTciParameter(const Tstring &name, TciParameterPassingMode passingMode, const TciValue &value):
         _name(new Tstring(name)), _passingMode(passingMode), _value(value.clone()) {}
-      CParameter(const CParameter &) = default;
-      CParameter(CParameter &&) = default;
-      ~CParameter() = default;
-      TciParameter *clone() const override                                        { return new CParameter(*this); }
+      CTciParameter(const CTciParameter &) = default;
+      CTciParameter(CTciParameter &&) = default;
+      ~CTciParameter() = default;
+      TciParameter *clone() const override                                        { return new CTciParameter(*this); }
       
       const TciValue &getValue() const override                                   { return *_value; }
       void setValue(TciValue &value) override                                     { _value.reset(value.clone()); }
       const TciParameterPassingMode &getParameterPassingMode() const override     { return _passingMode; }
-      void setParameterPassingMode(const TciParameterPassingMode &mode) override  { _passingMode = _mode; }
-      const Tstring &getParameterName() const override                            { return _name; }
-      void setParameterName(const Tstring &name) override                         { _value.reset(new Tstring(name)); }
+      void setParameterPassingMode(const TciParameterPassingMode &mode) override  { _passingMode = mode; }
+      const Tstring &getParameterName() const override                            { return *_name; }
+      void setParameterName(const Tstring &name) override                         { _name.reset(new Tstring(name)); }
       
-      Tboolean operator==(const TciParameter &param) const override               { return _name == param.getParameterName(); }
-      Tboolean operator<(const TciParameter &param) const override                { return _name < param.getParameterName(); }
+      Tboolean operator==(const TciParameter &param) const override               { return *_name == param.getParameterName(); }
+      Tboolean operator<(const TciParameter &param) const override                { return *_name < param.getParameterName(); }
     };
 
   } // namespace ttcn3
@@ -69,4 +71,4 @@ namespace freettcn {
 } // namespace freettcn
 
 
-#endif /* __PARAMETER_H__ */
+#endif /* __TCI_PARAMETER_H__ */
