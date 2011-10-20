@@ -50,7 +50,9 @@ typedef unsigned char Tbit;
 
 typedef unsigned char Tbyte;
 
+#ifndef ISSUE_0005945
 typedef unsigned char Tchar; /// @todo Type not defined in spec 
+#endif
 
 /// @} TTCN3InterfaceTypes
 
@@ -59,7 +61,7 @@ namespace ORG_ETSI_TTCN3_TRI {
 
   class QualifiedName {
   public:
-#if defined(TTCN_ID_IFACE_FIXED_1) || defined(TTCN_ID_IFACE_FIXED_2)
+#if defined(ISSUE_0005946_A) || defined(ISSUE_0005946_B)
     virtual ~QualifiedName();
     virtual const Tstring &getModuleName() const = 0;
     virtual void setModuleName(const Tstring &mName) = 0;

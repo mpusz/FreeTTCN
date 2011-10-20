@@ -44,7 +44,7 @@ MAKE = make
 CPP = g++ -g -Wall -std=c++0x
 
 # TODO: Remove it when GCC will start supporting override keyword
-CPP += -Doverride= -DTTCN_ID_IFACE_FIXED_2
+CPP += -Doverride= -DISSUE_0005945 -DISSUE_0005946_A -DISSUE_0005947
 
 AR = ar -c
 CD = cd

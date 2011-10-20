@@ -85,7 +85,7 @@ namespace ORG_ETSI_TTCN3_TCI {
     virtual ~TciModuleIdList();
     virtual Tsize size() const = 0;
     virtual Tboolean empty() const = 0;
-#ifdef TTCN_LIST_IFACE_FIXED
+#ifdef ISSUE_0005949
     virtual const TciModuleId *get(Tindex p_index) const = 0;
 #else
     virtual const TciModuleId *get(Tsize p_index) const = 0;
@@ -102,9 +102,9 @@ namespace ORG_ETSI_TTCN3_TCI {
    * as specified in the TTCN-3 ATS. This abstract type is used for module
    * parameter handling.
    */
-#ifdef TTCN_ID_IFACE_FIXED_1
+#ifdef ISSUE_0005946_A
   class TciModuleParameterId : public ORG_ETSI_TTCN3_TRI::QualifiedName {
-#elif TTCN_ID_IFACE_FIXED_2
+#elif ISSUE_0005946_B
   class TciModuleParameterId {
 #else
   class TciModuleParameterId : ORG_ETSI_TTCN3_TRI::QualifiedName {
@@ -112,9 +112,9 @@ namespace ORG_ETSI_TTCN3_TCI {
   public:
     virtual ~TciModuleParameterId();
     virtual Tboolean operator==(const TciModuleParameterId &mparId) const = 0;
-#ifdef TTCN_ID_IFACE_FIXED_1
+#ifdef ISSUE_0005946_A
     // nothing here
-#elif TTCN_ID_IFACE_FIXED_2
+#elif ISSUE_0005946_B
     virtual TciModuleParameterId *clone() const = 0;
     virtual const ORG_ETSI_TTCN3_TRI::QualifiedName &getName() const = 0;
 #endif
@@ -244,9 +244,9 @@ namespace ORG_ETSI_TTCN3_TCI {
    * A value of type TciBehaviourIdType identifies a TTCN-3 behaviour
    * functions.
    */
-#ifdef TTCN_ID_IFACE_FIXED_1
+#ifdef ISSUE_0005946_A
   class TciBehaviourId : public ORG_ETSI_TTCN3_TRI::QualifiedName {
-#elif TTCN_ID_IFACE_FIXED_2
+#elif ISSUE_0005946_B
   class TciBehaviourId {
 #else
   class TciBehaviourId : ORG_ETSI_TTCN3_TRI::QualifiedName {
@@ -254,9 +254,9 @@ namespace ORG_ETSI_TTCN3_TCI {
   public:
     virtual ~TciBehaviourId();
     virtual Tboolean operator==(const TciBehaviourId &bid) const = 0;
-#ifdef TTCN_ID_IFACE_FIXED_1
+#ifdef ISSUE_0005946_A
     // nothing here
-#elif TTCN_ID_IFACE_FIXED_2
+#elif ISSUE_0005946_B
     virtual TciBehaviourId *clone() const = 0;
     virtual const ORG_ETSI_TTCN3_TRI::QualifiedName &getName() const = 0;
 #endif
@@ -267,7 +267,7 @@ namespace ORG_ETSI_TTCN3_TCI {
    * A value of TciTestCaseIdType is the qualified name of a TTCN-3 testcase as
    * specified in the TTCN-3 ATS. This abstract type is used for testcase handling.
    */
-#if defined(TTCN_ID_IFACE_FIXED_1) || defined(TTCN_ID_IFACE_FIXED_2)
+#if defined(ISSUE_0005946_A) || defined(ISSUE_0005946_B)
   class TciTestCaseId : public TciBehaviourId {
 #else
   class TciTestCaseId : TciBehaviourId {
@@ -280,7 +280,7 @@ namespace ORG_ETSI_TTCN3_TCI {
   };
 
 
-  /// @todo Not in spec
+#ifdef ISSUE_0005945
   class TciTestCaseIdList {
   public:
     virtual ~TciTestCaseIdList();
@@ -293,6 +293,7 @@ namespace ORG_ETSI_TTCN3_TCI {
     virtual TciTestCaseIdList *clone() const = 0;
     virtual Tboolean operator<(const TciTestCaseIdList &pidList) const = 0;
   };
+#endif
 
 
   /**
@@ -393,13 +394,13 @@ namespace ORG_ETSI_TTCN3_TCI {
     virtual ~TciValueDifferenceList();
     virtual Tsize size() const = 0;
     virtual Tboolean empty() const = 0;
-#ifdef TTCN_LIST_IFACE_FIXED
+#ifdef ISSUE_0005949
     virtual const TciValueDifference *get(Tindex p_index) const = 0;
 #else
     virtual const TciValueDifference *get(Tinteger p_position) const = 0;
 #endif
     virtual void clear() = 0;
-#ifdef TTCN_LIST_IFACE_FIXED
+#ifdef ISSUE_0005949
     virtual void push_back(const TciValueDifference &comp) = 0;
 #else
     virtual void add(const TciValueDifference &comp) = 0;
@@ -551,10 +552,18 @@ namespace ORG_ETSI_TTCN3_TCI {
   public:
     virtual ~OctetstringValue();
     virtual Tsize getLength() const = 0;
+#ifdef ISSUE_0005945
+    virtual const Tinteger getOctet(Tindex p_position) const = 0;
+#else
     virtual const Tchar getOctet(Tindex p_position) const = 0;
+#endif
     virtual const Tstring &getString() const = 0;
     virtual void setLength(Tsize p_length) = 0;
+#ifdef ISSUE_0005945
+    virtual void setOctet(Tindex p_position, Tinteger p_ochar) = 0;
+#else
     virtual void setOctet(Tindex p_position, Tchar p_ochar) = 0;
+#endif
     virtual void setString(const Tstring &p_osValue) = 0;
     virtual Tboolean operator==(const OctetstringValue &octStr) const = 0;
     virtual OctetstringValue *clone() const = 0;
@@ -565,10 +574,18 @@ namespace ORG_ETSI_TTCN3_TCI {
   class HexstringValue : public virtual TciValue {
   public:
     virtual ~HexstringValue();
+#ifdef ISSUE_0005945
+    virtual Tinteger getHex(Tindex p_position) const = 0;
+#else
     virtual Tchar getHex(Tindex p_position) const = 0;
+#endif
     virtual Tsize getLength() const = 0;
     virtual const Tstring &getString() const = 0;
+#ifdef ISSUE_0005945
+    virtual void setHex(Tindex p_position, Tinteger p_hcValue) = 0;
+#else
     virtual void setHex(Tindex p_position, Tchar p_hcValue) = 0;
+#endif
     virtual void setLength(Tsize p_length) = 0;
     virtual void setString(const Tstring &p_hsValue) = 0;
     virtual Tboolean operator==(const HexstringValue &hexStr) const = 0;
@@ -658,7 +675,7 @@ namespace ORG_ETSI_TTCN3_TCI {
     virtual const TciValue &getAddress() const = 0;
     virtual void setAddress(const TciValue &T) = 0;
     virtual Tboolean operator==(const AddressValue &addr) const = 0;
-#ifdef TTCN_LIST_IFACE_FIXED
+#ifdef ISSUE_0005949
     virtual AddressValue *clone() const = 0;
 #else
     virtual AddressValue *cloneAddressValue() const = 0;
@@ -689,7 +706,7 @@ namespace ORG_ETSI_TTCN3_TCI {
     virtual Tboolean empty() const = 0;
     virtual const TciValue *get(Tindex index) const = 0;
     virtual void clear() = 0;
-#ifdef TTCN_LIST_IFACE_FIXED
+#ifdef ISSUE_0005949
     virtual void push_back(const TciValue &comp) = 0;
 #else
     virtual void add(const TciValue &comp) = 0;
