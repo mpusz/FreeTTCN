@@ -18,7 +18,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /**
- * @file   testComponent.cpp
+ * @file   component.cpp
  * @author Mateusz Pusz
  * @date   Wed Apr 25 13:38:56 2007
  * 
@@ -27,7 +27,7 @@
  * 
  */
 
-#include "freettcn/te/testComponent.h"
+#include "freettcn/te/component.h"
 #include "freettcn/te/te.h"
 #include "freettcn/te/module.h"
 #include "freettcn/te/behavior.h"
@@ -39,10 +39,8 @@
 #include "freettcn/tools/logMask.h"
 #include "freettcn/tools/timeStampMgr.h"
 #include "freettcn/tools/tools.h"
-extern "C" {
 #include "freettcn/ttcn3/tci_te_ch.h"
 #include "freettcn/ttcn3/tci_tl.h"
-}
 #include <cstring>
 #include <iostream>
 
@@ -58,24 +56,6 @@ freettcn::TE::CTestComponentType::CInstance::CInstance(const CType &type):
 freettcn::TE::CTestComponentType::CInstance::~CInstance()
 {
   Purge(_portIdArray);
-}
-
-void freettcn::TE::CTestComponentType::CInstance::PortIdArrayCreate()
-{
-  // create port Ids
-  const CTestComponentType &type = static_cast<const CTestComponentType &>(Type());
-  for(unsigned int i=0; i<type.PortInfoNum(); i++) {
-    TriPortId *portId = new TriPortId;
-    const CPortInfo &portInfo = type.PortInfo(i);
-    
-    portId->compInst = Id();
-    portId->portName = const_cast<char *>(portInfo.Name());
-    portId->portIndex = portInfo.PortIdx();
-    portId->portType = portInfo.Type().Id();
-    portId->aux = this;
-    
-    _portIdArray.push_back(portId);
-  }
 }
 
 const TriPortId &freettcn::TE::CTestComponentType::CInstance::PortId(const char *name, int idx) const
@@ -108,8 +88,6 @@ const TriPortId &freettcn::TE::CTestComponentType::CInstance::PortId(const char 
 freettcn::TE::CTestComponentType::CInstanceRemote::CInstanceRemote(const CType &type, const TriComponentId &id, TciTestComponentKindType kind):
   CInstance(type), _id(id), _kind(kind), _status(IDLE)
 {
-  // create port IDs array
-  PortIdArrayCreate();
 }
 
 const TriComponentId &freettcn::TE::CTestComponentType::CInstanceRemote::Id() const
@@ -306,9 +284,6 @@ void freettcn::TE::CTestComponentType::CInstanceLocal::Init(CModule &module, Tci
   _id.compType = Type().Id();
   
   _status = BLOCKED;
-  
-  // create port IDs array
-  PortIdArrayCreate();
   
   // create ports
   const CTestComponentType &type = static_cast<const CTestComponentType &>(Type());
@@ -713,7 +688,7 @@ freettcn::TE::CTestComponentType::~CTestComponentType()
 }
 
 
-void freettcn::TE::CTestComponentType::PortInfoAdd(const CPortType &portType, const char *name, int portIdx)
+void freettcn::TE::CTestComponentType::Register(std::shared_ptr<CTriPortId> id)
 {
   CPortInfo *portInfo = new CPortInfo(portType, name, portIdx);
   _portInfoArray.push_back(portInfo);
@@ -768,7 +743,7 @@ const freettcn::TE::CPortInfo &freettcn::TE::CTestComponentType::PortInfo(unsign
 
 
 
-freettcn::TE::CControlComponentType::CControlComponentType():
+freettcn::TE::CControlComponentType::CControlComponentType(const std::shared_ptr<const TciModuleId> &moduleId):
   freettcn::TE::CTestComponentType(0 , "_ControlComponentType_")
 {
 }
