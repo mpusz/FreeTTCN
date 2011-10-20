@@ -41,11 +41,11 @@ namespace freettcn {
       virtual void Initialize() = 0;
       
     protected:
-      bool Inited() const;
+      bool Inited() const { return _inited; }
       
     public:
-      CInitObject();
-      virtual ~CInitObject();
+      CInitObject(): _inited(false) {}
+      ~CInitObject() = default;
       void Init();
     };
     

@@ -29,27 +29,11 @@
 
 #include "freettcn/te/initObject.h"
 
-
-
-freettcn::TE::CInitObject::CInitObject():
-  _inited(false)
-{
-}
-
-freettcn::TE::CInitObject::~CInitObject()
-{
-}
-
 void freettcn::TE::CInitObject::Init()
 {
-  if (!_inited) {
+  if(!_inited) {
     // perform object specific initialization
     Initialize();
     _inited = true;
   }
-}
-
-bool freettcn::TE::CInitObject::Inited() const
-{
-  return _inited;
 }
