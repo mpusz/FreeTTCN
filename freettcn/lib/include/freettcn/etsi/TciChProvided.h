@@ -72,7 +72,7 @@ namespace ORG_ETSI_TTCN3_TCI {
     virtual void tciRaiseConnected(const TriPortId *sender, const TriComponentId *receiver,
                                    const TriSignatureId *signature, const TciValue *exception) = 0;
     //Called by the TE when it executes a TTCN-3 broadcast raise operation on a component portvirtual
-    void tciRaiseConnectedBC(const TriPortId *sender, const TriSignatureId *signature,
+    virtual void tciRaiseConnectedBC(const TriPortId *sender, const TriSignatureId *signature,
                              const TciValue *exception) = 0;
     //Called by the TE when it executes a TTCN-3 multicast raise operation on a component
     virtual void tciRaiseConnectedMC(const TriPortId *sender, const TriComponentIdList *receiver,

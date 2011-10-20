@@ -33,9 +33,12 @@
 #define __TCI_TM_PROVIDED_H__
 
 #include <freettcn/etsi/tci.h>
+#include <freettcn/etsi/tri.h>
 
 namespace ORG_ETSI_TTCN3_TCI {
   
+  using namespace ORG_ETSI_TTCN3_TRI;
+
   class TciTmProvided {
   public:
     //Destructor
