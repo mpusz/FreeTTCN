@@ -35,7 +35,3 @@ freettcn::TE::CLogMask::CLogMask(bool enabled /* true */):
   freettcn::CLogMask(CMD_TE_NUM, enabled)
 {
 }
-
-freettcn::TE::CLogMask::~CLogMask()
-{
-}

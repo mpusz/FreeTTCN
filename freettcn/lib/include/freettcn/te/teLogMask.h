@@ -39,8 +39,80 @@ namespace freettcn {
     
     class CLogMask : public freettcn::CLogMask {
     public:
-      CLogMask(bool enabled = true);
-      ~CLogMask();
+      enum TTECommands {
+        CMD_TE_TC_EXECUTE,
+        CMD_TE_TC_START,
+        CMD_TE_TC_STOP,
+        
+        CMD_TE_CTRL_START,
+        CMD_TE_CTRL_STOP,
+        
+        CMD_TE_M_MISMATCH_M,                          /**< communication with the SUT */
+        CMD_TE_M_MISMATCH_C,                          /**< intercomponent communication */
+        CMD_TE_M_RECEIVE_M,                           /**< communication with the SUT */
+        CMD_TE_M_RECEIVE_C,                           /**< intercomponent communication */
+    
+        CMD_TE_PR_GET_CALL_MISMATCH_M,                /**< communication with the SUT */
+        CMD_TE_PR_GET_CALL_MISMATCH_C,                /**< intercomponent communication */
+        CMD_TE_PR_GET_CALL_M,                         /**< communication with the SUT */
+        CMD_TE_PR_GET_CALL_C,                         /**< intercomponent communication */
+        CMD_TE_PR_GET_REPLY_MISMATCH_M,               /**< communication with the SUT */
+        CMD_TE_PR_GET_REPLY_MISMATCH_C,               /**< intercomponent communication */
+        CMD_TE_PR_GET_REPLY_M,                        /**< communication with the SUT */
+        CMD_TE_PR_GET_REPLY_C,                        /**< intercomponent communication */
+        CMD_TE_PR_GET_CATCH_MISMATCH_M,               /**< communication with the SUT */
+        CMD_TE_PR_GET_CATCH_MISMATCH_C,               /**< intercomponent communication */
+        CMD_TE_PR_GET_CATCH_TIMEOUT,
+    
+        CMD_TE_C_CREATE,
+        CMD_TE_C_START,
+        CMD_TE_C_RUNNING,
+        CMD_TE_C_ALIVE,
+        CMD_TE_C_STOP,
+        CMD_TE_C_DONE_MISMATCH,
+        CMD_TE_C_DONE,
+        CMD_TE_C_KILLED_MISMATCH,
+        CMD_TE_C_KILLED,
+        CMD_TE_C_TERMINATED,
+    
+        CMD_TE_P_CLEAR,
+        CMD_TE_P_STOP,
+        CMD_TE_P_HALT,
+    
+        CMD_TE_T_TIMEOUT_MISMATCH,
+        CMD_TE_T_TIMEOUT,
+    
+        CMD_TE_S_ENTER,
+        CMD_TE_S_LEAVE,
+    
+        CMD_TE_VAR,
+    
+        CMD_TE_MODULE_PAR,
+    
+        CMD_TE_GET_VERDICT,
+        CMD_TE_SET_VERDICT,
+    
+        CMD_TE_A_ENTER,
+        CMD_TE_A_LEAVE,
+        CMD_TE_A_NOMATCH,
+        CMD_TE_A_REPEAT,
+        CMD_TE_A_DEFAULTS,
+        CMD_TE_A_ACTIVATE,
+        CMD_TE_A_DEACTIVATE,
+        CMD_TE_A_WAIT,
+    
+        CMD_TE_ACTION,
+    
+        CMD_TE_MATCH,
+        CMD_TE_MATCH_MISMATCH,
+    
+        CMD_TE_INFO,
+    
+        CMD_TE_NUM                                    /**< should be the last one on the list */
+      };
+  
+      explicit CLogMask(bool enabled = true);
+      ~CLogMask() = default;
     };
     
   } // namespace TE

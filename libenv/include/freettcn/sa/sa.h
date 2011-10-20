@@ -43,7 +43,33 @@ namespace freettcn {
     
     class CLogMask : public freettcn::CLogMask {
     public:
-      CLogMask(bool enabled = true);
+      enum TSACommands {
+        CMD_SA_M_SEND_M,
+        CMD_SA_M_SEND_M_BC,
+        CMD_SA_M_SEND_M_MC,
+        CMD_SA_M_DETECTED_M,
+    
+        CMD_SA_PR_CALL_M,
+        CMD_SA_PR_CALL_M_BC,
+        CMD_SA_PR_CALL_M_MC,
+        CMD_SA_PR_GET_CALL_DETECTED_M,
+        CMD_SA_PR_REPLY_M,
+        CMD_SA_PR_REPLY_M_BC,
+        CMD_SA_PR_REPLY_M_MC,
+        CMD_SA_PR_GET_REPLY_DETECTED_M,
+        CMD_SA_PR_RAISE_M,
+        CMD_SA_PR_RAISE_M_BC,
+        CMD_SA_PR_RAISE_M_MC,
+        CMD_SA_PR_CATCH_DETECTED_M,
+        CMD_SA_PR_CATCH_M,
+    
+        CMD_SA_P_MAP,
+        CMD_SA_P_UNMAP,
+    
+        CMD_SA_NUM                                    /**< should be the last one on the list */
+      };
+
+      explicit CLogMask(bool enabled = true);
       ~CLogMask();
     };
 

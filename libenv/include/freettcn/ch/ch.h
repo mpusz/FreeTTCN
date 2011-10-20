@@ -43,7 +43,33 @@ namespace freettcn {
 
     class CLogMask : public freettcn::CLogMask {
     public:
-      CLogMask(bool enabled = true);
+      enum TCHCommands {
+        CMD_CH_M_SEND_C,
+        CMD_CH_M_SEND_C_BC,
+        CMD_CH_M_SEND_C_MC,
+        CMD_CH_M_DETECTED_C,
+    
+        CMD_CH_PR_CALL_C,
+        CMD_CH_PR_CALL_C_BC,
+        CMD_CH_PR_CALL_C_MC,
+        CMD_CH_PR_GET_CALL_DETECTED_C,
+        CMD_CH_PR_REPLY_C,
+        CMD_CH_PR_REPLY_C_BC,
+        CMD_CH_PR_REPLY_C_MC,
+        CMD_CH_PR_GET_REPLY_DETECTED_C,
+        CMD_CH_PR_RAISE_C,
+        CMD_CH_PR_RAISE_C_BC,
+        CMD_CH_PR_RAISE_C_MC,
+        CMD_CH_PR_CATCH_DETECTED_C,
+        CMD_CH_PR_CATCH_C,
+    
+        CMD_CH_P_CONNECT,
+        CMD_CH_P_DISCONNECT,
+
+        CMD_CH_NUM                                    /**< should be the last one on the list */
+      };
+    
+      explicit CLogMask(bool enabled = true);
       ~CLogMask();
     };
     

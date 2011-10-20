@@ -46,7 +46,14 @@ namespace freettcn {
     
     class CLogMask : public freettcn::CLogMask {
     public:
-      CLogMask(bool enabled = true);
+      enum TCDCommands {
+        CMD_CD_ENCODE,
+        CMD_CD_DECODE,
+      
+        CMD_CD_NUM                                    /**< should be the last one on the list */
+      };
+    
+      explicit CLogMask(bool enabled = true);
       ~CLogMask();
     };
     

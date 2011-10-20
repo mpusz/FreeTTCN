@@ -49,7 +49,18 @@ namespace freettcn {
     
     class CLogMask : public freettcn::CLogMask {
     public:
-      CLogMask(bool enabled = true);
+      enum TTMCommands {
+        CMD_TM_TC_STARTED,
+        CMD_TM_TC_TERMINATED,
+        
+        CMD_TM_CTRL_TERMINATED,
+        
+        CMD_TM_LOG,
+        
+        CMD_TM_NUM                                    /**< should be the last one on the list */
+      };
+      
+      explicit CLogMask(bool enabled = true);
       ~CLogMask();
     };
     

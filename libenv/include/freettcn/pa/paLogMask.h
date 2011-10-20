@@ -39,7 +39,19 @@ namespace freettcn {
     
     class CLogMask : public freettcn::CLogMask {
     public:
-      CLogMask(bool enabled = true);
+      enum TPACommands {
+        CMD_PA_PR_CATCH_TIMEOUT_DETECTED,
+    
+        CMD_PA_T_TIMEOUT_DETECTED,
+        CMD_PA_T_START,
+        CMD_PA_T_STOP,
+        CMD_PA_T_READ,
+        CMD_PA_T_RUNNING,
+    
+        CMD_PA_NUM                                    /**< should be the last one on the list */
+      };
+
+      explicit CLogMask(bool enabled = true);
       ~CLogMask();
     };
     
