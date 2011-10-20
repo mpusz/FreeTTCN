@@ -26,12 +26,13 @@ BIN_DIR = $(LONG_DIR_NAME)/../bin
 CPPFLAGS += -fPIC
 
 # files
-CPP_FILES = teLogMask.cpp sourceData.cpp modulesContainer.cpp \
-	type.cpp integer.cpp boolean.cpp verdict.cpp octetstring.cpp basicTypes.cpp \
-	record.cpp \
-	tci_value.cpp tci_tm_te.cpp tci_ch_te.cpp tci_cd_te.cpp \
-	tri_pa_te.cpp tri_sa_te.cpp \
-	te.cpp idObject.cpp initObject.cpp module.cpp testCase.cpp testComponent.cpp behavior.cpp timer.cpp port.cpp template.cpp
+CPP_FILES = teLogMask.cpp sourceData.cpp builtInTypes.cpp initObject.cpp \
+	te.cpp ets.cpp eds.cpp t3rts.cpp \
+	module.cpp \
+	modulesContainer.cpp \
+	timer.cpp port.cpp \
+	component.cpp \
+	template.cpp behavior.cpp testCase.cpp
 
 
 include Makefile.rules

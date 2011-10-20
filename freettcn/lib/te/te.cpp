@@ -29,329 +29,687 @@
 
 
 #include "freettcn/te/te.h"
+#include "freettcn/te/teEnv.h"
+#include "freettcn/te/t3rts.h"
+#include "freettcn/te/eds.h"
+#include "freettcn/te/ets.h"
+#include "freettcn/etsi/TciTmProvided.h"
 #include "freettcn/te/module.h"
-#include "freettcn/te/modulesContainer.h"
-#include "freettcn/te/behavior.h"
 #include "freettcn/te/testCase.h"
-#include "freettcn/te/timer.h"
-#include "freettcn/tools/logMask.h"
-#include "freettcn/tools/timeStampMgr.h"
+#include "freettcn/te/component.h"
+#include "freettcn/ttcn3/integer.h"
+#include "freettcn/ttcn3/boolean.h"
+#include "freettcn/ttcn3/verdict.h"
+#include "freettcn/ttcn3/octetstring.h"
 #include "freettcn/tools/exception.h"
-extern "C" {
-#include "freettcn/ttcn3/tci_te_tm.h"
-#include "freettcn/ttcn3/tci_te_ch.h"
-#include "freettcn/ttcn3/tri_te_sa.h"
-#include "freettcn/ttcn3/tci_tl.h"
-}
-#include <cstring>
+#include <cassert>
 
 
-freettcn::TE::CTTCNExecutable freettcn::TE::CTTCNExecutable::_instance;
-
-freettcn::TE::CTTCNExecutable &freettcn::TE::CTTCNExecutable::Instance()
-{
-  return _instance;
-}
-
-
-freettcn::TE::CTTCNExecutable::CTTCNExecutable():
-  _rootModule(0)
+freettcn::TE::CTTCN3Executable::CTTCN3Executable():
+  _t3rts(_ets)
 {
 }
 
 
-freettcn::TE::CTTCNExecutable::~CTTCNExecutable()
-{
+void freettcn::TE::CTTCN3Executable::Environment(std::unique_ptr<const CEnvironment> env)
+{ 
+  _env = std::move(env); 
+  _t3rts.Environment(*env);
 }
 
 
-void freettcn::TE::CTTCNExecutable::TciError(const std::string &str) const
-{
-  tciError(const_cast<char *>(str.c_str()));
-}
+// TM requests
 
-
-freettcn::TE::CModule &freettcn::TE::CTTCNExecutable::RootModule() const
-{
-  if (_rootModule)
-    return *_rootModule;
-  
-  throw ENotFound(E_DATA, "Root Module not set!!!");
-}
-
-
-
-
-
-void freettcn::TE::CTTCNExecutable::RootModule(String moduleId)
+void freettcn::TE::CTTCN3Executable::tciRootModule(const TciModuleId *moduleName)
 {
   try {
-    // obtain requested module
-    freettcn::TE::CModulesContainer &modContainer = freettcn::TE::CModulesContainer::Instance();
-    freettcn::TE::CModule &module = modContainer.Get(moduleId);
-    
-    // check if TTCN Executable is running test case or control part
-    if (_rootModule && _rootModule->Running()) {
-      TciError("Cannot set TTCN Root Module while tests are running");
-      return;
-    }
-    
-    // set given module as active module
-    _rootModule = &module;
-    
-    // init module
-    _rootModule->Init();
+    assert(moduleName);
+    _t3rts.RootModule(*moduleName);
   }
-  catch(freettcn::ENotFound &) {
-    std::string str;
-    str = "TTCN Module '";
-    str += moduleId;
-    str += "' not found";
-    TciError(str);
-    return;
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
   }
 }
 
 
-TciModuleParameterListType freettcn::TE::CTTCNExecutable::ModuleParametersGet(const TciModuleIdType &moduleName) const
+const ORG_ETSI_TTCN3_TCI::TciModuleIdList *freettcn::TE::CTTCN3Executable::getImportedModules() const
 {
-  const freettcn::TE::CModule &module = RootModule();
-  
-  // check if the same module given
-  if (strcmp(module.Id().moduleName, moduleName.moduleName)) {
-    std::string str;
-    str = "Given module: ";
-    str += moduleName.moduleName;
-    str += " different than root module: ";
-    str += module.Id().moduleName;
-    
-    // send an error
-    TciError(str);
-    
-    // return dummy data
-    TciModuleParameterListType modParList;
-    modParList.length = 0;
-    modParList.modParList = 0;
-    
-    return modParList;
+  try {
+    throw ENotImplemented(E_DATA, "Module imports are not supported yet");
+    return &_t3rts.RootModule().ImportedModules();
   }
-  
-  return module.Parameters();
-}
-
-
-TciTestCaseIdListType freettcn::TE::CTTCNExecutable::TestCasesGet() const
-{
-  return RootModule().TestCases();
-}
-
-
-TciParameterTypeListType freettcn::TE::CTTCNExecutable::TestCaseParametersGet(const TciTestCaseIdType &testCaseId) const
-{
-  const freettcn::TE::CModule &module = RootModule();
-  
-  // check if the same module given
-  if (strcmp(module.Id().moduleName, testCaseId.moduleName)) {
-    std::string str;
-    str = "Given test case module: ";
-    str += testCaseId.moduleName;
-    str += " different than root module: ";
-    str += module.Id().moduleName;
-    
-    // send an error
-    TciError(str);
-    
-    // return dummy data
-    TciParameterTypeListType tcParams;
-    tcParams.length = 0;
-    tcParams.parList = 0;
-    
-    return tcParams;
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+    return nullptr;
   }
-  
-  return module.TestCase(testCaseId.objectName).Parameters();
 }
 
 
-TriPortIdList freettcn::TE::CTTCNExecutable::TestCaseTSIGet(const TciTestCaseIdType &testCaseId) const
+const ORG_ETSI_TTCN3_TCI::TciModuleParameterList *freettcn::TE::CTTCN3Executable::tciGetModuleParameters(const TciModuleId *moduleName)
 {
-  const freettcn::TE::CModule &module = RootModule();
-  
-  // check if the same module given
-  if (strcmp(module.Id().moduleName, testCaseId.moduleName)) {
-    std::string str;
-    str = "Given test case module: ";
-    str += testCaseId.moduleName;
-    str += " different than root module: ";
-    str += module.Id().moduleName;
-    
-    // send an error
-    TciError(str);
-    
-    // return dummy data
-    TriPortIdList portList;
-    portList.portIdList = 0;
-    portList.length = 0;
-    
-    return portList;
+  try {
+    assert(moduleName);
+    _t3rts.RootModule();
+    return &_ets.Module(*moduleName).Parameters();
   }
-  
-  return module.TestCase(testCaseId.objectName).SystemInterface();
-}
-
-
-void freettcn::TE::CTTCNExecutable::TestCaseStart(const TciTestCaseIdType &testCaseId, const TciParameterListType &parameterlist) const
-{
-  freettcn::TE::CModule &module = RootModule();
-  
-  // check if the same module given
-  if (strcmp(module.Id().moduleName, testCaseId.moduleName)) {
-    std::string str;
-    str = "Given test case module: ";
-    str += testCaseId.moduleName;
-    str += " different than root module: ";
-    str += module.Id().moduleName;
-    
-    // send an error
-    TciError(str);
-    return;
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+    return nullptr;
   }
-  
-  freettcn::TE::CTestCase &tc = module.TestCase(testCaseId.objectName);
-  
-  // obtain module parameters
-  module.ParametersGet();
-  
-  // set as current test case
-  module.ActiveTestCase(tc);
-  
-  // start test case
-  tc.Start(0, 0, 0, &parameterlist, 0);
 }
 
 
-void freettcn::TE::CTTCNExecutable::TestCaseStop() const
+const ORG_ETSI_TTCN3_TCI::TciTestCaseIdList *freettcn::TE::CTTCN3Executable::tciGetTestCases() const
 {
-  freettcn::TE::CModule &module = RootModule();
-  if (module.Running())
-    module.ActiveTestCase().Stop();
+  try {
+    return &_t3rts.RootModule().TestCases();
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+    return nullptr;
+  }
 }
 
 
-const TriComponentId &freettcn::TE::CTTCNExecutable::ControlStart() const
+const ORG_ETSI_TTCN3_TCI::TciParameterTypeList *freettcn::TE::CTTCN3Executable::tciGetTestCaseParameters(const TciTestCaseId *testCaseId) const
 {
-  freettcn::TE::CModule &module = RootModule();
-  
-  // obtain module parameters
-  module.ParametersGet();
-  
-  return module.ControlStart();
+  try {
+    assert(testCaseId);
+    return &_t3rts.RootModule().TestCase(*testCaseId).Parameters();
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+    return nullptr;
+  }
 }
 
 
-void freettcn::TE::CTTCNExecutable::ControlStop() const
+const ORG_ETSI_TTCN3_TCI::TriPortIdList *freettcn::TE::CTTCN3Executable::tciGetTestCaseTSI(const TciTestCaseId &testCaseId) const
 {
-  freettcn::TE::CModule &module = RootModule();
-  if (module.Running())
-    module.ControlStop();
+  try {
+    return &_t3rts.RootModule().TestCase(testCaseId).SystemInterface();
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+    return nullptr;
+  }
 }
 
 
-void freettcn::TE::CTTCNExecutable::ConnectedMsgEnqueue(const TriPortId &sender, const TriComponentId &receiver, const Value &rcvdMessage) const
+void freettcn::TE::CTTCN3Executable::tciStartTestCase(const TciTestCaseId *testCaseId,
+                                                      const TciParameterList *parameterList)
 {
-  /// @todo enqueue new message
+  try {
+    assert(testCaseId);
+    _t3rts.TestCaseStart(*testCaseId, parameterList);
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+  }
 }
 
 
-const TriComponentId &freettcn::TE::CTTCNExecutable::TestComponentCreate(TciTestComponentKindType kind,
-                                                                         const Type &componentType,
-                                                                         String name) const
+void freettcn::TE::CTTCN3Executable::tciStopTestCase()
 {
-  if (kind == TCI_CTRL_COMP && componentType)
-    throw EOperationFailed(E_DATA, "'componentType' given for Control component!!!");
-  
-  return RootModule().TestComponentCreate(kind, componentType, name);
+  try {
+    _t3rts.TestCaseStop();
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+  }
 }
 
 
-void freettcn::TE::CTTCNExecutable::TestComponentStart(const TriComponentId &componentId,
-                                                       const TciBehaviourIdType &behaviorId,
-                                                       const TciParameterListType &parameterList) const
+const ORG_ETSI_TTCN3_TRI::TriComponentId *freettcn::TE::CTTCN3Executable::tciStartControl()
 {
-  RootModule().TestComponentStart(componentId, behaviorId, parameterList);
+  try {
+    return _t3rts.ControlStart();
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+    return nullptr;
+  }
 }
 
 
-void freettcn::TE::CTTCNExecutable::TestComponentStop(const TriComponentId &componentId) const
+void freettcn::TE::CTTCN3Executable::tciStopControl()
 {
-  RootModule().TestComponentStop(componentId);
+  try {
+    _t3rts.ControlStop();
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+  }
 }
 
 
-void freettcn::TE::CTTCNExecutable::TestComponentKill(const TriComponentId &componentId) const
+
+
+// CH requests
+
+void freettcn::TE::CTTCN3Executable::tciEnqueueMsgConnected(const TriPortId *sender,
+                                                           const TriComponentId *receiver,
+                                                           const TciValue *rcvdMessage)
 {
-  RootModule().TestComponentKill(componentId);
+  try {
+    assert(sender);
+    assert(receiver);
+    assert(rcvdMessage);
+    
+    std::unique_ptr<const TciValue> msg(rcvdMessage->clone());
+    
+    /// @todo enqueue new message
+    throw ENotImplemented(E_DATA, "EnqueMsg is not supported yet!!!");
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+  }
 }
 
 
-void freettcn::TE::CTTCNExecutable::Connect(const TriPortId &fromPort, const TriPortId &toPort) const
+void freettcn::TE::CTTCN3Executable::tciEnqueueCallConnected(const TriPortId *sender,
+                                                            const TriComponentId *receiver,
+                                                            const TriSignatureId *signature,
+                                                            const TciParameterList *parameterList)
 {
-  RootModule().Connect(fromPort, toPort);
+  try {
+    assert(sender);
+    assert(receiver);
+    assert(signature);
+    assert(parameterList);
+    
+    std::unique_ptr<const TciParameterList> msg(parameterList->clone());
+    
+    /// @todo enqueue new message
+    throw ENotImplemented(E_DATA, "EnqueCall is not supported yet!!!");
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+  }
 }
 
-void freettcn::TE::CTTCNExecutable::Disconnect(const TriPortId &fromPort, const TriPortId &toPort) const
+
+void freettcn::TE::CTTCN3Executable::tciEnqueueReplyConnected(const TriPortId *sender,
+                                                             const TriComponentId *receiver,
+                                                             const TriSignatureId *signature,
+                                                             const TciParameterList *parameterList,
+                                                             const TciValue *returnValue)
 {
-  RootModule().Disconnect(fromPort, toPort);
+  try {
+    assert(sender);
+    assert(receiver);
+    assert(signature);
+    assert(parameterList);
+    
+    std::unique_ptr<const TciParameterList> msg(parameterList->clone());
+    
+    /// @todo enqueue new message
+    throw ENotImplemented(E_DATA, "EnqueReply is not supported yet!!!");
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+  }
 }
 
-void freettcn::TE::CTTCNExecutable::Map(const TriPortId &fromPort, const TriPortId &toPort) const
+
+void freettcn::TE::CTTCN3Executable::tciEnqueueRaiseConnected(const TriPortId *sender,
+                                                             const TriComponentId *receiver,
+                                                             const TriSignatureId *signature,
+                                                             const TciValue *exception)
 {
-  RootModule().Map(fromPort, toPort);
+  try {
+    assert(sender);
+    assert(receiver);
+    assert(signature);
+    assert(exception);
+    
+    std::unique_ptr<const TciValue> msg(exception->clone());
+    
+    /// @todo enqueue new message
+    throw ENotImplemented(E_DATA, "EnqueRaise is not supported yet!!!");
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+  }
 }
 
-void freettcn::TE::CTTCNExecutable::Unmap(const TriPortId &fromPort, const TriPortId &toPort) const
+
+const ORG_ETSI_TTCN3_TRI::TriComponentId *freettcn::TE::CTTCN3Executable::tciCreateTestComponent(const TciTestComponentKind *kind,
+                                                                                                const TciType *componentType,
+                                                                                                const Tstring *name)
 {
-  RootModule().Unmap(fromPort, toPort);
+  try {
+    assert(kind);
+    return _t3rts.TestComponentCreate(*kind, componentType, name);
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+    return nullptr;
+  }
 }
 
-void freettcn::TE::CTTCNExecutable::TestComponentTerminated(const TriComponentId &componentId,
-                                                            const VerdictValue &verdict) const
+
+void freettcn::TE::CTTCN3Executable::tciStartTestComponent(const TriComponentId *component,
+                                                           const TciBehaviourId *behaviour,
+                                                           const TciParameterList *parameterList)
 {
-  RootModule().TestComponentTerminated(componentId, verdict);
+  try {
+    assert(component);
+    assert(behaviour);
+    const CModule &module = _ets.Module(behaviour->getModuleName());
+    _t3rts.TestComponentStart(*component, module.Behaviour(*behaviour), parameterList);
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+  }
 }
 
 
-void freettcn::TE::CTTCNExecutable::TestCaseExecute(const TciTestCaseIdType &testCaseId, const TriPortIdList &tsiPortList) const
+void freettcn::TE::CTTCN3Executable::tciStopTestComponent(const TriComponentId *component)
 {
-  freettcn::TE::CTestCase &tc = RootModule().TestCase(testCaseId.objectName);
-  
-  // set as current test case
-  RootModule().ActiveTestCase(tc);
-
-  // prepare test case
-  tc.Execute(testCaseId, tsiPortList);
+  try {
+    assert(component);
+    _t3rts.TestComponentStop(*component);
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+  }
 }
 
 
-void freettcn::TE::CTTCNExecutable::Reset() const
+void freettcn::TE::CTTCN3Executable::tciConnect(const TriPortId *fromPort,
+                                                const TriPortId *toPort)
 {
-  // stop running module
-  RootModule().Reset();
+  try {
+    assert(fromPort);
+    assert(toPort);
+    _t3rts.Connect(*fromPort, *toPort);
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+  }
 }
 
+
+void freettcn::TE::CTTCN3Executable::tciDisconnect(const TriPortId *fromPort,
+                                                  const TriPortId *toPort)
+{
+  try {
+    assert(fromPort);
+    assert(toPort);
+    _t3rts.Disconnect(*fromPort, *toPort);
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+  }
+}
+
+
+void freettcn::TE::CTTCN3Executable::tciMap(const TriPortId *fromPort,
+                                           const TriPortId *toPort)
+{
+  try {
+    assert(fromPort);
+    assert(toPort);
+    _t3rts.Map(*fromPort, *toPort);
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+  }
+}
+
+
+void freettcn::TE::CTTCN3Executable::tciUnmap(const TriPortId *fromPort,
+                                             const TriPortId *toPort)
+{
+  try {
+    assert(fromPort);
+    assert(toPort);
+    _t3rts.Unmap(*fromPort, *toPort);
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+  }
+}
+
+
+void freettcn::TE::CTTCN3Executable::tciTestComponentTerminated(const TriComponentId *component,
+                                                               const VerdictValue *verdict) const
+{
+  try {
+    assert(component);
+    assert(verdict);
+    _t3rts.TestComponentTerminated(*component, *verdict);
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+  }
+}
+
+
+Tboolean freettcn::TE::CTTCN3Executable::tciTestComponentRunning(const TriComponentId *component) const
+{
+  try {
+    assert(component);
+    return _t3rts.Component(*component).Running();
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+    return false;
+  }
+}
+
+
+Tboolean freettcn::TE::CTTCN3Executable::tciTestComponentDone(const TriComponentId *comp) const
+{
+  try {
+    assert(comp);
+    return _t3rts.Component(*comp).Done();
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+    return false;
+  }
+}
+
+
+const ORG_ETSI_TTCN3_TRI::TriComponentId *freettcn::TE::CTTCN3Executable::tciGetMTC() const
+{
+  try {
+    return _t3rts.MTC();
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+    return nullptr;
+  }
+}
+
+
+void freettcn::TE::CTTCN3Executable::tciExecuteTestCase(const TciTestCaseId *testCaseId,
+                                                        const TriPortIdList *tsiPortList)
+{
+  try {
+    assert(testCaseId);
+    _t3rts.TestCaseExecute(*testCaseId, tsiPortList);
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+  }
+}
+
+
+void freettcn::TE::CTTCN3Executable::tciReset()
+{
+  try {
+    _t3rts.Reset();
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+  }
+}
+
+
+void freettcn::TE::CTTCN3Executable::tciKillTestComponent(const TriComponentId *comp)
+{
+  try {
+    assert(comp);
+    _t3rts.TestComponentKill(*comp);
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+  }
+}
+
+
+Tboolean freettcn::TE::CTTCN3Executable::tciTestComponentAlive(const TriComponentId *comp) const
+{
+  try {
+    assert(comp);
+    return _t3rts.Component(*comp).Alive();
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+    return false;
+  }
+}
+
+
+Tboolean freettcn::TE::CTTCN3Executable::tciTestComponentKilled(const TriComponentId *comp) const
+{
+  try {
+    return _t3rts.Component(*comp).Killed();
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+    return false;
+  }
+}
+
+
+
+// CD requests
+
+const ORG_ETSI_TTCN3_TCI::TciType *freettcn::TE::CTTCN3Executable::getTypeForName(const Tstring typeName) const
+{
+  try {
+    return _ets.Type(typeName).get();
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+    return nullptr;
+  }
+}
+
+
+const ORG_ETSI_TTCN3_TCI::TciType &freettcn::TE::CTTCN3Executable::getInteger() const
+{
+  try {
+    return *_ets.TypeTTCN3().Integer();
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+    return *_ets.TypeTTCN3().Integer();
+  }
+}
+
+
+const ORG_ETSI_TTCN3_TCI::TciType &freettcn::TE::CTTCN3Executable::getFloat() const
+{
+  try {
+    throw ENotImplemented(E_DATA, "Float type not implemented yet");
+    //    return *_ets.TypeTTCN3().Float();
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+    return *_ets.TypeTTCN3().Integer();
+  }
+}
+
+
+const ORG_ETSI_TTCN3_TCI::TciType &freettcn::TE::CTTCN3Executable::getBoolean() const
+{
+  try {
+    return *_ets.TypeTTCN3().Boolean();
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+    return *_ets.TypeTTCN3().Integer();
+  }
+}
+
+
+const ORG_ETSI_TTCN3_TCI::TciType &freettcn::TE::CTTCN3Executable::getCharstring() const
+{
+  try {
+    throw ENotImplemented(E_DATA, "Charstring type not implemented yet");
+    //    return *_ets.TypeTTCN3().Charstring();
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+    return *_ets.TypeTTCN3().Integer();
+  }
+}
+
+
+const ORG_ETSI_TTCN3_TCI::TciType &freettcn::TE::CTTCN3Executable::getUniversalCharstring() const
+{
+  try {
+    throw ENotImplemented(E_DATA, "UniversalCharstring type not implemented yet");
+    //    return *_ets.TypeTTCN3().UniversalCharstring();
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+    return *_ets.TypeTTCN3().Integer();
+  }
+}
+
+
+const ORG_ETSI_TTCN3_TCI::TciType &freettcn::TE::CTTCN3Executable::getHexstring() const
+{
+  try {
+    throw ENotImplemented(E_DATA, "Hexstring type not implemented yet");
+    //    return *_ets.TypeTTCN3().Hexstring();
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+    return *_ets.TypeTTCN3().Integer();
+  }
+}
+
+
+const ORG_ETSI_TTCN3_TCI::TciType &freettcn::TE::CTTCN3Executable::getBitstring() const
+{
+  try {
+    throw ENotImplemented(E_DATA, "Bitstring type not implemented yet");
+    //    return *_ets.TypeTTCN3().Bitstring();
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+    return *_ets.TypeTTCN3().Integer();
+  }
+}
+
+
+const ORG_ETSI_TTCN3_TCI::TciType &freettcn::TE::CTTCN3Executable::getOctetstring() const
+{
+  try {
+    return *_ets.TypeTTCN3().Octetstring();
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+    return *_ets.TypeTTCN3().Integer();
+  }
+}
+
+
+const ORG_ETSI_TTCN3_TCI::TciType &freettcn::TE::CTTCN3Executable::getVerdict() const
+{
+  try {
+    return *_ets.TypeTTCN3().Verdict();
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+    return *_ets.TypeTTCN3().Integer();
+  }
+}
+
+
+void freettcn::TE::CTTCN3Executable::tciErrorReq(const Tstring message)
+{
+  _env->TM().tciError(message);
+}
 
 
 // PA requests
-void freettcn::TE::CTTCNExecutable::Timeout(const TriTimerId *timerId)
+
+void freettcn::TE::CTTCN3Executable::triTimeout(const TriTimerId *timerId)
 {
-  if (!timerId)
-    throw ENotInitialized(E_DATA, "'timerId' not specified!!!");
-  
-  freettcn::TE::CIdObject &object = CIdObject::Get(*timerId);
   try {
-    dynamic_cast<freettcn::TE::CTimer &>(object).Timeout();
+    assert(timerId);
+    _t3rts.Timeout(*timerId);
   }
   catch(std::exception &ex) {
-    throw EOperationFailed(E_DATA, "'timerId' does not point to Timer type!!!");
+    _env->TM().tciError(ex.what());
+  }
+}
+
+
+// SA requests
+
+void freettcn::TE::CTTCN3Executable::triEnqueueMsg(const TriPortId *tsiPortId,
+                                                  const TriAddress *SUTaddress,
+                                                  const TriComponentId *componentId,
+                                                  const TriMessage *receivedMessage)
+{
+  try {
+    assert(tsiPortId);
+    assert(componentId);
+    assert(receivedMessage);
+    /// @todo enqueue new message
+    throw ENotImplemented(E_DATA, "Call is not supported yet!!!");
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+  }
+}
+
+
+void freettcn::TE::CTTCN3Executable::triEnqueueCall(const TriPortId *tsiPortId,
+                                                   const TriAddress *SUTaddress,
+                                                   const TriComponentId *componentId,
+                                                   const TriSignatureId *signatureId,
+                                                   const TriParameterList *parameterList)
+{
+  try {
+    assert(tsiPortId);
+    assert(componentId);
+    assert(signatureId);
+    assert(parameterList);
+    /// @todo enqueue new message
+    throw ENotImplemented(E_DATA, "Call is not supported yet!!!");
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+  }
+}
+
+
+void freettcn::TE::CTTCN3Executable::triEnqueueReply(const TriPortId *tsiPortId,
+                                                    const TriAddress *SUTaddress,
+                                                    const TriComponentId *componentId,
+                                                    const TriSignatureId *signatureId,
+                                                    const TriParameterList *parameterList,
+                                                    const TriParameter *returnValue)
+{
+  try {
+    assert(tsiPortId);
+    assert(componentId);
+    assert(signatureId);
+    assert(parameterList);
+    /// @todo enqueue new message
+    throw ENotImplemented(E_DATA, "Call is not supported yet!!!");
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
+  }
+}
+
+
+void freettcn::TE::CTTCN3Executable::triEnqueueException(const TriPortId *tsiPortId,
+                                                        const TriAddress *SUTaddress,
+                                                        const TriComponentId *componentId,
+                                                        const TriSignatureId *signatureId,
+                                                        const TriException *exc)
+{
+  try {
+    assert(tsiPortId);
+    assert(componentId);
+    assert(signatureId);
+    assert(exc);
+    /// @todo enqueue new message
+    throw ENotImplemented(E_DATA, "Call is not supported yet!!!");
+  }
+  catch(std::exception &ex) {
+    _env->TM().tciError(ex.what());
   }
 }

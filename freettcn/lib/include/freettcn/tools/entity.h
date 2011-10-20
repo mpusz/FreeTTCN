@@ -30,12 +30,12 @@
 #define __ENTITY_H__
 
 #include <freettcn/tools/nonCopyable.h>
+#include <memory>
 
 namespace freettcn {
   
   class CTimeStampMgr;
   class CLogMask;
-  
   
   /**
    * @brief Base class for all TTCN-3 entities
@@ -67,9 +67,9 @@ namespace freettcn {
     
   private:
     bool _logging;                                /**< @brief global logging mask */
-    CTimeStampMgr *_ts;                           /**< @brief class responsible for
+    std::shared_ptr<CTimeStampMgr> _ts;           /**< @brief class responsible for
                                                      handling system timestamps */
-    CLogMask *_logMask;                           /**< @brief class that specifies
+    std::shared_ptr<CLogMask> _logMask;           /**< @brief class that specifies
                                                      which events should be logged */
 
   public:
@@ -79,7 +79,7 @@ namespace freettcn {
     CTimeStampMgr &TimeStampMgr() const;
     CLogMask &LogMask() const;
     bool Logging() const;
-    void LogEnable(CTimeStampMgr &ts, CLogMask &logMask);
+    void LogEnable(std::shared_ptr<CTimeStampMgr> ts, std::shared_ptr<CLogMask> logMask);
     void LogDisable();
   };
   
