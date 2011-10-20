@@ -38,32 +38,28 @@
 
 namespace freettcn {
 
-  namespace ttcn3 {
-    
-    using namespace ORG_ETSI_TTCN3_TRI;
+  using namespace ORG_ETSI_TTCN3_TRI;
 
-    class CTriTimerDuration : CNonAssignable, public ORG_ETSI_TTCN3_TRI::TriTimerDuration {
-      Tfloat _duration;
-    public:
-      CTriTimerDuration(Tfloat duration): _duration(duration) {}
-      CTriTimerDuration(const CTriTimerDuration &) = default;
-      CTriTimerDuration(CTriTimerDuration &&) = default;
-      ~CTriTimerDuration() = default;
-#ifdef TTCN_LIST_IFACE_FIXED
-      TriTimerDuration *clone() const override               { return new CTriTimerDuration(*this); }
+  class CTriTimerDuration : CNonAssignable, public ORG_ETSI_TTCN3_TRI::TriTimerDuration {
+    Tfloat _duration;
+    CTriTimerDuration(const CTriTimerDuration &) = default;
+  public:
+    CTriTimerDuration(Tfloat duration): _duration(duration) {}
+    CTriTimerDuration(CTriTimerDuration &&) = default;
+    ~CTriTimerDuration() = default;
+#ifdef ISSUE_0005949
+    TriTimerDuration *clone() const override               { return new CTriTimerDuration(*this); }
 #else
-      TriTimerDuration *cloneTimerDuration() override const  { return new CTriTimerDuration(*this); }
+    TriTimerDuration *cloneTimerDuration() override const  { return new CTriTimerDuration(*this); }
 #endif
       
-      Tfloat getDuration() const override           { return _duration; }
-      void setDuration(Tfloat duration) override    { _duration = duration; }
+    Tfloat getDuration() const override           { return _duration; }
+    void setDuration(Tfloat duration) override    { _duration = duration; }
       
-      Tboolean operator==(const TriTimerDuration &timd) const override  { return _duration == timd.getDuration(); }
-      Tboolean operator<(const TriTimerDuration &timd) const override   { return _duration < timd.getDuration(); }
-    };
+    Tboolean operator==(const TriTimerDuration &timd) const override  { return _duration == timd.getDuration(); }
+    Tboolean operator<(const TriTimerDuration &timd) const override   { return _duration < timd.getDuration(); }
+  };
         
-  } // namespace ttcn3
-  
 } // namespace freettcn
 
 #endif /* __TRI_TIMER_ID_H__ */

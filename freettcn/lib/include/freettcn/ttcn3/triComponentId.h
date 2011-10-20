@@ -38,42 +38,36 @@
 
 namespace freettcn {
 
-  namespace ttcn3 {
-    
-    using namespace ORG_ETSI_TTCN3_TRI;
+  using namespace ORG_ETSI_TTCN3_TRI;
 
-    class CTriComponentId : CNonAssignable, public ORG_ETSI_TTCN3_TRI::TriComponentId {
-      static Tinteger _nextId;
-      
-      std::shared_ptr<const QualifiedName> _typeName;
-      std::shared_ptr<const Tstring> _name;
-      Tinteger _id;
-    public:
-      CTriComponentId(const std::shared_ptr<const QualifiedName> &typeName, const Tstring &name):
-        _typeName(typeName), _name(new Tstring(name)), _id(_nextId++) {}
-      CTriComponentId(const CTriComponentId &) = default;
-      CTriComponentId(CTriComponentId &&) = default;
-      ~CTriComponentId() = default;
-#ifdef TTCN_LIST_IFACE_FIXED
-      TriComponentId *clone() const override             { return new CTriComponentId(*this); }
+  class CTriComponentId : CNonAssignable, public ORG_ETSI_TTCN3_TRI::TriComponentId {
+    std::shared_ptr<const QualifiedName> _typeName;
+    std::shared_ptr<const Tstring> _name;
+    Tinteger _id;
+  public:
+    CTriComponentId(const std::shared_ptr<const QualifiedName> &typeName, const Tstring &name, Tinteger id):
+      _typeName(typeName), _name(new Tstring(name)), _id(id) {}
+    CTriComponentId(const CTriComponentId &) = default;
+    CTriComponentId(CTriComponentId &&) = default;
+    ~CTriComponentId() = default;
+#ifdef ISSUE_0005949
+    TriComponentId *clone() const override             { return new CTriComponentId(*this); }
 #else
-      TriComponentId *cloneComponentId() override const  { return new CTriComponentId(*this); }
+    TriComponentId *cloneComponentId() override const  { return new CTriComponentId(*this); }
 #endif
       
-      const QualifiedName &getComponentTypeName() const override     { return *_typeName; }
-      void setComponentTypeName(const QualifiedName &tName) override { _typeName.reset(tName.clone()); }
-      const Tstring &getComponentName() const override               { return *_name; }
-      void setComponentName(const Tstring &sName) override           { _name.reset(new Tstring(sName)); }
-      const Tinteger &getComponentId() const override                { return _id; }
-      void setComponentId(const Tinteger &id) override               { _id = id; }
-      Tstring toString() const override                              { return *_name + "(" + _typeName->toString() + ")"; }
+    const QualifiedName &getComponentTypeName() const override     { return *_typeName; }
+    void setComponentTypeName(const QualifiedName &tName) override { _typeName.reset(tName.clone()); }
+    const Tstring &getComponentName() const override               { return *_name; }
+    void setComponentName(const Tstring &sName) override           { _name.reset(new Tstring(sName)); }
+    const Tinteger &getComponentId() const override                { return _id; }
+    void setComponentId(const Tinteger &id) override               { _id = id; }
+    Tstring toString() const override                              { return *_name + "(" + _typeName->toString() + ")"; }
       
-      Tboolean operator==(const TriComponentId &cmp) const override  { return _id == cmp.getComponentId(); }
-      Tboolean operator<(const TriComponentId &cmp) const override   { return _id < cmp.getComponentId(); }
-    };
+    Tboolean operator==(const TriComponentId &cmp) const override  { return _id == cmp.getComponentId(); }
+    Tboolean operator<(const TriComponentId &cmp) const override   { return _id < cmp.getComponentId(); }
+  };
         
-  } // namespace ttcn3
-  
 } // namespace freettcn
 
 #endif /* __TRI_COMPONENT_ID_H__ */

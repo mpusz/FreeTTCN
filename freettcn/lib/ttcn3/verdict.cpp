@@ -33,7 +33,9 @@
 
 
 /// @todo verify if encoding can be set for built-in types
-freettcn::ttcn3::CTypeVerdict::CTypeVerdict():
+freettcn::CTypeVerdict::CTypeVerdict():
   CType(CTciModuleId::BuiltIn(), "verdicttype", TCI_VERDICT, "", "", CExtension())
 {
+  if(!_instance)
+    _instance.reset(new CTypeVerdict(*this));
 }

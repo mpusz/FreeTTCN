@@ -29,5 +29,3 @@
  */
 
 #include "freettcn/ttcn3/triComponentId.h"
-
-Tinteger freettcn::ttcn3::CTriComponentId::_nextId = 0;

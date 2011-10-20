@@ -34,39 +34,43 @@
 
 namespace freettcn {
 
-  namespace ttcn3 {
-    
-    class CTypeBoolean : public CType {
-    public:
-      class CValue : public ORG_ETSI_TTCN3_TCI::BooleanValue, public CType::CValue {
-        Tboolean _value;
+  class CTypeBoolean : public CType {
+  public:
+    class CValue : public ORG_ETSI_TTCN3_TCI::BooleanValue, public CType::CValue {
+      Tboolean _value;
 
-      protected:
-        CValue(const CValue &) = default;
-        CValue(CValue &&) = default;
+    protected:
+      CValue(const CValue &) = default;
+
+    public:
+      explicit CValue(const std::shared_ptr<const TciType> &type, Tboolean value = false): CType::CValue(type, "", ""), _value(value) {}
+      CValue(CValue &&) = default;
+      ~CValue() = default;
+      BooleanValue *clone() const override              { return new CValue(*this); }
         
-      public:
-        explicit CValue(const TciType &type, Tboolean value = false): CType::CValue(type, "", ""), _value(value) {}
-        ~CValue() = default;
-        BooleanValue *clone() const override              { return new CValue(*this); }
+      Tboolean getBoolean() const override              { return _value; }
+      void setBoolean(Tboolean p_booleanValue) override { _value = p_booleanValue; }
         
-        Tboolean getBoolean() const override              { return _value; }
-        void setBoolean(Tboolean p_booleanValue) override { _value = p_booleanValue; }
-        
-        Tboolean operator==(const TciValue &val) const override        { return val.operator==(*this); }
-        Tboolean operator==(const BooleanValue &booleanVal) const override { return _value == booleanVal.getBoolean(); }
-        Tboolean operator<(const TciValue &val) const override         { return !val.operator<(*this) && !val.operator==(*this); }
-        Tboolean operator<(const BooleanValue &booleanVal) const override  { return _value < booleanVal.getBoolean(); }
-      };
-      
-      CTypeBoolean();
-      ~CTypeBoolean() = default;
-      TciType *clone() const override  { return new CTypeBoolean; }
-      TciValue *newInstance() override { return new CValue(*this); }
+      Tboolean operator==(const TciValue &val) const override            { return val.operator==(*this); }
+      Tboolean operator==(const BooleanValue &booleanVal) const override { return _value == booleanVal.getBoolean(); }
+      Tboolean operator<(const TciValue &val) const override             { return !val.operator<(*this) && !val.operator==(*this); }
+      Tboolean operator<(const BooleanValue &booleanVal) const override  { return _value < booleanVal.getBoolean(); }
     };
     
-  } // namespace ttcn3
-  
+  private:
+    static std::shared_ptr<CTypeBoolean> _instance;
+    
+  protected:
+    CTypeBoolean(const CTypeBoolean &) = default;
+    
+  public:
+    CTypeBoolean();
+    CTypeBoolean(CTypeBoolean &&) = default;
+    ~CTypeBoolean() = default;
+    TciType *clone() const override  { return new CTypeBoolean(*this); }
+    TciValue *newInstance() override { return new CValue(_instance); }
+  };
+    
 } // namespace freettcn
 
 #endif /* __BOOLEAN_H__ */

@@ -34,39 +34,43 @@
 
 namespace freettcn {
   
-  namespace ttcn3 {
-    
-    class CTypeInteger : public CType {
+  class CTypeInteger : public CType {
+  public:
+    class CValue : public ORG_ETSI_TTCN3_TCI::IntegerValue, public CType::CValue {
+      Tinteger _value;
+        
+    protected:
+      CValue(const CValue &) = default;
+        
     public:
-      class CValue : public ORG_ETSI_TTCN3_TCI::IntegerValue, public CType::CValue {
-        Tinteger _value;
+      explicit CValue(const std::shared_ptr<const TciType> &type, Tinteger value = 0): CType::CValue(type, "", ""), _value(value) {}
+      CValue(CValue &&) = default;
+      ~CValue() = default;
+      IntegerValue *clone() const override   { return new CValue(*this); }
         
-      protected:
-        CValue(const CValue &) = default;
-        CValue(CValue &&) = default;
+      Tinteger getInt() const override       { return _value; }
+      void setInt(Tinteger p_value) override { _value = p_value; }
         
-      public:
-        explicit CValue(const TciType &type, Tinteger value = 0): CType::CValue(type, "", ""), _value(value) {}
-        ~CValue() = default;
-        IntegerValue *clone() const override   { return new CValue(*this); }
-        
-        Tinteger getInt() const override       { return _value; }
-        void setInt(Tinteger p_value) override { _value = p_value; }
-        
-        Tboolean operator==(const TciValue &val) const override        { return val.operator==(*this); }
-        Tboolean operator==(const IntegerValue &intVal) const override { return _value == intVal.getInt(); }
-        Tboolean operator<(const TciValue &val) const override         { return !val.operator<(*this) && !val.operator==(*this); }
-        Tboolean operator<(const IntegerValue &intVal) const override  { return _value < intVal.getInt(); }
-      };
-      
-      CTypeInteger();
-      ~CTypeInteger() = default;
-      TciType *clone() const override  { return new CTypeInteger; }
-      TciValue *newInstance() override { return new CValue(*this); }
+      Tboolean operator==(const TciValue &val) const override        { return val.operator==(*this); }
+      Tboolean operator==(const IntegerValue &intVal) const override { return _value == intVal.getInt(); }
+      Tboolean operator<(const TciValue &val) const override         { return !val.operator<(*this) && !val.operator==(*this); }
+      Tboolean operator<(const IntegerValue &intVal) const override  { return _value < intVal.getInt(); }
     };
     
-  } // namespace ttcn3
-  
+  private:
+    static std::shared_ptr<CTypeInteger> _instance;
+    
+  protected:
+    CTypeInteger(const CTypeInteger &) = default;
+    
+  public:
+    CTypeInteger();
+    CTypeInteger(CTypeInteger &&) = default;
+    ~CTypeInteger() = default;
+    TciType *clone() const override  { return new CTypeInteger(*this); }
+    TciValue *newInstance() override { return new CValue(_instance); }
+  };
+    
 } // namespace freettcn
 
 #endif /* __INTEGER_H__ */

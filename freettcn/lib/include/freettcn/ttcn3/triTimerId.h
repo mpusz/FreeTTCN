@@ -38,35 +38,31 @@
 
 namespace freettcn {
 
-  namespace ttcn3 {
-    
-    using namespace ORG_ETSI_TTCN3_TRI;
+  using namespace ORG_ETSI_TTCN3_TRI;
 
-    class CTriTimerId : CNonAssignable, public ORG_ETSI_TTCN3_TRI::TriTimerId {
-      static Tinteger _nextId;
-      std::shared_ptr<const Tstring> _name;
-      const Tinteger _id;
-    public:
-      CTriTimerId(const Tstring &name): _name(new Tstring(name)), _id(_nextId++) {}
-      CTriTimerId(const CTriTimerId &) = default;
-      CTriTimerId(CTriTimerId &&) = default;
-      ~CTriTimerId() = default;
-#ifdef TTCN_LIST_IFACE_FIXED
-      TriTimerId *clone() const override                { return new CTriTimerId(*this); }
+  class CTriTimerId : CNonAssignable, public ORG_ETSI_TTCN3_TRI::TriTimerId {
+    static Tinteger _nextId;
+    std::shared_ptr<const Tstring> _name;
+    const Tinteger _id;
+    CTriTimerId(const CTriTimerId &) = default;
+  public:
+    CTriTimerId(const Tstring &name): _name(new Tstring(name)), _id(_nextId++) {}
+    CTriTimerId(CTriTimerId &&) = default;
+    ~CTriTimerId() = default;
+#ifdef ISSUE_0005949
+    TriTimerId *clone() const override                { return new CTriTimerId(*this); }
 #else
-      TriTimerId *cloneTimerId() override const         { return new CTriTimerId(*this); }
+    TriTimerId *cloneTimerId() override const         { return new CTriTimerId(*this); }
 #endif
       
-      const Tstring &getTimerName() const override      { return *_name; }
-      void setTimerName(const Tstring &pName) override  { _name.reset(new Tstring(pName)); }
-      const Tinteger getTId() const override            { return _id; }
+    const Tstring &getTimerName() const override      { return *_name; }
+    void setTimerName(const Tstring &pName) override  { _name.reset(new Tstring(pName)); }
+    const Tinteger getTId() const override            { return _id; }
       
-      Tboolean operator==(const TriTimerId &tmid) const override  { return _id == tmid.getTId(); }
-      Tboolean operator<(const TriTimerId &tmid) const override   { return _id < tmid.getTId(); }
-    };
+    Tboolean operator==(const TriTimerId &tmid) const override  { return _id == tmid.getTId(); }
+    Tboolean operator<(const TriTimerId &tmid) const override   { return _id < tmid.getTId(); }
+  };
     
-  } // namespace ttcn3
-  
 } // namespace freettcn
 
 #endif /* __TRI_TIMER_ID_H__ */

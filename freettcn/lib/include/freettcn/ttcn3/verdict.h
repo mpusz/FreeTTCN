@@ -34,39 +34,43 @@
 
 namespace freettcn {
   
-  namespace ttcn3 {
-    
-    class CTypeVerdict : public CType {
-    public:
-      class CValue : public ORG_ETSI_TTCN3_TCI::VerdictValue, public CType::CValue {
-        VerdictValueEnum _value;
+  class CTypeVerdict : public CType {
+  public:
+    class CValue : public ORG_ETSI_TTCN3_TCI::VerdictValue, public CType::CValue {
+      VerdictValueEnum _value;
 
-      protected:
-        CValue(const CValue &) = default;
-        CValue(CValue &&) = default;
+    protected:
+      CValue(const CValue &) = default;
         
-      public:
-        explicit CValue(const TciType &type, VerdictValueEnum value = NONE): CType::CValue(type, "", ""), _value(value) {}
-        ~CValue() = default;
-        VerdictValue *clone() const override                           { return new CValue(*this); }
+    public:
+      explicit CValue(const std::shared_ptr<const TciType> &type, VerdictValueEnum value = NONE): CType::CValue(type, "", ""), _value(value) {}
+      CValue(CValue &&) = default;
+      ~CValue() = default;
+      VerdictValue *clone() const override                           { return new CValue(*this); }
         
-        const VerdictValueEnum &getVerdict() const override            { return _value; }
-        void setVerdict(const VerdictValueEnum &p_enum) override       { _value = p_enum; }
+      const VerdictValueEnum &getVerdict() const override            { return _value; }
+      void setVerdict(const VerdictValueEnum &p_enum) override       { _value = p_enum; }
         
-        Tboolean operator==(const TciValue &val) const override        { return val.operator==(*this); }
-        Tboolean operator==(const VerdictValue &verdictVal) const override { return _value == verdictVal.getVerdict(); }
-        Tboolean operator<(const TciValue &val) const override         { return !val.operator<(*this) && !val.operator==(*this); }
-        Tboolean operator<(const VerdictValue &verdictVal) const override  { return _value < verdictVal.getVerdict(); }
-      };
-      
-      CTypeVerdict();
-      ~CTypeVerdict() = default;
-      TciType *clone() const override  { return new CTypeVerdict; }
-      TciValue *newInstance() override { return new CValue(*this); }
+      Tboolean operator==(const TciValue &val) const override        { return val.operator==(*this); }
+      Tboolean operator==(const VerdictValue &verdictVal) const override { return _value == verdictVal.getVerdict(); }
+      Tboolean operator<(const TciValue &val) const override         { return !val.operator<(*this) && !val.operator==(*this); }
+      Tboolean operator<(const VerdictValue &verdictVal) const override  { return _value < verdictVal.getVerdict(); }
     };
     
-  } // namespace ttcn3
-  
+  private:
+    static std::shared_ptr<CTypeVerdict> _instance;
+    
+  protected:
+    CTypeVerdict(const CTypeVerdict &) = default;
+    
+  public:        
+    CTypeVerdict();
+    CTypeVerdict(CTypeVerdict &&) = default;
+    ~CTypeVerdict() = default;
+    TciType *clone() const override  { return new CTypeVerdict(*this); }
+    TciValue *newInstance() override { return new CValue(_instance); }
+  };
+    
 } // namespace freettcn
 
 #endif /* __VERDICT_H__ */

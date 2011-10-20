@@ -38,44 +38,41 @@
 
 namespace freettcn {
 
-  namespace ttcn3 {
-    
-    using namespace ORG_ETSI_TTCN3_TRI;
+  using namespace ORG_ETSI_TTCN3_TRI;
 
-    class CTriPortId : CNonAssignable, public ORG_ETSI_TTCN3_TRI::TriPortId {
-      std::shared_ptr<const QualifiedName> _type;
-      std::shared_ptr<const Tstring> _name;
-      std::shared_ptr<const TriComponentId> _component;
-      Tinteger _index;
-    public:
-      CTriPortId(const std::shared_ptr<const QualifiedName> &type, const Tstring &name,
-              const std::shared_ptr<const TriComponentId> &component, Tindex index):
-        _type(type), _name(new Tstring(name)), _component(component), _index(index) {}
-      CTriPortId(const CTriPortId &) = default;
-      CTriPortId(CTriPortId &&) = default;
-      ~CTriPortId() = default;
-#ifdef TTCN_LIST_IFACE_FIXED
-      TriPortId *clone() const override        { return new CTriPortId(*this); }
+  class CTriPortId : CNonAssignable, public ORG_ETSI_TTCN3_TRI::TriPortId {
+    std::shared_ptr<const QualifiedName> _type;
+    std::shared_ptr<const Tstring> _name;
+    std::shared_ptr<const TriComponentId> _component;
+    Tinteger _index;
+
+    CTriPortId(const CTriPortId &) = default;
+  public:
+    CTriPortId(const std::shared_ptr<const QualifiedName> &type, const Tstring &name,
+               const std::shared_ptr<const TriComponentId> &component, Tindex index):
+      _type(type), _name(new Tstring(name)), _component(component), _index(index) {}
+    CTriPortId(CTriPortId &&) = default;
+    ~CTriPortId() = default;
+#ifdef ISSUE_0005949
+    TriPortId *clone() const override        { return new CTriPortId(*this); }
 #else
-      TriPortId *clonePortId() override const  { return new CTriPortId(*this); }
+    TriPortId *clonePortId() override const  { return new CTriPortId(*this); }
 #endif
       
-      const Tstring &getPortName() const override            { return *_name; }
-      void setPortName(const Tstring &pName) override        { _name.reset(new Tstring(pName)); }
-      const TriComponentId &getComponent() const override    { return *_component; }
-      void setComponent(const TriComponentId &comp) override { _component.reset(comp.cloneComponentId()); }
-      Tsize getPortIndex() const override                    { return _index; }
-      void setPortIndex(Tsize index) override                { _index = index; }
-      const QualifiedName &getPortType() const override      { return *_type; }
-      void setPortType(const QualifiedName &pType) override  { _type.reset(pType.clone()); }
-      Tboolean isArray() const override                      { return _index != -1; }
+    const Tstring &getPortName() const override            { return *_name; }
+    void setPortName(const Tstring &pName) override        { _name.reset(new Tstring(pName)); }
+    const TriComponentId &getComponent() const override    { return *_component; }
+    void setComponent(const TriComponentId &comp) override { _component.reset(comp.cloneComponentId()); }
+    Tsize getPortIndex() const override                    { return _index; }
+    void setPortIndex(Tsize index) override                { _index = index; }
+    const QualifiedName &getPortType() const override      { return *_type; }
+    void setPortType(const QualifiedName &pType) override  { _type.reset(pType.clone()); }
+    Tboolean isArray() const override                      { return _index != -1; }
       
-      Tboolean operator==(const TriPortId &prt) const override  { return *_name == prt.getPortName() && *_component == prt.getComponent(); }
-      Tboolean operator<(const TriPortId &prt) const override   { return *_name < prt.getPortName() && *_component < prt.getComponent(); }
-    };
+    Tboolean operator==(const TriPortId &prt) const override  { return *_name == prt.getPortName() && *_component == prt.getComponent(); }
+    Tboolean operator<(const TriPortId &prt) const override   { return *_name < prt.getPortName() && *_component < prt.getComponent(); }
+  };
         
-  } // namespace ttcn3
-  
 } // namespace freettcn
 
 #endif /* __TRI_PORT_ID_H__ */

@@ -36,78 +36,76 @@
 
 namespace freettcn {
 
-  namespace ttcn3 {
-    
-    class CTypeRecord : public CType {
-    public:
-      typedef std::vector<Tstring *> CFieldNames;
+  class CTypeRecord : public CType {
+  public:
+    typedef std::vector<Tstring *> CFieldNames;
       
-      class CValue : public ORG_ETSI_TTCN3_TCI::RecordValue, public CType::CValue {
-        typedef std::map<const Tstring *, std::shared_ptr<TciValue>, CPtrCmp> CFieldMap;
+    class CValue : public ORG_ETSI_TTCN3_TCI::RecordValue, public CType::CValue {
+      typedef std::map<const Tstring *, std::shared_ptr<TciValue>, CPtrCmp> CFieldMap;
         
-        const CFieldNames &_fieldNames;
-        CFieldMap _fieldMap;
+      const CFieldNames &_fieldNames;
+      CFieldMap _fieldMap;
 
-      protected:
-        CValue(const CValue &src);
-        CValue(CValue &&) = default;
-        
-      public:
-        explicit CValue(CTypeRecord &type);
-        ~CValue() = default;
-        
-        RecordValue *clone() const override                        { return new CValue(*this); }
-        
-        const TciValue &getField(const Tstring &p_field_name) const override;
-        void setField(const Tstring &p_field_name, const TciValue &p_new_value) override;
-        const CFieldNames &getFieldNames() const override          { return _fieldNames; }
-        void setFieldOmitted(const Tstring &fieldName) override;
-        
-        Tboolean operator==(const TciValue &val) const override    { return val.operator==(*this); }
-        Tboolean operator==(const RecordValue &rec) const override;
-        Tboolean operator<(const TciValue &val) const override     { return !val.operator<(*this) && !val.operator==(*this); }
-        Tboolean operator<(const RecordValue &rec) const override;
-      };
-      
-    private:
-      class CFieldData {
-        CType *_type;
-        Tstring _name;
-        bool _optional;
-      public:
-        CFieldData(CType &type, const Tstring &name, bool optional):
-          _type(&type), _name(name), _optional(optional) {}
-        CFieldData(const CFieldData &) = default;
-        CFieldData(CFieldData &&) = default;
-        ~CFieldData() = default;
-        CFieldData &operator=(const CFieldData &) = default;
-        
-        CType &Type() const         { return *_type; }
-        const Tstring &Name() const { return _name; }
-        Tstring &Name()             { return _name; }
-        bool Optional() const       { return _optional; }
-      };
-      
-      typedef std::vector<CFieldData> CFieldDataArray;
-      CFieldDataArray _fieldDataArray;
-      CFieldNames _fieldNames;
-      
     protected:
-      void Add(CType &fieldType, const Tstring &fieldName, bool optional = false);
-      
+      CValue(const CValue &src);
+        
     public:
-      CTypeRecord(const TciModuleId  &moduleId,
-                  const Tstring      &name,
-                  const Tstring      &encoding,
-                  const Tstring      &encodingVariant,
-                  const CExtension   &extension,
-                  size_t             fieldNum);
-      ~CTypeRecord() = default;
-      TciValue *newInstance() override { return new CValue(*this); }
+      explicit CValue(const std::shared_ptr<const CTypeRecord> &type);
+      CValue(CValue &&) = default;
+      ~CValue() = default;
+      RecordValue *clone() const override                        { return new CValue(*this); }
+        
+      const TciValue &getField(const Tstring &p_field_name) const override;
+      void setField(const Tstring &p_field_name, const TciValue &p_new_value) override;
+      const CFieldNames &getFieldNames() const override          { return _fieldNames; }
+      void setFieldOmitted(const Tstring &fieldName) override;
+        
+      Tboolean operator==(const TciValue &val) const override    { return val.operator==(*this); }
+      Tboolean operator==(const RecordValue &rec) const override;
+      Tboolean operator<(const TciValue &val) const override     { return !val.operator<(*this) && !val.operator==(*this); }
+      Tboolean operator<(const RecordValue &rec) const override;
     };
+      
+  private:
+    class CFieldData {
+      CType *_type;
+      Tstring _name;
+      bool _optional;
+    public:
+      CFieldData(CType &type, const Tstring &name, bool optional):
+        _type(&type), _name(name), _optional(optional) {}
+      CFieldData(const CFieldData &) = default;
+      CFieldData(CFieldData &&) = default;
+      ~CFieldData() = default;
+      CFieldData &operator=(const CFieldData &) = default;
+        
+      CType &Type() const         { return *_type; }
+      const Tstring &Name() const { return _name; }
+      Tstring &Name()             { return _name; }
+      bool Optional() const       { return _optional; }
+    };
+      
+    typedef std::vector<CFieldData> CFieldDataArray;
+    CFieldDataArray _fieldDataArray;
+    CFieldNames _fieldNames;
+      
+  protected:
+    CTypeRecord(const CTypeRecord &) = default;
+    void Add(CType &fieldType, const Tstring &fieldName, bool optional = false);
+      
+  public:
+    CTypeRecord(const std::shared_ptr<const TciModuleId> &moduleId,
+                const Tstring      &name,
+                const Tstring      &encoding,
+                const Tstring      &encodingVariant,
+                const CExtension   &extension,
+                size_t             fieldNum);
+    CTypeRecord(CTypeRecord &&) = default;
+    ~CTypeRecord() = default;
+    TciType *clone() const override  { return new CTypeRecord(*this); }
+    TciValue *newInstance() override { return new CValue(std::shared_ptr<const CTypeRecord>(new CTypeRecord(*this))); }
+  };
     
-  } // namespace ttcn3
-  
 } // namespace freettcn
 
 

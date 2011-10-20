@@ -33,7 +33,9 @@
 
 
 /// @todo verify if encoding can be set for built-in types
-freettcn::ttcn3::CTypeInteger::CTypeInteger():
+freettcn::CTypeInteger::CTypeInteger():
   CType(CTciModuleId::BuiltIn(), "integer", TCI_INTEGER, "", "", CExtension())
 {
+  if(!_instance)
+    _instance.reset(new CTypeInteger(*this));
 }

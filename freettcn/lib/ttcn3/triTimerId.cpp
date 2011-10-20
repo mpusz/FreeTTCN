@@ -31,4 +31,4 @@
 #include "freettcn/ttcn3/triTimerId.h"
 
 
-Tinteger freettcn::ttcn3::CTriTimerId::_nextId = 0;
+Tinteger freettcn::CTriTimerId::_nextId = 0;

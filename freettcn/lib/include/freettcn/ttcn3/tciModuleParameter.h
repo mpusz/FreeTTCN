@@ -38,35 +38,29 @@
 
 namespace freettcn {
 
-  namespace ttcn3 {
-    
-    using namespace ORG_ETSI_TTCN3_TCI;
+  using namespace ORG_ETSI_TTCN3_TCI;
 
-    class CTciModuleParameter : CNonAssignable, public ORG_ETSI_TTCN3_TCI::TciModuleParameter {
-      std::shared_ptr<const TciModuleParameterId> _id;
-      std::shared_ptr<const TciValue> _defaultValue;
-      // std::shared_ptr<const TciValue> _value;
+  class CTciModuleParameter : CNonAssignable, public ORG_ETSI_TTCN3_TCI::TciModuleParameter {
+    std::shared_ptr<const TciModuleParameterId> _id;
+    std::shared_ptr<const TciValue> _defaultValue;
+    CTciModuleParameter(const CTciModuleParameter &) = default;
       
-    public:
-      CTciModuleParameter(const TciModuleParameterId &id, const TciValue &defaultValue): _id(id.clone()), _defaultValue(defaultValue.clone()) {} //, _value(_defaultValue) {}
-      CTciModuleParameter(const CTciModuleParameter &) = default;
-      CTciModuleParameter(CTciModuleParameter &&) = default;
-      ~CTciModuleParameter() = default;
-      TciModuleParameter *clone() const override                           { return new CTciModuleParameter(*this); }
+  public:
+    CTciModuleParameter(std::shared_ptr<const TciModuleParameterId> id,
+                        std::shared_ptr<const TciValue> defaultValue):
+      _id(id), _defaultValue(defaultValue) {}
+    CTciModuleParameter(CTciModuleParameter &&) = default;
+    ~CTciModuleParameter() = default;
+    TciModuleParameter *clone() const override                           { return new CTciModuleParameter(*this); }
       
-      const TciValue &getDefaultValue() const override                     { return *_defaultValue; }
-      const Tstring &getModuleParameterName() const override               { return _id->getName().getObjectName(); }
-      const TciModuleParameterId &getTciModuleParameterId() const override { return *_id; }
+    const TciValue &getDefaultValue() const override                     { return *_defaultValue; }
+    const Tstring &getModuleParameterName() const override               { return _id->getObjectName(); }
+    const TciModuleParameterId &getTciModuleParameterId() const override { return *_id; }
       
-      Tboolean operator==(const TciModuleParameter &mpar) const override   { return *_id == mpar.getTciModuleParameterId(); }
-      Tboolean operator<(const TciModuleParameter &mpar) const override    { return *_id < mpar.getTciModuleParameterId(); }
-      
-      // void Value(std::shared_ptr<const TciValue> value)                    { _value = value; }
-      // std::shared_ptr<const TciValue> Value() const                        { return _value; }
-    };
+    Tboolean operator==(const TciModuleParameter &mpar) const override   { return *_id == mpar.getTciModuleParameterId(); }
+    Tboolean operator<(const TciModuleParameter &mpar) const override    { return *_id < mpar.getTciModuleParameterId(); }
+  };
 
-  } // namespace ttcn3
-  
 } // namespace freettcn
 
 

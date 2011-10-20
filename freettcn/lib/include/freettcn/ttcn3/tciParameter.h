@@ -38,36 +38,32 @@
 
 namespace freettcn {
 
-  namespace ttcn3 {
-    
-    using namespace ORG_ETSI_TTCN3_TCI;
+  using namespace ORG_ETSI_TTCN3_TCI;
 
-    class CTciParameter : CNonAssignable, public ORG_ETSI_TTCN3_TCI::TciParameter {
-      std::shared_ptr<const Tstring> _name;
-      TciParameterPassingMode _passingMode;
-      std::shared_ptr<const TciValue> _value;
+  class CTciParameter : CNonAssignable, public ORG_ETSI_TTCN3_TCI::TciParameter {
+    std::shared_ptr<const Tstring> _name;
+    TciParameterPassingMode _passingMode;
+    std::shared_ptr<const TciValue> _value;
       
-    public:
-      CTciParameter(const Tstring &name, TciParameterPassingMode passingMode, const TciValue &value):
-        _name(new Tstring(name)), _passingMode(passingMode), _value(value.clone()) {}
-      CTciParameter(const CTciParameter &) = default;
-      CTciParameter(CTciParameter &&) = default;
-      ~CTciParameter() = default;
-      TciParameter *clone() const override                                        { return new CTciParameter(*this); }
+    CTciParameter(const CTciParameter &) = default;
+  public:
+    CTciParameter(const Tstring &name, TciParameterPassingMode passingMode, const TciValue &value):
+      _name(new Tstring(name)), _passingMode(passingMode), _value(value.clone()) {}
+    CTciParameter(CTciParameter &&) = default;
+    ~CTciParameter() = default;
+    TciParameter *clone() const override                                        { return new CTciParameter(*this); }
       
-      const TciValue &getValue() const override                                   { return *_value; }
-      void setValue(TciValue &value) override                                     { _value.reset(value.clone()); }
-      const TciParameterPassingMode &getParameterPassingMode() const override     { return _passingMode; }
-      void setParameterPassingMode(const TciParameterPassingMode &mode) override  { _passingMode = mode; }
-      const Tstring &getParameterName() const override                            { return *_name; }
-      void setParameterName(const Tstring &name) override                         { _name.reset(new Tstring(name)); }
+    const TciValue &getValue() const override                                   { return *_value; }
+    void setValue(TciValue &value) override                                     { _value.reset(value.clone()); }
+    const TciParameterPassingMode &getParameterPassingMode() const override     { return _passingMode; }
+    void setParameterPassingMode(const TciParameterPassingMode &mode) override  { _passingMode = mode; }
+    const Tstring &getParameterName() const override                            { return *_name; }
+    void setParameterName(const Tstring &name) override                         { _name.reset(new Tstring(name)); }
       
-      Tboolean operator==(const TciParameter &param) const override               { return *_name == param.getParameterName(); }
-      Tboolean operator<(const TciParameter &param) const override                { return *_name < param.getParameterName(); }
-    };
+    Tboolean operator==(const TciParameter &param) const override               { return *_name == param.getParameterName(); }
+    Tboolean operator<(const TciParameter &param) const override                { return *_name < param.getParameterName(); }
+  };
 
-  } // namespace ttcn3
-  
 } // namespace freettcn
 
 

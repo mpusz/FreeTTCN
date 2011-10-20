@@ -38,31 +38,30 @@
 
 namespace freettcn {
 
-  namespace ttcn3 {
-    
-    using namespace ORG_ETSI_TTCN3_TCI;
+  using namespace ORG_ETSI_TTCN3_TCI;
 
-    class CTciModuleId : CNonAssignable, public ORG_ETSI_TTCN3_TCI::TciModuleId {
-      static CTciModuleId _builtIn;
-      std::shared_ptr<const Tstring> _name;
-    public:
-      static const CTciModuleId &BuiltIn() { return _builtIn; }
+  class CTciModuleId : CNonAssignable, public ORG_ETSI_TTCN3_TCI::TciModuleId {
+    static std::shared_ptr<CTciModuleId> _builtIn;
+    std::shared_ptr<const Tstring> _name;
       
-      CTciModuleId(const Tstring &name): _name(new Tstring(name)) {}
-      CTciModuleId(const CTciModuleId &) = default;
-      CTciModuleId(CTciModuleId &&) = default;
-      ~CTciModuleId() = default;
-      TciModuleId *clone() const override                { return new CTciModuleId(*this); }
+    CTciModuleId(const CTciModuleId &) = default;
+  public:
+    static const std::shared_ptr<CTciModuleId> &BuiltIn() { return _builtIn; }
       
-      const Tstring &getObjectName() const override      { return *_name; }
-      void setObjectName(const Tstring &p_name) override { _name.reset(new Tstring(p_name)); }
+    CTciModuleId(const Tstring &name): _name(new Tstring(name)) {}
+    CTciModuleId(CTciModuleId &&) = default;
+    ~CTciModuleId() = default;
+    TciModuleId *clone() const override                { return new CTciModuleId(*this); }
       
-      Tboolean operator==(const TciModuleId &mid) const override { return *_name == mid.getObjectName(); }
-      Tboolean operator<(const TciModuleId &mid) const override  { return *_name < mid.getObjectName(); }
-    };
+    const Tstring &getObjectName() const override      { return *_name; }
+    void setObjectName(const Tstring &p_name) override { _name.reset(new Tstring(p_name)); }
+      
+    Tboolean operator==(const TciModuleId &mid) const override { return *_name == mid.getObjectName(); }
+    Tboolean operator<(const TciModuleId &mid) const override  { return *_name < mid.getObjectName(); }
+      
+    std::shared_ptr<const Tstring> Name() const { return _name; }
+  };
         
-  } // namespace ttcn3
-  
 } // namespace freettcn
 
 #endif /* __TCI_MODULE_ID_H__ */

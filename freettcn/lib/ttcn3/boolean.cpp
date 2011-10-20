@@ -33,7 +33,9 @@
 
 
 /// @todo verify if encoding can be set for built-in types
-freettcn::ttcn3::CTypeBoolean::CTypeBoolean():
+freettcn::CTypeBoolean::CTypeBoolean():
   CType(CTciModuleId::BuiltIn(), "boolean", TCI_BOOLEAN, "", "", CExtension())
 {
+  if(!_instance)
+    _instance.reset(new CTypeBoolean(*this));
 }

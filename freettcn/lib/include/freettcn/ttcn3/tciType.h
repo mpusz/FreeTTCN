@@ -31,84 +31,86 @@
 #define __TCI_TYPE_H__
 
 #include <freettcn/etsi/tci.h>
-#include <freettcn/tools/nonCopyable.h>
+#include <freettcn/tools/nonAssignable.h>
 #include <memory>
 
 namespace freettcn {
 
-  namespace ttcn3 {
+  using namespace ORG_ETSI_TTCN3_TCI;
     
-    using namespace ORG_ETSI_TTCN3_TCI;
-    
-    class CType : CNonCopyable, public ORG_ETSI_TTCN3_TCI::TciType  {
-    public:
-      class CValue : freettcn::CNonAssignable, public virtual ORG_ETSI_TTCN3_TCI::TciValue {
-      private:
-        const TciType &_type;
-        std::unique_ptr<Tstring> _encoding;
-        std::unique_ptr<Tstring> _encodingVariant;
-        
-      protected:
-        CValue(const CValue &src);
-        CValue(CValue &&) = default;
-        
-      public:
-        CValue(const TciType &type,
-               const Tstring &encoding,
-               const Tstring &encodingVariant);
-        ~CValue() = default;
-        
-        const TciType &getType() const override { return _type; }
-        const Tstring &getValueEncoding() const override;
-        const Tstring &getValueEncodingVariant() const override;
-        Tboolean notPresent() const override    { return false; }
-      };
-
-      class CValueOmitted : public CValue {
-      public:
-        CValueOmitted(const TciType &type,
-                      const Tstring &encoding,
-                      const Tstring &encodingVariant);
-        ~CValueOmitted() = default;
-        TciValue *clone() const override;
-        Tboolean notPresent() const override    { return true; }
-        Tboolean operator==(const TciValue &val) const override;
-        Tboolean operator<(const TciValue &val) const override;
-      };
-      
-      typedef std::vector<Tstring*> CExtension;
-      
+  class CType : CNonAssignable, public ORG_ETSI_TTCN3_TCI::TciType  {
+  public:
+    class CValue : freettcn::CNonAssignable, public virtual ORG_ETSI_TTCN3_TCI::TciValue {
     private:
-      const TciModuleId  &_moduleId;
-      const Tstring      _name;
-      const TciTypeClass _class;
-      const Tstring      _encoding;
-      const Tstring      _encodingVariant;
-      const CExtension   _extension;
-      
+      std::shared_ptr<const TciType> _type;
+      std::shared_ptr<Tstring> _encoding;
+      std::shared_ptr<Tstring> _encodingVariant;
+        
+    protected:
+      CValue(const CValue &src) = default;
+        
     public:
-      CType(const TciModuleId  &moduleId,
-            const Tstring      &name,
-            const TciTypeClass &typeClass,
-            const Tstring      &encoding,
-            const Tstring      &encodingVariant,
-            const CExtension   &extension);
-      ~CType() = default;
+      CValue(const std::shared_ptr<const TciType> &type,
+             const Tstring &encoding,
+             const Tstring &encodingVariant);
+      CValue(CValue &&) = default;
+      ~CValue() = default;
       
-      const TciModuleId &getDefiningModule() const override  { return _moduleId; }
-      const Tstring &getName() const override                { return _name; }
-      const TciTypeClass &getTypeClass() const override      { return _class; }
-      const Tstring &getTypeEncoding() const override        { return _encoding; }
-      const Tstring &getTypeEncodingVariant() const override { return _encodingVariant; }
-      const CExtension &getTypeExtension() const override    { return _extension; }
-      Tboolean operator==(const TciType &typ) const override;
-      Tboolean operator<(const TciType &typ) const override;
+      const TciType &getType() const override { return *_type; }
+      const Tstring &getValueEncoding() const override;
+      const Tstring &getValueEncodingVariant() const override;
+      Tboolean notPresent() const override    { return false; }
+      
+      const std::shared_ptr<const TciType> &Type() const;
     };
+
+    class CValueOmitted : public CValue {
+    public:
+      CValueOmitted(const std::shared_ptr<const TciType> &type,
+                    const Tstring &encoding        = "",
+                    const Tstring &encodingVariant = "");
+      ~CValueOmitted() = default;
+      TciValue *clone() const override;
+      Tboolean notPresent() const override    { return true; }
+      Tboolean operator==(const TciValue &val) const override;
+      Tboolean operator<(const TciValue &val) const override;
+    };
+      
+    typedef std::vector<Tstring*> CExtension;
+      
+  private:
+    std::shared_ptr<const TciModuleId>  _moduleId;
+    std::shared_ptr<const Tstring>      _name;
+    const TciTypeClass                  _class;
+    std::shared_ptr<const Tstring>      _encoding;
+    std::shared_ptr<const Tstring>      _encodingVariant;
+    std::shared_ptr<CExtension>         _extension;
+      
+  protected:
+    CType(const CType &) = default;
     
-    Tstring QualifiedName(const TciType &type);
+  public:
+    CType(const std::shared_ptr<const TciModuleId> &moduleId,
+          const Tstring      &name,
+          const TciTypeClass &typeClass,
+          const Tstring      &encoding,
+          const Tstring      &encodingVariant,
+          const CExtension   &extension);
+    CType(CType &&) = default;
+    ~CType() = default;
     
-  } // namespace ttcn3
-  
+    const TciModuleId &getDefiningModule() const override  { return *_moduleId; }
+    const Tstring &getName() const override                { return *_name; }
+    const TciTypeClass &getTypeClass() const override      { return _class; }
+    const Tstring &getTypeEncoding() const override        { return *_encoding; }
+    const Tstring &getTypeEncodingVariant() const override { return *_encodingVariant; }
+    const CExtension &getTypeExtension() const override    { return *_extension; }
+    Tboolean operator==(const TciType &typ) const override;
+    Tboolean operator<(const TciType &typ) const override;
+  };
+    
+  Tstring QualifiedName(const TciType &type);
+    
 } // namespace freettcn
 
 

@@ -33,14 +33,18 @@
 #include "freettcn/tools/exception.h"
 
 
-void freettcn::ttcn3::CTypeOctetstring::CValue::setLength(Tsize p_length)
+void freettcn::CTypeOctetstring::CValue::setLength(Tsize p_length)
 {
   _value.reset(new Tstring(*_value));
   _value->resize(p_length, '0');
 }
 
 
-void freettcn::ttcn3::CTypeOctetstring::CValue::setOctet(Tindex p_position, Tchar p_ochar)
+#ifdef ISSUE_0005945
+void freettcn::CTypeOctetstring::CValue::setOctet(Tindex p_position, Tinteger p_ochar)
+#else
+void freettcn::CTypeOctetstring::CValue::setOctet(Tindex p_position, Tchar p_ochar)
+#endif
 {
   if(std::string("0123456789abcdefABCDEF").find_first_of(p_ochar) != std::string::npos) {
     _value.reset(new Tstring(*_value));
@@ -51,7 +55,7 @@ void freettcn::ttcn3::CTypeOctetstring::CValue::setOctet(Tindex p_position, Tcha
 }
 
 
-void freettcn::ttcn3::CTypeOctetstring::CValue::setString(const Tstring &p_osValue) override
+void freettcn::CTypeOctetstring::CValue::setString(const Tstring &p_osValue) override
 {
   if(p_osValue.find_first_not_of("0123456789abcdefABCDEF") == std::string::npos) {
     _value.reset(new Tstring(p_osValue));
@@ -64,7 +68,9 @@ void freettcn::ttcn3::CTypeOctetstring::CValue::setString(const Tstring &p_osVal
 
 
 /// @todo verify if encoding can be set for built-in types
-freettcn::ttcn3::CTypeOctetstring::CTypeOctetstring():
+freettcn::CTypeOctetstring::CTypeOctetstring():
   CType(CTciModuleId::BuiltIn(), "octetstring", TCI_OCTETSTRING, "", "", CExtension())
 {
+  if(!_instance)
+    _instance.reset(new CTypeOctetstring(*this));
 }
